@@ -1,0 +1,76 @@
+         }
+         if (sum >= 9007199254740992.0) {
+             if (radix == 10) {
+                 /* If we're accumulating a decimal number and the number
+                  * is >= 2^53, then the result from the repeated multiply-add
+                  * above may be inaccurate.  Call Java to get the correct
+                  * answer.
+                  */
+                 try {
+                     return Double.valueOf(s.substring(start, end)).doubleValue();
+                 } catch (NumberFormatException nfe) {
+                     return NaN;
+                 }
+             }
+         }
+         return sum;
+     }
+     
+     public static boolean isJSLineTerminator(int c)
+     {
+         // Optimization for faster check for eol character:
+         // they do not have 0xDFD0 bits set
+         if ((c & 0xDFD0) != 0) {
+             return false;
+         }
+         return c == '\n' || c == '\r' || c == 0x2028 || c == 0x2029;
+     }
+
+    // stuff other than whitespace since start of line
+    private boolean dirtyLine;
+
+    // Set this to an initial non-null value so that the Parser has
+    // something to retrieve even if an error has occurred and no
+    // string is found.  Fosters one class of error, but saves lots of
+    // code.
+    private String string = "";
+    private double number;
+    private boolean isOctal;
+
+    // delimiter for last string literal scanned
+    private int quoteChar;
+
+    private char[] stringBuffer = new char[128];
+    private int stringBufferTop;
+    private ObjToIntMap allStrings = new ObjToIntMap(50);
+
+    // Room to backtrace from to < on failed match of the last - in <!--
+    private final int[] ungetBuffer = new int[3];
+    private int ungetCursor;
+
+    private boolean hitEOF = false;
+
+    private int lineStart = 0;
+    private int lineEndChar = -1;
+    int lineno;
+
+    private String sourceString;
+    private Reader sourceReader;
+    private char[] sourceBuffer;
+    private int sourceEnd;
+
+    // sourceCursor is an index into a small buffer that keeps a
+    // sliding window of the source stream.
+    int sourceCursor;
+
+    // cursor is a monotonically increasing index into the original
+    // source stream, tracking exactly how far scanning has progressed.
+    // Its value is the index of the next character to be scanned.
+    int cursor;
+
+    // Record start and end positions of last scanned token.
+    int tokenBeg;
+    int tokenEnd;
+    
+    public static final double NaN = Double.longBitsToDouble(0x7ff8000000000000L);
+}
