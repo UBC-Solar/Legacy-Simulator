@@ -1,6 +1,8 @@
 package com;
 // last edited on Saturday, Nov 2
 // To-Do add coments. Debug and test
+//NOAH: This class looks good, just has some minor errors so it can't run. 
+// I commented it out so the rest of the code runs. 
 public class MotorBasic {/*
 //------------------ CLASS FIELDS ----------------------------------------
 	public double voltage;		// Temperature, as a safeguard for the motors
