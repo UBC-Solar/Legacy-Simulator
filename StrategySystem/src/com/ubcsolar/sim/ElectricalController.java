@@ -104,4 +104,66 @@ return energyNeeded;
 /** @todo make these for all class fields */
 
 
+private double voltage_from_panel()
+{
+	return myPanels.voltage();
+}
+private double current_from_panel()
+{
+	return myPanels.current;
+}
+private double current_needed_for_motor( double voltage, double velocity)
+{
+	
+	return myMotor.current(voltage,velocity);
+}
+
+
+public void current_divide()
+{
+	double time_recharge_battery;
+	double panel_voltage = voltage_from_panel();
+	double panel_current = current_from_panel();
+	
+	double motor_current = current_needed_for_motor(panel_voltage,car_velocity);
+	//double battery_recharged_current = panel_current - motor_current;
+	double battery_charge_current = battery_charge_current(panel_voltage);
+	//double remaining_current = panel_current - motor_current;
+	
+	double sum_current = panel_current + battery_charge_current;
+	
+	
+	if (motor_current > sum_current)  // when both panel and battery cannot provide enough energy
+	{
+		Log.write("Energy can be provided is insucifficient.");
+	}
+	else if (motor_current > panel_current)  // when panel cannot provide enough, extra energy from battery.
+	{
+		
+	}
+	else   // when panel provides extra energy , put extra energy to battery.
+	{
+		
+		if(true)  // when battery is not full, and it needs energy  
+		{
+		}	
+		else   // when battery is full, and no energy is needed
+		{
+		}
+		
+	}
+	time_recharge_battery = battery_recharged_time(panel_voltage,battery_recharged_current);
+	
+	
+}
+private double battery_charge_current(double battery_charge_voltage)
+{
+	return myBattery.charge_current(battery_charge_voltage);
+}
+private double battery_recharged_time( double voltage_recharged, double current_recharged){
+	return ( myBattery.time_recharged(voltage_recharged, current_recharged));
+}
+
+
+
 }
