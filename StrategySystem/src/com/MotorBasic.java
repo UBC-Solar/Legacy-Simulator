@@ -1,6 +1,7 @@
+package com;
 // last edited on Saturday, Nov 2
 // To-Do add coments. Debug and test
-public class MotorBasic {
+public class MotorBasic {/*
 //------------------ CLASS FIELDS ----------------------------------------
 	public double voltage;		// Temperature, as a safeguard for the motors
 	public double velocity;			// The speed of the car
@@ -60,5 +61,5 @@ public class MotorBasic {
 	public double force(double torque, double radius){
 		double force
 		return force;
-	}	
+	}	*/
 }
