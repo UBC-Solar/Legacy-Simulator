@@ -178,7 +178,7 @@ private double coolingAmount(){
  
  // shows the heat produced for this iteration
  public double heat_from_panel(){
-	 return this.deltaHeat;
+	 return this.deltaTemp;
  }
  
  // shows the current temp of the panels
