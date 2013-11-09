@@ -9,11 +9,12 @@ We can add more information as we get more and more detailed in our factors.
 */
 
 public class Environment{
-	private int sunIntensity;/** intensity of the sun in %*/
-	private int sunAngle;/** angle of the sun in degrees. 0/180 is at the horizon, 90 at noon*/
+	private double sunIntensity;/** intensity of the sun in w/square meter*/
+	private double sunAngle;/** angle of the sun in degrees. 0/180 is at the horizon, 90 at noon*/
 	private int windStrength;/** windstrengh in... mph?*/
 	private int windAngle;/**  wind direction in degrees (0-360, 0 being North) */
 	private int wetness;/** how wet the track is, scale of 1-100 */
+	private double temperature; // the ambient outside temperature
 
 	
 /** constructor. No way to change environments, 
@@ -25,12 +26,14 @@ public class Environment{
  * @param windAngle - the direction of wind in degrees (0-360)
  * @param wetness - from 1-100, how wet the track is. 
 */
-public Environment(int sunIntensity, int sunAngle, int windStrength, int windAngle, int wetness){
+public Environment(int sunIntensity, int sunAngle, int windStrength, int windAngle, int wetness,
+		float temperature){
 	this.sunIntensity = sunIntensity;
 	this.sunAngle = sunAngle;
 	this.windStrength = windStrength;
 	this.windAngle = windAngle;
 	this.wetness = wetness;
+	this.temperature = temperature;
 	Log.write("Environment created");
 }
 
@@ -38,7 +41,7 @@ public int getWetness(){
 	return wetness;
 }
 
-public int getSunIntensity(){
+public double getSunIntensity(){
 	return sunIntensity;
 }
 
@@ -48,9 +51,11 @@ public int getWindAngle(){
 public int windStrength(){
 	return windStrength;
 	}
-public int getSunAngle(){
+public double getSunAngle(){
 	return sunAngle;
 }
-
-
+public double getTemperature(){
+	return temperature;
 }
+}
+

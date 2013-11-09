@@ -14,6 +14,15 @@ Or we can roll it all into one.
 import java.util.*;
 public class Track{
 
+// --------- Fields ----------- //
+	
+private double angle ;
+private double direction;
+private double position;
+
+// -------- Constructor ---------//
+
+
 
 public Track(String message, String fileName){
 	//TODO load track values from file with the fileName
@@ -23,5 +32,15 @@ public Track(String message, String fileName){
 public List getTrack(){
 	//TODO figure out how we're storing the track. And return it. 
 	return new ArrayList<Integer>();
+}
+
+public double getPosition(){
+	return position;
+}
+public double getDirection(){
+	return direction;
+}
+public double getAngle(){
+	return angle;
 }
 }
