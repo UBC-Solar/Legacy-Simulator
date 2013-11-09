@@ -170,14 +170,21 @@ private double current_from_panel()
 }
 
 
-//param 
-//return 
+/** Gets current the battery can feed
+ * @param battery_charge_voltage - the voltage level of the circuit
+ * @return The current that the battery is able to provide
+ */
 private double current_battery_feed(double battery_charge_voltage)
 {
 	return myBattery.charge_current(battery_charge_voltage);
 }
 
 
+/** Gets total amount time to let the battery to reach full
+ * @param voltage_recharged - the voltage level of the circuit
+ * @param current_recharged - the current to feed the battery
+ * @return The total amount time needed to get battery fully charged
+ */
 private double time_charging_battery( double voltage_recharged, double current_recharged){
 	return ( myBattery.time_to_reach_full(voltage_recharged, current_recharged));
 }
