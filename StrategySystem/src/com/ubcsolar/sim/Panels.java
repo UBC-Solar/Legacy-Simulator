@@ -154,6 +154,7 @@ private void calculateTemperature(){
 }
 
 // TODO implement cooling formula for the panels based on speed, environmental temperature, and current temperature
+// TODO implement cooling amount based on car speed 
 private double coolingAmount(){
 	double tempDifference = temp - enviro.getTemperature();
 	double tempReduce = .05 * (tempDifference) * Math.exp(-.01);
