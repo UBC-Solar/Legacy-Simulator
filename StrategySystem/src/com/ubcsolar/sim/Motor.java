@@ -12,10 +12,11 @@ how they interact (currently passing watts, may need to pass voltage and current
 
 public class Motor{
 //---------------CLASS FIElDS-------------------------------
-private double maxDraw; /** the max electricity the motor can require. @todo fix this */
-private int temperature;/** the temp. of the motor (Celsius). Don't want to overheat now. */
-private int currentRPM;  /** the current spinning speed of the motor */
-
+private double force;		/** current force exerted on the motor **/
+private double temperature;	/** the temp. of the motor (Celsius). Don't want to overheat now. */
+private double voltage;		/** voltage that the motor is operating at **/
+private double current;		/** current that the motor is operating at **/
+private double radius; 		/** radius of the wheel **/
 //-----------END OF FIELDS, START OF CONSTRUCTORS--------------
 /** Copy constructor. Builds a motor with all fields and models equal to the given 
  * @param oldMotor - the battery to copy. 
@@ -34,74 +35,56 @@ public Motor(String fileName){
 
 private void loadModel(String fileName){
 /** @todo implement this. Figure out how to represent the Motor model. */
-	//These should be coming from the model file. Here until implemented. 
-	maxDraw = 5; //made that number up. 
-	temperature = 22;// start at room temperature
-	currentRPM=0; /* current rotation speed */
+	//These should be coming from the model file. Here until implemented.
+	//Need these from tests of the motor:
+	//noLoadSpeed
+	//stallTorque
 }
 
 /** default constructor, builds a motor with a default Model */
-public Motor(){
-/** @todo build a default motor */
-	maxDraw = 5; //made that number up. 
-	temperature = 22;// start at room temperature
-	currentRPM=0; /* current rotation speed */
+public Motor(double newForce, double newRadius, double newTemperature, double newVoltage, double newCurrent, double newRPM){
+	force = newForce;		
+	temperature = newTemperature;
+	voltage = newVoltage;
+	current = newCurrent;
+	radius = newRadius;
 }
 
 //--------END OF CONSTRUCTOR-TYPE METHODS, START OF CALULATING ONES--------------
-/** calculates the net current the motor would consume given it's current 
- * @param voltageInput - the number of volts that would be given to the motor
- * @param netForce - units = tourque? The current load on the motor (total friction) // @todo check the units
- * @param netWeight - the mass of the moving object. This is included for change in momentum. 
- * @return netCurrentConsumed - the current the motor would consume (Amps) (or generate if it's a negative number)
- */
-public double netCurrent(double voltageInput, int netForce, int netWeight){
-/** @todo use the model to predict this */
-double netCurrentConsumed = pullCurrentOutOfButt();
-return netCurrentConsumed;
-}
 
-/** This function is for testing purposes
- * @return madeUpNumber - some number I made up. In Amps. 
+/** returns force predicted by power - torque graph
+ * assumption: power - torque graph is linear
+ * @param voltage 	- current voltage that the motor is running at
+ * @param radius	- radius of the wheel
  */
-private double pullCurrentOutOfButt(){
-/** @todo render this function redundant. Please. Don't want to make up numbers =) */
-double madeUpNumber =7.5;
-return madeUpNumber;
+private double getRPM(double voltage, double current){
+	double power;
+	double calculatedRPM;
+	double c = 5000; // slope of power - RPM graph, made-up value
+	power = voltage*current;
+	calculatedRPM = c * power;
+	return calculatedRPM;
 }
 
 /** predicts the next state of the motor and all class fields
- * @param time - the time (in milliseconds) that this iteration spans
- * @param worldEnviro - the environment the car is operating
- * @param doLog - If True, will write messages to the log. 
- * @param throttle - the current requested throttle setting
- * @param netForce - the current net force on the car. 
- * @param netWeight - the net weight of the car. //NOAH: May be able to remove this if given in constructor?
- * @param wattageIn - the power given to the motor to convert into mechanical energy. 
+ * @param time 		- the time (in milliseconds) that this iteration spans
+ * @param radius	- radius of the wheel
+ * @param doLog 	- if True, will write messages to the log 
+ * @param netForce 	- the current net force on the car. 
+ * @param netWeight - net weight of the car
  * @return the rpm of the motor
  */
-public int nextMotor(int time, Environment worldEnviro, Boolean doLog, int netForce, int netWeight, double wattageIn){
-int rpm = getSpinSpeed(wattageIn, time);
-temperature += pullCurrentOutOfButt(); /** @todo model this better*/
-Log.write("Motor now spinning at: " + rpm + " rpm");
-temperature += 1; /** @todo get a better heat model! */
-currentRPM = rpm;
-return rpm;
-}
-
-/** calculates how fast the motor is now spinning
- * based on the energy input, and current spin speed
- * @param wattageIn - the power to the motor
- * @param time - the length of this iteration (longer means it can accelerate more)
- */
-private int getSpinSpeed(double wattageIn, int time){
-/** @todo need to fix this */
-if(wattageIn>0){
-return 420;
-}
-else{
-return 0;
-}
+public double nextMotor(int time, Boolean doLog, double netForce, double currentRPM){
+	// todo create a better heat model
+	// function is too massive and messy. need to clean up calculations. get it working for now. 
+	// switch so this method plays with torque values instead
+	double rpm = getRPM(voltage, current); 
+	double torqueFrNetForce = netForce/radius;
+	double rpmNetForce;
+	Log.write("Motor now spinning at: " + rpm + " rpm");
+	rpmNetForce = 3000 - 5*torqueFrNetForce;	// made up slope of rpm - torque graph
+	currentRPM = rpm - rpmNetForce;
+	return currentRPM;
 }
 
 //------------GETTERS AND SETTERS-------------------
