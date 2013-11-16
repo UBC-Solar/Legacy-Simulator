@@ -87,7 +87,7 @@ public double nextMotor(double time, Environment worldEnviro, Boolean doLog, dou
 	double stallTorque = 1000;
 	double slope = noLoadSpeed/stallTorque;
 	torqueVoltage = slope * voltage + noLoadSpeed;
-	currentRPM = 5* torqueVoltage;
+	currentRPM = (int)(5* torqueVoltage);
 	Log.write("Motor now spinning at: " + currentRPM + " rpm");
 	return currentRPM;
 }
