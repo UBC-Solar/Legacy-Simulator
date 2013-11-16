@@ -77,7 +77,7 @@ private double getRPM(double voltage, double current){
  * @param netWeight - net weight of the car
  * @returns the RPM of the motor
  */
-public double nextMotor(double time, Environment worldEnviro, Boolean doLog, double netForce, double netWeight, double voltage, double current){
+public int nextMotor(double time, Environment worldEnviro, Boolean doLog, double netForce, double netWeight, double voltage, double current){
 	// todo create a better heat model
 	// function is too massive and messy. need to clean up calculations. get it working for now. 
 	// returns currentRPM of steady state motors
