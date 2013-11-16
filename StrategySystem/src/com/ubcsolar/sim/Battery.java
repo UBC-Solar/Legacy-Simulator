@@ -49,7 +49,11 @@ public Battery(String fileName){
 	loadModel(fileName);
 
 }
-
+public void draw(double wattsOutput){
+	/** @todo implement this. Lower state of charge, check heat? Throw an exception if not enough */
+	wattsStored -= wattsOutput;
+	temperature += 1; /** @todo do this better? */
+}
 /** fills in class fields and model from file
  * @param fileName - the file to load from
  */

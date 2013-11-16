@@ -95,8 +95,8 @@ public int nextElectricalController(int time, Environment worldEnviro, Boolean d
 	}
 	else if (CurrentRequested > panel_current)  // when panel cannot provide enough, extra energy from battery.
 	{
-		if(myBattery.doesContain(CurrentRequested - panel_current)){ //if the batteries have enough
-			myBattery.draw(Math.abs(CurrentRequested - panel_current)); //put all generated power to motor, pull difference from batteries
+		if(time <= time_charging_battery(panel_voltage,panel_current-CurrentRequested)){ //if the batteries have enough
+			myBattery.draw(Math.abs(panel_current-CurrentRequested)*panel_voltage); //put all generated power to motor, pull difference from batteries
 			rpm = myMotor.nextMotor(time, worldEnviro, doLog, netForce, netWeight, CurrentRequested,panel_voltage);
 		}
 		
