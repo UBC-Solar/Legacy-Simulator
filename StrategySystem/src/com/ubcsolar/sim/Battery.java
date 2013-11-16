@@ -72,33 +72,17 @@ public void nextBattery(int time, Environment worldEnviro,Boolean doLog){
 	Log.write("Watts left: " + wattsStored);
 }
 
-/** to avoid over-drawing, this return true if there
- * is that amount, false if there isn't that much in the batteries.
- * @param wattsToCheck - the amount of watts that are wanted to be pulled out
- * @return doesContain - if there is that much energy stored, return true. 
- */
-public boolean doesContain(double wattsToCheck){
-	if(wattsStored>=wattsToCheck){
-		return true;
-	}
-	else{return false;}
-}
 
-/** draws the requested amount from the battery 
- * @param wattsOutput - the amount of watts to remove from the battery
- */
-public void draw(double wattsOutput){
-	/** @todo implement this. Lower state of charge, check heat? Throw an exception if not enough */
-	wattsStored -= wattsOutput;
-	temperature += 1; /** @todo do this better? */
-}
+
+
 
 /** stores the given amount of watts in the battery, or vents it if over capacity.
  * @param wattsToPutIn - the amount of energy (Watts) to store. 
  */
-public void store(double wattsToPutIn){
+public void store(double time, double current, double voltage){
 	/** @todo implement. Add to state of charge, check heat? */
-	wattsStored += wattsToPutIn;
+	
+	wattsStored = wattsStored + time*current*voltage;
 	temperature += 1; /** @todo implement heat modelling better*/
 }
 
@@ -116,7 +100,7 @@ public double heatFromCharge(double current, double chargeTime){
 
 
 public int getStateOfCharge(){
-	return (int)((double)wattsStored/(double)maxCharge)*100;
+	return (int)((double)wattsStored/(double)maxCharge)*100; 
 }
 
 
