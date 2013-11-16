@@ -57,6 +57,7 @@ public Motor(double newForce, double newRadius, double newTemperature, double ne
  * @param voltage 	- current voltage that the motor is running at
  * @param radius	- radius of the wheel
  */
+/*
 private double getRPM(double voltage, double current){
 	double power;
 	double calculatedRPM;
@@ -65,6 +66,7 @@ private double getRPM(double voltage, double current){
 	calculatedRPM = c * power;
 	return calculatedRPM;
 }
+*/
 
 /** predicts the next state of the motor and all class fields
  *  assumes steady state
@@ -75,7 +77,7 @@ private double getRPM(double voltage, double current){
  * @param netWeight - net weight of the car
  * @returns the RPM of the motor
  */
-public double nextMotor(double time, double worldEnviro, Boolean doLog, double netForce, double netWeight, double voltage, double current){
+public double nextMotor(double time, Environment worldEnviro, Boolean doLog, double netForce, double netWeight, double voltage, double current){
 	// todo create a better heat model
 	// function is too massive and messy. need to clean up calculations. get it working for now. 
 	// returns currentRPM of steady state motors
