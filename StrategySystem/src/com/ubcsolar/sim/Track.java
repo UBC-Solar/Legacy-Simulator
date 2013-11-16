@@ -26,6 +26,9 @@ private double position;
 
 public Track(String message, String fileName){
 	//TODO load track values from file with the fileName
+	angle =0;
+	direction =0;
+	position =0;
 	System.out.println(message);
 }
 

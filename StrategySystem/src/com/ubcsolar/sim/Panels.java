@@ -95,7 +95,7 @@ return powerGenerated;
  */
 
 private double calculatePower(int time, Environment worldEnviro){
-	double actualAngle = enviro.getSunAngle() - track.getAngle();
+	double actualAngle = enviro.getSunAngle()-track.getAngle();
 	double actualAngleRadians = ( actualAngle * Math.PI) / 180 ;         // converts the sun angle to radians 
 	double sunEnergy = (Math.sin(actualAngleRadians) * enviro.getSunIntensity()); // calculates the watts per square meter on a flat surface
 													   // calculates the actual angle of sun hitting the panels
