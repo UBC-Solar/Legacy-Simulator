@@ -38,7 +38,7 @@ public void initialize(String trackFileName){
 	Log.write("World - created");
 	worldTrack = new Track("World created track", trackFileName);
 	System.out.println("World created itself");
-	worldEnviro = new Environment(100, 90, 0, 0, 0);
+	worldEnviro = new Environment(100, 90, 0, 0, 0,0);
 	//worldDriver = new Driver(worldTrack); //starts the general chain. need to fix this. 
 	worldDriver = 
 	new Driver("driverModel1.txt", worldTrack,

@@ -57,12 +57,12 @@ public ElectricalController(ElectricalController oldElectricalController){
  * @param netForce - the current net force on the car. 
  * @param netWeight - the net weight of the car. //NOAH: May be able to remove this if given in constructor?
  */
-public double nextElectricalController(int time, Environment worldEnviro, Boolean doLog, int throttle, int netForce, int netWeight){
+public int nextElectricalController(int time, Environment worldEnviro, Boolean doLog, int throttle, int netForce, int netWeight){
 /** @todo figure out how to calculate regenerative braking */
 	
 	double CurrentRequested = Current_needed(throttle,time); //this is how much voltage would be fed to the motor
 	double panelCurrentGenerated = myPanels.nextPanels(time, worldEnviro, doLog); //this is how much power the solar cells made
-	double rpm = 0;
+	int rpm = 0;
 	if(doLog){Log.write("Current requested was: " + CurrentRequested + " A");}
 	
 	
