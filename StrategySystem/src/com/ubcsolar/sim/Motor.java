@@ -67,6 +67,7 @@ private double getRPM(double voltage, double current){
 }
 
 /** predicts the next state of the motor and all class fields
+ *  assumes steady state
  * @param time 		- the time (in milliseconds) that this iteration spans
  * @param radius	- radius of the wheel
  * @param doLog 	- if True, will write messages to the log 
@@ -80,13 +81,12 @@ public double nextMotor(double time, double worldEnviro, Boolean doLog, double n
 	// returns currentRPM of steady state motors
 	double currentRPM;
 	double torqueVoltage;
-	double rpmNetForce;
 	double noLoadSpeed = 1000;
 	double stallTorque = 1000;
 	double slope = noLoadSpeed/stallTorque;
-	Log.write("Motor now spinning at: " + rpm + " rpm");
 	torqueVoltage = slope * voltage + noLoadSpeed;
-	currentRPM = radius * torqueVoltage;
+	currentRPM = 5* torqueVoltage;
+	Log.write("Motor now spinning at: " + currentRPM + " rpm");
 	return currentRPM;
 }
 
