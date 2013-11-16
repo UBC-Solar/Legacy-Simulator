@@ -81,7 +81,7 @@ public double nextMotor(double time, Environment worldEnviro, Boolean doLog, dou
 	// todo create a better heat model
 	// function is too massive and messy. need to clean up calculations. get it working for now. 
 	// returns currentRPM of steady state motors
-	double currentRPM;
+	int currentRPM;
 	double torqueVoltage;
 	double noLoadSpeed = 1000;
 	double stallTorque = 1000;
