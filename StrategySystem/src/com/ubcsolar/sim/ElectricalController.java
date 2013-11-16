@@ -86,7 +86,7 @@ public int nextElectricalController(int time, Environment worldEnviro, Boolean d
 		rpm = myMotor.nextMotor(time, worldEnviro, doLog, netForce, netWeight, 0,0);
 		Log.write("Energy can be provided is insucifficient.");
 		Log.write("Was too much. No power applied to Motor");
-		if (time <= current_battery_feed(panel_voltage,time) )  // battery will not be full
+		if (time <= time_charging_battery(panel_voltage,panel_current) )  // battery will not be full
 		{
 		myBattery.store(time,panel_current,panel_voltage);
 		if(doLog){Log.write("Extra energy charging battery");} 
@@ -112,7 +112,7 @@ public int nextElectricalController(int time, Environment worldEnviro, Boolean d
 		rpm = myMotor.nextMotor(time, worldEnviro, doLog, netForce, netWeight, CurrentRequested,panel_voltage);
 		
 		
-		if (time <= current_battery_feed(panel_voltage,time) )   // when battery is not full, and it needs energy  
+		if (time <= time_charging_battery(panel_voltage,panel_current))   // when battery is not full, and it needs energy  
 		{
 			myBattery.store(time,panel_current-CurrentRequested,panel_voltage);
 			if(doLog){Log.write("Extra energy charging battery");} 
@@ -178,7 +178,7 @@ private double current_from_panel()
  */
 private double current_battery_feed(double battery_charge_voltage,double time)
 {
-	return myBattery.charge_current(battery_charge_voltage,time);
+	return myBattery.getCurrent(battery_charge_voltage,time);
 }
 
 
@@ -188,7 +188,7 @@ private double current_battery_feed(double battery_charge_voltage,double time)
  * @return The total amount time needed to get battery fully charged
  */
 private double time_charging_battery( double voltage_recharged, double current_recharged){
-	return ( myBattery.time_to_reach_full(voltage_recharged, current_recharged));
+	return ( myBattery.getMaxRechargeTime(voltage_recharged, current_recharged));
 }
 
 
