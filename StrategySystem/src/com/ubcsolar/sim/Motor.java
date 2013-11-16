@@ -1,6 +1,6 @@
 package com.ubcsolar.sim;
 /** This class models the motor. 
-It holds the tourque curves, and calculates how fast
+It holds the torque curves, and calculates how fast
 it spins based on the power going into it. 
 Also models heat to make sure we don't cook it.
 Ideally, it would be similar to Stanford's panel sim (http://solarcar.stanford.edu/design/systems/strategy/)
@@ -72,18 +72,21 @@ private double getRPM(double voltage, double current){
  * @param doLog 	- if True, will write messages to the log 
  * @param netForce 	- the current net force on the car. 
  * @param netWeight - net weight of the car
- * @return the rpm of the motor
+ * @returns the RPM of the motor
  */
-public double nextMotor(int time, Boolean doLog, double netForce, double currentRPM){
+public double nextMotor(double time, double worldEnviro, Boolean doLog, double netForce, double netWeight, double voltage, double current){
 	// todo create a better heat model
 	// function is too massive and messy. need to clean up calculations. get it working for now. 
-	// switch so this method plays with torque values instead
-	double rpm = getRPM(voltage, current); 
-	double torqueFrNetForce = netForce/radius;
+	// returns currentRPM of steady state motors
+	double currentRPM;
+	double torqueVoltage;
 	double rpmNetForce;
+	double noLoadSpeed = 1000;
+	double stallTorque = 1000;
+	double slope = noLoadSpeed/stallTorque;
 	Log.write("Motor now spinning at: " + rpm + " rpm");
-	rpmNetForce = 3000 - 5*torqueFrNetForce;	// made up slope of rpm - torque graph
-	currentRPM = rpm - rpmNetForce;
+	torqueVoltage = slope * voltage + noLoadSpeed;
+	currentRPM = radius * torqueVoltage;
 	return currentRPM;
 }
 
