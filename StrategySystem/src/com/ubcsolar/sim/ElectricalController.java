@@ -22,7 +22,7 @@ private Motor myMotor; /** the motor that the ElectricalController manages. */
 public ElectricalController(Track newTrack){
 	myBattery = new Battery();
 	myPanels = new Panels(newTrack);
-	myMotor = new Motor();
+	myMotor = new Motor("");
 }
 
 /** Standard constructor, builds a ElectricalController with given parameters. 
@@ -57,12 +57,12 @@ public ElectricalController(ElectricalController oldElectricalController){
  * @param netForce - the current net force on the car. 
  * @param netWeight - the net weight of the car. //NOAH: May be able to remove this if given in constructor?
  */
-public int nextElectricalController(int time, Environment worldEnviro, Boolean doLog, int throttle, int netForce, int netWeight){
+public double nextElectricalController(int time, Environment worldEnviro, Boolean doLog, int throttle, int netForce, int netWeight){
 /** @todo figure out how to calculate regenerative braking */
 	
 	double CurrentRequested = Current_needed(throttle,time); //this is how much voltage would be fed to the motor
 	double panelCurrentGenerated = myPanels.nextPanels(time, worldEnviro, doLog); //this is how much power the solar cells made
-	int rpm = 0;
+	double rpm = 0;
 	if(doLog){Log.write("Current requested was: " + CurrentRequested + " A");}
 	
 	
@@ -160,7 +160,7 @@ private double total_current(int time)
 
 private double voltage_from_panel()
 {
-	return myPanels.voltage();
+	return myPanels.voltage_from_panel();
 }
 
 /** Gets current level from panel
@@ -168,7 +168,7 @@ private double voltage_from_panel()
  */
 private double current_from_panel()
 {
-	return myPanels.current();
+	return myPanels.current_from_panel();
 }
 
 
