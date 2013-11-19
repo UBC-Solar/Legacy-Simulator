@@ -114,7 +114,7 @@ public int nextElectricalController(int time, Environment worldEnviro, Boolean d
 		
 		if (time <= time_charging_battery(panel_voltage,panel_current))   // when battery is not full, and it needs energy  
 		{
-			myBattery.store(time,panel_current-CurrentRequested,panel_voltage);
+			myBattery.storeEnergy(time,panel_current-CurrentRequested,panel_voltage);
 			if(doLog){Log.write("Extra energy charging battery");} 
 		}	
 
