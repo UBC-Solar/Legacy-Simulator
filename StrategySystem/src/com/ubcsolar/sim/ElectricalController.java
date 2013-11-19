@@ -88,7 +88,7 @@ public int nextElectricalController(int time, Environment worldEnviro, Boolean d
 		Log.write("Was too much. No power applied to Motor");
 		if (time <= time_charging_battery(panel_voltage,panel_current) )  // battery will not be full
 		{
-		myBattery.store(time,panel_current,panel_voltage);
+		myBattery.storeEnergy(time,panel_current,panel_voltage);
 		if(doLog){Log.write("Extra energy charging battery");} 
 		}
 		
@@ -96,7 +96,7 @@ public int nextElectricalController(int time, Environment worldEnviro, Boolean d
 	else if (CurrentRequested > panel_current)  // when panel cannot provide enough, extra energy from battery.
 	{
 		if(time <= time_charging_battery(panel_voltage,panel_current-CurrentRequested)){ //if the batteries have enough
-			myBattery.draw(Math.abs(panel_current-CurrentRequested)*panel_voltage); //put all generated power to motor, pull difference from batteries
+			myBattery.drawEnergy(time,CurrentRequested-panel_current,panel_voltage); //put all generated power to motor, pull difference from batteries
 			rpm = myMotor.nextMotor(time, worldEnviro, doLog, netForce, netWeight, CurrentRequested,panel_voltage);
 		}
 		
