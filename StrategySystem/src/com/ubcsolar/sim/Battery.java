@@ -1,128 +1,73 @@
 package com.ubcsolar.sim;
 
 /**
-This class models the battery. The important features are the temperature and State of Charge.
-Should throw errors if it overheats. 
-draw determined by the ElectricalController. 
-Noah wasn't sure exactly how it interfaces with the ElectricalController, so maybe different
-implementation is needed. 
+This class models the battery. The important features are:
+- display the battery's temperature and state of charge at set time iterations
+- show error if it overheats
+- show error if it overcharges
+
+Drawing & storing power is done through other methods.
+
+Interacts mainly with the electric controller:
+- lets the electric controller know how long the batteries could charge for, until it reaches 100%
+- lets the electric controller know what current the batteries can provide, given the voltage and time period demanded
 */
+
 
 public class Battery{
-//---------------CLASS FIElDS-------------------------------
-private int temperature; /** temperature of batteries/housing in degrees C */
-private double wattsStored; /** the current charge (watts) in the battery*/
-private double maxCharge; /**max charge of the battery, in watts. Used to calculate % charge*/ 
-//-----------END OF FIELDS, START OF CONSTRUCTORS--------------]
-
-private double currentCharge;	// current charge (watts) in batteries
-private double percentCharge;
-private double time;
-
-/** copy constructor. 
- * creates a battery with all fields equal to the old one. 
- */
- public Battery(Battery oldBattery){
-	/** @todo implement this and the needed getter methods */
- }
- 
-/** default constructor (no filename). 
- * builds a battery with built-in default model */
-public Battery(){
-	/** @todo implement default battery and model*/
-
-	currentCharge = maxCharge;
-	percentCharge = currentCharge/maxCharge*100;
-	temperature = 22; // start at room temperature 
-	wattsStored = 100; // start with 100 watts in the tank 
-	maxCharge = 500; // .5kw battery 
-	Log.write("Default battery created.");
-	Log.write("Current charge: " + percentCharge);
-}
-
-/**
- * standard Constructor
- * @param fileName - the file from which to load the model from
-*/
-public Battery(String fileName){
-	Log.write("battery created");
-	loadModel(fileName);
-
-}
-public void draw(double wattsOutput){
-	/** @todo implement this. Lower state of charge, check heat? Throw an exception if not enough */
-	wattsStored -= wattsOutput;
-	temperature += 1; /** @todo do this better? */
-}
-/** fills in class fields and model from file
- * @param fileName - the file to load from
- */
- private void loadModel(String fileName){
- /** @todo represent and load the battery model here */
- // the following values provided until ^^ gets done. 
- 	temperature = 0;
-	wattsStored = 100;
-	maxCharge = 500; //pulled that number out of my butt. Very small battery.
-}
-//--------END OF CONSTRUCTOR-TYPE METHODS, START OF CALULATING ONES--------------
-
-/** predicts the next state of the ElectricalController and subclasses, given the arguments.
- * Note: drawing and storing of power is done through other methods. 
- */
-public void nextBattery(int time, Environment worldEnviro,Boolean doLog){
-	/** @todo implement */
-	//check heat
-	//anything else to do here?
-	Log.write("Watts left: " + wattsStored);
-}
-
-
-
-
-
-/** stores the given amount of watts in the battery, or vents it if over capacity.
- * @param wattsToPutIn - the amount of energy (Watts) to store. 
- */
-public void store(double time, double current, double voltage){
-	/** @todo implement. Add to state of charge, check heat? */
 	
-	wattsStored = wattsStored + time*current*voltage;
-	temperature += 1; /** @todo implement heat modelling better*/
+//---------------------------------------CLASS FIElDS--------------------------------------------------------------------------------------
+private int temperature; /** temperature of batteries in degrees C */													
+private double maxChargeCapacity; /**max charge of the battery (in amp-hours) */ 
+private double batteryVoltage; /** nominal voltage of battery (in volts) */
+private double storedEnergy; /** the current remaining electric energy in the battery (in watt-hours) */
+private double maxStoredEnergy; /** electric energy stored in the battery when it's 100% charged */
+private double time;
+//-----------------------------------------------------------------------------------------------------------------------------------------
+
+
+//------------------------------------SETTER & GETTER METHODS------------------------------------------------------------------------------
+public void defaultBattery(){															// Constructs a default battery. Should be called out at time = 0.
+	maxChargeCapacity = 20;														 
+	batteryVoltage = 3.65;																// Values for charge capacity & voltage are taken from manufacturer's product data sheet
+	maxStoredEnergy = maxChargeCapacity*batteryVoltage;									// Working under the assumption that energy is give by Ah*V = Wh
+	storedEnergy = maxStoredEnergy;														// Assuming battery is 100% charged
+	Log.write("Default battery created.");
 }
 
-//------------GETTERS AND SETTERS-------------------
-/** @todo implement more getters */
-/**this method returns the state of charge in %
- * @return the % of charge in the battery
- */
+public int getStateOfCharge(){															// Returns the current state of charge as a percentage.
+	return (int)((double)storedEnergy/(double)maxStoredEnergy)*100; 
+}
+//------------------------------------------------------------------------------------------------------------------------------------------
 
-public double heatFromCharge(double current, double chargeTime){
-	double heatFromCharge=0;
-	// insert calculations here
-	return heatFromCharge;
+
+//-----------------------------------------CALCULATION METHODS------------------------------------------------------------------------------
+public double getMaxRechargeTime(double voltage, double currentRecharge){				// Calculates the maximum time the battery could recharge for before it overcharges.
+	double rechargeTime;																// Takes in the voltage & current from electric controller as inputs. Returns time in seconds.
+	if (currentRecharge > maxChargeCapacity){
+		return null;
+		Log.write(Cannot exceed max charge capactiy);									// Display error when the specified charging current exceed the max charging capacity (20A)
+	}																					// Might need to omit this?? Battery could technically accept up to 112.5A for 10s (from product's data sheet)
+	else{
+		rechargeTime =(maxStoredEnergy-storedEnergy)/(voltage*currentRecharge )*3600;	// Using: (maxWh - currentWh)/(V*A) = hrs; then converted to seconds.  
+		return rechargeTime;
+	}
 }
 
-
-public int getStateOfCharge(){
-	return (int)((double)wattsStored/(double)maxCharge)*100; 
-}
-
-
-public double getCurrentCharge(double currentCharge){					// Returns current state of charge (as a percentage).
+public double getCurrent(double voltage, double chargeTime){							// Calculates the current the battery can provide, considering it's state of charge at the time. 
+	double currentCharge;																// Voltage & time period in seconds (specified by the electric controller) are inputs.
+	currentCharge = storedEnergy/(chargeTime/3600 * voltage);							// Using: Wh/(V*t) = A
 	return currentCharge;
 }
 
-public double getMaxRechargeTime(double voltage, double currentRecharge){	// Calculates the maximum time the battery could recharge for before it overcharges.
-	double RechargeTime;											// Takes in the voltage & current from electric controller as inputs.
-	RechargeTime =(maxCharge -  wattsStored)/(voltage * currentRecharge );	 // wrong model, needs to be corrected.														// Returns maxRechargeTime in seconds.
-	return RechargeTime;
+public double heatFromCharge(double current, double chargeTime){
+	double heatFromCharge=0;
+	// TO DO: need calculations here
+	// need to consider ambient temperature, battery's temperature, and the heat produced by the adjacent batteries in the pack
+	return heatFromCharge;
 }
-
-public double getCurrent(double voltage, double chargeTime){			// Calculates the current the battery can provide, considering it's current state of charge, and
-	double current_charge = 0;												// the voltage & time period required by the electric controller.
-	return current_charge;
-}
-
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 
 }
+
