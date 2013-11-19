@@ -45,7 +45,8 @@ public void initialize(String trackFileName){
 		new Car("CarModel1.txt", 0, worldTrack,
 			new ElectricalController("ElectricalControllerModel1.txt",
 				new Battery("batteryModel1.txt"),
-				new Panels("panelsModel1.txt"),
+				
+				new Panels(20, worldEnviro, 0, 0, worldTrack), //TODO update Panel's string filename onstructor.
 				new Motor("motorModel1.txt")
 			)
 		)

@@ -28,8 +28,9 @@ private Track track; // current direction of the car w.r.t. sun
 
 /** default constructor. Builds the panels with default heat, angle, and watts*/
 public Panels(double temp, Environment newEnviro, double voltage, double current, Track newTrack){
- this.temp = enviro.getTemperature();
- enviro = newEnviro;
+	enviro = newEnviro;
+	this.temp = enviro.getTemperature();
+ track = newTrack;
  this.voltage = voltage;
  this.current = current;
  power = (voltage * current);
