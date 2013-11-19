@@ -27,7 +27,7 @@ private double time;
 
 
 //------------------------------------SETTER & GETTER METHODS------------------------------------------------------------------------------
-public void defaultBattery(){															// Constructs a default battery. Should be called out at time = 0.
+public void Battery(){																	// Constructs a default battery. Should be called out at time = 0.
 	maxChargeCapacity = 20;														 
 	batteryVoltage = 3.65;																// Values for charge capacity & voltage are taken from manufacturer's product data sheet
 	maxStoredEnergy = maxChargeCapacity*batteryVoltage;									// Working under the assumption that energy is give by Ah*V = Wh
@@ -40,6 +40,11 @@ public int getStateOfCharge(){															// Returns the current state of cha
 }
 
 public void nextBattery(double time, Environment worldEnviro, Boolean doLog){
+}
+
+public Battery(String fileName){
+	//TODO get properties and model from file
+	Log.write("Battery created");
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
 
