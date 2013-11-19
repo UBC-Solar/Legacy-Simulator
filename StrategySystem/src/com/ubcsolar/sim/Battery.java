@@ -70,7 +70,7 @@ public double heatFromCharge(double current, double chargeTime){
 	return heatFromCharge;
 }
 
-public void storeEnergy(double time, double current, double voltage){					// Store energy in watt-hours
+public void storeEnergy(double time, double current, double voltage){					// Store energy in watt-hours.
 	storedEnergy = storedEnergy + (current*voltage*time)/3600;
 	
 }
