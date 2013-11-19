@@ -38,6 +38,9 @@ public void defaultBattery(){															// Constructs a default battery. Sho
 public int getStateOfCharge(){															// Returns the current state of charge as a percentage.
 	return (int)((double)storedEnergy/(double)maxStoredEnergy)*100; 
 }
+
+public void nextBattery(double time, Environment worldEnviro, Boolean doLog){
+}
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -45,9 +48,9 @@ public int getStateOfCharge(){															// Returns the current state of cha
 public double getMaxRechargeTime(double voltage, double currentRecharge){				// Calculates the maximum time the battery could recharge for before it overcharges.
 	double rechargeTime;																// Takes in the voltage & current from electric controller as inputs. Returns time in seconds.
 	if (currentRecharge > maxChargeCapacity){
-		return null;
-		Log.write(Cannot exceed max charge capactiy);									// Display error when the specified charging current exceed the max charging capacity (20A)
-	}																					// Might need to omit this?? Battery could technically accept up to 112.5A for 10s (from product's data sheet)
+		Log.write("Cannot exceed max charge capactiy");									// Display error when the specified charging current exceed the max charging capacity (20A)
+		return -1.0;																		// Might need to omit this?? Battery could technically accept up to 112.5A for 10s (from product's data sheet)
+	}
 	else{
 		rechargeTime =(maxStoredEnergy-storedEnergy)/(voltage*currentRecharge )*3600;	// Using: (maxWh - currentWh)/(V*A) = hrs; then converted to seconds.  
 		return rechargeTime;
@@ -65,6 +68,11 @@ public double heatFromCharge(double current, double chargeTime){
 	// TO DO: need calculations here
 	// need to consider ambient temperature, battery's temperature, and the heat produced by the adjacent batteries in the pack
 	return heatFromCharge;
+}
+
+public void storeEnergy(double time, double current, double voltage){					// Store energy in watt-hours
+	storedEnergy = storedEnergy + (current*voltage*time)/3600;
+	
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
