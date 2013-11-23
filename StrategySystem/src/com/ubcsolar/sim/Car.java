@@ -21,6 +21,7 @@ private int throttle; /** speed the driver wants to be going. */
 private boolean isAccelerating; /** is true if car is accelerating (i.e speed will be different next iteration) */
 private ElectricalController myElectricalController; /** ElectricalController of the car @todo rename to ElectricalController*/
 public final int maxSpeed; /** car's max speed in km/h. Needed to convert between percent. */
+private MechController myMechController;
 //NOAH: ^^ this can probably be removed. It was a dumb workaround. 
 
 //-----------END OF FIELDS, START OF CONSTRUCTORS--------------
@@ -38,6 +39,7 @@ public Car( Track newTrack){
 	throttle = 0;
 	Log.write("Car created");
 	myElectricalController = new ElectricalController(newTrack);
+	myMechController = new MechController(newTrack);
 	maxSpeed = 120; /** @todo remove this. */
 }
 
@@ -48,9 +50,10 @@ public Car( Track newTrack){
  * @param newCurrentSpeed - the speed, in km/h that the car is travelling
  * @param newTrack - the track that the car is driving on
  */
-public Car(String fileName, int newCurrentSpeed, Track newTrack,  ElectricalController newElectricalController){
+public Car(String fileName, int newCurrentSpeed, Track newTrack,  ElectricalController newElectricalController, MechController newMechController){
 	myTrack = newTrack;
 	myElectricalController = newElectricalController;
+	myMechController = newMechController;
 	currentSpeed = newCurrentSpeed;
 	loadModels(fileName);
 	maxSpeed = 120; /** @todo eliminate this */

@@ -5,3 +5,5 @@ class foo{
 			System.out.println(item);
 	}
 }
+
+//test

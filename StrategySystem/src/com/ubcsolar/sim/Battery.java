@@ -28,8 +28,8 @@ private double time;
 
 //------------------------------------SETTER & GETTER METHODS------------------------------------------------------------------------------
 public Battery(){																		// Constructs a default battery. Should be called out at time = 0.
-	maxChargeCapacity = 20;														 
-	batteryVoltage = 3.65;																// Values for charge capacity & voltage are taken from manufacturer's product data sheet
+	maxChargeCapacity = 220;														 
+	batteryVoltage = 40.15;																// Values for charge capacity & voltage are taken from manufacturer's product data sheet
 	maxStoredEnergy = maxChargeCapacity*batteryVoltage;									// Working under the assumption that energy is give by Ah*V = Wh
 	storedEnergy = maxStoredEnergy;														// Assuming battery is 100% charged
 	Log.write("Default battery created.");
