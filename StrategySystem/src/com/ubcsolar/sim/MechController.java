@@ -12,6 +12,9 @@ public class MechController {
 public double nextMech(double tourque){
 	return 5; //km/h
 }
+public double getAngularVelocity(){
+	return 200.0;
+}
 	
 	
 }

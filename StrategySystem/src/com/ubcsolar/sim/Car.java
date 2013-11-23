@@ -88,7 +88,8 @@ myWeight = 150;  /** @todo get weight from the car file */
 */
 public void nextCar(int time, Environment worldEnviro, Boolean doLog, int throttleSetting){
 	int currentNetForce = calculateNetForce();
-	int rpm = myElectricalController.nextElectricalController(time, worldEnviro, doLog, throttleSetting, currentNetForce, myWeight);
+	double angularVelo = myMechController.getAngularVelocity();
+	int rpm = myElectricalController.nextElectricalController(time, worldEnviro, doLog, throttleSetting, angularVelo);
 	currentSpeed = translateToSpeed(rpm);
 	if(doLog){Log.write("Going " + currentSpeed + " km/h");}
 	checkIfSkidding(worldEnviro);
