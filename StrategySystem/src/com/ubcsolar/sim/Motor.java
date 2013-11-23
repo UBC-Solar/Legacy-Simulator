@@ -12,11 +12,9 @@ how they interact (currently passing watts, may need to pass voltage and current
 
 public class Motor{
 //---------------CLASS FIElDS-------------------------------
-private double force;		/** current force exerted on the motor **/
-private double temperature;	/** the temp. of the motor (Celsius). Don't want to overheat now. */
-private double voltage;		/** voltage that the motor is operating at **/
+private double torque;		/** the torque on the motor **/
 private double current;		/** current that the motor is operating at **/
-private double radius; 		/** radius of the wheel **/
+
 //-----------END OF FIELDS, START OF CONSTRUCTORS--------------
 /** Copy constructor. Builds a motor with all fields and models equal to the given 
  * @param oldMotor - the battery to copy. 
@@ -37,59 +35,89 @@ private void loadModel(String fileName){
 /** @todo implement this. Figure out how to represent the Motor model. */
 	//These should be coming from the model file. Here until implemented.
 	//Need these from tests of the motor:
-	//noLoadSpeed
-	//stallTorque
+	// characteristic resistance
+	// emfconstant
+	// torque constant
 }
 
 /** default constructor, builds a motor with a default Model */
-public Motor(double newForce, double newRadius, double newTemperature, double newVoltage, double newCurrent, double newRPM){
-	force = newForce;		
-	temperature = newTemperature;
-	voltage = newVoltage;
+public Motor(double newTorque,double newCurrent){
 	current = newCurrent;
-	radius = newRadius;
+	torque = newTorque;
 }
 
 //--------END OF CONSTRUCTOR-TYPE METHODS, START OF CALULATING ONES--------------
 
-/** returns force predicted by power - torque graph
- * assumption: power - torque graph is linear
- * @param voltage 	- current voltage that the motor is running at
- * @param radius	- radius of the wheel
+/** characteristic resistance of the motor, 16 mOhm, and EMF Constant are assumptions. Need data.
+ * @param delV 		 	 	- voltage of the motor treater as a generator
+ * @param batteryVoltage 	- voltage of the main bus bar
+ * @param accelPercent		- accelerator percentage - duty cycle, essentially
+ * @param angAccel			- angular acceleration, w, of the motor
+ * return current of the motor
  */
-/*
-private double getRPM(double voltage, double current){
-	double power;
-	double calculatedRPM;
-	double c = 5000; // slope of power - RPM graph, made-up value
-	power = voltage*current;
-	calculatedRPM = c * power;
-	return calculatedRPM;
+public double getCurrent(double batteryVoltage, int accelPercent, double angAccel){
+	double current;
+	double delV;
+	double charRes = 0.016;
+	double emfConstant = 20.0;
+	delV = getDelV(batteryVoltage, accelPercent, angAccel, emfConstant);
+	current = delV/charRes;
+	return current;
 }
-*/
 
-/** predicts the next state of the motor and all class fields
- *  assumes steady state
- * @param time 		- the time (in milliseconds) that this iteration spans
- * @param radius	- radius of the wheel
- * @param doLog 	- if True, will write messages to the log 
- * @param netForce 	- the current net force on the car. 
- * @param netWeight - net weight of the car
- * @returns the RPM of the motor
+/** finds delta voltage of the motor, if negative, torque is negative
+ * @param delV 		 	 	- voltage of the motor treater as a generator
+ * @param batteryVoltage 	- accelerator percentage
+ * @param accelPercent		- duty cycle that the motor is running at
+ * @param angAccel			- angular acceleration, w, of the motor
+ * @param emfConstant		- EMF Constant of the motor
+ * return delV of the motor
  */
-public int nextMotor(double time, Environment worldEnviro, Boolean doLog, double netForce, double netWeight, double voltage, double current){
-	// todo create a better heat model
-	// function is too massive and messy. need to clean up calculations. get it working for now. 
-	// returns currentRPM of steady state motors
-	int currentRPM;
-	double torqueVoltage;
-	double noLoadSpeed = 1000;
-	double stallTorque = 1000;
-	double slope = noLoadSpeed/stallTorque;
-	torqueVoltage = slope * voltage + noLoadSpeed;
-	currentRPM = (int)(5* torqueVoltage);
-	Log.write("Motor now spinning at: " + currentRPM + " rpm");
-	return currentRPM;
+private double getDelV(double batteryVoltage, int dutyCycle, double angAccel, double emfConstant){
+	double delV;
+	delV = batteryVoltage * dutyCycle - emfConstant * angAccel;
+	return delV;
+}
+
+/** calculates torque of the motor, given current
+ * @param torqueConstant	- torque-current relationship is assumed to be linear
+ * return torque exerted by the motor
+ */
+public double getTorque(){
+	double torqueConstant = 18.0;
+	torque = torqueConstant * current;
+	return torque;
+}
+
+/** regenerative braking occurs when delV is a negative, therefore motor is spinning backwards
+ * @param batteryVoltage 	- bus bar voltage, determined by battery
+ * @param accelPercent		- duty cycle that the motor is running at
+ * @param angAccel			- angular acceleration, w, of the motor
+ * @param emfConstant		- EMF Constant of the motor 
+ * return boolean 			- true, if regen, false, if no regen
+ */
+public Boolean isRegen(double batteryVoltage, double dutyCycle, double angAccel, double emfConstant){
+	double delV;
+	delV = batteryVoltage * dutyCycle - emfConstant * angAccel;
+	if (delV > 0)
+		return false;
+	else
+		return true;
+}
+
+/** creates next motor object
+ * @param batteryVoltage	- bus bar voltage, determined by the battery
+ * @param dutyCycle			- duty cycle of the motor
+ * @param angAccel			- angular acceleration, w
+ * @param doLog				- if true, will write to log
+ * @return current drawn, given the parameters
+ */
+public double nextMotor(double batteryVoltage, int dutyCycle, double angAccel, Boolean doLog){
+	current = getCurrent(batteryVoltage, dutyCycle, angAccel);
+	torque = getTorque();
+	Log.write("Motor now spinning at: " + torque + " N m");
+	Log.write("Motor now pulling: " + current + " A");
+	return current;
 }
 
 //------------GETTERS AND SETTERS-------------------
