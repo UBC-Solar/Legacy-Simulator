@@ -1,10 +1,7 @@
 package com.ubcsolar.sim;
 /**
 This class models the ElectricalController in controlling the panels, motor, and battery.
-I wasn't sure exactly how they interact in the real world, or what units to use
-and pass among the subclasses. 
-Currently I use Watts, but I'm sure that must change. 
-Will need to go through the ElectricalController-down and check for proper interaction. 
+ 
 */
 
 
@@ -57,18 +54,28 @@ public ElectricalController(ElectricalController oldElectricalController){
  * @param netForce - the current net force on the car. 
  * @param netWeight - the net weight of the car. //NOAH: May be able to remove this if given in constructor?
  */
-public int nextElectricalController(int time, Environment worldEnviro, Boolean doLog, int throttle, int netForce, int netWeight){
+public int nextElectricalController(int time, Environment worldEnviro, Boolean doLog, int throttle, double angAccel){
 /** @todo figure out how to calculate regenerative braking */
 	
+	
+	double battery_voltage = voltage_from_battery();
+	
+	boolean moter_regen = checkMotorRegen();
+
 	double CurrentRequested = Current_needed(throttle,time); //this is how much voltage would be fed to the motor
+	
+	// Assume the current states the same in the "time" interval
 	double panelCurrentGenerated = myPanels.nextPanels(time, worldEnviro, doLog); //this is how much power the solar cells made
+	
 	int rpm = 0;
+	
 	if(doLog){Log.write("Current requested was: " + CurrentRequested + " A");}
 	
 	
-	
 	double time_recharge_battery;
-	double panel_voltage = voltage_from_panel();
+	
+	
+	
 	double panel_current = current_from_panel();
 	
 	
@@ -125,7 +132,7 @@ myBattery.nextBattery(time, worldEnviro, doLog);
 return rpm;
 }
 
-/** converts the throttle percentage into a energy value
+/** converts the throttle percentage to a energy value
  * @param throttle - the throttle setting (in percentage)
  * @param time - the time interval
  * @return current_needed - the amount of current (in A) it would take
@@ -154,13 +161,14 @@ private double total_current(int time)
 }
 
 
-/** Gets voltage level from panel
- * @return The voltage that the panel is able to provide
+/** Gets voltage level from battery
+ * @return The voltage that the battery is running at. (Assuming it's a fixed value)
+*
  */
 
-private double voltage_from_panel()
+private double voltage_from_battery()
 {
-	return myPanels.voltage_from_panel();
+	return myBattery.BatteryVoltageLevel();
 }
 
 /** Gets current level from panel
@@ -191,6 +199,9 @@ private double time_charging_battery( double voltage_recharged, double current_r
 	return ( myBattery.getMaxRechargeTime(voltage_recharged, current_recharged));
 }
 
-
+private boolean checkMotorRegen()
+{double batteryVoltage, int accelPercent, double angAccel
+	return myMotor.isRegen()
+}
 
 }
