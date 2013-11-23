@@ -124,7 +124,7 @@ public double nextMotor(double batteryVoltage, int dutyCycle, double angAccel, B
 }
 
 //------------GETTERS AND SETTERS-------------------
-/** Getter method for Characteristic Resistance, EMF constant, Torque Constant **/
+/** Getter methods for Characteristic Resistance, EMF constant, Torque Constant **/
 public double getCharRes(){
 	return charRes;
 }
@@ -135,7 +135,7 @@ public double getTorqueConstant(){
 	return torqueConstant;
 }
 
-/** Setter method for Current and Torque **/
+/** Setter methods for Current and Torque **/
 public void setCurrent(double value){
 	current = value;
 }
