@@ -103,16 +103,16 @@ public double heatFromCharge(double current, double chargeTime){
  * @todo Incorporate efficiency
  * @todo Incorporate calculates that changes the batteryVoltage since voltage varies according to battery's state of charge
  */
-public void storeEnergy(double time, double current, double voltage){
-	storedEnergy = storedEnergy + (current*voltage*time)/3600;	
+public void storeEnergy(double time, double current){
+	storedEnergy = storedEnergy + (current*batteryVoltage*time)/3600;	
 }
 
 /** Draws energy (in watt-hrs)
  * @todo Incorporate efficiency
  * @todo Incorporate calculates that changes the batteryVoltage since voltage varies according to battery's state of charge
  */
-public void drawEnergy(double time, double current, double voltage){
-	storedEnergy = storedEnergy - (current*voltage*time)/3600;
+public void drawEnergy(double time, double current){
+	storedEnergy = storedEnergy - (current*batteryVoltage*time)/3600;
 }
 //-----------------------------------------------------------------------------------------------------------------------------------------
 
