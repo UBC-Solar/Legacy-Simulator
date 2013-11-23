@@ -60,105 +60,127 @@ public int nextElectricalController(int time, Environment worldEnviro, Boolean d
 	
 	double battery_voltage = voltage_from_battery();
 	
-	boolean moter_regen = checkMotorRegen();
-
-	double CurrentRequested = Current_needed(throttle,time); //this is how much voltage would be fed to the motor
+	// Is motor regenerating.
+	boolean motor_regen = checkMotorRegen(battery_voltage,throttle,angAccel);
+	
+	// The current that the motor is needed or regened
+	double motor_current = getMotorCurrent(battery_voltage,throttle,angAccel);
+	
+	//double CurrentRequested = Current_needed(throttle,time); //this is how much voltage would be fed to the motor
 	
 	// Assume the current states the same in the "time" interval
+	// @Tofix: maybe add another param "voltage" to panel.
 	double panelCurrentGenerated = myPanels.nextPanels(time, worldEnviro, doLog); //this is how much power the solar cells made
+	
 	
 	int rpm = 0;
 	
-	if(doLog){Log.write("Current requested was: " + CurrentRequested + " A");}
+	if (motor_regen)
+	{
+	
+	if(doLog){Log.write("Current regened from motor: " + (-motor_current) + " A");}
+	}
+	else{
+		if(doLog){Log.write("Current needed for motor: " + motor_current + " A");}
+	}
 	
 	
-	double time_recharge_battery;
+	// The time needed for the battery to get fully charged
 	
 	
 	
+	// The current the panel can generate
+	// To fix: add voltage to this method.
 	double panel_current = current_from_panel();
 	
 	
+	// The current that the battery can charge the system
+	double battery_charge_current = current_battery_feed(time);
 
-	double battery_charge_current = current_battery_feed(panel_voltage,time);
-
 	
-	double sum_current = panel_current + battery_charge_current;
+	//double sum_current = panel_current + battery_charge_current;
 	
 	
-	if (CurrentRequested > sum_current)  // when both panel and battery cannot provide enough energy
+	if(motor_regen) // when motor is regenerating energy
 	{
-		//provide no power to motor
+		// To fix: Add "time" param when we take "heat" into account.
+		rpm = (int) myMotor.nextMotor(battery_voltage, throttle, angAccel,  doLog);
+		if(doLog)
+		Log.write("Motor is regenerating energy.");
 		
-		rpm = myMotor.nextMotor(time, worldEnviro, doLog, netForce, netWeight, 0,0);
-		Log.write("Energy can be provided is insucifficient.");
-		Log.write("Was too much. No power applied to Motor");
-		if (time <= time_charging_battery(panel_voltage,panel_current) )  // battery will not be full
+		//Since the motor current is negative when it's regenerating, sum_current = pannel_current + (- motor_current).
+		double sum_current=panel_current -motor_current ;
+		
+		if (time <= time_charging_battery(sum_current) )  // battery will not be full
 		{
-		myBattery.storeEnergy(time,panel_current,panel_voltage);
-		if(doLog){Log.write("Extra energy charging battery");} 
+			myBattery.storeEnergy(time,sum_current);
+			if(doLog){Log.write("Recharging the battery.");} 
 		}
-		
-	}
-	else if (CurrentRequested > panel_current)  // when panel cannot provide enough, extra energy from battery.
-	{
-		if(time <= time_charging_battery(panel_voltage,panel_current-CurrentRequested)){ //if the batteries have enough
-			myBattery.drawEnergy(time,CurrentRequested-panel_current,panel_voltage); //put all generated power to motor, pull difference from batteries
-			rpm = myMotor.nextMotor(time, worldEnviro, doLog, netForce, netWeight, CurrentRequested,panel_voltage);
-		}
-		
-	}
-	else if(panel_current == CurrentRequested)
-	{
-		rpm = myMotor.nextMotor(time, worldEnviro, doLog, netForce, netWeight, CurrentRequested,panel_voltage);
-		//put all generated power into the motor. No need to use the battery
-		if(doLog){Log.write("power in = power out");} //mention that. That's cool.
-	}
-	else if(panel_current > CurrentRequested)  // when panel provides extra energy , put extra energy to battery.
-	{
-		rpm = myMotor.nextMotor(time, worldEnviro, doLog, netForce, netWeight, CurrentRequested,panel_voltage);
-		
-		
-		if (time <= time_charging_battery(panel_voltage,panel_current))   // when battery is not full, and it needs energy  
+		else
 		{
-			myBattery.storeEnergy(time,panel_current-CurrentRequested,panel_voltage);
-			if(doLog){Log.write("Extra energy charging battery");} 
-		}	
+			if(doLog){Log.write("Battery Full.");} 
+		}
+	} else   // when motor needs to extract energy
+	{
+		double sum_current = panel_current + battery_charge_current;
+		if(sum_current < motor_current) // When current provided by the system cannot feed the needs of motor
+		{  
+			//provide no power to motor
+			rpm = (int) myMotor.nextMotor(0, throttle, angAccel,  doLog);
+			if(doLog){Log.write("Energy can be provided is insucifficient.");
+			Log.write("Was too much. No power applied to Motor");}
+			
+			//Try to put the panel energy to battery
+			if (time <= time_charging_battery(panel_current) )  // battery will not be full
+			{
+				myBattery.storeEnergy(time,panel_current);
+				if(doLog){Log.write("Recharging the battery");} 
+			}
+			else
+			{
+				if(doLog){Log.write("Battery Full.");} 
+			}
+			
+		}
+		else if (motor_current > panel_current)  // when panel cannot provide enough, extra energy from battery.
+		{
+			
+				//Pull current from battery
+				myBattery.drawEnergy(time,motor_current-panel_current);
+				//Put all generated power to motor
+				rpm = (int) myMotor.nextMotor(battery_voltage, throttle, angAccel,  doLog);
+				if(doLog){Log.write("Pull energy from battery.");}
+		}
+		else if (panel_current == motor_current)
+		{
+			rpm = (int) myMotor.nextMotor(battery_voltage, throttle, angAccel,  doLog);
+			//put all generated power into the motor. No need to use the battery
+			if(doLog){Log.write("power in = power out");} 
+		}
+		else if(panel_current > motor_current)  // when panel provides extra energy , put extra energy to battery.
+		{
+			rpm = (int) myMotor.nextMotor(battery_voltage, throttle, angAccel,  doLog);
+			if (time <= time_charging_battery(panel_current))   // when battery is not full, and it needs energy  
+			{
+				myBattery.storeEnergy(time,panel_current);
+				if(doLog){Log.write("Pull energy from battery.");} 
+			}	
 
-		
+			
+		}
+	
 	}
-
+	
+	
 myBattery.nextBattery(time, worldEnviro, doLog);
 return rpm;
 }
 
-/** converts the throttle percentage to a energy value
- * @param throttle - the throttle setting (in percentage)
- * @param time - the time interval
- * @return current_needed - the amount of current (in A) it would take
- */
 
-private double Current_needed(int throttle,int time){
-/** @todo implement this! */
-	double current_needed;
-	double total_current = 0;
-	total_current=total_current(time);
-	current_needed= total_current*throttle/100;
-
-return current_needed;
-}
 //------------GETTERS AND SETTERS-------------------
 
 
-/** Calculate the total current that the panel and battery have currently.
- * @param time - the time interval to execute the operation
- * @return total current (max current) that battery and solar panel can feed to the motor.
- */
-private double total_current(int time)
-{
-	//To do: (Whether/How) Integrate current regenerated from motor;
-	return (current_from_panel() + current_battery_feed(voltage_from_panel(),time));
-}
+
 
 
 /** Gets voltage level from battery
@@ -168,7 +190,7 @@ private double total_current(int time)
 
 private double voltage_from_battery()
 {
-	return myBattery.BatteryVoltageLevel();
+	return myBattery.getBatteryVoltage();
 }
 
 /** Gets current level from panel
@@ -181,12 +203,12 @@ private double current_from_panel()
 
 
 /** Gets current that the battery can feed
- * @param battery_charge_voltage - the voltage level of the circuit
+ * @param time - 
  * @return The current that the battery is able to provide
  */
-private double current_battery_feed(double battery_charge_voltage,double time)
+private double current_battery_feed(double time)
 {
-	return myBattery.getCurrent(battery_charge_voltage,time);
+	return myBattery.getCurrent(time);
 }
 
 
@@ -195,13 +217,16 @@ private double current_battery_feed(double battery_charge_voltage,double time)
  * @param current_recharged - the current to feed the battery
  * @return The total amount time needed to get battery fully charged
  */
-private double time_charging_battery( double voltage_recharged, double current_recharged){
-	return ( myBattery.getMaxRechargeTime(voltage_recharged, current_recharged));
+private double time_charging_battery(  double current_recharged){
+	return ( myBattery.getMaxRechargeTime( current_recharged));
 }
 
-private boolean checkMotorRegen()
-{double batteryVoltage, int accelPercent, double angAccel
-	return myMotor.isRegen()
+private boolean checkMotorRegen(double battery_voltage, int throttle, double angAccel)
+{
+	return myMotor.isRegen(battery_voltage,throttle,angAccel);
 }
-
+private double getMotorCurrent(double battery_voltage,int throttle,double angAccel)
+{
+	return myMotor.getCurrent(battery_voltage, throttle, angAccel);
+}
 }
