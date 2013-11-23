@@ -14,8 +14,8 @@ public class Motor{
 //---------------CLASS FIElDS-------------------------------
 private double torque;			/** the torque on the motor **/
 private double current;			/** current that the motor is operating at **/
-private double emfConstant; 	/** emf constant defined by motor tests **/
-private double torqueConstant;	/** torque-current constant defined by motor tests **/
+private double emfConstant; 	/** EMF constant determined by motor tests **/
+private double torqueConstant;	/** torque-current constant determined by motor tests **/
 private double charRes;			/** characteristic resistance of the motor **/
 //-----------END OF FIELDS, START OF CONSTRUCTORS--------------
 /** Copy constructor. Builds a motor with all fields and models equal to the given 
