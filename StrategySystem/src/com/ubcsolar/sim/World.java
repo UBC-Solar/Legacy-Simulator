@@ -48,7 +48,7 @@ public void initialize(String trackFileName){
 				
 				new Panels(20, worldEnviro, 0, 0, worldTrack), //TODO update Panel's string filename onstructor.
 				new Motor("motorModel1.txt")
-			)
+			), new MechController(worldTrack)
 		)
 	);
 			
