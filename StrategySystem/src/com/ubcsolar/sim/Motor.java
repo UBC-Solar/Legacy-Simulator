@@ -12,9 +12,11 @@ how they interact (currently passing watts, may need to pass voltage and current
 
 public class Motor{
 //---------------CLASS FIElDS-------------------------------
-private double torque;		/** the torque on the motor **/
-private double current;		/** current that the motor is operating at **/
-
+private double torque;			/** the torque on the motor **/
+private double current;			/** current that the motor is operating at **/
+private double emfConstant; 	/** EMF constant determined by motor tests **/
+private double torqueConstant;	/** torque-current constant determined by motor tests **/
+private double charRes;			/** characteristic resistance of the motor **/
 //-----------END OF FIELDS, START OF CONSTRUCTORS--------------
 /** Copy constructor. Builds a motor with all fields and models equal to the given 
  * @param oldMotor - the battery to copy. 
@@ -29,6 +31,8 @@ private double current;		/** current that the motor is operating at **/
 public Motor(String fileName){
 	Log.write("ElectricalController created motor");
 	loadModel(fileName);
+	emfConstant = 20;
+	torqueConstant = 18.0;
 }
 
 private void loadModel(String fileName){
@@ -44,6 +48,9 @@ private void loadModel(String fileName){
 public Motor(double newTorque,double newCurrent){
 	current = newCurrent;
 	torque = newTorque;
+	emfConstant = 20;
+	torqueConstant = 18.0;
+	charRes = 0.016;
 }
 
 //--------END OF CONSTRUCTOR-TYPE METHODS, START OF CALULATING ONES--------------
@@ -58,9 +65,7 @@ public Motor(double newTorque,double newCurrent){
 public double getCurrent(double batteryVoltage, int accelPercent, double angAccel){
 	double current;
 	double delV;
-	double charRes = 0.016;
-	double emfConstant = 20.0;
-	delV = getDelV(batteryVoltage, accelPercent, angAccel, emfConstant);
+	delV = getDelV(batteryVoltage, accelPercent, angAccel);
 	current = delV/charRes;
 	return current;
 }
@@ -73,9 +78,9 @@ public double getCurrent(double batteryVoltage, int accelPercent, double angAcce
  * @param emfConstant		- EMF Constant of the motor
  * return delV of the motor
  */
-private double getDelV(double batteryVoltage, int dutyCycle, double angAccel, double emfConstant){
+private double getDelV(double batteryVoltage, int accelPercent, double angAccel){
 	double delV;
-	delV = batteryVoltage * dutyCycle - emfConstant * angAccel;
+	delV = batteryVoltage * accelPercent - emfConstant * angAccel;
 	return delV;
 }
 
@@ -84,7 +89,6 @@ private double getDelV(double batteryVoltage, int dutyCycle, double angAccel, do
  * return torque exerted by the motor
  */
 public double getTorque(){
-	double torqueConstant = 18.0;
 	torque = torqueConstant * current;
 	return torque;
 }
@@ -96,9 +100,9 @@ public double getTorque(){
  * @param emfConstant		- EMF Constant of the motor 
  * return boolean 			- true, if regen, false, if no regen
  */
-public Boolean isRegen(double batteryVoltage, double dutyCycle, double angAccel, double emfConstant){
+public Boolean isRegen(double batteryVoltage, int accelPercent, double angAccel){
 	double delV;
-	delV = batteryVoltage * dutyCycle - emfConstant * angAccel;
+	delV = batteryVoltage * accelPercent - emfConstant * angAccel;
 	if (delV > 0)
 		return false;
 	else
