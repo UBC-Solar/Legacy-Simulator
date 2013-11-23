@@ -110,7 +110,7 @@ public void storeEnergy(double time, double current, double voltage){					// Sto
 public void drawEnergy(double time, double current, double voltage){					// Draw energy (in watt-hours)
 	storedEnergy = storedEnergy - (current*voltage*time)/3600;
 }
-//-------------------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------------
 
 
 }
