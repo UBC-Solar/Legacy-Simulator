@@ -55,7 +55,7 @@ public ElectricalController(ElectricalController oldElectricalController){
  * @param netWeight - the net weight of the car. //NOAH: May be able to remove this if given in constructor?
  */
 public int nextElectricalController(int time, Environment worldEnviro, Boolean doLog, int throttle, double angAccel){
-/** @todo figure out how to calculate regenerative braking */
+/** @todo figure out the heat stuff */
 	
 	
 	double battery_voltage = voltage_from_battery();
@@ -203,7 +203,7 @@ private double current_from_panel()
 
 
 /** Gets current that the battery can feed
- * @param time - 
+ * @param time - the time interval in which the battery needs to feed the system.
  * @return The current that the battery is able to provide
  */
 private double current_battery_feed(double time)
@@ -221,10 +221,23 @@ private double time_charging_battery(  double current_recharged){
 	return ( myBattery.getMaxRechargeTime( current_recharged));
 }
 
+/** Check if Motor is regenerating energy.
+ * @param battery_voltage - the voltage level of the circuit
+ * @param throttle - accelPercent
+ * @param angAccel - Angular velocity
+ * @return True if regenerating; false if not regenerating
+ */
 private boolean checkMotorRegen(double battery_voltage, int throttle, double angAccel)
 {
 	return myMotor.isRegen(battery_voltage,throttle,angAccel);
 }
+
+/** Gets the amount of current the motor needs or provides
+ * @param battery_voltage - the voltage level of the circuit
+ * @param throttle - accelPercent
+ * @param angAccel - Angular velocity
+ * @return A negative value if motor is regenerating; a positive value if motor needs to extract energy.
+ */
 private double getMotorCurrent(double battery_voltage,int throttle,double angAccel)
 {
 	return myMotor.getCurrent(battery_voltage, throttle, angAccel);
