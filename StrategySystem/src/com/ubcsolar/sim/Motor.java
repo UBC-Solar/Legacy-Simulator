@@ -33,6 +33,7 @@ public Motor(String fileName){
 	loadModel(fileName);
 	emfConstant = 20;
 	torqueConstant = 18.0;
+	charRes = 0.016;
 }
 
 private void loadModel(String fileName){
@@ -75,7 +76,6 @@ public double getCurrent(double batteryVoltage, int accelPercent, double angAcce
  * @param batteryVoltage 	- accelerator percentage
  * @param accelPercent		- duty cycle that the motor is running at
  * @param angAccel			- angular acceleration, w, of the motor
- * @param emfConstant		- EMF Constant of the motor
  * return delV of the motor
  */
 private double getDelV(double batteryVoltage, int accelPercent, double angAccel){
@@ -97,7 +97,6 @@ public double getTorque(){
  * @param batteryVoltage 	- bus bar voltage, determined by battery
  * @param accelPercent		- duty cycle that the motor is running at
  * @param angAccel			- angular acceleration, w, of the motor
- * @param emfConstant		- EMF Constant of the motor 
  * return boolean 			- true, if regen, false, if no regen
  */
 public Boolean isRegen(double batteryVoltage, int accelPercent, double angAccel){
@@ -125,6 +124,23 @@ public double nextMotor(double batteryVoltage, int dutyCycle, double angAccel, B
 }
 
 //------------GETTERS AND SETTERS-------------------
-/** @todo implement these */
+/** Getter method for Characteristic Resistance, EMF constant, Torque Constant **/
+public double getCharRes(){
+	return charRes;
+}
+public double getEMFConstant(){
+	return emfConstant;
+}
+public double getTorqueConstant(){
+	return torqueConstant;
+}
+
+/** Setter method for Current and Torque **/
+public void setCurrent(double value){
+	current = value;
+}
+public void setTorque(double value){
+	torque = value;
+}
 
 }
