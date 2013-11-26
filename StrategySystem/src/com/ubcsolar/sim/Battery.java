@@ -82,6 +82,7 @@ public double getMaxRechargeTime(double currentRecharge){
  * @param chargeTime - time period (in seconds) for which the battery will be providing this current; specified by electrical controller
  * @todo Confirm this assumption: Wh/(V*t) = A
  * @todo Incorporate charging efficiency, temperature, other factors that will be of influence
+ * @todo Apply limitation to battery's maximum discharge capacity
  * */
 public double getCurrent(double chargeTime){ 
 	double currentCharge;
