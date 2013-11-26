@@ -14,7 +14,7 @@ public class Panels{
 // ---------------CLASS FIELDS -------------------------------
 private double maxPower; /** the most it will generate under ideal conditions*/
 private double maxTemp; /** the most amount of heat it can tolerate before shutting down */
-private double deltaTemp; /* temperature increase per time step*/
+// private double deltaTemp; /* temperature increase per time step*/
 private Environment enviro;   // current angle panels are w.r.t. sun
 private double current;  // current current
 private double voltage;  // current voltage
@@ -81,10 +81,8 @@ public double nextPanels(int time, Environment worldEnviro, Boolean doLog){
 //update heat
 //update position/angle?? 
 /** @todo find a way so the panels know what angle they're on. */
-
-	double powerGenerated = calculatePower(time, worldEnviro);
-	if(doLog){Log.write("Panels made: " + powerGenerated + " Watts");
-}
+calculateTemperature();
+double powerGenerated = calculatePower(time, worldEnviro);
 return powerGenerated;
 	}
 
@@ -96,12 +94,17 @@ return powerGenerated;
  */
 
 private double calculatePower(int time, Environment worldEnviro){
-	double actualAngle = enviro.getSunAngle()-track.getAngle();
+	/*double actualAngle = enviro.getSunAngle()-track.getAngle();
 	double actualAngleRadians = ( actualAngle * Math.PI) / 180 ;         // converts the sun angle to radians 
 	double sunEnergy = (Math.sin(actualAngleRadians) * enviro.getSunIntensity()); // calculates the watts per square meter on a flat surface
 													   // calculates the actual angle of sun hitting the panels
-	double powerAvailable = calculateOutput(sunEnergy);
+	double powerAvailable = calculateOutput(sunEnergy, powerProduced);
+	*/ 
+	/* assumption is that we have 389 panels each produce (0.6V * 6A) 3.6W under ideal conditions (sun intensity, angle)
+	 and we have 389 cells for a total of 1400.4 Watts*/
+	double powerAvailable = 1400.4;
 	double powerProduced = calculatePanelEfficiency() * powerAvailable;
+	calculateOutput(powerProduced);
 	double output = powerProduced * time;
 	Log.write("Panels produced " + output + " watts of power");
 	return output;
@@ -116,24 +119,25 @@ private double calculatePower(int time, Environment worldEnviro){
 // two possible methods, one to calculate efficiency based on a smooth curve of temp / maxTemp,
 // the other method is to subtract 0.32% per degree in C
 private double calculatePanelEfficiency(){
-	double efficiencyLoss = temp * 0.32;
-	double efficiency = 1 - efficiencyLoss;
+	double efficiencyLoss = temp * 0.0032;
+	double efficiency = 1.0 - efficiencyLoss;
 	double eff1 = 1;
 	if (efficiency <= 0){
 		eff1 = 0;
 	}
 	else {eff1 = efficiency;}
-	Log.write("Panels operating at " + eff1 + "efficiency");
+	Log.write("Panels operating at " + eff1 + " efficiency");
 	return eff1;
+
 }
 
 // TODO implement calculateOutput; 
 // takes in available power and gives back the voltage and current associated with that on the power curve
 // returns power * voltage
 // TODO implement power curve information
-private double calculateOutput(double powerAvailable){ 
-	double currentOut = powerAvailable* 0.006;
-	double voltageOut = 0.5;
+private double calculateOutput(double powerProduced){ 
+	double currentOut = powerProduced / 38.06; // calculated based on bus voltage
+	double voltageOut = 38.06;      	 	  // this is the average voltage across the 6 panel segments
 	voltage = voltageOut;
 	current = currentOut;
 	power = currentOut * voltageOut;
@@ -145,10 +149,10 @@ private double calculateOutput(double powerAvailable){
 // TODO implement panel heating: defines deltaHeat as some value based on power produced, and adds deltaHeat to temp
 // TODO: totally made up the cooling rate and deltaHeat values
 private void calculateTemperature(){
-	deltaTemp = power * 0.005;
+	double deltaTemp = power * 0.001;  // totally arbitrary amount of heat generated per watt generated
 	temp = enviro.getTemperature() + deltaTemp;
-	double newTemp = coolingAmount();
-	temp = newTemp;
+	//double newTemp = coolingAmount();
+//	temp = newTemp;
 	
 	Log.write("Panels produced " + deltaTemp + " amount of heat");
 	Log.write("Panels are currently at " + temp + " degrees celsius");
@@ -156,12 +160,13 @@ private void calculateTemperature(){
 
 // TODO implement cooling formula for the panels based on speed, environmental temperature, and current temperature
 // TODO implement cooling amount based on car speed 
-private double coolingAmount(){
+/* private double coolingAmount(){
 	double tempDifference = temp - enviro.getTemperature();
 	double tempReduce = .05 * (tempDifference) * Math.exp(-.01);
 	return tempReduce;// arbitrary amount of 5% cooling of the temperature difference
+	*/ // the above cooling model needs some refinement;
 	
-}
+
 
  // ----------------- Getters and Setters ---------------- //
  // gives the current voltage output
@@ -179,10 +184,10 @@ private double coolingAmount(){
 	 return this.current * this.voltage;
  }
  
- // shows the heat produced for this iteration
- public double heat_from_panel(){
-	 return this.deltaTemp;
- }
+//   shows the heat produced for this iteration
+//   public double heat_from_panel(){
+//	 return this.deltaTemp;
+// }
  
  // shows the current temp of the panels
  public double temp_from_panel(){

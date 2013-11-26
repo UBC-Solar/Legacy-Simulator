@@ -55,7 +55,7 @@ public double getSunAngle(){
 	return sunAngle;
 }
 public double getTemperature(){
-	return temperature;
+	return 30;
 }
 }
 
