@@ -5,10 +5,7 @@ it spins based on the power going into it.
 Also models heat to make sure we don't cook it.
 Ideally, it would be similar to Stanford's panel sim (http://solarcar.stanford.edu/design/systems/strategy/)
 except for motors instead.
-Noah wasn't sure how the motor interfaced with the ElectricalController, so may have to redo
-how they interact (currently passing watts, may need to pass voltage and current) 
 */
-/** @todo figure out how to model regen */
 
 public class Motor{
 //---------------CLASS FIElDS-------------------------------
@@ -17,9 +14,10 @@ private double current;			/** current that the motor is operating at **/
 private double emfConstant; 	/** EMF constant determined by motor tests **/
 private double torqueConstant;	/** torque-current constant determined by motor tests **/
 private double charRes;			/** characteristic resistance of the motor **/
+
 //-----------END OF FIELDS, START OF CONSTRUCTORS--------------
 /** Copy constructor. Builds a motor with all fields and models equal to the given 
- * @param oldMotor - the battery to copy. 
+ * @param oldMotor - the motor to copy. 
  */
  public Motor(Motor oldMotor){
  /** @todo implement this, and all needed getters. */
@@ -38,10 +36,8 @@ public Motor(String fileName){
 
 private void loadModel(String fileName){
 /** @todo implement this. Figure out how to represent the Motor model. */
-	//These should be coming from the model file. Here until implemented.
-	//Need these from tests of the motor:
 	// characteristic resistance
-	// emfconstant
+	// EMF constant
 	// torque constant
 }
 
@@ -51,11 +47,10 @@ public Motor(double newTorque,double newCurrent){
 	torque = newTorque;
 	emfConstant = 20;
 	torqueConstant = 18.0;
-	charRes = 0.016;
+	charRes = 16;
 }
 
 //--------END OF CONSTRUCTOR-TYPE METHODS, START OF CALULATING ONES--------------
-
 /** characteristic resistance of the motor, 16 mOhm, and EMF Constant are assumptions. Need data.
  * @param delV 		 	 	- voltage of the motor treater as a generator
  * @param batteryVoltage 	- voltage of the main bus bar
