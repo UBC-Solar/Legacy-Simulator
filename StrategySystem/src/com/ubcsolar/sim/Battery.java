@@ -26,11 +26,11 @@ private double time;
  *  @todo Confirm this assumption: total stored electric energy in batteries is given by:  Ah*V = Wh		(charge capacity*voltage = energy)
  *  @todo Confirm this assumption: that the battery's voltage starts out at 40.15V
  */
-public Battery(){
+public Battery(){					// TODO: add parameters to set state of charge, instead of automatic 100%
 	maxChargeCapacity = 220;				 
 	batteryVoltage = 40.15;
 	maxStoredEnergy = maxChargeCapacity*batteryVoltage;
-	storedEnergy = maxStoredEnergy;
+	storedEnergy = 0.5*maxStoredEnergy;
 	Log.write("Default battery created.");
 }
 
