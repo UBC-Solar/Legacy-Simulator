@@ -55,13 +55,13 @@ public Motor(double newTorque,double newCurrent){
  * @param delV 		 	 	- voltage of the motor treater as a generator
  * @param batteryVoltage 	- voltage of the main bus bar
  * @param accelPercent		- accelerator percentage - duty cycle, essentially
- * @param angAccel			- angular acceleration, w, of the motor
+ * @param angVel			- angular velocity, w, of the motor
  * return current of the motor
  */
-public double getCurrent(double batteryVoltage, int accelPercent, double angAccel){
+public double getCurrent(double batteryVoltage, int accelPercent, double angVel){
 	double current;
 	double delV;
-	delV = getDelV(batteryVoltage, accelPercent, angAccel);
+	delV = getDelV(batteryVoltage, accelPercent, angVel);
 	current = delV/charRes;
 	return current;
 }
@@ -73,9 +73,9 @@ public double getCurrent(double batteryVoltage, int accelPercent, double angAcce
  * @param angAccel			- angular acceleration, w, of the motor
  * return delV of the motor
  */
-private double getDelV(double batteryVoltage, int accelPercent, double angAccel){
+private double getDelV(double batteryVoltage, int accelPercent, double angVel){
 	double delV;
-	delV = batteryVoltage * accelPercent - emfConstant * angAccel;
+	delV = batteryVoltage * accelPercent - emfConstant * angVel; 
 	return delV;
 }
 
@@ -94,24 +94,26 @@ public double getTorque(){
  * @param angAccel			- angular acceleration, w, of the motor
  * return boolean 			- true, if regen, false, if no regen
  */
-public Boolean isRegen(double batteryVoltage, int accelPercent, double angAccel){
+public Boolean isRegen(double batteryVoltage, int accelPercent, double angVel){
 	double delV;
-	delV = batteryVoltage * accelPercent - emfConstant * angAccel;
-	if (delV > 0)
-		return false;
-	else
+	delV = batteryVoltage * accelPercent - emfConstant * angVel;
+	if ( (angVel > 0 ) && (delV < 0)) 		// car is slowing down
 		return true;
+	else if ((angVel < 0) && (delV > 0))	// car when going backwards is slowing down
+		return true;
+	else 									// every other case 
+		return false;
 }
 
 /** creates next motor object
  * @param batteryVoltage	- bus bar voltage, determined by the battery
  * @param dutyCycle			- duty cycle of the motor
- * @param angAccel			- angular acceleration, w
+ * @param angVel			- angular acceleration, w
  * @param doLog				- if true, will write to log
  * @return current drawn, given the parameters
  */
-public double nextMotor(double batteryVoltage, int dutyCycle, double angAccel, Boolean doLog){
-	current = getCurrent(batteryVoltage, dutyCycle, angAccel);
+public double nextMotor(double batteryVoltage, int dutyCycle, double angVel, Boolean doLog){
+	current = getCurrent(batteryVoltage, dutyCycle, angVel);
 	torque = getTorque();
 	Log.write("Motor now spinning at: " + torque + " N m");
 	Log.write("Motor now pulling: " + current + " A");
