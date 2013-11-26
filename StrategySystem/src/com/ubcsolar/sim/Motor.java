@@ -29,9 +29,9 @@ private double charRes;			/** characteristic resistance of the motor **/
 public Motor(String fileName){
 	Log.write("ElectricalController created motor");
 	loadModel(fileName);
-	emfConstant = 20;
-	torqueConstant = 18.0;
-	charRes = 0.016;
+	emfConstant = 20.0;
+	torqueConstant = 4.0;
+	charRes = 100.0;
 }
 
 private void loadModel(String fileName){
@@ -45,9 +45,9 @@ private void loadModel(String fileName){
 public Motor(double newTorque,double newCurrent){
 	current = newCurrent;
 	torque = newTorque;
-	emfConstant = 20;
+	emfConstant = 20.0;
 	torqueConstant = 18.0;
-	charRes = 16;
+	charRes = 16.0;
 }
 
 //--------END OF CONSTRUCTOR-TYPE METHODS, START OF CALULATING ONES--------------
