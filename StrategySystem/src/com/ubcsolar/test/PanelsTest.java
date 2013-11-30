@@ -17,11 +17,13 @@ public class PanelsTest {
 }
 	@Test
 	public void test() {
+		
 		fail("Not yet implemented");
 	}
 
 	@Test
 	public void test1CurrentFromPanel(){
+		
 		assertTrue(myTestPanels.current_from_panel()== 1400.4 / 38.06 );
 	}
 	
