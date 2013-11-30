@@ -115,8 +115,11 @@ public Boolean isRegen(double batteryVoltage, int accelPercent, double angVel){
 public double nextMotor(double batteryVoltage, int dutyCycle, double angVel, Boolean doLog){
 	current = getCurrent(batteryVoltage, dutyCycle, angVel);
 	torque = getTorque();
-	Log.write("Motor now spinning at: " + torque + " N m");
-	Log.write("Motor now pulling: " + current + " A");
+	Log.write("Motor torque is at: " + torque + " N m");
+	if (current > 0)
+		Log.write("Motor is now consuming: " + current + " A");
+	else if (current <= 0)
+		Log.write("Motor is now producing: " + current + " A");
 	return current;
 }
 
