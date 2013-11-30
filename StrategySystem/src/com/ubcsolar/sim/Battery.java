@@ -21,7 +21,7 @@ private double time;
 
 
 //------------------------------------SETTER & GETTER METHODS------------------------------------------------------------------------------
-/** Constructs a default battery, at 100% charged state.
+/** Constructs a default battery, at 50% charged state.
  *  Values for maxChargeCapacity & batteryVoltage are taken from manufacturer's product data sheet.
  *  @todo Confirm this assumption: total stored electric energy in batteries is given by:  Ah*V = Wh		(charge capacity*voltage = energy)
  *  @todo Confirm this assumption: that the battery's voltage starts out at 40.15V
@@ -52,7 +52,11 @@ public void nextBattery(double time, Environment worldEnviro, Boolean doLog){
 }
 
 /** @todo get properties and model from file */
-public Battery(String fileName){
+public Battery(String fileName){					// TODO: add model file for battery
+	maxChargeCapacity = 220;				 
+	batteryVoltage = 40.15;
+	maxStoredEnergy = maxChargeCapacity*batteryVoltage;
+	storedEnergy = 0.5*maxStoredEnergy;
 	Log.write("Battery created");
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -105,7 +109,7 @@ public double heatFromCharge(double current, double chargeTime){
  * @todo Incorporate calculates that changes the batteryVoltage since voltage varies according to battery's state of charge
  */
 public void storeEnergy(double time, double current){
-	storedEnergy = storedEnergy + (current*batteryVoltage*time)/3600;	
+	storedEnergy = storedEnergy + (current*batteryVoltage*time)/3600;
 }
 
 /** Draws energy (in watt-hrs)
