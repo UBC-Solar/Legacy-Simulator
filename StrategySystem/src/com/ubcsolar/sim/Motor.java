@@ -7,13 +7,18 @@ Ideally, it would be similar to Stanford's panel sim (http://solarcar.stanford.e
 except for motors instead.
 */
 
+/** Highest priority To-Do:
+ * Each PWM cycle has its own efficiency curve associated to it, based on its current.
+ * So for each PWM, the current vs efficiency will be different.
+ * How to go about tackling: Have a look up table in Excel to get values.
+ */
 public class Motor{
 //---------------CLASS FIElDS-------------------------------
-private double torque;			/** the torque on the motor **/
-private double current;			/** current that the motor is operating at **/
-private double emfConstant; 	/** EMF constant determined by motor tests **/
-private double torqueConstant;	/** torque-current constant determined by motor tests **/
-private double charRes;			/** characteristic resistance of the motor **/
+private double torque;			/** the torque on the motor, in Nm **/
+private double current;			/** current that the motor is operating at, in Amperes **/
+private double emfConstant; 	/** EMF constant determined by motor tests, Constant value **/
+private double torqueConstant;	/** torque-current constant determined by motor tests , Constant value**/
+private double charRes;			/** characteristic resistance of the motor, in Ohms**/
 
 //-----------END OF FIELDS, START OF CONSTRUCTORS--------------
 /** Copy constructor. Builds a motor with all fields and models equal to the given 
@@ -63,7 +68,7 @@ public double getCurrent(double batteryVoltage, int accelPercent, double angVel)
  */
 private double getDelV(double batteryVoltage, int accelPercent, double angVel){
 	double delV;
-	delV = batteryVoltage * accelPercent - emfConstant * angVel; 
+	delV = (batteryVoltage * accelPercent) - (emfConstant * angVel); 
 	return delV;
 }
 
