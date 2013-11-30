@@ -29,25 +29,13 @@ private double charRes;			/** characteristic resistance of the motor **/
 public Motor(String fileName){
 	Log.write("ElectricalController created motor");
 	loadModel(fileName);
-	emfConstant = 20.0;
-	torqueConstant = 4.0;
-	charRes = 100.0;
 }
 
 private void loadModel(String fileName){
-/** @todo implement this. Figure out how to represent the Motor model. */
-	// characteristic resistance
-	// EMF constant
-	// torque constant
-}
-
-/** default constructor, builds a motor with a default Model */
-public Motor(double newTorque,double newCurrent){
-	current = newCurrent;
-	torque = newTorque;
+/** @todo implement this. Figure out how to represent and read the motor representation. */
 	emfConstant = 20.0;
 	torqueConstant = 5.0;
-	charRes = 16.0;
+	charRes = 100.0;
 }
 
 //--------END OF CONSTRUCTOR-TYPE METHODS, START OF CALULATING ONES--------------
@@ -59,11 +47,11 @@ public Motor(double newTorque,double newCurrent){
  * return current of the motor
  */
 public double getCurrent(double batteryVoltage, int accelPercent, double angVel){
-	double current;
+	double delCurrent;
 	double delV;
 	delV = getDelV(batteryVoltage, accelPercent, angVel);
-	current = delV/charRes;
-	return current;
+	delCurrent = delV/charRes;
+	return delCurrent;
 }
 
 /** finds delta voltage of the motor, if negative, torque is negative
@@ -83,7 +71,7 @@ private double getDelV(double batteryVoltage, int accelPercent, double angVel){
  * @param torqueConstant	- torque-current relationship is assumed to be linear
  * return torque exerted by the motor
  */
-public double getTorque(){
+public double getTorque(double current){
 	torque = torqueConstant * current;
 	return torque;
 }
@@ -114,11 +102,11 @@ public Boolean isRegen(double batteryVoltage, int accelPercent, double angVel){
  */
 public double nextMotor(double batteryVoltage, int dutyCycle, double angVel, Boolean doLog){
 	current = getCurrent(batteryVoltage, dutyCycle, angVel);
-	torque = getTorque();
+	torque = getTorque(current);
 	Log.write("Motor torque is at: " + torque + " N m");
 	if (current > 0)
 		Log.write("Motor is now consuming: " + current + " A");
-	else if (current <= 0)
+	else 
 		Log.write("Motor is now producing: " + current + " A");
 	return current;
 }
