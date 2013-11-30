@@ -46,7 +46,7 @@ public Motor(double newTorque,double newCurrent){
 	current = newCurrent;
 	torque = newTorque;
 	emfConstant = 20.0;
-	torqueConstant = 18.0;
+	torqueConstant = 5.0;
 	charRes = 16.0;
 }
 
