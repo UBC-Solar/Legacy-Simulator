@@ -139,11 +139,11 @@ public class GUI {
 	public JTable getMap() {
 		return table;
 	}
-	
+	/*
 	public JTextArea getForecast() {
 		return Forecast;
 	}
 	public JTree getPerformance() {
 		return tree;
-	}
+	}*/
 }
