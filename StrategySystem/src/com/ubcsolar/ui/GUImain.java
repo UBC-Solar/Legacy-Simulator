@@ -7,6 +7,9 @@ import javax.swing.SpringLayout;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -56,10 +59,12 @@ public class GUImain {
 		menuBar.add(mnModules);
 		
 		JMenuItem mntmMap = new JMenuItem("Map");
-		mntmMap.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				new JFrame("Map").setVisible(true);
+		mntmMap.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("test");
+				JFrame frame = new Map();
+				frame.setVisible(true);
 			}
 		});
 		mnModules.add(mntmMap);
