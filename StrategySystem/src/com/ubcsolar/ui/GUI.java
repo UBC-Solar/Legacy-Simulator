@@ -45,6 +45,7 @@ public class GUI {
 	private JTable table;
 	private final Action action = new SwingAction();
 	private final Action action_1 = new SwingAction_1();
+	private final Action action_2 = new SwingAction_2();
 
 	/**
 	 * Launch the application.
@@ -139,7 +140,7 @@ public class GUI {
 			public void mouseClicked(MouseEvent arg0) {
 			}
 		});
-		mntmNewMenuItem_11.setAction(action_1);
+		mntmNewMenuItem_11.setAction(action_2);
 		mnStrategy.add(mntmNewMenuItem_11);
 		
 	
@@ -198,6 +199,14 @@ public class GUI {
 	private class SwingAction_1 extends AbstractAction {
 		public SwingAction_1() {
 			putValue(NAME, "SwingAction_1");
+			putValue(SHORT_DESCRIPTION, "Some short description");
+		}
+		public void actionPerformed(ActionEvent e) {
+		}
+	}
+	private class SwingAction_2 extends AbstractAction {
+		public SwingAction_2() {
+			putValue(NAME, "SwingAction_2");
 			putValue(SHORT_DESCRIPTION, "Some short description");
 		}
 		public void actionPerformed(ActionEvent e) {
