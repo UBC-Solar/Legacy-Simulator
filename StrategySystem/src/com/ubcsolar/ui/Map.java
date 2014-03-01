@@ -1,19 +1,23 @@
 package com.ubcsolar.ui;
 
 import com.ubcsolar.map.*;
-import com.ubcsolar.map.MapController;
 
+import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
-import javax.swing.JButton;
-
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class Map {
 
-	private JFrame frame;
+public class Map extends JFrame {
+
+	private JPanel contentPane;
 
 	/**
 	 * Launch the application.
@@ -22,8 +26,8 @@ public class Map {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Map window = new Map();
-					window.frame.setVisible(true);
+					Map frame = new Map();
+					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -32,34 +36,33 @@ public class Map {
 	}
 
 	/**
-	 * Create the application.
+	 * Create the frame.
 	 */
 	public Map() {
-		initialize();
-	}
-
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 787, 454);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 538, 395);
 		
-		JButton btnNewButton = new JButton("Map1");
-		btnNewButton.addMouseListener(new MouseAdapter() {
+		JMenuBar menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+		
+		JMenu mnLoadMap = new JMenu("Load Map");
+		menuBar.add(mnLoadMap);
+		
+		JMenuItem mntmNewMenuItem = new JMenuItem("ASC2014 Route Map");
+		mntmNewMenuItem.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				MapController.load("res/ASC2014ClassicMapFull.kml");
 			}
-			// hardcoded string name for mapcontroller, will need to change it a browsing functionality
 		});
-		btnNewButton.setBounds(0, 0, 89, 23);
-		frame.getContentPane().add(btnNewButton);
+		mnLoadMap.add(mntmNewMenuItem);
 		
-		JButton btnNewButton_1 = new JButton("Map2");
-		btnNewButton_1.setBounds(0, 34, 89, 23);
-		frame.getContentPane().add(btnNewButton_1);
+		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Other Map");
+		mnLoadMap.add(mntmNewMenuItem_1);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
 	}
+
 }
