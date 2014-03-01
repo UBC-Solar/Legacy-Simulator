@@ -11,6 +11,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -19,9 +22,9 @@ public class Map extends JFrame {
 
 	private JPanel contentPane;
 
-	/**
+/**
 	 * Launch the application.
-	 */
+	 *//*//commented out, don't need a MAIN in Map. 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -33,7 +36,7 @@ public class Map extends JFrame {
 				}
 			}
 		});
-	}
+	}*/
 
 	/**
 	 * Create the frame.
@@ -49,10 +52,9 @@ public class Map extends JFrame {
 		menuBar.add(mnLoadMap);
 		
 		JMenuItem mntmNewMenuItem = new JMenuItem("ASC2014 Route Map");
-		mntmNewMenuItem.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				MapController.load("res/ASC2014ClassicMapFull.kml");
+		mntmNewMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				MapController.load("res/ASC2014ClassicMapFull.kml"); //TODO hardcoded, will need to update
 			}
 		});
 		mnLoadMap.add(mntmNewMenuItem);
