@@ -1,5 +1,10 @@
 package com.ubcsolar.sim;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.*;
+import java.util.*;
+
 /*
 
 
@@ -61,7 +66,7 @@ public void initialize(String trackFileName){
 public static void main(String[] args){
 	System.out.println("hello world");
 	World theWorld = new World("trackfile.exe"); //create a 'World' object (we could run 5 different simulations here)
-	for(int second = 0; second<10; second++){ //currently running 10 iterations
+	for(int second = 0; second<18000; second++){ //currently running 10 iterations
 		System.out.println(""); //clear line to make Iterations stand out.
 		Log.write("Iteration: " + second);
 		theWorld.nextWorld();
