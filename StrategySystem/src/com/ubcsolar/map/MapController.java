@@ -1,9 +1,9 @@
 package com.ubcsolar.map;
 
 public class MapController {
-	static DataHolder current;
+	DataHolder current;
 	
-	public static void load(String filename){
+	public void load(String filename){
 	current = new DataHolder(filename);	
 	}
 
