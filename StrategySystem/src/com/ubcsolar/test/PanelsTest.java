@@ -31,11 +31,11 @@ public class PanelsTest {
 	public void testPower(){
 		assertTrue(myTestPanels.power_from_panel()== 1400.4);
 	}
-	
+	/*
 	@Test
 	public void testTemp(){
 		assertTrue(myTestPanels.temp_from_panel()== 0);
-	}
+	}*/
 	
 	@Test
 	public void testVoltage(){
