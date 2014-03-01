@@ -44,6 +44,7 @@ public class GUI {
 	private JFrame frame;
 	private JTable table;
 	private final Action action = new SwingAction();
+	private final Action action_1 = new SwingAction_1();
 
 	/**
 	 * Launch the application.
@@ -131,7 +132,16 @@ public class GUI {
 			public void mouseClicked(MouseEvent e) {
 			}
 		});
-		mntmNewMenuItem.setAction(action);
+		
+		JMenuItem mntmNewMenuItem_11 = new JMenuItem("Map Window");
+		mntmNewMenuItem_11.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+			}
+		});
+		mntmNewMenuItem_11.setAction(action_1);
+		mnStrategy.add(mntmNewMenuItem_11);
+		
 	
 		mnStrategy.add(mntmNewMenuItem);
 		
@@ -176,18 +186,37 @@ public class GUI {
 		
 		JMenuItem mntmRegulations = new JMenuItem("Regulations");
 		mnNewMenu.add(mntmRegulations);
+	}	
+	private class SwingAction extends AbstractAction {
+		public SwingAction() {
+			putValue(NAME, "SwingAction");
+			putValue(SHORT_DESCRIPTION, "Some short description");
+		}
+		public void actionPerformed(ActionEvent e) {
+		}
 	}
+	private class SwingAction_1 extends AbstractAction {
+		public SwingAction_1() {
+			putValue(NAME, "SwingAction_1");
+			putValue(SHORT_DESCRIPTION, "Some short description");
+		}
+		public void actionPerformed(ActionEvent e) {
+		}
+	}
+}
 
 	// This is center display in main window for map
+	/*
 	public JTable getMap() {
 		return table;
 	}
-	
+	/*
 	public JTextArea getForecast() {
 		return Forecast;
 	}
 	public JTree getPerformance() {
 		return tree;
+<<<<<<< HEAD
 	}
 	private class SwingAction extends AbstractAction {
 		public SwingAction() {
@@ -197,4 +226,6 @@ public class GUI {
 		public void actionPerformed(ActionEvent e) {
 		}
 	}
-}
+=======
+	}*/
+
