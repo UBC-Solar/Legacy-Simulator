@@ -32,10 +32,10 @@ public class BatteryTest {
 		testGetMaxRechargeTime();
 		init2();
 		testGetCurrent();
-		init2();
+		init2();/*
 		testStoreEnergy();
 		init2();
-		testDrawEnergy();
+		testDrawEnergy();*/
 	}
 	
 	@Test
@@ -66,7 +66,7 @@ public class BatteryTest {
 	public void testGetCurrent(){
 		assertTrue(myTestBattery.getCurrent(5.0)== 79200.0);
 	}
-	
+	/*
 	@Test
 	public void testStoreEnergy(){
 		assertTrue(myTestBattery.storeEnergy(5.0,10.0)> 4416.5);
@@ -76,6 +76,6 @@ public class BatteryTest {
 	public void testDrawEnergy(){
 		assertTrue(myTestBattery.drawEnergy(5.0,10.0)< 4416.5);
 				
-	}
+	}*/
 	
 }

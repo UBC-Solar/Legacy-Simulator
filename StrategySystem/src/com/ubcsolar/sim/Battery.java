@@ -23,7 +23,7 @@ private double time;
 //------------------------------------SETTER & GETTER METHODS------------------------------------------------------------------------------
 /** Constructs a default battery, at 50% charged state.
  *  Values for maxChargeCapacity & batteryVoltage are taken from manufacturer's product data sheet.
- *  @todo Confirm this assumption: total stored electric energy in batteries is given by:  Ah*V = Wh		(charge capacity*voltage = energy)
+ *  Total stored electric energy in batteries is given by:  Ah*V = Wh		(charge capacity*voltage = energy)
  *  @todo Confirm this assumption: that the battery's voltage starts out at 40.15V
  */
 public Battery(){					// TODO: add parameters to set state of charge, instead of automatic 100%
@@ -31,24 +31,7 @@ public Battery(){					// TODO: add parameters to set state of charge, instead of
 	batteryVoltage = 40.15;
 	maxStoredEnergy = maxChargeCapacity*batteryVoltage;
 	storedEnergy = 0.5*maxStoredEnergy;
-	Log.write("Default battery created.");
-}
-
-/** Reuturns the battery's voltage. */
-public double getBatteryVoltage(){
-	return batteryVoltage;
-}
-
-/** Returns the current state of charge of battery, as a percentage. */
-public int getStateOfCharge(){
-	return (int)((double)storedEnergy/(double)maxStoredEnergy)*100; 
-}
-
-/** Predict the next state of the battery. 
- * @param time - the time interval (in seconds)
- * @todo need to finish this method
- */
-public void nextBattery(double time, Environment worldEnviro, Boolean doLog){
+	Log.write("Battery created.");
 }
 
 /** @todo get properties and model from file */
@@ -59,6 +42,37 @@ public Battery(String fileName){					// TODO: add model file for battery
 	storedEnergy = 0.5*maxStoredEnergy;
 	Log.write("Battery created");
 }
+
+/** Sets the state of charge of battery. */
+public void setStateOfCharge(double SOC){
+	storedEnergy = (SOC/100)*maxStoredEnergy;
+}
+
+/** Returns the current state of charge of battery, as a percentage. */
+public double getStateOfCharge(){
+	return (storedEnergy/maxStoredEnergy)*100; 
+}
+
+/** Returns the stored energy in the battery. (watt-hours) */
+public double getStoredEnergy(){
+	return storedEnergy;
+}
+
+
+/** Returns the battery's voltage. */
+public double getBatteryVoltage(){
+	return batteryVoltage;
+}
+
+
+/** Predict the next state of the battery. 
+ * @param time - the time interval (in seconds)
+ * @todo need to finish this method
+ */
+public void nextBattery(double time, Environment worldEnviro, Boolean doLog){
+}
+
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -66,14 +80,17 @@ public Battery(String fileName){					// TODO: add model file for battery
 /** Calculates the maximum time the battery could recharge for, before it overcharges. (in seconds)
  * Should display error if the specified charge is over the battery's max charge capacity
  * @param currentRecharge - the current the battery will be charged at, specified by the electrical controller (in amps)
- * @todo Confirm the battery's max charge capacity, and confirm that it absolutely cannot charge at a capacity that exceeds it
- * @todo Confirm this assumption: the charging time is given by: (maxWh-currentWh)/(V*A)
+ * Charging time is given by: (maxWh-currentWh)/(V*A)
  * @todo Incorporate charging efficiency, temperature, other factors that will affect the charging time
  * */
 public double getMaxRechargeTime(double currentRecharge){
 	double rechargeTime;
 	if (currentRecharge > maxChargeCapacity){
 		Log.write("Cannot exceed max charge capactiy");
+		return -1.0;
+	}
+	if (currentRecharge <= 0){
+		Log.write("Error: negative current given");
 		return -1.0;				
 	}
 	else{
@@ -84,7 +101,7 @@ public double getMaxRechargeTime(double currentRecharge){
 
 /** Calculates what current the battery can provide (in amps), considering it's current state of charge.
  * @param chargeTime - time period (in seconds) for which the battery will be providing this current; specified by electrical controller
- * @todo Confirm this assumption: Wh/(V*t) = A
+ * Confirm this assumption: Wh/(V*t) = A
  * @todo Incorporate charging efficiency, temperature, other factors that will be of influence
  * @todo Apply limitation to battery's maximum discharge capacity
  * */
@@ -109,7 +126,13 @@ public double heatFromCharge(double current, double chargeTime){
  * @todo Incorporate calculates that changes the batteryVoltage since voltage varies according to battery's state of charge
  */
 public void storeEnergy(double time, double current){
+	if (current <= 0){
+		Log.write("Error: negative current given");
+		return;
+	}
+	else{
 	storedEnergy = storedEnergy + (current*batteryVoltage*time)/3600;
+	}
 }
 
 /** Draws energy (in watt-hrs)
@@ -117,7 +140,13 @@ public void storeEnergy(double time, double current){
  * @todo Incorporate calculates that changes the batteryVoltage since voltage varies according to battery's state of charge
  */
 public void drawEnergy(double time, double current){
+	if (current <= 0){
+		Log.write("Error: negative current given");
+		return;
+	}
+	else{
 	storedEnergy = storedEnergy - (current*batteryVoltage*time)/3600;
+	}
 }
 //-----------------------------------------------------------------------------------------------------------------------------------------
 
