@@ -18,10 +18,10 @@ public class DataHolder {
 		
 		try {
 
-			File stocks = new File(filename);
+			File xmlDoc = new File(filename);
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(stocks);
+			Document doc = dBuilder.parse(xmlDoc);
 			doc.getDocumentElement().normalize();
 
 			System.out.println("root of xml file" + doc.getDocumentElement().getNodeName());
