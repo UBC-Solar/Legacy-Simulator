@@ -58,7 +58,7 @@ public Panels(Track newTrack){
  * @param fileName - the name of the file to pull the model from. 
  */
 public Panels(String fileName){
-	//TODO get properties and model from file
+	
 	Log.write("Panels created");
 }
 /** loads the model from the given file. 
@@ -111,7 +111,7 @@ private double calculatePower(int time, Environment worldEnviro){
 	Log.write("Panels produced " + output + " watts of power");
 	return output;
 	 
- /** TODO implement this. Will need to develop a model */ 
+
 // TODO need to adjust for square meter collecting area
  }
 

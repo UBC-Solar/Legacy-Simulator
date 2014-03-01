@@ -31,11 +31,19 @@ import javax.swing.JMenuItem;
 import javax.swing.JMenu;
 import java.awt.List;
 import java.awt.Choice;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.AbstractAction;
+import java.awt.event.ActionEvent;
+import javax.swing.Action;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 public class GUI {
 
 	private JFrame frame;
 	private JTable table;
+	private final Action action = new SwingAction();
 
 	/**
 	 * Launch the application.
@@ -67,21 +75,49 @@ public class GUI {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 805, 479);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(new BorderLayout(0, 0));
+		frame.getContentPane().setLayout(null);
 		
 		JTree tree = new JTree();
+		tree.setModel(new DefaultTreeModel(
+			new DefaultMutableTreeNode("Simulation") {
+				{
+					DefaultMutableTreeNode node_1;
+					node_1 = new DefaultMutableTreeNode("Car parameters\t");
+						node_1.add(new DefaultMutableTreeNode("battery"));
+						node_1.add(new DefaultMutableTreeNode("weight"));
+						node_1.add(new DefaultMutableTreeNode("Panel production"));
+					add(node_1);
+					node_1 = new DefaultMutableTreeNode("Strategy");
+						node_1.add(new DefaultMutableTreeNode("basketball"));
+						node_1.add(new DefaultMutableTreeNode("soccer"));
+						node_1.add(new DefaultMutableTreeNode("football"));
+						node_1.add(new DefaultMutableTreeNode("hockey"));
+					add(node_1);
+					node_1 = new DefaultMutableTreeNode("food");
+						node_1.add(new DefaultMutableTreeNode("hot dogs"));
+						node_1.add(new DefaultMutableTreeNode("pizza"));
+						node_1.add(new DefaultMutableTreeNode("ravioli"));
+						node_1.add(new DefaultMutableTreeNode("bananas"));
+					add(node_1);
+				}
+			}
+		));
+		tree.setBounds(0, 0, 124, 320);
 		tree.setEditable(true);
-		frame.getContentPane().add(tree, BorderLayout.WEST);
+		frame.getContentPane().add(tree);
 		
 		ScrollPane scrollPane = new ScrollPane();
-		frame.getContentPane().add(scrollPane, BorderLayout.SOUTH);
+		scrollPane.setBounds(0, 320, 789, 100);
+		frame.getContentPane().add(scrollPane);
 		
 		Box verticalBox = Box.createVerticalBox();
-		frame.getContentPane().add(verticalBox, BorderLayout.NORTH);
+		verticalBox.setBounds(0, 0, 789, 0);
+		frame.getContentPane().add(verticalBox);
 		
 		table = new JTable();
+		table.setBounds(156, 32, 633, 288);
 		table.setCellSelectionEnabled(true);
-		frame.getContentPane().add(table, BorderLayout.CENTER);
+		frame.getContentPane().add(table);
 		
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
@@ -90,6 +126,13 @@ public class GUI {
 		menuBar.add(mnStrategy);
 		
 		JMenuItem mntmNewMenuItem = new JMenuItem("Route map");
+		mntmNewMenuItem.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+			}
+		});
+		mntmNewMenuItem.setAction(action);
+	
 		mnStrategy.add(mntmNewMenuItem);
 		
 		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Weather Map");
@@ -145,5 +188,13 @@ public class GUI {
 	}
 	public JTree getPerformance() {
 		return tree;
+	}
+	private class SwingAction extends AbstractAction {
+		public SwingAction() {
+			putValue(NAME, "SwingAction");
+			putValue(SHORT_DESCRIPTION, "Some short description");
+		}
+		public void actionPerformed(ActionEvent e) {
+		}
 	}
 }
