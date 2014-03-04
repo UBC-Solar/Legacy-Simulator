@@ -45,7 +45,7 @@ public class GUImain {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
+		frame.setBounds(100, 100, 485, 347);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new SpringLayout());
 		
@@ -69,13 +69,31 @@ public class GUImain {
 		});
 		mnModules.add(mntmMap);
 		
-		JMenuItem mntmSimulator = new JMenuItem("Simulator");
+		JMenuItem mntmSimulator = new JMenuItem("Simulation");
+		mntmSimulator.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFrame frame = new Simulation();
+				frame.setVisible(true);
+			}
+		});
 		mnModules.add(mntmSimulator);
 		
 		JMenuItem mntmPerformance = new JMenuItem("Performance");
+		mntmPerformance.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFrame frame = new Performance();
+				frame.setVisible(true);
+			}
+		});
 		mnModules.add(mntmPerformance);
 		
 		JMenuItem mntmStrategy = new JMenuItem("Strategy");
+		mntmStrategy.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFrame frame = new Strategy();
+				frame.setVisible(true);
+			}
+		});
 		mnModules.add(mntmStrategy);
 	}
 }

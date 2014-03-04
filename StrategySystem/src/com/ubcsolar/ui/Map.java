@@ -16,11 +16,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.JTable;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JScrollPane;
 
 
 public class Map extends JFrame {
 
 	private JPanel contentPane;
+	private JTable table;
 
 /**
 	 * Launch the application.
@@ -42,11 +47,17 @@ public class Map extends JFrame {
 	 * Create the frame.
 	 */
 	public Map() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 538, 395);
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
+		
+		JMenu mnNewMenu = new JMenu("View Map");
+		menuBar.add(mnNewMenu);
+		
+		JMenuItem mntmCoordinates = new JMenuItem("Coordinates");
+		mnNewMenu.add(mntmCoordinates);
 		
 		JMenu mnLoadMap = new JMenu("Load Map");
 		menuBar.add(mnLoadMap);
@@ -63,8 +74,29 @@ public class Map extends JFrame {
 		mnLoadMap.add(mntmNewMenuItem_1);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		GroupLayout gl_contentPane = new GroupLayout(contentPane);
+		gl_contentPane.setHorizontalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 321, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(181, Short.MAX_VALUE))
+		);
+		gl_contentPane.setVerticalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
+					.addContainerGap())
+		);
+		
+		
+		
+		table = new JTable();
+		scrollPane.setViewportView(table);
+		contentPane.setLayout(gl_contentPane);
 	}
-
 }
