@@ -4,7 +4,7 @@ public class MapController {
 	private static DataHolder current;
 	
 	public static void load(String filename){
-	current = new DataHolder(filename);	
+		current = new DataHolder(filename);	
 	}
 
 }
