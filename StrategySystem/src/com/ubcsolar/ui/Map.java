@@ -18,6 +18,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 
+import javax.swing.JDialog;
 import javax.swing.JTable;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -25,6 +26,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JEditorPane;
+import javax.swing.JButton;
 
 
 public class Map extends JFrame {
@@ -51,6 +53,12 @@ public class Map extends JFrame {
 	/**
 	 * Create the frame.
 	 */
+	public void LabelUpdate(String labelupdate) {
+		lblBlank.setText(labelupdate);
+	}
+	
+	JLabel lblBlank = new JLabel("blank");
+	
 	public Map() {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 538, 395);
@@ -73,6 +81,8 @@ public class Map extends JFrame {
 				try {
 					MapController.load("res/ASC2014ClassicMapFull.kml");
 				} catch (IOException e) {
+					JDialog dialog = new ErrorMessage();
+					dialog.setVisible(true);
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 					
@@ -93,6 +103,16 @@ public class Map extends JFrame {
 		JScrollPane scrollPane = new JScrollPane();
 		
 		JPanel panel = new JPanel();
+		
+		JButton btnNewButton = new JButton("New button");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String dataname = MapController.getLoadedMapName();
+				LabelUpdate(dataname); 
+			}
+		});
+		
+	
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -100,14 +120,28 @@ public class Map extends JFrame {
 					.addContainerGap()
 					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 321, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel, GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE))
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(10)
+							.addComponent(lblBlank)
+							.addContainerGap())
+						.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+							.addGroup(gl_contentPane.createSequentialGroup()
+								.addComponent(btnNewButton)
+								.addContainerGap())
+							.addComponent(panel, GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE))))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(panel, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)
+							.addGap(2)
+							.addComponent(lblBlank)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnNewButton))
 						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE))
 					.addContainerGap())
 		);

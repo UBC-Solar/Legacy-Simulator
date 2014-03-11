@@ -12,7 +12,8 @@ public class MapController {
 	
 	
 	//TODO implement
-	public static String getLoadedMapName(){
+
+	public static String getLoadedMapName(){ 
 		if(current == null){
 			return null;
 		}
