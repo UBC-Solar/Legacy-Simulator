@@ -6,9 +6,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class ReadXML {
+public class ReadMETAR {
 
-	public static void main(String argv[]) {
+	public static void ReadMETAR(String argv[]) {
 		
 		try{
 			
@@ -100,27 +100,27 @@ public class ReadXML {
 				}
 				
 				if (btemp) {
-					System.out.println("TEMPERATURE : " + new String(ch, start, length));
+					System.out.println("TEMPERATURE (deg C) : " + new String(ch, start, length));
 					btemp = false;
 				}
 		 
 				if (bdewpoint) {
-					System.out.println("DEW POINT : " + new String(ch, start, length));
+					System.out.println("DEW POINT (deg C) : " + new String(ch, start, length));
 					bdewpoint = false;
 				}
 		 
 				if (bwind_dir) {
-					System.out.println("WIND DIRECTION : " + new String(ch, start, length));
+					System.out.println("WIND DIRECTION (deg) : " + new String(ch, start, length));
 					bwind_dir = false;
 				}
 		 
 				if (bwind_speed) {
-					System.out.println("WIND SPEED : " + new String(ch, start, length));
+					System.out.println("WIND SPEED (kt) : " + new String(ch, start, length));
 					bwind_speed = false;
 				}
 		 
 				if (bvisibility) {
-					System.out.println("VISIBILITY : " + new String(ch, start, length));
+					System.out.println("VISIBILITY (mi): " + new String(ch, start, length));
 					bvisibility = false;
 					System.out.println("");
 				}
@@ -136,7 +136,7 @@ public class ReadXML {
 			
 		};
 		
-		saxParser.parse("res/test_METARxml", handler);
+		saxParser.parse("res/test_METAR_xml", handler);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
