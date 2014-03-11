@@ -34,14 +34,14 @@ private ErrorMessage thisone = this	;
 	 * Create the dialog.
 	 */
 	public ErrorMessage() {
-		setBounds(100, 100, 345, 186);
+		setBounds(100, 100, 304, 158);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		{
-			JLabel lblNewLabel = new JLabel("Error: IO Exception file was not loaded. ");
-			lblNewLabel.setBounds(68, 10, 193, 14);
+			JLabel lblNewLabel = new JLabel(" Error: IO Exception, file not found.");
+			lblNewLabel.setBounds(44, 21, 195, 38);
 			contentPanel.add(lblNewLabel);
 		}
 		{
@@ -51,7 +51,7 @@ private ErrorMessage thisone = this	;
 					thisone.setVisible(false);
 				}
 			});
-			btnOkay.setBounds(118, 87, 89, 23);
+			btnOkay.setBounds(88, 70, 89, 23);
 			contentPanel.add(btnOkay);
 		}
 	}
