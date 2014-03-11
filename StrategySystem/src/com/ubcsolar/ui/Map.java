@@ -16,6 +16,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+
 import javax.swing.JTable;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -68,7 +70,13 @@ public class Map extends JFrame {
 		JMenuItem mntmNewMenuItem = new JMenuItem("ASC2014 Route Map");
 		mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				MapController.load("res/ASC2014ClassicMapFull.kml"); 
+				try {
+					MapController.load("res/ASC2014ClassicMapFull.kml");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					
+				} 
 				
 				
 				//TODO hardcoded, will need to update

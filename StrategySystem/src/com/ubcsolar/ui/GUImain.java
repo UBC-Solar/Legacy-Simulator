@@ -76,6 +76,15 @@ public class GUImain {
 				frame.setVisible(true);
 			}
 		});
+		
+		JMenuItem mntmWeather = new JMenuItem("Weather");
+		mntmWeather.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFrame frame = new Weather();
+				frame.setVisible(true);
+			}
+		});
+		mnModules.add(mntmWeather);
 		mnModules.add(mntmSimulator);
 		
 		JMenuItem mntmPerformance = new JMenuItem("Performance");
