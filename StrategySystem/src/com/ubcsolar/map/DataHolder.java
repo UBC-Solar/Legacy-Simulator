@@ -25,8 +25,7 @@ public class DataHolder {
 	
 	
 	private void pureLoad(String filename) throws IOException{
-		
-		
+
 		
 		try {
 
