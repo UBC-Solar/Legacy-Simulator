@@ -5,6 +5,7 @@
 package com.ubcsolar.map;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -16,14 +17,14 @@ import org.w3c.dom.NodeList;
 
 public class DataHolder {
 
-	public DataHolder(String filename){
+	public DataHolder(String filename) throws IOException{
 		System.out.println("Map data holder has been created!");
 		pureLoad(filename);
 	}
 	
 	
 	
-	private void pureLoad(String filename){
+	private void pureLoad(String filename) throws IOException{
 		
 		
 		
@@ -65,7 +66,10 @@ public class DataHolder {
 						 */
 				}
 			}
-			} catch (Exception ex) {
+			}catch(IOException e){
+				throw e;
+			}
+			catch (Exception ex) {
 				System.out.println("main2 failed");
 			ex.printStackTrace();
 			}

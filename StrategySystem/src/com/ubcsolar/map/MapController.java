@@ -1,9 +1,11 @@
 package com.ubcsolar.map;
 
+import java.io.IOException;
+
 public class MapController {
 	private static DataHolder current;
 	
-	public static void load(String filename){
+	public static void load(String filename) throws IOException{
 		current = new DataHolder(filename);	
 	}
 	
