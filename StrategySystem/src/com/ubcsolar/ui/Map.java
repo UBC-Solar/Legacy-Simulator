@@ -1,5 +1,7 @@
 package com.ubcsolar.ui;
 
+import com.ubcsolar.common.Listener;
+import com.ubcsolar.common.Notification;
 import com.ubcsolar.map.*;
 
 import java.awt.BorderLayout;
@@ -11,6 +13,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,10 +32,12 @@ import javax.swing.JEditorPane;
 import javax.swing.JButton;
 
 
-public class Map extends JFrame {
+public class Map extends JFrame implements Listener {
 
 	private JPanel contentPane;
 	private JTable table;
+	private GlobalController mySession;
+	private JLabel lblBlank = new JLabel("blank");
 
 /**
 	 * Launch the application.
@@ -53,14 +58,28 @@ public class Map extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public void LabelUpdate(String labelupdate) {
+	public void labelUpdate(String labelupdate) {
 		lblBlank.setText(labelupdate);
 	}
 	
-	JLabel lblBlank = new JLabel("blank");
 	
-	public Map() {
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	
+	public void notify(Notification n){
+		System.out.println("MAP GOT A NOTIFICATION");
+		//TODO add any notifications here
+		if(n.getClass() == NewMapLoadedNotification.class){
+			labelUpdate(((NewMapLoadedNotification) n).getMapLoadedName());
+			JOptionPane.showMessageDialog(this, "New map: " + (((NewMapLoadedNotification) n).getMapLoadedName()));
+		}
+	}
+	public void register(){
+		mySession.register(this, NewMapLoadedNotification.class);
+		//TODO add any notifications you need to listen for here. 
+	}
+	public Map(GlobalController toAdd) {
+		mySession = toAdd;
+		register();
+		setDefaultCloseOperation(HIDE_ON_CLOSE);
 		setBounds(100, 100, 538, 395);
 		
 		JMenuBar menuBar = new JMenuBar();
@@ -76,10 +95,10 @@ public class Map extends JFrame {
 		menuBar.add(mnLoadMap);
 		
 		JMenuItem mntmNewMenuItem = new JMenuItem("ASC2014 Route Map");
-		/*mntmNewMenuItem.addActionListener(new ActionListener() {
+		mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					MapController.load("res/ASC2014ClassicMapFull.kml");
+					mySession.getMapController().load("res/ASC2014ClassicMapFull.kml");
 				} catch (IOException e) {
 					JDialog dialog = new ErrorMessage();
 					dialog.setVisible(true);
@@ -91,7 +110,7 @@ public class Map extends JFrame {
 				
 				//TODO hardcoded, will need to update
 			}
-		});*/
+		});
 		mnLoadMap.add(mntmNewMenuItem);
 		
 		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Other Map");
@@ -104,13 +123,13 @@ public class Map extends JFrame {
 		
 		JPanel panel = new JPanel();
 		
-		JButton btnNewButton = new JButton("New button");
-		/*btnNewButton.addActionListener(new ActionListener() {
+		JButton btnNewButton = new JButton("Refresh Map Name");
+		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String dataname = MapController.getLoadedMapName();
-				LabelUpdate(dataname); 
+				String dataname = mySession.getMapController().getLoadedMapName();
+				labelUpdate(dataname); 
 			}
-		});*/
+		});
 		
 	
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);

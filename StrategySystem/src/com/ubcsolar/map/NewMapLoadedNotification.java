@@ -10,5 +10,8 @@ public class NewMapLoadedNotification extends Notification {
 		super();
 		this.mapLoadedName = name;
 	}
-	
+
+	public String getMapLoadedName(){
+		return mapLoadedName;
+	}
 }

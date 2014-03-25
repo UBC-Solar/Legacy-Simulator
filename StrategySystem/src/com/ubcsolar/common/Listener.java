@@ -1,6 +1,5 @@
-package com.ubcsolar.ui;
+package com.ubcsolar.common;
 
-import com.ubcsolar.common.Notification;
 
 public interface Listener {
 	

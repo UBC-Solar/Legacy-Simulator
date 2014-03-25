@@ -17,11 +17,17 @@ import org.w3c.dom.NodeList;
 
 public class DataHolder {
 	private MapController myMapController;
+	private String filename;
+	
 	public DataHolder(String filename, MapController toAdd) throws IOException{
 		myMapController = toAdd;
 		pureLoad(filename);
+		this.filename = filename;
 	}
 	
+	public String getFileName(){
+		return filename;
+	}
 	
 	
 	private void pureLoad(String filename) throws IOException{
@@ -54,8 +60,8 @@ public class DataHolder {
 							Element subElement = (Element) subNode;
 							//NodeList subNodes2 = subElement.getElementsByTagName("coordinates");
 							//System.out.println("Size: " + subNodes2.getLength());
-							System.out.println(getValue("coordinates", subElement));
-							System.out.println(subNode.getNodeName());
+							//System.out.println(getValue("coordinates", subElement));
+							//System.out.println(subNode.getNodeName());
 							
 						}
 						//System.out.println(node.getNodeName());

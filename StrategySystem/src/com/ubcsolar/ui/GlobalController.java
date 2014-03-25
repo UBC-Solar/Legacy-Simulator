@@ -3,8 +3,12 @@ package com.ubcsolar.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ubcsolar.car.CarController;
+import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.Notification;
 import com.ubcsolar.map.MapController;
+import com.ubcsolar.sim.SimController;
+import com.ubcsolar.weather.WeatherController;
 
 public class GlobalController {
 	private List<Listener> listOfListeners; //listeners, waiting for a trigger listed in triggers/. 
@@ -12,6 +16,9 @@ public class GlobalController {
 								//listener in pos. 1 is waiting for the trigger in pos. 1, etc. 
 	private GUImain mainWindow; 
 	private MapController myMapController;
+	private CarController myCarController;
+	private SimController mySimController;
+	private WeatherController myWeatherController;
 	
 	
 	
@@ -19,6 +26,10 @@ public class GlobalController {
 	public GlobalController(GUImain mainWindow){
 		this.mainWindow = mainWindow;
 		myMapController = new MapController(this);
+		myCarController = new CarController(this);
+		mySimController = new SimController(this);
+		myWeatherController = new WeatherController(this);
+		
 		listOfListeners = new ArrayList<Listener>();
 		listOfTriggers = new ArrayList<Class<? extends Notification>>();
 		
@@ -42,6 +53,22 @@ public class GlobalController {
 	public MapController getMapController(){
 		return myMapController;
 	}
+
+	public SimController getMySimController() {
+		return mySimController;
+	}
+
+
+	public CarController getMyCarController() {
+		return myCarController;
+	}
+
+
+	public WeatherController getMyWeatherController() {
+		return myWeatherController;
+	}
+
+
 	
 	
 }
