@@ -16,9 +16,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class DataHolder {
-
-	public DataHolder(String filename) throws IOException{
-		System.out.println("Map data holder has been created!");
+	private MapController myMapController;
+	public DataHolder(String filename, MapController toAdd) throws IOException{
+		myMapController = toAdd;
 		pureLoad(filename);
 	}
 	

@@ -76,7 +76,7 @@ public class Map extends JFrame {
 		menuBar.add(mnLoadMap);
 		
 		JMenuItem mntmNewMenuItem = new JMenuItem("ASC2014 Route Map");
-		mntmNewMenuItem.addActionListener(new ActionListener() {
+		/*mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					MapController.load("res/ASC2014ClassicMapFull.kml");
@@ -91,7 +91,7 @@ public class Map extends JFrame {
 				
 				//TODO hardcoded, will need to update
 			}
-		});
+		});*/
 		mnLoadMap.add(mntmNewMenuItem);
 		
 		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Other Map");
@@ -105,12 +105,12 @@ public class Map extends JFrame {
 		JPanel panel = new JPanel();
 		
 		JButton btnNewButton = new JButton("New button");
-		btnNewButton.addActionListener(new ActionListener() {
+		/*btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String dataname = MapController.getLoadedMapName();
 				LabelUpdate(dataname); 
 			}
-		});
+		});*/
 		
 	
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);

@@ -3,19 +3,25 @@ package com.ubcsolar.ui;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SpringLayout;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import com.ubcsolar.common.Notification;
+import com.ubcsolar.map.NewMapLoadedNotification;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 
-public class GUImain {
+public class GUImain implements Listener{
 
 	private JFrame frame;
+	private GlobalController mySession; 
 
 	/**
 	 * Launch the application.
@@ -39,11 +45,27 @@ public class GUImain {
 	public GUImain() {
 		initialize();
 	}
-
+	
+	@Override
+	public void notify(Notification n){
+		
+		if(n.getClass() == NewMapLoadedNotification.class){
+			System.out.println("IT WORKED!!!");
+		}
+		//TODO: Do something when notified. 
+		
+	}
+	
+	private void registerListeners(){
+		mySession.register(this, NewMapLoadedNotification.class);
+	}
+	
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		mySession = new GlobalController(this);
+		registerListeners();
 		frame = new JFrame();
 		frame.setBounds(100, 100, 485, 347);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -63,8 +85,15 @@ public class GUImain {
 			
 			public void actionPerformed(ActionEvent arg0) {
 				System.out.println("test");
-				JFrame frame = new Map();
-				frame.setVisible(true);
+				try{
+				mySession.getMapController().load("res\\ASC2014ClassicMapFull.kml");
+				}
+				catch(IOException ex){
+					System.out.println("could not load");
+				}
+				
+				//JFrame frame = new Map();
+				//frame.setVisible(true);
 			}
 		});
 		mnModules.add(mntmMap);
