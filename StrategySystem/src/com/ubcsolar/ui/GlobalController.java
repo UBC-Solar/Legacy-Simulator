@@ -13,6 +13,8 @@ import java.util.List;
 
 import com.ubcsolar.car.CarController;
 import com.ubcsolar.common.Listener;
+import com.ubcsolar.common.Log;
+import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.Notification;
 import com.ubcsolar.map.MapController;
 import com.ubcsolar.sim.SimController;
@@ -55,7 +57,7 @@ public class GlobalController {
 	public synchronized void register(Listener l, Class<? extends Notification> n){
 		listOfListeners.add(l);
 		listOfTriggers.add(n);
-		System.out.println("Got a register request for " + l.getClass());
+		System.out.println(l.getClass() + " registered for " + n);
 	}
 	
 	/**
@@ -63,6 +65,7 @@ public class GlobalController {
 	 * @param n - the notification being sent. 
 	 */
 	public synchronized void sendNotification(Notification n){
+		Log.write(n.getMessage(), LogType.NOTIFICATION);
 		System.out.println("Global Controller got a notification " + n.getClass() );
 		for(int i=0; i<listOfTriggers.size(); i++){
 			if(listOfTriggers.get(i) == n.getClass()){

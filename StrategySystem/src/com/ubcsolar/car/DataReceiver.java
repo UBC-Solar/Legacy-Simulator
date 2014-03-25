@@ -52,7 +52,7 @@ public class DataReceiver implements Runnable {
 			else{
 				speed --;
 			}
-			myCarController.notify(new CarUpdateNotification(this.speed));
+			myCarController.sendNotification(new CarUpdateNotification(this.speed));
 			return speed;
 		}
 			

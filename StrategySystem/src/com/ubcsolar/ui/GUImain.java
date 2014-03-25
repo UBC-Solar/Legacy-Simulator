@@ -1,5 +1,6 @@
 package com.ubcsolar.ui;
 
+import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -67,7 +68,7 @@ public class GUImain implements Listener{
 			else{
 				this.carSpeed.setText("Car speed: " + ((CarUpdateNotification) n).getNewCarSpeed());
 			}
-			System.out.println("test");
+			
 		}
 		//TODO: Do something when notified. 
 		
@@ -153,9 +154,9 @@ public class GUImain implements Listener{
 		mnModules.add(mntmStrategy);
 		this.loadedMapName = new JLabel("None");
 		this.carSpeed = new JLabel("test");
-		frame.getContentPane().add(loadedMapName);
+		//frame.getContentPane().add(loadedMapName);
 		
-		frame.getContentPane().add(carSpeed);
+		frame.getContentPane().add(carSpeed, BorderLayout.SOUTH);
 		
 	}
 

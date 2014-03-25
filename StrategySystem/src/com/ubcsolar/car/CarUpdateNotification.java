@@ -14,4 +14,10 @@ public class CarUpdateNotification extends Notification {
 		return carSpeed;
 	}
 	
+	
+	@Override
+	public String getMessage() {
+		return "Car is now travelling at: " + carSpeed + "Km/h";
+	}
+	
 }

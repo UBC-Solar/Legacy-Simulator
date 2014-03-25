@@ -11,6 +11,13 @@ public class NewMapLoadedNotification extends Notification {
 		this.mapLoadedName = name;
 	}
 
+	
+	@Override
+	public String getMessage(){
+		return "Loaded map name is now: " + mapLoadedName;
+	}
+	
+	
 	public String getMapLoadedName(){
 		return mapLoadedName;
 	}

@@ -17,11 +17,18 @@ public abstract class Notification { //abstract because it can't be used itself,
 		time = System.currentTimeMillis();
 	}
 	
-	/*
+	/**
 	 * returns the time that the notification was created
 	 */
 	public long getTime(){
 		return time;
 	}
+	
+	/**
+	 * for logging, gets the message explaining what's going on in a String
+	 * i.e "Loaded map name is now: ____" or "car speed is now: ___"
+	 * @return A string explaining the state
+	 */
+	public abstract String getMessage();
 
 }
