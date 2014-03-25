@@ -36,13 +36,13 @@ public class DataReceiver implements Runnable {
 		if(speed == 0){
 			isAccelerating = true;
 			speed++;
-			myCarController.notify(new CarUpdateNotification(this.speed));
+			myCarController.sendNotification(new CarUpdateNotification(this.speed));
 			return speed; 
 		}
 		else if(speed == 100){
 			isAccelerating = false;
 			speed --;
-			myCarController.notify(new CarUpdateNotification(this.speed));
+			myCarController.sendNotification(new CarUpdateNotification(this.speed));
 			return speed;
 		}
 		else{
