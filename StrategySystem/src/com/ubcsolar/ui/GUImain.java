@@ -158,4 +158,10 @@ public class GUImain implements Listener{
 		frame.getContentPane().add(carSpeed);
 		
 	}
+
+	@Override
+	public void register() {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -29,11 +29,6 @@ public abstract class ModuleController implements Listener {
 		mySession.sendNotification(n); 
 	}
 	
-	/**
-	 * registers as a listener for any notifications it needs
-	 */
-	protected abstract void register();
-	
-	
+
 
 }

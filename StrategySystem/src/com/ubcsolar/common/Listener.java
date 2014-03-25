@@ -12,5 +12,10 @@ public interface Listener {
 	 * @param n - the notification sending
 	 */
 	public void notify(Notification n);
+	
+	/**
+	 * used to register (probably with the Global Controller) to receive notifications
+	 */
+	public abstract void register(); 
 
 }

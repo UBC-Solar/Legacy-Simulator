@@ -41,7 +41,7 @@ public class CarController extends ModuleController {
 	 * registers for any notifications it needs to hear
 	 */
 	@Override
-	protected void register() {
+	public void register() {
 		// TODO Auto-generated method stub
 
 	}

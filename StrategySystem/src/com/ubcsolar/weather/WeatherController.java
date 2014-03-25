@@ -30,7 +30,7 @@ public class WeatherController extends ModuleController {
 	 * registers to receive notifications
 	 */
 	@Override
-	protected void register() {
+	public void register() {
 		// TODO Auto-generated method stub
 		//this.mySession.register(this, NewMapLoadedNotification.class); //example line.
 		
