@@ -25,14 +25,13 @@ public class GlobalController {
 	
 	public GlobalController(GUImain mainWindow){
 		this.mainWindow = mainWindow;
+		listOfListeners = new ArrayList<Listener>();
+		listOfTriggers = new ArrayList<Class<? extends Notification>>();
 		myMapController = new MapController(this);
 		myCarController = new CarController(this);
 		mySimController = new SimController(this);
 		myWeatherController = new WeatherController(this);
-		
-		listOfListeners = new ArrayList<Listener>();
-		listOfTriggers = new ArrayList<Class<? extends Notification>>();
-		
+
 		
 	}
 	
@@ -42,7 +41,7 @@ public class GlobalController {
 		System.out.println("Got a register request for " + l.getClass());
 	}
 	public void notify(Notification n){
-		System.out.println("Global Controller got a notification");
+		System.out.println("Global Controller got a notification " + n.getClass() );
 		for(int i=0; i<listOfTriggers.size(); i++){
 			if(listOfTriggers.get(i) == n.getClass()){
 				listOfListeners.get(i).notify(n);

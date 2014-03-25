@@ -10,6 +10,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import com.ubcsolar.car.CarUpdateNotification;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.Notification;
 import com.ubcsolar.map.NewMapLoadedNotification;
@@ -25,6 +26,7 @@ public class GUImain implements Listener{
 	private JFrame frame;
 	private GlobalController mySession; 
 	private JLabel loadedMapName;
+	private JLabel carSpeed;
 
 	/**
 	 * Launch the application.
@@ -57,12 +59,23 @@ public class GUImain implements Listener{
 			System.out.println("IT WORKED!!!");
 			//JOptionPane.showMessageDialog(frame, "New map: " + (((NewMapLoadedNotification) n).getMapLoadedName()));
 		}
+		else if(n.getClass() == CarUpdateNotification.class){
+
+			if(this.carSpeed == null){
+				carSpeed = new JLabel("test");
+			}
+			else{
+				this.carSpeed.setText("Car speed: " + ((CarUpdateNotification) n).getNewCarSpeed());
+			}
+			System.out.println("test");
+		}
 		//TODO: Do something when notified. 
 		
 	}
 	
 	private void registerListeners(){
 		mySession.register(this, NewMapLoadedNotification.class);
+		mySession.register(this, CarUpdateNotification.class);
 	}
 	
 	/**
@@ -139,7 +152,10 @@ public class GUImain implements Listener{
 		});
 		mnModules.add(mntmStrategy);
 		this.loadedMapName = new JLabel("None");
+		this.carSpeed = new JLabel("test");
 		frame.getContentPane().add(loadedMapName);
+		
+		frame.getContentPane().add(carSpeed);
 		
 	}
 }

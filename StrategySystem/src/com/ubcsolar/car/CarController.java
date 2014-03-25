@@ -6,14 +6,17 @@ import com.ubcsolar.ui.GlobalController;
 
 public class CarController extends ModuleController {
 
+	private DataReceiver myDataReceiver;
 	public CarController(GlobalController toAdd) {
 		super(toAdd);
+		myDataReceiver = new DataReceiver(this);
+		myDataReceiver.run();
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public void notify(Notification n) {
-		// TODO Auto-generated method stub
+		this.mySession.notify(n);
 
 	}
 
