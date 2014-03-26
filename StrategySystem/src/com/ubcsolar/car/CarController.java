@@ -23,9 +23,15 @@ public class CarController extends ModuleController {
 		super(toAdd);
 		myDataReceiver = new DataReceiver(this);
 		myDataReceiver.run();
+		sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
 		// TODO Auto-generated constructor stub
 	}
 	
+	public void startFakeCar(){
+		myDataReceiver = new SimulatedDataReceiver(this);
+		myDataReceiver.run();
+		sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
+	}
 	
 	/**
 	 * this is where the class receives any notifications it registered for. 
@@ -44,6 +50,21 @@ public class CarController extends ModuleController {
 	public void register() {
 		// TODO Auto-generated method stub
 
+	}
+	
+	public String getLoadedCarName(){
+		return myDataReceiver.getName();
+	}
+
+	//returns null if no speed has ever been reported
+	public int getLastReportedSpeed(){
+		return myDataReceiver.getLastReportedSpeed();
+	}
+
+	public void adviseOfNewCarReport(CarUpdateNotification carUpdateNotification) {
+		// TODO store this in some kind of record. 
+		sendNotification(carUpdateNotification);
+		
 	}
 
 }

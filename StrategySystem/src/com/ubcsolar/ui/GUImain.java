@@ -36,7 +36,6 @@ public class GUImain implements Listener{
 	private JFrame frame;
 	private GlobalController mySession; 
 	private JLabel loadedMapName;
-	private JLabel carSpeed;
 	private JPanel carWindow;
 	private JPanel mainPanel;
 	private JPanel simPanel;
@@ -46,6 +45,7 @@ public class GUImain implements Listener{
 	private JFrame myCar;
 	private JFrame myWeather;
 	private JFrame mySim;
+	private JPanel LoadStatusPanel;
 
 
 	/**
@@ -80,7 +80,7 @@ public class GUImain implements Listener{
 	}
 	@Override
 	public void notify(Notification n){
-		
+		/*
 		if(n.getClass() == NewMapLoadedNotification.class){
 			this.loadedMapName.setText(((NewMapLoadedNotification) n).getMapLoadedName());
 			System.out.println("IT WORKED!!!");
@@ -95,7 +95,7 @@ public class GUImain implements Listener{
 				this.carSpeed.setText("Car speed: " + ((CarUpdateNotification) n).getNewCarSpeed());
 			}
 			
-		}
+		}*/
 		//TODO: Do something when notified. 
 		
 	}
@@ -176,7 +176,7 @@ public class GUImain implements Listener{
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),},
 			new RowSpec[] {
-				RowSpec.decode("14px"),
+				RowSpec.decode("14px:grow"),
 				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("default:grow"),
 				FormFactory.RELATED_GAP_ROWSPEC,
@@ -185,10 +185,10 @@ public class GUImain implements Listener{
 				RowSpec.decode("default:grow"),
 				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("default:grow"),}));
-		this.carSpeed = new JLabel("test");
-		//frame.getContentPane().add(loadedMapName);
 		
-		frame.getContentPane().add(carSpeed, "1, 1, left, top");
+		LoadStatusPanel = new LoadStatusPanel(this.mySession);
+		LoadStatusPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+		frame.getContentPane().add(LoadStatusPanel, "1, 1, 3, 1, fill, fill");
 		
 		weatherWindow = new WeatherPanel(this.mySession);
 		weatherWindow.setBorder(BorderFactory.createLineBorder(Color.black));

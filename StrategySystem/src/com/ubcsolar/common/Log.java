@@ -1,8 +1,11 @@
 /**
- * 
+ * This class acts as a log for the program, and could be used for error bug-hunting,
+ * and performance managment. 
  */
 package com.ubcsolar.common;
 
+
+//TODO: make this log it's own thread with an event queue. 
 import java.util.ArrayList;
 import java.util.List;
 

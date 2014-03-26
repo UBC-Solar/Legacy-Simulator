@@ -60,7 +60,8 @@ public class CarPanel extends JPanel implements Listener{
 		lblCar = new JLabel("Car");
 		add(lblCar, "18, 2");
 		
-		lblCarspeed = new JLabel("CarSpeed");
+		lblCarspeed = new JLabel();
+		updateCarSpeed(mySession.getMyCarController().getLastReportedSpeed());
 		add(lblCarspeed, "2, 6");
 		
 		JButton btnSettings = new JButton("Settings");
@@ -74,6 +75,10 @@ public class CarPanel extends JPanel implements Listener{
 
 		//initialize();
 		register();
+	}
+	
+	private void updateCarSpeed(int newSpeed){
+		lblCarspeed.setText("Car Speed: " + newSpeed);
 	}
 	
 	public void launchPerformance(){

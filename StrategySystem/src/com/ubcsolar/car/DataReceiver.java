@@ -5,18 +5,18 @@ import java.util.TimerTask;
 
 public class DataReceiver implements Runnable {
 
-	private CarController myCarController;
-
-	private int speed; //in km/h
-	private boolean isAccelerating;
+	protected CarController myCarController;
+	private String name = "live";
 	private Timer myTimer;
+	protected int lastSpeed;
 	
 	public DataReceiver(CarController toAdd){
 		myCarController = toAdd;
-		speed = 0;
-		isAccelerating = true;
 	}
 	
+	public int getLastReportedSpeed(){
+		return lastSpeed;
+	}
 	@Override
 	public void run() {
 
@@ -24,7 +24,7 @@ public class DataReceiver implements Runnable {
 		myTimer.schedule(new TimerTask() {
 				@Override
 				public void run() {
-						getNewSpeed();
+						checkForUpdate();
 					
 				}
 			}, 0, 2000);
@@ -32,31 +32,14 @@ public class DataReceiver implements Runnable {
 		
 	
 
-	private int getNewSpeed(){
-		if(speed == 0){
-			isAccelerating = true;
-			speed++;
-			myCarController.sendNotification(new CarUpdateNotification(this.speed));
-			return speed; 
-		}
-		else if(speed == 100){
-			isAccelerating = false;
-			speed --;
-			myCarController.sendNotification(new CarUpdateNotification(this.speed));
-			return speed;
-		}
-		else{
-			if(isAccelerating){
-				speed++;
-			}
-			else{
-				speed --;
-			}
-			myCarController.sendNotification(new CarUpdateNotification(this.speed));
-			return speed;
-		}
-			
+	protected void checkForUpdate(){
+			//TODO check the Arduino socket/buffer for any transmission. 
+		//myCarController.adviseOfNewCarReport(new CarUpdateNotification(25));*/
 		
 	}
-	
+
+	public String getName() {
+		return name;
+	}
+
 }
