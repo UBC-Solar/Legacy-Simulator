@@ -13,10 +13,11 @@ import javax.swing.JMenu;
 public class Performance extends JFrame {
 
 	private JPanel contentPane;
+	private GlobalController mySession;
 
 	/**
 	 * Launch the application.
-	 */
+	 *//*//no main()needed here
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -28,12 +29,14 @@ public class Performance extends JFrame {
 				}
 			}
 		});
-	}
+	}*/
 
 	/**
 	 * Create the frame.
+	 * @param mySession 
 	 */
-	public Performance() {
+	public Performance(GlobalController mySession) {
+		this.mySession = mySession;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		

@@ -38,6 +38,9 @@ public class GlobalController {
 	 */
 	public GlobalController(GUImain mainWindow){
 		this.mainWindow = mainWindow;
+		//TODO: turn the 2 lists into a KVP<Class<?extends Notification>, ArrayList<Listener>> 
+		//AKA a table indexed by the notifications. Look up the notification type, send it to all
+		//listeners registered for it. 
 		listOfListeners = new ArrayList<Listener>();
 		listOfTriggers = new ArrayList<Class<? extends Notification>>();
 		myMapController = new MapController(this);
@@ -67,6 +70,7 @@ public class GlobalController {
 	public synchronized void sendNotification(Notification n){
 		Log.write(n.getMessage(), LogType.NOTIFICATION);
 		System.out.println("Global Controller got a notification " + n.getClass() );
+		System.out.println(listOfTriggers.size());
 		for(int i=0; i<listOfTriggers.size(); i++){
 			if(listOfTriggers.get(i) == n.getClass()){
 				listOfListeners.get(i).notify(n);

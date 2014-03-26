@@ -13,10 +13,11 @@ import javax.swing.JMenuItem;
 public class Weather extends JFrame {
 
 	private JPanel contentPane;
+	private GlobalController mySession;
 
 	/**
 	 * Launch the application.
-	 */
+	 *//*//don't need a main here.
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -28,12 +29,14 @@ public class Weather extends JFrame {
 				}
 			}
 		});
-	}
+	}*/
 
 	/**
 	 * Create the frame.
+	 * @param mySession 
 	 */
-	public Weather() {
+	public Weather(GlobalController mySession) {
+		this.mySession = mySession;
 		setTitle("Weather");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 489, 358);

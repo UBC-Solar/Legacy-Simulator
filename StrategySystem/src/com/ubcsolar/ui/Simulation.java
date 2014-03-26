@@ -21,10 +21,11 @@ import java.awt.event.ActionEvent;
 public class Simulation extends JFrame {
 
 	private JPanel contentPane;
-
+	private GlobalController mySession;
+	
 	/**
 	 * Launch the application.
-	 */
+	 *//*//don't need a Main() here.
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -36,12 +37,14 @@ public class Simulation extends JFrame {
 				}
 			}
 		});
-	}
+	}*/
 
 	/**
 	 * Create the frame.
+	 * @param mySession 
 	 */
-	public Simulation() {
+	public Simulation(GlobalController mySession) {
+		this.mySession = mySession;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		

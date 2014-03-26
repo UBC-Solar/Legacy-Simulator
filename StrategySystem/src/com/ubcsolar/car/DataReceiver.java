@@ -27,7 +27,7 @@ public class DataReceiver implements Runnable {
 						getNewSpeed();
 					
 				}
-			}, 0, 200);
+			}, 0, 2000);
 		}
 		
 	
