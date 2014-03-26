@@ -1,5 +1,5 @@
 package com.ubcsolar.common;
 
 public enum LogType {
-NOTIFICATION, ERROR;
+NOTIFICATION, ERROR, SYSTEM_REPORT;
 }

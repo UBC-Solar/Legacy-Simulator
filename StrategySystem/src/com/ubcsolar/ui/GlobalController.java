@@ -78,6 +78,7 @@ public class GlobalController {
 		}
 	}
 	
+	
 	public MapController getMapController(){
 		return myMapController;
 	}

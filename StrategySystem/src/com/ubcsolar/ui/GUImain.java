@@ -1,3 +1,8 @@
+/**
+ * This class forms the main window, and launches all additional needed windows. 
+ * This is the main "dashboard" for a user on the road. 
+ */
+
 package com.ubcsolar.ui;
 
 import java.awt.BorderLayout;
@@ -15,6 +20,8 @@ import javax.swing.JMenuItem;
 
 import com.ubcsolar.car.CarUpdateNotification;
 import com.ubcsolar.common.Listener;
+import com.ubcsolar.common.Log;
+import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.Notification;
 import com.ubcsolar.map.NewMapLoadedNotification;
 
@@ -52,6 +59,7 @@ public class GUImain implements Listener{
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		Log.write("Application started: " + System.currentTimeMillis(), LogType.SYSTEM_REPORT);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -71,31 +79,35 @@ public class GUImain implements Listener{
 		initialize();
 	}
 	
-	
+	/**
+	 * creates all windows that can be launched from this main panel
+	 */
 	private void buildAllWindows(){
-		this.mySim = new Simulation(this.mySession);
-		this.myCar = new Performance(this.mySession);
-		this.myMap = new Map(this.mySession);
-		this.myWeather = new Weather(this.mySession);
+		this.mySim = new Simulation(this.mySession); //Sim advanced window
+		this.myCar = new Performance(this.mySession); //Car advanced window
+		this.myMap = new Map(this.mySession); //Map advanced window
+		this.myWeather = new Weather(this.mySession); //Weather advanced window
 	}
+	
+	/**
+	 * registers for all classes that this window needs to listen for
+	 */
+	@Override
+	public void register() {
+			/*mySession.register(this, NewMapLoadedNotification.class);
+			mySession.register(this, CarUpdateNotification.class);*/
+		
+		
+		// TODO Auto-generated method stub
+		
+	}
+	
+	/**
+	 * will be notified of any notifications this class has registered for. 
+	 */
 	@Override
 	public void notify(Notification n){
-		/*
-		if(n.getClass() == NewMapLoadedNotification.class){
-			this.loadedMapName.setText(((NewMapLoadedNotification) n).getMapLoadedName());
-			System.out.println("IT WORKED!!!");
-			//JOptionPane.showMessageDialog(frame, "New map: " + (((NewMapLoadedNotification) n).getMapLoadedName()));
-		}
-		else if(n.getClass() == CarUpdateNotification.class){
-
-			if(this.carSpeed == null){
-				carSpeed = new JLabel("test");
-			}
-			else{
-				this.carSpeed.setText("Car speed: " + ((CarUpdateNotification) n).getNewCarSpeed());
-			}
-			
-		}*/
+	
 		//TODO: Do something when notified. 
 		
 	}
@@ -186,6 +198,7 @@ public class GUImain implements Listener{
 				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("default:grow"),}));
 		
+		//THIS SECTION ADDS IN THE PANELS
 		LoadStatusPanel = new LoadStatusPanel(this.mySession);
 		LoadStatusPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		frame.getContentPane().add(LoadStatusPanel, "1, 1, 3, 1, fill, fill");
@@ -226,34 +239,35 @@ public class GUImain implements Listener{
 	}
 	
 	
-
+	/**
+	 * launches the Sim window
+	 */
 	public void launchSim() {
 		mySim.setVisible(true);
 		
 	}
 
+	/**
+	 * launches the Weather window
+	 */
 	public void launchWeather() {
 		myWeather.setVisible(true);
 		
 	}
-
+	/**
+	 * launches the Car window
+	 */
 	public void launchPerformance() {
 		myCar.setVisible(true);
 		
 	}
-
+	/**
+	 * launches the Map window
+	 */
 	public void launchMap(){
 		myMap.setVisible(true);
 	}
 	
 	
-	@Override
-	public void register() {
-			mySession.register(this, NewMapLoadedNotification.class);
-			mySession.register(this, CarUpdateNotification.class);
-		
-		
-		// TODO Auto-generated method stub
-		
-	}
+
 }

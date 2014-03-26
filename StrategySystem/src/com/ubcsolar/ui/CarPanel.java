@@ -1,3 +1,6 @@
+/**
+ * The Car subpanel on the main UI
+ */
 package com.ubcsolar.ui;
 
 import java.awt.event.ActionEvent;
@@ -61,7 +64,7 @@ public class CarPanel extends JPanel implements Listener{
 		add(lblCar, "18, 2");
 		
 		lblCarspeed = new JLabel();
-		updateCarSpeed(mySession.getMyCarController().getLastReportedSpeed());
+		updateCarSpeedLabel(mySession.getMyCarController().getLastReportedSpeed());
 		add(lblCarspeed, "2, 6");
 		
 		JButton btnSettings = new JButton("Settings");
@@ -77,10 +80,11 @@ public class CarPanel extends JPanel implements Listener{
 		register();
 	}
 	
-	private void updateCarSpeed(int newSpeed){
-		lblCarspeed.setText("Car Speed: " + newSpeed);
-	}
-	
+
+
+	/**
+	 * Asks the parent to launch the Performance window. 
+	 */
 	public void launchPerformance(){
 		parent.launchPerformance();
 	}
@@ -91,13 +95,19 @@ public class CarPanel extends JPanel implements Listener{
 		super.add(lblCar);
 	}*/
 	
+	/**
+	 * updates the car Speed label with the right message
+	 * @param newSpeed - the new speed of the car
+	 */
 	private void updateCarSpeedLabel(int speed){
 		this.lblCarspeed.setText("Car Speed: " + speed + " km/h");
 	}
+	
+	
 	@Override
 	public void notify(Notification n) {
 		if(n.getClass() == CarUpdateNotification.class){
-			updateCarSpeedLabel(((CarUpdateNotification) n).getNewCarSpeed());
+			updateCarSpeedLabel(((CarUpdateNotification) n).getNewCarSpeed()); //for the CarSpeed label.
 		}
 		// TODO Auto-generated method stub
 		

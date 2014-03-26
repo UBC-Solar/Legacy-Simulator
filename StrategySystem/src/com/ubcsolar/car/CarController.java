@@ -48,19 +48,35 @@ public class CarController extends ModuleController {
 	 */
 	@Override
 	public void register() {
-		// TODO Auto-generated method stub
+		// add registration code here. 
 
 	}
 	
+	/**
+	 * gets the name of the car currently loaded. 
+	 * Car name will be something like "live" or "sim ___"
+	 * @return Name of the currently loaded car
+	 */
 	public String getLoadedCarName(){
 		return myDataReceiver.getName();
 	}
 
-	//returns null if no speed has ever been reported
+	/**
+	 * gets the last reported speed of the car. 
+	 * Returns 0 if no speed has ever been reported.  
+	 * @return the last reported speed of the car. 
+	 */
 	public int getLastReportedSpeed(){
+		//TODO: consider moving this to a Double or float. 
 		return myDataReceiver.getLastReportedSpeed();
 	}
 
+	/**
+	 * This is the method that the subclasses will call. 
+	 * It will add the report to the log
+	 * If broadcasting is turned on, it will send a notification out.  
+	 * @param carUpdateNotification - the notification to send out. 
+	 */
 	public void adviseOfNewCarReport(CarUpdateNotification carUpdateNotification) {
 		// TODO store this in some kind of record. 
 		sendNotification(carUpdateNotification);

@@ -1,3 +1,6 @@
+/**
+ *  this class forms a basic tool/status bar showing the name of the loaded modules. 
+ */
 package com.ubcsolar.ui;
 
 import javax.swing.JPanel;
@@ -16,11 +19,17 @@ import javax.swing.JLabel;
 public class LoadStatusPanel extends JPanel implements Listener {
 	private GlobalController mySession;
 	//private GUImain parent;
-	private JLabel lblMap;
-	private JLabel lblWeather;
-	private JLabel lblSim;
-	private JLabel lblCar;
+	private JLabel lblMap; //Displays the name of the loaded map
+	private JLabel lblWeather; //dispalyed the name of the loaded weather
+	private JLabel lblSim; //displays the name of the last-run sim
+	private JLabel lblCar; //displays the name of the loaded car (simulated or real?)
+	
+	/**
+	 * constructor
+	 * @param session - the session to get the needed controllers
+	 */
 	public LoadStatusPanel(GlobalController session){
+		super();
 		//this.parent = parent;
 		this.mySession = session;
 		setLayout(new FormLayout(new ColumnSpec[] {
@@ -52,26 +61,37 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		register();
 	}
 	
+	/**
+	 * updates the map label with the right message
+	 * @param mapName - the name of map to display
+	 */
 	private void updateMapLabel(String mapName){
 		lblMap.setText("Map: " + mapName);
 	}
+	
+	/**
+	 * updates the car label with the right message to display
+	 * @param carName - the name of the car to display
+	 */
 	private void updateCarLabel(String carName){
 		lblCar.setText("Car: " + carName);
 	}
+	
+	
 	@Override
 	public void notify(Notification n) {
 		//TODO add support for additional notifcations as they come. 
 		if(n.getClass() == NewMapLoadedNotification.class){
-			updateMapLabel(((NewMapLoadedNotification) n).getMapLoadedName());
+			updateMapLabel(((NewMapLoadedNotification) n).getMapLoadedName()); //to update the map label
 		}
 		else if(n.getClass() == NewCarLoadedNotification.class){
-			updateCarLabel(((NewCarLoadedNotification) n).getNameOfCar());
+			updateCarLabel(((NewCarLoadedNotification) n).getNameOfCar()); //to update the car label
 		}
 		/*//TODO implement these
-		else if(n.getClass() == NewWeatherLoadedNotification.class){
+		else if(n.getClass() == NewWeatherLoadedNotification.class){ //to update the weather label
 			updateWeatherLabel(n.getNameOfWeather());
 		}
-		else if(n.getClass() == SimDoneRunningNotification.class){
+		else if(n.getClass() == SimDoneRunningNotification.class){ //to update the sim label
 			
 			updateSimLabel(n.getNameOfSim());
 		}*/

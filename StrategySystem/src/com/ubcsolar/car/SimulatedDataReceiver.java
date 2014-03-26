@@ -1,3 +1,7 @@
+/**
+ * this class provides simulated notifications. 
+ * Currently very simple and not very realistic
+ */
 package com.ubcsolar.car;
 
 public class SimulatedDataReceiver extends DataReceiver {
@@ -9,7 +13,7 @@ public class SimulatedDataReceiver extends DataReceiver {
 	
 	public SimulatedDataReceiver(CarController toAdd) {
 		super(toAdd);
-		lastSpeed = 0;
+		lastSpeed = 0; 
 		isAccelerating = true;
 		name = "basic sim";
 		// TODO Auto-generated constructor stub
@@ -21,6 +25,9 @@ public class SimulatedDataReceiver extends DataReceiver {
 		return name;
 	}
 	
+	/**
+	 * generated a new speed. Accelerates up to 100, then slows back down to 0 linerally. 
+	 */
 	@Override
 	protected void checkForUpdate(){
 	if(lastSpeed == 0){

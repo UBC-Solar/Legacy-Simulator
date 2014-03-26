@@ -1,3 +1,8 @@
+/**
+ * this Frame is the advanced window for the map. 
+ * Will show advanced settings as well as advanced information that doesn't belong on the main window. 
+ * Allows a user to load a new map
+ */
 package com.ubcsolar.ui;
 
 import com.ubcsolar.common.Listener;
@@ -64,18 +69,31 @@ public class Map extends JFrame implements Listener {
 	
 	
 	
+	/**
+	 * All notifications that this class has registered for will come here
+	 */
+	@Override
 	public void notify(Notification n){
-		System.out.println("MAP GOT A NOTIFICATION");
 		//TODO add any notifications here
-		if(n.getClass() == NewMapLoadedNotification.class){
-			labelUpdate(((NewMapLoadedNotification) n).getMapLoadedName());
+		if(n.getClass() == NewMapLoadedNotification.class){ //when a new map is loaded, propogate the new name. 
+			labelUpdate(((NewMapLoadedNotification) n).getMapLoadedName()); 
 			JOptionPane.showMessageDialog(this, "New map: " + (((NewMapLoadedNotification) n).getMapLoadedName()));
 		}
 	}
+	
+	/**
+	 * register for any notifications that this class needs to
+	 */
+	@Override
 	public void register(){
-		mySession.register(this, NewMapLoadedNotification.class);
+		mySession.register(this, NewMapLoadedNotification.class); //need this for the map label and tool bar.
 		//TODO add any notifications you need to listen for here. 
 	}
+	
+	/**
+	 * constructor
+	 * @param toAdd - the session to refer to for the controllers, and to register with
+	 */
 	public Map(GlobalController toAdd) {
 		mySession = toAdd;
 		register();
