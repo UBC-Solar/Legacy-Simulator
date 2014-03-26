@@ -39,6 +39,7 @@ public class GUImain implements Listener{
 	private JLabel carSpeed;
 	private JPanel carWindow;
 	private JPanel mainPanel;
+	private JPanel simPanel;
 	private JPanel mapWindow;
 	private JPanel weatherWindow;
 	private JFrame myMap;
@@ -181,7 +182,7 @@ public class GUImain implements Listener{
 				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("default:grow"),
 				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
+				RowSpec.decode("default:grow"),
 				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("default:grow"),}));
 		this.carSpeed = new JLabel("test");
@@ -207,6 +208,13 @@ public class GUImain implements Listener{
 		
 		JLabel lblMain = new JLabel("Main");
 		mainPanel.add(lblMain);
+		//TODO: turn these panels into their own classes, and set them up.
+		simPanel = new JPanel();
+		frame.getContentPane().add(simPanel, "1, 7, fill, fill");
+		simPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+		
+		JLabel lblSim = new JLabel("Sim");
+		simPanel.add(lblSim);
 		
 		mapWindow = new JPanel();
 		frame.getContentPane().add(mapWindow, "1, 9, fill, fill");
