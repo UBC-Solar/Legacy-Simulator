@@ -116,7 +116,7 @@ public class Map extends JFrame implements Listener {
 		mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					mySession.getMapController().load("res/ASC2014ClassicMapFull.kml");
+					mySession.getMapController().load("res/EDCToHope.kml");
 				} catch (IOException e) {
 					JDialog dialog = new ErrorMessage();
 					dialog.setVisible(true);
