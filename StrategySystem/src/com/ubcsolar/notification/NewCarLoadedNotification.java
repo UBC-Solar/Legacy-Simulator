@@ -1,6 +1,12 @@
-package com.ubcsolar.car;
+/**
+ * Used to announce that a new car has been loaded so that 
+ * all UI elements can update the name of the car, reset 
+ * any counters, and update pointers. 
+ * 
+ */
 
-import com.ubcsolar.common.Notification;
+package com.ubcsolar.notification;
+
 
 public class NewCarLoadedNotification extends Notification {
 

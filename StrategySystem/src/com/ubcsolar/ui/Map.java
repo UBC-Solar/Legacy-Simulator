@@ -6,8 +6,8 @@
 package com.ubcsolar.ui;
 
 import com.ubcsolar.common.Listener;
-import com.ubcsolar.common.Notification;
 import com.ubcsolar.map.*;
+import com.ubcsolar.notification.Notification;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;

@@ -18,12 +18,12 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import com.ubcsolar.car.CarUpdateNotification;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.Log;
 import com.ubcsolar.common.LogType;
-import com.ubcsolar.common.Notification;
 import com.ubcsolar.map.NewMapLoadedNotification;
+import com.ubcsolar.notification.CarUpdateNotification;
+import com.ubcsolar.notification.Notification;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

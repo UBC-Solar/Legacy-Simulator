@@ -7,7 +7,9 @@
 package com.ubcsolar.car;
 
 import com.ubcsolar.common.ModuleController;
-import com.ubcsolar.common.Notification;
+import com.ubcsolar.notification.CarUpdateNotification;
+import com.ubcsolar.notification.NewCarLoadedNotification;
+import com.ubcsolar.notification.Notification;
 import com.ubcsolar.ui.GlobalController;
 
 // TODO: Check threading. Should be calling subclasses as their own thread
@@ -28,9 +30,20 @@ public class CarController extends ModuleController {
 	}
 	
 	public void startFakeCar(){
+		stopListeningToCar();
 		myDataReceiver = new SimulatedDataReceiver(this);
 		myDataReceiver.run();
 		sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
+	}
+	
+	/**
+	 * stops listening to updates. If it's a simulated car, stops producing new notifications. 
+	 * If there is no dataReceiver loaded, silently ignores the command. 
+	 */
+	public void stopListeningToCar(){
+		if(myDataReceiver != null){
+			myDataReceiver.stop();
+		}
 	}
 	
 	/**

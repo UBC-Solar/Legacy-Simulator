@@ -9,10 +9,10 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import com.jgoodies.forms.factories.FormFactory;
-import com.ubcsolar.car.NewCarLoadedNotification;
 import com.ubcsolar.common.Listener;
-import com.ubcsolar.common.Notification;
 import com.ubcsolar.map.NewMapLoadedNotification;
+import com.ubcsolar.notification.NewCarLoadedNotification;
+import com.ubcsolar.notification.Notification;
 
 import javax.swing.JLabel;
 

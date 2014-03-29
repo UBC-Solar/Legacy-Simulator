@@ -12,7 +12,7 @@ package com.ubcsolar.map;
 import java.io.IOException;
 
 import com.ubcsolar.common.ModuleController;
-import com.ubcsolar.common.Notification;
+import com.ubcsolar.notification.Notification;
 import com.ubcsolar.ui.GlobalController;
 
 public class MapController extends ModuleController{

@@ -51,7 +51,9 @@ public class DataReceiver implements Runnable { //needs to be threaded so it can
 			}, 0, 2000);
 		}
 		
-	
+	public void stop(){
+		myTimer.cancel();
+	}
 	/**
 	 * this class will check to see if an update has landed in the buffer yet.
 	 */

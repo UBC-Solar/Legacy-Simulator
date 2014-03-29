@@ -3,9 +3,8 @@
  * data reported. 
  */
 
-package com.ubcsolar.car;
+package com.ubcsolar.notification;
 
-import com.ubcsolar.common.Notification;
 
 public class CarUpdateNotification extends Notification {
 

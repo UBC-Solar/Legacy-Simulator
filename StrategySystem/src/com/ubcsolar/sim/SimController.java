@@ -7,7 +7,7 @@
 package com.ubcsolar.sim;
 //TODO: implement
 import com.ubcsolar.common.ModuleController;
-import com.ubcsolar.common.Notification;
+import com.ubcsolar.notification.Notification;
 import com.ubcsolar.ui.GlobalController;
 
 public class SimController extends ModuleController {

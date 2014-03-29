@@ -1,6 +1,6 @@
 package com.ubcsolar.map;
 
-import com.ubcsolar.common.Notification;
+import com.ubcsolar.notification.Notification;
 
 public class NewMapLoadedNotification extends Notification {
 

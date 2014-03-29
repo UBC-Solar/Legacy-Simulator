@@ -10,9 +10,9 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.ubcsolar.car.CarUpdateNotification;
 import com.ubcsolar.common.Listener;
-import com.ubcsolar.common.Notification;
+import com.ubcsolar.notification.CarUpdateNotification;
+import com.ubcsolar.notification.Notification;
 
 import javax.swing.SwingConstants;
 

@@ -4,6 +4,8 @@
  */
 package com.ubcsolar.car;
 
+import com.ubcsolar.notification.CarUpdateNotification;
+
 public class SimulatedDataReceiver extends DataReceiver {
 
 	

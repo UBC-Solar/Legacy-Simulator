@@ -4,6 +4,7 @@
  */
 package com.ubcsolar.common;
 
+import com.ubcsolar.notification.Notification;
 import com.ubcsolar.ui.GlobalController;
 
 public abstract class ModuleController implements Listener {
