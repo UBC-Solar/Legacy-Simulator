@@ -59,7 +59,7 @@ public class GUImain implements Listener{
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		Log.write("Application started: " + System.currentTimeMillis(), LogType.SYSTEM_REPORT);
+		Log.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Application started");
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -127,6 +127,33 @@ public class GUImain implements Listener{
 		frame.setJMenuBar(menuBar);
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
+		
+		JMenuItem mntmPrintLog = new JMenuItem("Print Log");
+		mntmPrintLog.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent arg0) {
+				Log.printOut();
+			}
+		});
+		mnFile.add(mntmPrintLog);
+		
+		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent arg0) {
+				mySession.exit();
+			}
+		});
+		mnFile.add(mntmExit);
+		
+		/*JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent arg0) {
+				mySession.exit();
+			}
+		});*/
+		
 		
 		JMenu mnModules = new JMenu("Modules");
 		menuBar.add(mnModules);

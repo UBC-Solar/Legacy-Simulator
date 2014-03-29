@@ -21,7 +21,7 @@ public class NewCarLoadedNotification extends Notification {
 	}
 	@Override
 	public String getMessage() {
-		return (nameOfCar + " is now loaded");
+		return ("Car \"" + nameOfCar + "\" is now loaded");
 	}
 
 	

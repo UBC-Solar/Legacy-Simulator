@@ -72,7 +72,7 @@ public class GlobalController {
 	 * @param n - the notification being sent. 
 	 */
 	public synchronized void sendNotification(Notification n){
-		Log.write(n.getMessage(), LogType.NOTIFICATION);
+		Log.write(LogType.NOTIFICATION, System.currentTimeMillis(), n.getMessage());
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
 		
@@ -101,6 +101,16 @@ public class GlobalController {
 
 	public WeatherController getMyWeatherController() {
 		return myWeatherController;
+	}
+
+	
+	/**
+	 * allows for graceful shutdown
+	 */
+	public void exit() {
+		Log.printOut();
+		//System.exit(0);
+		
 	}
 
 
