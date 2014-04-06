@@ -72,7 +72,7 @@ public class GlobalController {
 	 * @param n - the notification being sent. 
 	 */
 	public synchronized void sendNotification(Notification n){
-		Log.write(LogType.NOTIFICATION, System.currentTimeMillis(), n.getMessage());
+		Log.write(LogType.NOTIFICATION, n.getTime(), n.getMessage());
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
 		
@@ -109,7 +109,7 @@ public class GlobalController {
 	 */
 	public void exit() {
 		Log.printOut();
-		//System.exit(0);
+		System.exit(0);
 		
 	}
 

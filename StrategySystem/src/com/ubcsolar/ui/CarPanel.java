@@ -63,8 +63,8 @@ public class CarPanel extends JPanel implements Listener{
 		lblCar = new JLabel("Car");
 		add(lblCar, "18, 2");
 		
-		lblCarspeed = new JLabel();
-		updateCarSpeedLabel(mySession.getMyCarController().getLastReportedSpeed());
+		lblCarspeed = new JLabel("No speed yet");
+		
 		add(lblCarspeed, "2, 6");
 		
 		JButton btnSettings = new JButton("Settings");
@@ -76,10 +76,20 @@ public class CarPanel extends JPanel implements Listener{
 		});
 		
 
-		//initialize();
+		if(mySession != null){ //NullPointerException protection. And now they'll show up in a 
+								//WYSIWYG editor. 
+		initializeValues();
 		register();
+		}
 	}
 	
+
+
+	private void initializeValues() {
+		updateCarSpeedLabel(mySession.getMyCarController().getLastReportedSpeed());
+		
+	}
+
 
 
 	/**

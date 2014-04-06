@@ -3,11 +3,14 @@ World
 My
 <coordinates>
 49.262530000000005,-123.24782,96.39534759521484
-49.377370000000006,-121.44211000000001,43.0
+-121.44211000000001,49.377370000000006,0.0
 </coordinates>
 Name is jonas, I'm lost in a whale
 the end.
 <coordinates>
+
+
+
 </coordinates>
 test 1 
 test 2

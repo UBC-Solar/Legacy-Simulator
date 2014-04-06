@@ -31,7 +31,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	public LoadStatusPanel(GlobalController session){
 		super();
 		//this.parent = parent;
-		this.mySession = session;
+		mySession = session;
 		setLayout(new FormLayout(new ColumnSpec[] {
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("max(49dlu;default):grow"),
@@ -44,8 +44,8 @@ public class LoadStatusPanel extends JPanel implements Listener {
 			new RowSpec[] {
 				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("max(19dlu;default)"),}));
-		
-		lblMap = new JLabel("Map loaded: " + mySession.getMapController().getLoadedMapName());
+
+		lblMap = new JLabel("Map loaded: None");
 		add(lblMap, "2, 2");
 		
 		//lblWeather = new JLabel(mySession.getMyWeatherController().getLoadedWeatherName());
@@ -53,12 +53,20 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		lblWeather = new JLabel("Weather loaded: " + "none");
 		add(lblWeather, "4, 2");
 		
-		lblSim = new JLabel("Sim");
+		lblSim = new JLabel("Sim: Has not run");
 		add(lblSim, "6, 2, fill, default");
 		
-		lblCar = new JLabel("Car: " + mySession.getMyCarController().getLoadedCarName());
+		lblCar = new JLabel("Car Loaded: None");
 		add(lblCar, "8, 2, center, default");
-		register();
+		if(mySession != null){
+			initializeValues();
+			register();
+		}
+	}
+	
+	private void initializeValues(){
+		lblCar.setText("Car: " + mySession.getMyCarController().getLoadedCarName());
+		lblMap.setText("Map loaded: " + mySession.getMapController().getLoadedMapName());
 	}
 	
 	/**
@@ -101,8 +109,10 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	
 	@Override
 	public void register() {
+		if(mySession != null){
 		mySession.register(this,  NewMapLoadedNotification.class);
 		mySession.register(this, NewCarLoadedNotification.class);
+		}
 		//mySession.register(this, SimDonwRunningNotificaiton.class); //TODO implement when I get there. 
 		//mySession.register(this,  NewWeatherLoadedNotification.class); //TODO implement when this gets created
 		// TODO Auto-generated method stub

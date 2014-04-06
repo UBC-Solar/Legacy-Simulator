@@ -242,6 +242,7 @@ public class GUImain implements Listener{
 		frame.getContentPane().add(carWindow, "1, 5, fill, fill");
 
 		
+		
 		mainPanel = new JPanel();
 		mainPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		frame.getContentPane().add(mainPanel, "3, 3, 1, 7, fill, fill");
