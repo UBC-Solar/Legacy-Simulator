@@ -125,7 +125,13 @@ public static final String API_KEY = "AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek";
 		}
 		urlToSend += "" + coordinateList.get(stopBefore-1).getLat() + "," + coordinateList.get(stopBefore-1).getLong();
 		
-		
+		//TODO check for error messages to be nice to Google: 
+		/*https://maps.googleapis.com/maps/api/elevation/json?locations=50.11133,-120.78621000000001&sensor=false&key=AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek
+		{
+		   "error_message" : "You have exceeded your daily request quota for this API.",
+		   "results" : [],
+		   "status" : "OVER_QUERY_LIMIT"
+		}*/
 		
 		urlToSend += "&sensor=false&key=" + API_KEY;
 		
