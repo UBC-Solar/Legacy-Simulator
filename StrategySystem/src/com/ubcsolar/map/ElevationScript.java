@@ -38,7 +38,7 @@ public static final String API_KEY = "AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek";
 			if(sCurrentLine.contains("<coordinates>")){
 				//fw.write(sCurrentLine.replace(" ", " \n") + "\r\n");
 				record = true;
-				fw.write(sCurrentLine + "\r\n");
+				fw.write(sCurrentLine.replace(" ", " \n") + "\r\n");
 			}
 			else if(sCurrentLine.contains("</coordinates>")){
 				record = false; 
@@ -97,7 +97,7 @@ public static final String API_KEY = "AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek";
 	if(coordinateList.size()==0){
 		return;
 	}
-	int maxCoordinatesInURL = 30; //THIS CONTROLS # of requests. Not sure what 2000 characters looks like. 
+	int maxCoordinatesInURL = 30; //Number of coordinates per URL. Each coord counts as a request. Not sure what 2000 characters looks like. 
 	int remainder = coordinateList.size() % maxCoordinatesInURL;
 	int numOfWholeParts = (coordinateList.size()-remainder)/maxCoordinatesInURL;
 	
@@ -150,7 +150,7 @@ public static final String API_KEY = "AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek";
 			coordinateList.get(start + i).setElevation(results.getJSONObject(i).getDouble("elevation"));
 		}
 		
-		//System.out.println(results.getJSONObject(1).toString(0));
+		//System.out.println(results.getJSONObject(1).toString(0)); 
 		
 		}
 	
