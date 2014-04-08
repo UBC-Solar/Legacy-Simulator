@@ -13,6 +13,18 @@ public class WeatherController extends ModuleController {
 	}
 
 	
+	public void loadMetars(String filename){
+		ReadMETAR.ReadMETAR(filename, this);
+		System.out.println("Order to load metars received");
+	}
+	
+	public void loadTafs(String filename){
+		//ReadTAFS.ReadTAFS(filename, this);
+	}
+	
+	
+	
+	
 	/**
 	 * will receive all notifications it has registered for here.
 	 * The 'shoulder tap'

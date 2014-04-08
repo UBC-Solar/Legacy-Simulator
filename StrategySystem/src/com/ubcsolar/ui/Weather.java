@@ -2,6 +2,8 @@ package com.ubcsolar.ui;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -35,7 +37,8 @@ public class Weather extends JFrame {
 	 * Create the frame.
 	 * @param mySession 
 	 */
-	public Weather(GlobalController mySession) {
+	public Weather(final GlobalController mySession) {
+		setTitle("Advanced Weather");
 		this.mySession = mySession;
 		setTitle("Weather");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -44,8 +47,18 @@ public class Weather extends JFrame {
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		
-		JMenuItem mntmWeatherMap = new JMenuItem("Weather map");
-		menuBar.add(mntmWeatherMap);
+		JMenuItem mntmFile = new JMenuItem("file");
+		menuBar.add(mntmFile);
+		
+		JMenuItem mntmloadMetars = new JMenuItem("Load Default METAR");
+		mntmloadMetars.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mySession.getMyWeatherController().loadMetars("res/test_METAR_xml");
+				
+			}
+		});
+		mntmFile.add(mntmloadMetars);
+		
 		
 		JMenuItem mntmForecasts = new JMenuItem("Forecasts");
 		menuBar.add(mntmForecasts);
