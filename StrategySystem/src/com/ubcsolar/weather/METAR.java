@@ -1,8 +1,14 @@
 package com.ubcsolar.weather;
 
 public class METAR {
-private final Long time;
-private final String airportID;
+private final Long rawText;
+private final String stationID;
+private final Long observationTime;
+private final latitude;
+private final longitude;
+
+
+
 private final int windSpeed;
 public METAR(Long time, String airID, int windSpeed){
 	this.time = time;

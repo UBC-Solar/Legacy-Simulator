@@ -1,13 +1,17 @@
 package com.ubcsolar.weather;
 
+import java.util.ArrayList;
+
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class ReadMETAR {
-
+	
+	static ArrayList<METAR> listOfMetars = new ArrayList<METAR>();
 	public static void ReadMETAR() {
 		
 		try{
@@ -16,7 +20,7 @@ public class ReadMETAR {
 			SAXParser saxParser = factory.newSAXParser();
 			
 			DefaultHandler handler = new DefaultHandler() {
-			
+				METAR current;
 				boolean bstation_id = false;
 				boolean bobservation_time = false;
 				boolean blatitude = false;
@@ -27,11 +31,15 @@ public class ReadMETAR {
 				boolean bwind_speed = false;
 				boolean bvisibility = false;
 				boolean bskycond = false;
+				String stationID;
+				long observationTime;
 
 				public void startElement(String uri, String localName,String qName, 
 		                Attributes attributes) throws SAXException {
 		 
-				
+				if (qName.equalsIgnoreCase("METAR")) {
+						bstation_id = true;
+					}
 				if (qName.equalsIgnoreCase("station_id")) {
 					bstation_id = true;
 				}
@@ -79,6 +87,7 @@ public class ReadMETAR {
 			public void characters(char ch[], int start, int length) throws SAXException {
 				 
 				if (bstation_id) {
+					stationID= new String(ch, start, length);
 					System.out.println("STATION ID: " + new String(ch, start, length));
 					bstation_id = false;
 				}
@@ -133,7 +142,12 @@ public class ReadMETAR {
 				
 			}
 			
+			public void endElement(String uri, String localName,String qName, 
+	                Attributes attributes) throws SAXException {
+				current = new METAR(this.observationTime, stationID, 5);
+				listOfMetars.add(current);
 			
+			}
 		};
 		
 		saxParser.parse("res/test_METAR_xml", handler);
