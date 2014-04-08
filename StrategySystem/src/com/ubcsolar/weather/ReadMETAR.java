@@ -9,10 +9,12 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.ubcsolar.notification.NewMetarReportLoadedNotification;
+
 public class ReadMETAR {
 	
 	static ArrayList<METAR> listOfMetars = new ArrayList<METAR>();
-	public static void ReadMETAR() {
+	public static void ReadMETAR(String filename, WeatherController mySession) {
 		
 		try{
 			
@@ -250,8 +252,9 @@ public class ReadMETAR {
 			}
 		};
 		
-		saxParser.parse("res/test_METAR_xml", handler);
+		saxParser.parse(filename, handler);
 			
+		mySession.sendNotification(new NewMetarReportLoadedNotification(listOfMetars));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
