@@ -1,3 +1,6 @@
+/**
+ * The Car subpanel on the main UI
+ */
 package com.ubcsolar.ui;
 
 import java.awt.event.ActionEvent;
@@ -7,9 +10,9 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.ubcsolar.car.CarUpdateNotification;
 import com.ubcsolar.common.Listener;
-import com.ubcsolar.common.Notification;
+import com.ubcsolar.notification.CarUpdateNotification;
+import com.ubcsolar.notification.Notification;
 
 import javax.swing.SwingConstants;
 
@@ -60,7 +63,8 @@ public class CarPanel extends JPanel implements Listener{
 		lblCar = new JLabel("Car");
 		add(lblCar, "18, 2");
 		
-		lblCarspeed = new JLabel("CarSpeed");
+		lblCarspeed = new JLabel("No speed yet");
+		
 		add(lblCarspeed, "2, 6");
 		
 		JButton btnSettings = new JButton("Settings");
@@ -72,10 +76,25 @@ public class CarPanel extends JPanel implements Listener{
 		});
 		
 
-		//initialize();
+		if(mySession != null){ //NullPointerException protection. And now they'll show up in a 
+								//WYSIWYG editor. 
+		initializeValues();
 		register();
+		}
 	}
 	
+
+
+	private void initializeValues() {
+		updateCarSpeedLabel(mySession.getMyCarController().getLastReportedSpeed());
+		
+	}
+
+
+
+	/**
+	 * Asks the parent to launch the Performance window. 
+	 */
 	public void launchPerformance(){
 		parent.launchPerformance();
 	}
@@ -86,13 +105,19 @@ public class CarPanel extends JPanel implements Listener{
 		super.add(lblCar);
 	}*/
 	
+	/**
+	 * updates the car Speed label with the right message
+	 * @param newSpeed - the new speed of the car
+	 */
 	private void updateCarSpeedLabel(int speed){
 		this.lblCarspeed.setText("Car Speed: " + speed + " km/h");
 	}
+	
+	
 	@Override
 	public void notify(Notification n) {
 		if(n.getClass() == CarUpdateNotification.class){
-			updateCarSpeedLabel(((CarUpdateNotification) n).getNewCarSpeed());
+			updateCarSpeedLabel(((CarUpdateNotification) n).getNewCarSpeed()); //for the CarSpeed label.
 		}
 		// TODO Auto-generated method stub
 		

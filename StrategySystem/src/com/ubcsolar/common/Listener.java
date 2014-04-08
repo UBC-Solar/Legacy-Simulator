@@ -4,6 +4,8 @@
  */
 package com.ubcsolar.common;
 
+import com.ubcsolar.notification.Notification;
+
 
 public interface Listener {
 	

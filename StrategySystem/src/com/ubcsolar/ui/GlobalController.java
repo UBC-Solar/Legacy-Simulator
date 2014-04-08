@@ -8,15 +8,18 @@
 
 package com.ubcsolar.ui;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import com.ubcsolar.car.CarController;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.Log;
 import com.ubcsolar.common.LogType;
-import com.ubcsolar.common.Notification;
 import com.ubcsolar.map.MapController;
+import com.ubcsolar.notification.Notification;
 import com.ubcsolar.sim.SimController;
 import com.ubcsolar.weather.WeatherController;
 
@@ -61,6 +64,7 @@ public class GlobalController {
 		listOfListeners.add(l);
 		listOfTriggers.add(n);
 		System.out.println(l.getClass() + " registered for " + n);
+		System.out.println("Total number registered: " + listOfListeners.size());
 	}
 	
 	/**
@@ -68,15 +72,18 @@ public class GlobalController {
 	 * @param n - the notification being sent. 
 	 */
 	public synchronized void sendNotification(Notification n){
-		Log.write(n.getMessage(), LogType.NOTIFICATION);
-		System.out.println("Global Controller got a notification " + n.getClass() );
-		System.out.println(listOfTriggers.size());
+		Log.write(LogType.NOTIFICATION, n.getTime(), n.getMessage());
+		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+		Calendar cal = Calendar.getInstance();
+		
+		System.out.println(dateFormat.format(cal.getTime()) + "- Global Controller got a notification " + n.getClass() );
 		for(int i=0; i<listOfTriggers.size(); i++){
 			if(listOfTriggers.get(i) == n.getClass()){
 				listOfListeners.get(i).notify(n);
 			}
 		}
 	}
+	
 	
 	public MapController getMapController(){
 		return myMapController;
@@ -94,6 +101,16 @@ public class GlobalController {
 
 	public WeatherController getMyWeatherController() {
 		return myWeatherController;
+	}
+
+	
+	/**
+	 * allows for graceful shutdown
+	 */
+	public void exit() {
+		Log.printOut();
+		System.exit(0);
+		
 	}
 
 

@@ -4,7 +4,7 @@
  * All notifications will extend this one. 
  */
 
-package com.ubcsolar.common;
+package com.ubcsolar.notification;
 
 public abstract class Notification { //abstract because it can't be used itself, only extended. 
 	
