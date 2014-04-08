@@ -120,7 +120,7 @@ public class GUImain implements Listener{
 		mySession = new GlobalController(this);
 		
 		frame = new JFrame();
-		frame.setBounds(200, 200, 585, 447);
+		frame.setBounds(200, 200, 800, 800);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.buildAllWindows();
 		JMenuBar menuBar = new JMenuBar();
@@ -228,7 +228,9 @@ public class GUImain implements Listener{
 		//THIS SECTION ADDS IN THE PANELS
 		LoadStatusPanel = new LoadStatusPanel(this.mySession);
 		LoadStatusPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+		//frame.getContentPane().add(LoadStatusPanel);
 		frame.getContentPane().add(LoadStatusPanel, "1, 1, 3, 1, fill, fill");
+		//TODO: remove the fills. We don't want it to grow.
 		
 		weatherWindow = new WeatherPanel(this.mySession);
 		weatherWindow.setBorder(BorderFactory.createLineBorder(Color.black));
