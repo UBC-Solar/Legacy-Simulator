@@ -232,12 +232,12 @@ public class GUImain implements Listener{
 		frame.getContentPane().add(LoadStatusPanel, "1, 1, 3, 1, fill, fill");
 		//TODO: remove the fills. We don't want it to grow.
 		
-		weatherWindow = new WeatherPanel(this.mySession);
+		weatherWindow = new WeatherPanel(this.mySession, this);
 		weatherWindow.setBorder(BorderFactory.createLineBorder(Color.black));
 		frame.getContentPane().add(weatherWindow, "1, 3, fill, fill");
 		
-		JLabel lblWeather = new JLabel("Weather");
-		weatherWindow.add(lblWeather);
+		/*JLabel lblWeather = new JLabel("Weather");
+		weatherWindow.add(lblWeather);*/
 		
 		carWindow = new CarPanel(this.mySession, this);
 		carWindow.setBorder(BorderFactory.createLineBorder(Color.black));
