@@ -7,14 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ubcsolar.weather.METAR;
+import com.ubcsolar.weather.Taf;
 
 /**
  * @author Noah
  *
  */
-public class NewMetarReportLoaded extends Notification {
+public class NewTafReportLoadedNotification extends Notification {
 
-	private ArrayList<METAR> listOfMetars;
+	private ArrayList<Taf> listOfTafs;
 	
 	
 	/* (non-Javadoc)
@@ -26,12 +27,12 @@ public class NewMetarReportLoaded extends Notification {
 		return null;
 	}
 
-	public NewMetarReportLoaded(List<METAR> listOfMetars){
-		listOfMetars = new ArrayList<METAR>(listOfMetars);
+	public NewTafReportLoadedNotification(List<Taf> listOfMetars){
+		listOfMetars = new ArrayList<Taf>(listOfMetars);
 	}
 	
-	public List<METAR> getListOfMetars(){
-		return listOfMetars;
+	public List<Taf> getListOfMetars(){
+		return listOfTafs;
 	}
 	
 }

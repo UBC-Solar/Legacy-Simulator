@@ -12,6 +12,8 @@ import com.jgoodies.forms.factories.FormFactory;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.map.NewMapLoadedNotification;
 import com.ubcsolar.notification.NewCarLoadedNotification;
+import com.ubcsolar.notification.NewMetarReportLoadedNotification;
+import com.ubcsolar.notification.NewTafReportLoadedNotification;
 import com.ubcsolar.notification.Notification;
 
 import javax.swing.JLabel;
@@ -20,9 +22,10 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	private GlobalController mySession;
 	//private GUImain parent;
 	private JLabel lblMap; //Displays the name of the loaded map
-	private JLabel lblWeather; //dispalyed the name of the loaded weather
+	private JLabel lblMetar; //dispalyed the name of the loaded metar report
 	private JLabel lblSim; //displays the name of the last-run sim
 	private JLabel lblCar; //displays the name of the loaded car (simulated or real?)
+	private JLabel lblTaf; //displays the name of the loaded Taf report
 	
 	/**
 	 * constructor
@@ -38,6 +41,8 @@ public class LoadStatusPanel extends JPanel implements Listener {
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("max(49dlu;default):grow"),
 				FormFactory.RELATED_GAP_COLSPEC,
+				FormFactory.DEFAULT_COLSPEC,
+				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("max(49dlu;default):grow"),
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("max(49dlu;default):grow"),},
@@ -50,14 +55,17 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		
 		//lblWeather = new JLabel(mySession.getMyWeatherController().getLoadedWeatherName());
 		//TODO add these in as we develop the model
-		lblWeather = new JLabel("Weather loaded: " + "none");
-		add(lblWeather, "4, 2");
+		lblMetar = new JLabel("Metar: none");
+		add(lblMetar, "4, 2");
+		
+		lblTaf = new JLabel("TAF: none");
+		add(lblTaf, "6, 2");
 		
 		lblSim = new JLabel("Sim: Has not run");
-		add(lblSim, "6, 2, fill, default");
+		add(lblSim, "8, 2, fill, default");
 		
 		lblCar = new JLabel("Car Loaded: None");
-		add(lblCar, "8, 2, center, default");
+		add(lblCar, "10, 2, center, default");
 		if(mySession != null){
 			initializeValues();
 			register();
@@ -95,6 +103,13 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		else if(n.getClass() == NewCarLoadedNotification.class){
 			updateCarLabel(((NewCarLoadedNotification) n).getNameOfCar()); //to update the car label
 		}
+		else if(n.getClass() == NewMetarReportLoadedNotification.class){
+			updateMetarLabel("" + n.getTime());
+		}
+		else if(n.getClass() == NewMetarReportLoadedNotification.class){
+			updateTafLabel("" + n.getTime());
+		}
+		
 		/*//TODO implement these
 		else if(n.getClass() == NewWeatherLoadedNotification.class){ //to update the weather label
 			updateWeatherLabel(n.getNameOfWeather());
@@ -107,11 +122,23 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	}
 	
 	
+	private void updateMetarLabel(String string) {
+		this.lblMetar.setText("Metar: " + string);
+		
+	}
+
+	private void updateTafLabel(String string) {
+		this.lblTaf.setText("Taf: " + string);
+		
+	}
+
 	@Override
 	public void register() {
 		if(mySession != null){
 		mySession.register(this,  NewMapLoadedNotification.class);
 		mySession.register(this, NewCarLoadedNotification.class);
+		mySession.register(this, NewMetarReportLoadedNotification.class);
+		mySession.register(this, NewTafReportLoadedNotification.class);
 		}
 		//mySession.register(this, SimDonwRunningNotificaiton.class); //TODO implement when I get there. 
 		//mySession.register(this,  NewWeatherLoadedNotification.class); //TODO implement when this gets created

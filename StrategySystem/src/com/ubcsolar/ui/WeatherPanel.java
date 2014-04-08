@@ -3,8 +3,8 @@ package com.ubcsolar.ui;
 import javax.swing.JPanel;
 
 import com.ubcsolar.common.Listener;
-import com.ubcsolar.notification.NewMetarReportLoaded;
-import com.ubcsolar.notification.NewTafReportLoaded;
+import com.ubcsolar.notification.NewMetarReportLoadedNotification;
+import com.ubcsolar.notification.NewTafReportLoadedNotification;
 import com.ubcsolar.notification.Notification;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -58,7 +58,7 @@ public class WeatherPanel extends JPanel implements Listener {
 	
 	@Override
 	public void notify(Notification n) {
-		if(n.getClass() == NewMetarReportLoaded.class){
+		if(n.getClass() == NewMetarReportLoadedNotification.class){
 			updateMetarLabel("" + n.getTime());
 		}
 		
@@ -72,8 +72,8 @@ public class WeatherPanel extends JPanel implements Listener {
 
 	@Override
 	public void register() {
-		mySession.register(this, NewMetarReportLoaded.class);
-		mySession.register(this, NewTafReportLoaded.class);
+		mySession.register(this, NewMetarReportLoadedNotification.class);
+		mySession.register(this, NewTafReportLoadedNotification.class);
 	}
 
 }
