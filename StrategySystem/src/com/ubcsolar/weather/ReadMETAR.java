@@ -8,7 +8,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class ReadMETAR {
 
-	public static void ReadMETAR(String argv[]) {
+	public static void ReadMETAR() {
 		
 		try{
 			
@@ -18,7 +18,7 @@ public class ReadMETAR {
 			DefaultHandler handler = new DefaultHandler() {
 			
 				boolean bstation_id = false;
-				boolean btime = false;
+				boolean bobservation_time = false;
 				boolean blatitude = false;
 				boolean blongitude = false;
 				boolean btemp = false;
@@ -37,7 +37,7 @@ public class ReadMETAR {
 				}
 				
 				if (qName.equalsIgnoreCase("observation_time")) {
-					btime = true;
+					bobservation_time = true;
 				}
 				
 				if (qName.equalsIgnoreCase("latitude")) {
@@ -83,9 +83,9 @@ public class ReadMETAR {
 					bstation_id = false;
 				}
 				
-				if (btime) {
-					System.out.println("TIME : " + new String(ch, start, length));
-					btime = false;
+				if (bobservation_time) {
+					System.out.println("OBSERVATION TIME : " + new String(ch, start, length));
+					bobservation_time = false;
 				}
 				
 				

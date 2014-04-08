@@ -9,7 +9,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 
 public class ReadTAFS {
-public static void ReadTAFS(String argv[]) {
+public static void ReadTAFS() {
 		
 		try{
 			

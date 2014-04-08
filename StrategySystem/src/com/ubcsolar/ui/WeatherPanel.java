@@ -3,7 +3,7 @@ package com.ubcsolar.ui;
 import javax.swing.JPanel;
 
 import com.ubcsolar.common.Listener;
-import com.ubcsolar.common.Notification;
+import com.ubcsolar.notification.Notification;
 
 public class WeatherPanel extends JPanel implements Listener {
 	private GlobalController mySession;
