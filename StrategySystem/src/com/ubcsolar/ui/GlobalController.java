@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import javax.swing.ImageIcon;
 
 import com.ubcsolar.car.CarController;
 import com.ubcsolar.common.Listener;
@@ -32,7 +33,10 @@ public class GlobalController {
 	private CarController myCarController; //the Car controller
 	private SimController mySimController; //the Sim controller
 	private WeatherController myWeatherController; //the Weather controller.
+	public final ImageIcon iconImage;
 	
+
+
 	
 	
 	/**
@@ -40,6 +44,7 @@ public class GlobalController {
 	 * @param mainWindow - the root window for the UI
 	 */
 	public GlobalController(GUImain mainWindow){
+		iconImage = new ImageIcon("res/squareLogo.png");
 		this.mainWindow = mainWindow;
 		//TODO: turn the 2 lists into a KVP<Class<?extends Notification>, ArrayList<Listener>> 
 		//AKA a table indexed by the notifications. Look up the notification type, send it to all

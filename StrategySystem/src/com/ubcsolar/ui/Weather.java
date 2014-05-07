@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.ImageIcon;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -66,6 +67,14 @@ public class Weather extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-	}
+		
+		setTitleAndLogo();
+		}
+		
+		private void setTitleAndLogo(){
+			
+			this.setIconImage(mySession.iconImage.getImage());
+			this.setTitle("Weather");
+		}
 
 }

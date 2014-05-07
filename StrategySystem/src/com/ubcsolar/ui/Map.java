@@ -26,6 +26,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JTable;
 import javax.swing.GroupLayout;
@@ -42,6 +43,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
+
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
@@ -169,7 +171,14 @@ public class Map extends JFrame implements Listener {
 		contentPane.add(cp, BorderLayout.CENTER);
 		
 		
-	}
+		setTitleAndLogo();
+		}
+		
+		private void setTitleAndLogo(){
+			ImageIcon img = new ImageIcon("res/squareLogo.png");
+			this.setIconImage(img.getImage());
+			this.setTitle("Map");
+		}
 	private void buildDefaultChart(){
 		ds = createDataset();
 		this.elevationChart = 

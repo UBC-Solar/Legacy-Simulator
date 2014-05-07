@@ -6,6 +6,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.ImageIcon;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -69,6 +70,13 @@ public class Strategy extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
-	}
-
+		
+		setTitleAndLogo();
+		}
+		
+		private void setTitleAndLogo(){
+			//this.setIconImage(mySession.iconImage.getImage());
+			//TODO renable this when I set up a session in Constructor. 
+			this.setTitle("Strategy");
+		}
 }

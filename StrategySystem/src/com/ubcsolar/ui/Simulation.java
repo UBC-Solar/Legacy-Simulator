@@ -3,6 +3,7 @@ package com.ubcsolar.ui;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -77,6 +78,13 @@ public class Simulation extends JFrame {
 		gbc_btnNewSimulation.gridx = 0;
 		gbc_btnNewSimulation.gridy = 0;
 		contentPane.add(btnNewSimulation, gbc_btnNewSimulation);
-	}
+		
+		setTitleAndLogo();
+		}
+		
+		private void setTitleAndLogo(){
+			this.setIconImage(mySession.iconImage.getImage());
+			this.setTitle("Simulation");
+		}
 
 }

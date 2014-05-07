@@ -75,6 +75,12 @@ public class Performance extends JFrame {
 				startFakeCar();
 			}
 		});
+		setTitleAndLogo();
+	}
+	
+	private void setTitleAndLogo(){
+		this.setIconImage(mySession.iconImage.getImage());
+		this.setTitle("Performance");
 	}
 	
 	private void startFakeCar(){

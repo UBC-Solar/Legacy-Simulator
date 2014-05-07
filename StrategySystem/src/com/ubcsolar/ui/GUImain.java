@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.awt.EventQueue;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -127,6 +128,7 @@ public class GUImain implements Listener{
 		frame.setJMenuBar(menuBar);
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
+		
 		
 		JMenuItem mntmPrintLog = new JMenuItem("Print Log");
 		mntmPrintLog.addActionListener(new ActionListener() {
@@ -266,6 +268,14 @@ public class GUImain implements Listener{
 		JLabel lblMap = new JLabel("Map");
 		mapWindow.add(lblMap);
 		register(); //do last, in case a notification is sent before we're done building.
+		
+		
+		setTitleAndLogo();
+	}
+	
+	private void setTitleAndLogo(){
+		frame.setIconImage(mySession.iconImage.getImage());
+		frame.setTitle("TITUS-Main");
 	}
 	
 	
