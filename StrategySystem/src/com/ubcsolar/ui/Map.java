@@ -36,13 +36,28 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JEditorPane;
 import javax.swing.JButton;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.xy.DefaultXYDataset;
+import org.jfree.data.xy.XYDataset;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.RowSpec;
+ 
+
+
 
 public class Map extends JFrame implements Listener {
 
 	private JPanel contentPane;
-	private JTable table;
 	private GlobalController mySession;
-	private JLabel lblBlank = new JLabel("blank");
+	private JLabel lblMapName;
+	private JButton btnRefreshMapName;
+	private XYDataset ds;
+	private JFreeChart elevationChart;
+	private ChartPanel cp;
 
 /**
 	 * Launch the application.
@@ -64,7 +79,7 @@ public class Map extends JFrame implements Listener {
 	 * Create the frame.
 	 */
 	public void labelUpdate(String labelupdate) {
-		lblBlank.setText(labelupdate);
+		lblMapName.setText(labelupdate);
 	}
 	
 	
@@ -136,57 +151,50 @@ public class Map extends JFrame implements Listener {
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
+		contentPane.setLayout(new BorderLayout(0, 0));
 		
-		JScrollPane scrollPane = new JScrollPane();
+		JPanel statusPanel= new JPanel();
+		contentPane.add(statusPanel, BorderLayout.NORTH);
 		
-		JPanel panel = new JPanel();
+		lblMapName = new JLabel("Map Loaded: None");
+		statusPanel.add(lblMapName);
 		
-		JButton btnNewButton = new JButton("Refresh Map Name");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				String dataname = mySession.getMapController().getLoadedMapName();
-				labelUpdate(dataname); 
-			}
-		});
-		
-	
-		GroupLayout gl_contentPane = new GroupLayout(contentPane);
-		gl_contentPane.setHorizontalGroup(
-			gl_contentPane.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_contentPane.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 321, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGap(10)
-							.addComponent(lblBlank)
-							.addContainerGap())
-						.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-							.addGroup(gl_contentPane.createSequentialGroup()
-								.addComponent(btnNewButton)
-								.addContainerGap())
-							.addComponent(panel, GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE))))
-		);
-		gl_contentPane.setVerticalGroup(
-			gl_contentPane.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_contentPane.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addComponent(panel, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)
-							.addGap(2)
-							.addComponent(lblBlank)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnNewButton))
-						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE))
-					.addContainerGap())
-		);
+		btnRefreshMapName = new JButton("Refresh Map Name");
+		statusPanel.add(btnRefreshMapName);
+		//TODO add in handler to refresh name
 		
 		
 		
-		table = new JTable();
-		scrollPane.setViewportView(table);
-		contentPane.setLayout(gl_contentPane);
+		buildDefaultChart();
+		contentPane.add(cp, BorderLayout.CENTER);
+		
+		
 	}
+	private void buildDefaultChart(){
+		ds = createDataset();
+		this.elevationChart = 
+				ChartFactory.createXYLineChart(
+						"Test Chart",
+						"x axis",
+						"y axis", 
+						ds,
+						PlotOrientation.VERTICAL, true, true, false);
+		
+		cp = new ChartPanel(elevationChart);
+		//initialize ds, elevationChart, and cp
+	}
+	
+	/** this method is for testing. Code developed from 
+	 * http://www.caveofprogramming.com/frontpage/articles/java/charts-in-java-swing-with-jfreechart/
+	 * 
+	 * @return
+	 */
+	private XYDataset createDataset(){
+	DefaultXYDataset dds = new DefaultXYDataset();
+		double[][] data = { {0.1, 0.2, 0.3}, {1, 2, 3} };
+		
+		dds.addSeries("series1", data);
+		return dds;
+	}
+	
 }

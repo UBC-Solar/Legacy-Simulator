@@ -2,6 +2,8 @@ package com.ubcsolar.map;
 
 import com.ubcsolar.notification.Notification;
 
+
+
 public class NewMapLoadedNotification extends Notification {
 
 	public final String mapLoadedName;
