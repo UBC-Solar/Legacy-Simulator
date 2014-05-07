@@ -175,8 +175,7 @@ public class Map extends JFrame implements Listener {
 		}
 		
 		private void setTitleAndLogo(){
-			ImageIcon img = new ImageIcon("res/squareLogo.png");
-			this.setIconImage(img.getImage());
+			this.setIconImage(mySession.iconImage.getImage());
 			this.setTitle("Map");
 		}
 	private void buildDefaultChart(){

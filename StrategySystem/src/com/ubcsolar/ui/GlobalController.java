@@ -44,7 +44,7 @@ public class GlobalController {
 	 * @param mainWindow - the root window for the UI
 	 */
 	public GlobalController(GUImain mainWindow){
-		iconImage = new ImageIcon("res/squareLogo.png");
+		iconImage = new ImageIcon("res/windowIcon.png");
 		this.mainWindow = mainWindow;
 		//TODO: turn the 2 lists into a KVP<Class<?extends Notification>, ArrayList<Listener>> 
 		//AKA a table indexed by the notifications. Look up the notification type, send it to all
