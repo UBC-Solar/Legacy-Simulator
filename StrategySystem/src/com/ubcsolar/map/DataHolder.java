@@ -6,20 +6,23 @@ package com.ubcsolar.map;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class DataHolder {
 	private MapController myMapController;
 	private String filename;
 	
-	public DataHolder(String filename, MapController toAdd) throws IOException{
+	public DataHolder(String filename, MapController toAdd) throws IOException, SAXException, ParserConfigurationException{
 		myMapController = toAdd;
 		pureLoad(filename);
 		this.filename = filename;
@@ -30,55 +33,12 @@ public class DataHolder {
 	}
 	
 	
-	private void pureLoad(String filename) throws IOException{
+	private void pureLoad(String filename) throws IOException, SAXException, ParserConfigurationException{
 
-		
-		try {
-
-			File xmlDoc = new File(filename);
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(xmlDoc);
-			doc.getDocumentElement().normalize();
-
-			System.out.println("root of xml file" + doc.getDocumentElement().getNodeName());
-			NodeList nodes = doc.getElementsByTagName("Placemark");
-			System.out.println("size: " + nodes.getLength());
-			System.out.println("==========================");
-
-			for (int i = 0; i < nodes.getLength(); i++) {
-				Node node = nodes.item(i);
-				
-				if (node.getNodeType() == Node.ELEMENT_NODE) {
-						Element element = (Element) node;
-						NodeList subNodes = element.getElementsByTagName("LineString");
-			
-						//Node placeMarkOne = 
-						for(int j=0; j<subNodes.getLength(); j++){
-							Node subNode = subNodes.item(j);
-							
-							Element subElement = (Element) subNode;
-							//NodeList subNodes2 = subElement.getElementsByTagName("coordinates");
-							//System.out.println("Size: " + subNodes2.getLength());
-							//System.out.println(getValue("coordinates", subElement));
-							//System.out.println(subNode.getNodeName());
-							
-						}
-						//System.out.println(node.getNodeName());
-						/*System.out.println("Stock Symbol: " + getValue("Point", element));
-				System.out.println("Stock Price: " + getValue("LineString", element));
-				System.out.println("Stock Quantity: " + getValue("quantity", element));
-						 */
-				}
-			}
-			}catch(IOException e){
-				throw e;
-			}
-			catch (Exception ex) {
-				System.out.println("main2 failed");
-			ex.printStackTrace();
-			}
-			}
+		SaxKmlParser test = new SaxKmlParser();
+		ArrayList<Point> allPoints = new ArrayList<Point>();
+		test.parseToPoints(allPoints, filename);
+	}
 	
 	
 			//note: tag name is case sensitive. 

@@ -36,6 +36,7 @@ import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JEditorPane;
 import javax.swing.JButton;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -43,6 +44,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
+import org.xml.sax.SAXException;
 
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -132,16 +134,26 @@ public class Map extends JFrame implements Listener {
 		JMenuItem mntmNewMenuItem = new JMenuItem("ASC2014 Route Map");
 		mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				try {
-					mySession.getMapController().load("res/EDCToHope.kml");
-				} catch (IOException e) {
-					JDialog dialog = new ErrorMessage();
-					dialog.setVisible(true);
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					
-				} 
 				
+					try {
+						mySession.getMapController().load("res/test.txt");
+					} catch (IOException e) {
+						JDialog dialog = new ErrorMessage("IO Exception: File could not be loaded (bad filename?)");
+						dialog.setVisible(true);
+						e.printStackTrace();
+						
+					} catch (SAXException e) {
+						JDialog dialog = new ErrorMessage("SAX parser Exception: The file was formatted badly");
+						dialog.setVisible(true);
+						e.printStackTrace();
+						
+					} catch (ParserConfigurationException e) {
+						JDialog dialog = new ErrorMessage("Something with the parser configuration: Check stack trace.");
+						dialog.setVisible(true);
+						e.printStackTrace();
+						
+					}
+				 
 				
 				//TODO hardcoded, will need to update
 			}

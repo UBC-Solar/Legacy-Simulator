@@ -1,16 +1,60 @@
-Hello
-World
-My
-<coordinates>
-49.262530000000005,-123.24782,96.39534759521484
--121.44211000000001,49.377370000000006,0.0
-</coordinates>
-Name is jonas, I'm lost in a whale
-the end.
-<coordinates>
-
-
-
-</coordinates>
-test 1 
-test 2
+<?xml version='1.0' encoding='UTF-8'?>
+<kml xmlns='http://www.opengis.net/kml/2.2'>
+	<Document>
+		<name>Directions from Hope, BC to Merritt, BC</name>
+		<Placemark>
+			<styleUrl>#line-1267FF-4</styleUrl>
+			<name>Directions from Hope, BC to Merritt, BC</name>
+			<LineString>
+				<tessellate>0</tessellate>
+				<coordinates>
+50.110220000000005,-120.78181000000001,602.0
+50.11061,-120.78338000000001,601.6246337890625
+50.11077,-120.78401000000001,601.4628295898438
+50.11081,-120.78417,601.3738403320312
+50.111160000000005,-120.78557,600.9624633789062
+50.11133,-120.78621000000001,601.0
+			</coordinates>
+			</LineString>
+		</Placemark>
+		<Placemark>
+			<styleUrl>#icon-503-ff8277</styleUrl>
+			<name>Hope, BC</name>
+			<description><![CDATA[711-741 Fraser Avenue, Hope, BC V0X 1L0, Canada]]></description>
+			<Point>
+				<coordinates>
+49.3803111,-121.444074,40.16861724853516
+				</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<styleUrl>#icon-503-ff8277</styleUrl>
+			<name>Merritt, BC</name>
+			<description><![CDATA[2101 Princeton-Kamloops Highway, Merritt, BC V1K 1R6, Canada]]></description>
+			<Point>
+				<coordinates>
+50.1113335,-120.78620560000002,601.0
+				</coordinates>
+			</Point>
+		</Placemark>
+		<Style id='line-1267FF-4'>
+			<LineStyle>
+				<color>ffFF6712</color>
+				<width>4</width>
+			</LineStyle>
+		</Style>
+		<Style id='icon-503-ff8277'>
+			<IconStyle>
+				<color>ff7782ff</color>
+				<scale>1.1</scale>
+				<Icon>
+					<href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+				</Icon>
+			</IconStyle>
+		</Style>
+	</Document>
+</kml>
+				
+				
+				
+				

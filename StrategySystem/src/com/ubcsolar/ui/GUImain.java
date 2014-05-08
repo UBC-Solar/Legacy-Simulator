@@ -171,7 +171,6 @@ public class GUImain implements Listener{
 				catch(IOException ex){
 					JOptionPane.showMessageDialog(frame, ex.getMessage() + " Could not load map");
 				}*/
-				System.out.println("yep");
 				launchMap();
 			}
 		});

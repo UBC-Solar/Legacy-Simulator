@@ -11,6 +11,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -33,19 +34,29 @@ private ErrorMessage thisone = this	;
 	/**
 	 * Create the dialog.
 	 */
-	public ErrorMessage() {
+	public ErrorMessage(String message) {
+		createDialog(message);
+	}
+	
+	
+	/**
+	 * creates an error dialog
+	 * @param message - the message to display
+	 */
+	private void createDialog(String message) {
+		this.setTitle("Error!");
 		setBounds(100, 100, 304, 158);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		{
-			JLabel lblNewLabel = new JLabel(" Error: IO Exception, file not found.");
+			JLabel lblNewLabel = new JLabel(message);
 			lblNewLabel.setBounds(44, 21, 195, 38);
 			contentPanel.add(lblNewLabel);
 		}
 		{
-			JButton btnOkay = new JButton("      Okay");
+			JButton btnOkay = new JButton("OK");
 			btnOkay.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					thisone.setVisible(false);
@@ -54,6 +65,13 @@ private ErrorMessage thisone = this	;
 			btnOkay.setBounds(88, 70, 89, 23);
 			contentPanel.add(btnOkay);
 		}
+	
+}
+/**
+ * creates an error dialog with a default error message (discouraged!)
+ */
+	public ErrorMessage(){
+		createDialog("An unexpected error has occured");
 	}
 
 }

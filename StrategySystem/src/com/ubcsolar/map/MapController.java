@@ -11,6 +11,10 @@ package com.ubcsolar.map;
 
 import java.io.IOException;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.notification.Notification;
 import com.ubcsolar.ui.GlobalController;
@@ -38,8 +42,10 @@ public class MapController extends ModuleController{
 	 * loads a kml route file
 	 * @param filename - must be a valid KML file. Referential or full network paths acceptable
 	 * @throws IOException - if unable to load file. 
+	 * @throws ParserConfigurationException 
+	 * @throws SAXException 
 	 */
-	public void load(String filename) throws IOException{
+	public void load(String filename) throws IOException, SAXException, ParserConfigurationException{
 		System.out.println("Loading " + filename);
 		current = new DataHolder(filename, this);	
 		sendNotification(new NewMapLoadedNotification(filename));
