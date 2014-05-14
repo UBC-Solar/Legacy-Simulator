@@ -1,2 +1,3 @@
 -turn the registration/distribution center in Global controller into a KP
 -clean up GUIMain constructor.
+-clean up/document the elevation script. 

@@ -180,9 +180,19 @@ public static final String API_KEY = "AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek";
 				System.out.println(b);
 			}*/
 		//System.out.println(Double.parseDouble(bits[1]));
-		Coordinate temp = new Coordinate(Double.parseDouble(bits[1]), //NOTE: the KML data seems to be long, lat
+		
+		/**NOTE: This won't work if we travel to somewhere that's not an E coordinate)!!*/
+		Coordinate temp;
+		if(Double.parseDouble(bits[0])<0){
+		 temp = new Coordinate(Double.parseDouble(bits[1]), //NOTE: the KML data seems to be long, lat
 										Double.parseDouble(bits[0]),
 										Double.parseDouble(bits[2]));
+		}
+		else{
+			temp = new Coordinate(Double.parseDouble(bits[1]), //NOTE: the KML data seems to be long, lat
+					Double.parseDouble(bits[0]),
+					Double.parseDouble(bits[2]));
+		}
 										
 		//System.out.print(temp.getLong());
 		coordinateList.add(temp);		

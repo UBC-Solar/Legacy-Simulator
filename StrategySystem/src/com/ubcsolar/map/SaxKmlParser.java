@@ -27,6 +27,8 @@ public <InputClass extends List<Point>> InputClass parseToPoints(InputClass toFi
    DefaultHandler defaultHandler = new DefaultHandler(){  
     String nameTag="close";  
     String coordinatesTag="close";  
+    String placemarkTag = "open";
+    String pointName = "";
     String coordinates = "";
       
     // this method is called every time the parser gets an open tag '<'  
@@ -49,8 +51,9 @@ public <InputClass extends List<Point>> InputClass parseToPoints(InputClass toFi
     public void characters(char ch[], int start, int length)  
       throws SAXException {  
        
-     if (nameTag.equals("open")) {  
-      System.out.println("Name : " + new String(ch, start, length));  
+     if (nameTag.equals("open")) {
+    	 String tempPointName = new String(ch, start, length);
+    	 pointName = tempPointName;
      }  
      if (coordinatesTag.equals("open")) {  
       coordinates += new String(ch, start, length);  
@@ -63,19 +66,23 @@ public <InputClass extends List<Point>> InputClass parseToPoints(InputClass toFi
       throws SAXException {  
        
      if (qName.equalsIgnoreCase("name")) {  
-      nameTag = "close";  
+    	 System.out.println("Name: " + pointName);
+    	 nameTag = "close";  
      }  
      if (qName.equalsIgnoreCase("coordinates")) {  
-    	 System.out.println("Coordinates: ");
-    	 System.out.println(coordinates);
-    	 coordinates = "";
     	 coordinatesTag = "close";  
      }  
-     if (qName.equalsIgnoreCase("point")) {  
-      System.out.println("I would make a point here");
+     if (qName.equalsIgnoreCase("point")) {
+    	 System.out.println(coordinates);
+    	 coordinates = "";
+    	 System.out.println("I would make a point here");
+    	 
      }  
      if (qName.equalsIgnoreCase("linestring")) {  
-      System.out.println("I would make a list of points here"); 
+    	 System.out.println(coordinates);
+    	 
+         coordinates = "";
+    	 System.out.println("I would make a list of points here"); 
      }  
     }  
    };  
