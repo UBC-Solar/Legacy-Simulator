@@ -1,7 +1,7 @@
 package com.ubcsolar.weather;
 
 import com.ubcsolar.common.ModuleController;
-import com.ubcsolar.map.NewMapLoadedNotification;
+import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 import com.ubcsolar.ui.GlobalController;
 

@@ -7,6 +7,7 @@ package com.ubcsolar.ui;
 
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.map.*;
+import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 
 import java.awt.BorderLayout;

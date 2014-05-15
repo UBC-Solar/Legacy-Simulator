@@ -16,13 +16,15 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 import com.ubcsolar.common.ModuleController;
+import com.ubcsolar.notification.RouteDataAsRequestedNotification;
+import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 import com.ubcsolar.ui.GlobalController;
 
 public class MapController extends ModuleController{
 
 	
-	private DataHolder current; //the dataHolder
+	private DataHolder currentRoute; //the dataHolder
 
 	public MapController(GlobalController toAdd) {
 		super(toAdd);
@@ -47,11 +49,12 @@ public class MapController extends ModuleController{
 	 */
 	public void load(String filename) throws IOException, SAXException, ParserConfigurationException{
 		System.out.println("Loading " + filename);
-		current = new DataHolder(filename, this);	
+		currentRoute = new DataHolder(filename, this);	
 		sendNotification(new NewMapLoadedNotification(filename));
 	}
 	
 	public void getAllPoints(){
+		sendNotification(new RouteDataAsRequestedNotification(currentRoute.getAllPoints()));
 		
 	}
 	
@@ -63,12 +66,12 @@ public class MapController extends ModuleController{
 	 * @return filename - the full network path name of the file.
 	 */
 	public String getLoadedMapName(){ 
-		if(current == null){
+		if(currentRoute == null){
 			return null;
 		}
 		//TODO: chenge it from network path to just file name
 		else{
-			return current.getFileName();
+			return currentRoute.getFileName();
 		}
 		
 	}

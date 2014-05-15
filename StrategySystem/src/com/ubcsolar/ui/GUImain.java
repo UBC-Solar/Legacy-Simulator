@@ -22,8 +22,8 @@ import javax.swing.JMenuItem;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.Log;
 import com.ubcsolar.common.LogType;
-import com.ubcsolar.map.NewMapLoadedNotification;
 import com.ubcsolar.notification.CarUpdateNotification;
+import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 
 import java.awt.event.ActionEvent;

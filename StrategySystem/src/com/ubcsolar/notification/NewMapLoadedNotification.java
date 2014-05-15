@@ -1,6 +1,5 @@
-package com.ubcsolar.map;
+package com.ubcsolar.notification;
 
-import com.ubcsolar.notification.Notification;
 
 
 
