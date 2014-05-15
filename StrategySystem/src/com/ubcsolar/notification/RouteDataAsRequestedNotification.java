@@ -57,8 +57,7 @@ public class RouteDataAsRequestedNotification extends Notification {
 	 */
 	@Override
 	public String getMessage() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Sending points for the first " + this.numOfDistanceRequested + " " + this.unitMeasuredBy + ".";
 	}
 
 	/**

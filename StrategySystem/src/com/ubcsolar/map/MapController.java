@@ -51,6 +51,9 @@ public class MapController extends ModuleController{
 		System.out.println("Loading " + filename);
 		currentRoute = new DataHolder(filename, this);	
 		sendNotification(new NewMapLoadedNotification(filename));
+		//Decided against automatically sending all data points. 
+		//If the UI element wants them, it can specifiy it. 
+		//getAllPoints();
 	}
 	
 	public void getAllPoints(){

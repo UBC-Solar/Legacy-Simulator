@@ -31,4 +31,5 @@ public abstract class Notification { //abstract because it can't be used itself,
 	 */
 	public abstract String getMessage();
 
+
 }

@@ -154,9 +154,12 @@ public class SaxKmlParser extends DefaultHandler{
 				pointCount++; 
 				//for testing: print out the point I just added.
 				//System.out.println(temp.getInformation() + " " + temp.getLat() + "," + temp.getLon() + "," + temp.getElevationInMeters());
+				
 			}
-		}
 			
+		}
+		
+		
 	}
    
    

@@ -5,10 +5,12 @@
  */
 package com.ubcsolar.ui;
 
+import com.ubcsolar.common.DistanceUnit;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.map.*;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
+import com.ubcsolar.notification.RouteDataAsRequestedNotification;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -26,6 +28,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -99,14 +102,23 @@ public class Map extends JFrame implements Listener {
 			labelUpdate(((NewMapLoadedNotification) n).getMapLoadedName()); 
 			JOptionPane.showMessageDialog(this, "New map: " + (((NewMapLoadedNotification) n).getMapLoadedName()));
 		}
+		else if (n.getClass() == RouteDataAsRequestedNotification.class){
+			RouteDataAsRequestedNotification n2 = (RouteDataAsRequestedNotification) n;
+			updateMap(n2.getListOfPoints(), n2.getNumOfDistanceRequested(), n2.getUnitMeasuredBy());
+		}
 	}
 	
+
+
+
+
 	/**
 	 * register for any notifications that this class needs to
 	 */
 	@Override
 	public void register(){
 		mySession.register(this, NewMapLoadedNotification.class); //need this for the map label and tool bar.
+		mySession.register(this, RouteDataAsRequestedNotification.class);
 		//TODO add any notifications you need to listen for here. 
 	}
 	
@@ -137,14 +149,16 @@ public class Map extends JFrame implements Listener {
 			public void actionPerformed(ActionEvent arg0) {
 				
 					try {
+						//TODO hardcoded, will need to update
 						mySession.getMapController().load("res/test.txt");
+						
 					} catch (IOException e) {
 						JDialog dialog = new ErrorMessage("IO Exception: File could not be loaded (bad filename?)");
 						dialog.setVisible(true);
 						e.printStackTrace();
 						
 					} catch (SAXException e) {
-						JDialog dialog = new ErrorMessage("SAX parser Exception: The file was formatted badly");
+						JDialog dialog = new ErrorMessage("SAX parser Exception: The file was formatted badly. Bad character?");
 						dialog.setVisible(true);
 						e.printStackTrace();
 						
@@ -154,9 +168,10 @@ public class Map extends JFrame implements Listener {
 						e.printStackTrace();
 						
 					}
+					mySession.getMapController().getAllPoints();
 				 
 				
-				//TODO hardcoded, will need to update
+			
 			}
 		});
 		mnLoadMap.add(mntmNewMenuItem);
@@ -216,6 +231,34 @@ public class Map extends JFrame implements Listener {
 		
 		dds.addSeries("series1", data);
 		return dds;
+	}
+	
+	/**
+	 * update map with received data
+	 * @param listOfPoints - the points
+	 * @param numOfDistanceRequested - the distance they cover (or were requested to)
+	 * @param unitMeasuredBy - units. 
+	 */
+	private void updateMap(ArrayList<Point> listOfPoints,
+			int numOfDistanceRequested, DistanceUnit unitMeasuredBy) {
+		
+		if(listOfPoints.size() <1){ //if there are no points, abort. 
+			return;
+		}
+		//TODO this ignores the last 2, because I haven't figured out how to sort them yet. 
+		double[][] data = new double[listOfPoints.size() -2][listOfPoints.size()-2];
+		
+		
+		
+		/*
+		DefaultXYDataset dds = new DefaultXYDataset();
+		
+		
+		//double[][] data = { {0.1, 0.2, 0.3}, {1, 2, 3} };
+		
+		dds.addSeries("series1", data);
+		return dds;*/
+		
 	}
 	
 }
