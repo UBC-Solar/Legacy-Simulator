@@ -51,6 +51,10 @@ public class MapController extends ModuleController{
 		sendNotification(new NewMapLoadedNotification(filename));
 	}
 	
+	public void getAllPoints(){
+		
+	}
+	
 	
 
 	/**

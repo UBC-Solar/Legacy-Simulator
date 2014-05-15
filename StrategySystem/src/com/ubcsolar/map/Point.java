@@ -11,6 +11,101 @@ public Point(double lat, double lon, double elevationInMeters){
 	this.lon = lon;
 	this.elevation = elevationInMeters;
 }
+
+public Point(int lat, int lon, int elevationInMeters){
+	this.lat = lat;
+	this.lon = lon;
+	this.elevation = elevationInMeters;
+}
+
+public Point(int lat, double lon, double elevationInMeters){
+	this.lat = lat;
+	this.lon = lon;
+	this.elevation = elevationInMeters;
+}
+
+public Point(double lat, int lon, double elevationInMeters){
+	this.lat = lat;
+	this.lon = lon;
+	this.elevation = elevationInMeters;
+}
+
+public Point(double lat, double lon, int elevationInMeters){
+	this.lat = lat;
+	this.lon = lon;
+	this.elevation = elevationInMeters;
+}
+
+public Point(int lat, double lon, int elevationInMeters){
+	this.lat = lat;
+	this.lon = lon;
+	this.elevation = elevationInMeters;
+}
+
+
+public Point(int lat, int lon, double elevationInMeters){
+	this.lat = lat;
+	this.lon = lon;
+	this.elevation = elevationInMeters;
+}
+
+public Point(double lat, int lon, int elevationInMeters){
+	this.lat = lat;
+	this.lon = lon;
+	this.elevation = elevationInMeters;
+}
+
+public Point(int lat, int lon, int elevationInMeters, String note){
+	this.lat = lat;
+	this.lon = lon;
+	this.elevation = elevationInMeters;
+	information = note;
+}
+
+public Point(int lat, double lon, double elevationInMeters, String note){
+	this.lat = lat;
+	this.lon = lon;
+	this.elevation = elevationInMeters;
+	information = note;
+}
+
+public Point(double lat, int lon, double elevationInMeters, String note){
+	this.lat = lat;
+	this.lon = lon;
+	this.elevation = elevationInMeters;
+	information = note;
+}
+
+public Point(double lat, double lon, int elevationInMeters, String note){
+	this.lat = lat;
+	this.lon = lon;
+	this.elevation = elevationInMeters;
+	information = note;
+}
+
+public Point(int lat, double lon, int elevationInMeters, String note){
+	this.lat = lat;
+	this.lon = lon;
+	this.elevation = elevationInMeters;
+	information = note;
+}
+
+
+public Point(int lat, int lon, double elevationInMeters, String note){
+	this.lat = lat;
+	this.lon = lon;
+	this.elevation = elevationInMeters;
+	information = note;
+}
+
+public Point(double lat, int lon, int elevationInMeters, String note){
+	this.lat = lat;
+	this.lon = lon;
+	this.elevation = elevationInMeters;
+	information = note;
+}
+
+
 public Point(double lat, double lon, double elevationInMeters, String note){
 	this.lat = lat;
 	this.lon = lon;
