@@ -113,6 +113,7 @@ public class GlobalController {
 	 * allows for graceful shutdown
 	 */
 	public void exit() {
+		Log.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "System Quitting");
 		Log.printOut();
 		System.exit(0);
 		

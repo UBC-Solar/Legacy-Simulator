@@ -38,6 +38,9 @@ import com.jgoodies.forms.layout.RowSpec;
 import com.jgoodies.forms.factories.FormFactory;
 
 import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 
 public class GUImain implements Listener{
 
@@ -266,6 +269,15 @@ public class GUImain implements Listener{
 		
 		JLabel lblMap = new JLabel("Map");
 		mapWindow.add(lblMap);
+		
+		JButton btnAdvanced = new JButton("Advanced");
+		btnAdvanced.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				launchMap();
+			}
+		});
+
+		mapWindow.add(btnAdvanced);
 		register(); //do last, in case a notification is sent before we're done building.
 		
 		

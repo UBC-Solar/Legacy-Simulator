@@ -197,7 +197,7 @@ public class Map extends JFrame implements Listener {
 	 */
 	private void setTitleAndLogo(){
 			this.setIconImage(mySession.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
-			this.setTitle("Map"); //possible "advanced map"?
+			this.setTitle("Advanced Map"); //possible "advanced map"?
 	}
 	
 	/**
