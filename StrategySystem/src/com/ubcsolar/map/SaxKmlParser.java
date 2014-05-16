@@ -32,7 +32,10 @@ public class SaxKmlParser extends DefaultHandler{
    
 	
 	/**
-	 * Entry point for the class, fills the List from the file.  
+	 * Entry point for the class, fills the List from the file. 
+	 * NOTE: Adds points in order (which means that if Google Maps
+	 * lists the route, then the cities, it will assume you do the route, then go between the 
+	 * cities again. 
 	 * @param toFill - the List to fillwith points
 	 * @param file - the valid KML file to read from
 	 * @return - a List with all points
@@ -123,14 +126,14 @@ public class SaxKmlParser extends DefaultHandler{
     */
 	private void parsePoints(String aBigStringOfCoordinates, String pointName2) throws SAXParseException {
 		
-		String delim = "[\n\\s]+";
+		String delim = "[\n\\s]+"; //use whitespace or newlines as the delim. 
 		String[] allPoints = aBigStringOfCoordinates.split(delim);
 		int pointCount = 0; //to count the number of points added
 							//(may not be equal to length of allPoints, due to extra '\n's or whitepace)
 		for(int i = 0; i<allPoints.length; i++){
-			if(allPoints[i].length()>2){ //eliminates blank rows. Must have at least 2 commas. 
+			if(allPoints[i].length()>2){ //eliminates blank rows. Must have at least 2 commas to be a valid coordinate. 
 				String[] coordinatePieces = allPoints[i].split("[,\\s]+");
-				if(coordinatePieces.length<3){
+				if(coordinatePieces.length<3){ //i.e not a valid coordinate. (even altitude 0 would be ok)
 					throw new SAXParseException("Not three parts to this coordinate. "
 							+ "May have had whitespace or newlines between lat, long, and elevation",
 							new LocatorImpl());
@@ -142,16 +145,20 @@ public class SaxKmlParser extends DefaultHandler{
 										Double.parseDouble(coordinatePieces[1]),
 										Double.parseDouble(coordinatePieces[2]));
 				}
-				catch(IllegalArgumentException e){
+				catch(IllegalArgumentException e){ //if we can't parse into a Double
 					throw new SAXParseException("Error converting from String to coordinate."
 							+ " Invalid Character?"
 							, new LocatorImpl());
 				}
 				if(pointCount == 0){
-					temp.setInformation(pointName2);
+					temp.setInformation(pointName2); //if it's the first one, set the name as the info. 
+													//first one in a route will be 'directions from __ to__'
+													//first (and only) in a point will be the city name.
 				}
-				toFill.add(temp);
-				pointCount++; 
+				toFill.add(temp); //add to end of the toFill list. 
+				pointCount++; //because the number of points may be different than array position (blanks, etc). 
+			
+				
 				//for testing: print out the point I just added.
 				//System.out.println(temp.getInformation() + " " + temp.getLat() + "," + temp.getLon() + "," + temp.getElevationInMeters());
 				

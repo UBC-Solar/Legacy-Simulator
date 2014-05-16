@@ -69,24 +69,9 @@ public class Map extends JFrame implements Listener {
 	private JFreeChart elevationChart;
 	private ChartPanel cp;
 
-/**
-	 * Launch the application.
-	 *//*//commented out, don't need a MAIN in Map. 
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Map frame = new Map();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}*/
-
 	/**
-	 * Create the frame.
+	 * update the map name label
+	 * @param labelupdate - what to make the label display
 	 */
 	public void labelUpdate(String labelupdate) {
 		lblMapName.setText(labelupdate);
@@ -100,19 +85,19 @@ public class Map extends JFrame implements Listener {
 	@Override
 	public void notify(Notification n){
 		//TODO add any notifications here
+		
+		//A new map has been loaded into the program
 		if(n.getClass() == NewMapLoadedNotification.class){ //when a new map is loaded, propogate the new name. 
 			labelUpdate(((NewMapLoadedNotification) n).getMapLoadedName()); 
 			JOptionPane.showMessageDialog(this, "New map: " + (((NewMapLoadedNotification) n).getMapLoadedName()));
 		}
+		//the data that this class likely requested has been processed and loaded
+		//possibly somewhere else requested data, but we can update this graph anyway
 		else if (n.getClass() == RouteDataAsRequestedNotification.class){
 			RouteDataAsRequestedNotification n2 = (RouteDataAsRequestedNotification) n;
 			updateMap(n2.getListOfPoints(), n2.getNumOfDistanceRequested(), n2.getUnitMeasuredBy());
 		}
 	}
-	
-
-
-
 
 	/**
 	 * register for any notifications that this class needs to
@@ -120,7 +105,8 @@ public class Map extends JFrame implements Listener {
 	@Override
 	public void register(){
 		mySession.register(this, NewMapLoadedNotification.class); //need this for the map label and tool bar.
-		mySession.register(this, RouteDataAsRequestedNotification.class);
+		mySession.register(this, RouteDataAsRequestedNotification.class); //for when route data is processed and sent out. Likely requested
+																		//by this class
 		//TODO add any notifications you need to listen for here. 
 	}
 	
@@ -131,6 +117,8 @@ public class Map extends JFrame implements Listener {
 	public Map(GlobalController toAdd) {
 		mySession = toAdd;
 		register();
+		buildDefaultChart();
+		setTitleAndLogo();
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
 		setBounds(100, 100, 538, 395);
 		
@@ -197,32 +185,38 @@ public class Map extends JFrame implements Listener {
 		
 		
 		
-		buildDefaultChart();
+		//add in the chart
 		contentPane.add(cp, BorderLayout.CENTER);
 		
-		
-		setTitleAndLogo();
 		}
-		
-		private void setTitleAndLogo(){
-			this.setIconImage(mySession.iconImage.getImage());
-			this.setTitle("Map");
-		}
+	
+	
+	
+	/**
+	 * set the title and icon for this window. 
+	 */
+	private void setTitleAndLogo(){
+			this.setIconImage(mySession.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
+			this.setTitle("Map"); //possible "advanced map"?
+	}
+	
+	/**
+	 * Creates a canned chart. Usually to initialize the window because no data has been loaded. 
+	 */
 	private void buildDefaultChart(){
-		ds = createDataset();
+		ds = createBlankDataset();
 		this.elevationChart = 
 				ChartFactory.createXYLineChart(
-						"Test Chart",
-						"x axis",
-						"y axis", 
+						"Height Chart",
+						"Distance",
+						"Height", 
 						ds,
 						PlotOrientation.VERTICAL, true, true, false);
 		
 		cp = new ChartPanel(elevationChart);
-		//initialize ds, elevationChart, and cp
 	}
 	
-	/** this method is for testing. Code developed from 
+	/** this method is for testing, builds canned dataset. Code developed from 
 	 * http://www.caveofprogramming.com/frontpage/articles/java/charts-in-java-swing-with-jfreechart/
 	 * 
 	 * @return
@@ -232,6 +226,18 @@ public class Map extends JFrame implements Listener {
 		double[][] data = { {0.1, 0.2, 0.3}, {1, 2, 3} };
 		
 		dds.addSeries("series1", data);
+		return dds;
+	}
+	
+	
+	/**
+	 * Makes an empty dataset for an empty chart. 
+	 * @return - an empty dataset. 
+	 */
+	private XYDataset createBlankDataset(){
+		DefaultXYDataset dds = new DefaultXYDataset();
+		double[][] data = new double[2][0];
+		dds.addSeries("", data);
 		return dds;
 	}
 	
@@ -258,19 +264,19 @@ public class Map extends JFrame implements Listener {
 		
 		//TODO ignores last 2 cuz I haven't figured out how to sort them yet. 
 				double tripDistance = 0.0; //whatever units I select below. 
-				double[][] data = new double[2][listOfPoints.size()-2];
+				double[][] data = new double[2][listOfPoints.size()];
 				if(listOfPoints.size() > 1){
 					data[0][0] = tripDistance; //first distance is zero.
-					data[1][0] = listOfPoints.get(0).getElevationInFeet();
-					minHeight = listOfPoints.get(0).getElevationInFeet();
-					maxHeight = listOfPoints.get(0).getElevationInFeet();
+					data[1][0] = listOfPoints.get(0).getElevationInMeters();
+					minHeight = listOfPoints.get(0).getElevationInMeters();
+					maxHeight = listOfPoints.get(0).getElevationInMeters();
 					
-					for(int i = 1; i<listOfPoints.size()-2; i++){
+					for(int i = 1; i<listOfPoints.size(); i++){
 						tripDistance +=  listOfPoints.get(i-1).calculateDistance(listOfPoints.get(i), unitMeasuredBy);
 						data[0][i] = tripDistance;
 						
 						//TODO make this change from feet to anything
-						double tempHeight = listOfPoints.get(i).getElevationInFeet();
+						double tempHeight = listOfPoints.get(i).getElevationInMeters();
 						data[1][i] = tempHeight;
 						if(tempHeight - minHeight < 0){
 							minHeight = tempHeight; //new low
@@ -326,31 +332,5 @@ public class Map extends JFrame implements Listener {
 
 
 
-	private XYDataset makeDataSet(ArrayList<Point> listOfPoints, DistanceUnit elevationUnit) {
-		//TODO ignores last 2 cuz I haven't figured out how to sort them yet. 
-		double tripDistance = 0.0; //whatever units I select below. 
-		double[][] data = new double[2][listOfPoints.size()-2];
-		if(listOfPoints.size() > 1){
-			data[0][0] = tripDistance; //first distance is zero.
-			data[1][0] = listOfPoints.get(0).getElevationInFeet();
-			
-			for(int i = 1; i<listOfPoints.size()-2; i++){
-				tripDistance +=  listOfPoints.get(i-1).calculateDistance(listOfPoints.get(i), elevationUnit);
-				data[0][i] = tripDistance;
-				
-				//TODO make this change from feet to anything
-				data[1][i] = listOfPoints.get(i).getElevationInFeet();
-			}
-			
-			
-		}
-		
-		
-		DefaultXYDataset dds = new DefaultXYDataset();
-		
-		dds.addSeries("Route", data);
-		return dds;
-		
-	}
 	
 }

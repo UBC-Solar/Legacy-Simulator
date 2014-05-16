@@ -3,6 +3,14 @@
 	<Document>
 		<name>Directions from 2345 East Mall, Vancouver, BC to Hope Museum, Water Avenue, Hope, BC</name>
 		<Placemark>
+			<styleUrl>#icon-503-ff8277</styleUrl>
+			<name>2345 East Mall, Vancouver, BC</name>
+			<description><![CDATA[2345 East Mall, The University of British Columbia, Greater Vancouver A, BC V6T 1Z4, Canada]]></description>
+			<Point>
+				<coordinates>49.2625265,-123.2478246,96.37736511230469</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
 			<styleUrl>#line-1267FF-4</styleUrl>
 			<name>Directions from 2345 East Mall, Vancouver, BC to Hope Museum, Water Avenue, Hope, BC</name>
 			<LineString>
@@ -2387,20 +2395,13 @@
 </coordinates>
 			</LineString>
 		</Placemark>
-		<Placemark>
-			<styleUrl>#icon-503-ff8277</styleUrl>
-			<name>2345 East Mall, Vancouver, BC</name>
-			<description><![CDATA[2345 East Mall, The University of British Columbia, Greater Vancouver A, BC V6T 1Z4, Canada]]></description>
-			<Point>
-				<coordinates>-123.2478246,49.2625265,96.37736511230469</coordinates>
-			</Point>
-		</Placemark>
+		
 		<Placemark>
 			<styleUrl>#icon-503-ff8277</styleUrl>
 			<name>Hope Museum, Water Avenue, Hope, BC</name>
 			<description><![CDATA[Hudsons Bay Street, Hope, BC V0X 1L0, Canada]]></description>
 			<Point>
-				<coordinates>-121.44210780000003,49.3773744,43</coordinates>
+				<coordinates>49.3773744,-121.44210780000003,43</coordinates>
 			</Point>
 		</Placemark>
 		<Style id='line-1267FF-4'>
