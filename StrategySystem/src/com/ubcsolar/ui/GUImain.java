@@ -57,7 +57,7 @@ public class GUImain implements Listener{
 	private JFrame myWeather;
 	private JFrame mySim;
 	private JPanel LoadStatusPanel;
-
+// this is a test comment
 
 	/**
 	 * Launch the application.
