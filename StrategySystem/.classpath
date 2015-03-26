@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="lib/jFreeChart/jcommon-1.0.21.jar"/>
 	<classpathentry kind="lib" path="lib/jFreeChart/jfreechart-1.0.17.jar"/>
 	<classpathentry kind="lib" path="lib/jFreeChart/junit-4.11.jar"/>
+	<classpathentry kind="lib" path="lib/forecastio-lib-java-master/jar/ForecastIOLib-1.5.2-jar-with-dependencies.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
