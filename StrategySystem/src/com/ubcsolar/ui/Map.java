@@ -140,7 +140,7 @@ public class Map extends JFrame implements Listener {
 				
 					try {
 						//TODO hardcoded, will need to update
-						mySession.getMapController().load("res/NEWEDCToHopeElevations.kml");
+						mySession.getMapController().load("res/HopeToMerrittElevated.kml");
 						
 					} catch (IOException e) {
 						JDialog dialog = new ErrorMessage("IO Exception: File could not be loaded (bad filename?)");
@@ -271,8 +271,10 @@ public class Map extends JFrame implements Listener {
 					minHeight = listOfPoints.get(0).getElevationInMeters();
 					maxHeight = listOfPoints.get(0).getElevationInMeters();
 					
+					
 					for(int i = 1; i<listOfPoints.size(); i++){
 						tripDistance +=  listOfPoints.get(i-1).calculateDistance(listOfPoints.get(i), unitMeasuredBy);
+						System.out.println(listOfPoints.get(i-1).calculateDistance(listOfPoints.get(i), unitMeasuredBy));
 						data[0][i] = tripDistance;
 						
 						//TODO make this change from feet to anything

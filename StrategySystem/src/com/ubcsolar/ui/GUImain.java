@@ -42,6 +42,8 @@ import javax.swing.JButton;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 
+import org.openstreetmap.gui.jmapviewer.JMapViewer;
+
 public class GUImain implements Listener{
 
 	private JFrame frame;
@@ -249,7 +251,7 @@ public class GUImain implements Listener{
 
 		
 		
-		mainPanel = new JPanel();
+		mainPanel = new JMapViewer();
 		mainPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		frame.getContentPane().add(mainPanel, "3, 3, 1, 7, fill, fill");
 		
