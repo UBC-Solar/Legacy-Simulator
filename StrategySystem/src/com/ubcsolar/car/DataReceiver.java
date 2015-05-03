@@ -4,53 +4,90 @@
 
 package com.ubcsolar.car;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TooManyListenersException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import gnu.io.CommPortIdentifier; 
+import gnu.io.PortInUseException;
+import gnu.io.SerialPort;
+import gnu.io.SerialPortEvent; 
+import gnu.io.SerialPortEventListener; 
+import gnu.io.UnsupportedCommOperationException;
+
 //TODO turn this class into an abstract one, and move the listening implementation into a concrete
 //subclass
-public class DataReceiver implements Runnable { //needs to be threaded so it can listen for a response
+public class DataReceiver implements Runnable,SerialPortEventListener { //needs to be threaded so it can listen for a response
 
 	protected CarController myCarController; //the parent to notify of a new result. 
 	private String name = "live"; //"live" because it's listening for real transmissions
-	private Timer myTimer; //how often to check. May be able to remove this and just have it block while
-							//listening
-	public int speed; //the last reported speed of the car. Will probably 
-							//have a value for each possible value
+
+	// values from the last received data are cached in these variables...
+	public int speed;
 	public float totalVoltage;
 	public int stateOfCharge;
 	public Map<String,Integer> temperatures = new HashMap<String,Integer>();
 	public Map<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
-	
+
+	private InputStream inputStream;
+	private SerialPort serialPort;
+	private Thread readThread;
+	private byte[] serialReadBuf = new byte[500];
+	private int serialReadBufPos = 0;
+
 	/**
 	 * default constructor.
 	 * @param toAdd - the CarController to notify when it gets a new result
 	 */ 
 	 
-	 	public DataReceiver(CarController toAdd){
+	public DataReceiver(CarController toAdd){
 		myCarController = toAdd;
+
+		// for now it always takes the first serial port.
+		Enumeration portList = CommPortIdentifier.getPortIdentifiers();
+		while(portList.hasMoreElements()){
+			CommPortIdentifier portId = (CommPortIdentifier) portList.nextElement();
+			if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL){
+				try{
+					serialPort = (SerialPort) portId.open("SimpleReadApp", 2000);
+				}catch(PortInUseException e) {System.out.println(e);}
+				try {
+					inputStream = serialPort.getInputStream();
+				} catch (IOException e) {System.out.println(e);}
+				try {
+					serialPort.addEventListener(this);
+				} catch (TooManyListenersException e) {System.out.println(e);}
+				serialPort.notifyOnDataAvailable(true);
+				try {
+					serialPort.setSerialPortParams(115200,
+						SerialPort.DATABITS_8,
+						SerialPort.STOPBITS_1,
+						SerialPort.PARITY_NONE);
+				} catch (UnsupportedCommOperationException e) {System.out.println(e);}
+				readThread = new Thread(this);
+				readThread.start();
+			}
+		}
 	}
 	
 	public static void main(String[] argv){
 		DataReceiver dr = new DataReceiver(null);
-		dr.loadJSONData(null);
-		System.out.println(dr.speed);
-		System.out.println(dr.totalVoltage);
-		System.out.println(dr.temperatures.toString());
-		System.out.println(dr.cellVoltages.toString());
 	}
 	
 	public void loadJSONData(String jsonData){
 		JSONObject data;
 		// test data
-		jsonData = "{\"speed\":100,\"totalVoltage\":44.4,\"stateOfCharge\":101,\"temperatures\":{\"bms\":40,\"motor\":50,\"pack0\":35,\"pack1\":36,\"pack2\":37,\"pack3\":38},\"cellVoltages\":{\"pack0\":[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2],\"pack1\":[1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2],\"pack2\":[2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3.0,3.1,3.2],\"pack3\":[3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4.0,4.1,4.2]}}\n";
+		//jsonData = "{\"speed\":100,\"totalVoltage\":44.4,\"stateOfCharge\":101,\"temperatures\":{\"bms\":40,\"motor\":50,\"pack0\":35,\"pack1\":36,\"pack2\":37,\"pack3\":38},\"cellVoltages\":{\"pack0\":[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2],\"pack1\":[1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2],\"pack2\":[2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3.0,3.1,3.2],\"pack3\":[3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4.0,4.1,4.2]}}\n";
 		try{
 			data = new JSONObject(jsonData);			
 		}catch(JSONException e){
@@ -63,7 +100,7 @@ public class DataReceiver implements Runnable { //needs to be threaded so it can
 			this.temperatures.put(key, (int) temperatures.get(key));
 		JSONObject cellVoltages = ((JSONObject) data.get("cellVoltages"));
 		for(String key : JSONObject.getNames(cellVoltages)){
-			int packID = key.toCharArray()[key.length()-1] - 0x30;
+			int packID = key.toCharArray()[key.length()-1] - '0';
 			this.cellVoltages.put(packID, new ArrayList<Float>());
 			JSONArray array = (JSONArray) cellVoltages.get(key);
 			for(int i=0; i<array.length(); i++)
@@ -80,41 +117,63 @@ public class DataReceiver implements Runnable { //needs to be threaded so it can
 		return speed;
 	}
 	
-	/**
-	 * starts the listening timer
-	 */
 	@Override
 	public void run() {
-		//TODO: rather than a timer, just have it block until it gets a new one. 
-		myTimer = new Timer();
-		myTimer.schedule(new TimerTask() {
-				@Override
-				public void run() {
-						checkForUpdate();
-					
-				}
-			}, 0, 2000);
-		}
+		try {
+			Thread.sleep(20000);
+		} catch (InterruptedException e) {System.out.println(e);}
+	}
 		
 	public void stop(){
-		myTimer.cancel();
+		serialPort.notifyOnDataAvailable(false);
 	}
-	/**
-	 * this class will check to see if an update has landed in the buffer yet.
-	 */
+
+	@Deprecated
 	protected void checkForUpdate(){
-			//TODO check the Arduino socket/buffer for any transmission. 
-		//myCarController.adviseOfNewCarReport(new CarUpdateNotification(25));
-		
 	}
-	
-	
+
 	/**
 	 * 
 	 * @return the name of the car loaded. 
 	 */
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public void serialEvent(SerialPortEvent event) {
+		switch(event.getEventType()) {
+		case SerialPortEvent.BI:
+		case SerialPortEvent.OE:
+		case SerialPortEvent.FE:
+		case SerialPortEvent.PE:
+		case SerialPortEvent.CD:
+		case SerialPortEvent.CTS:
+		case SerialPortEvent.DSR:
+		case SerialPortEvent.RI:
+		case SerialPortEvent.OUTPUT_BUFFER_EMPTY:
+			break;
+		case SerialPortEvent.DATA_AVAILABLE:
+
+			try {
+				while (inputStream.available() > 0) {
+					serialReadBuf[serialReadBufPos] = (byte) inputStream.read();
+					if(serialReadBuf[serialReadBufPos] == '\n'){
+						serialReadBuf[serialReadBufPos+1] = 0;
+						loadJSONData(new String(serialReadBuf));
+						serialReadBufPos = 0;
+
+						System.out.println(this.speed);
+						System.out.println(this.totalVoltage);
+						System.out.println(this.temperatures.toString());
+						System.out.println(this.cellVoltages.toString());
+					}else{
+						serialReadBufPos++;
+					}
+				}
+			} catch (IOException e) {System.out.println(e);}
+			break;
+		}
 	}
 
 }
