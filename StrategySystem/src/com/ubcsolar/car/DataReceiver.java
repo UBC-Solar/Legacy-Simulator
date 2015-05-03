@@ -4,8 +4,15 @@
 
 package com.ubcsolar.car;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 //TODO turn this class into an abstract one, and move the listening implementation into a concrete
 //subclass
@@ -15,8 +22,12 @@ public class DataReceiver implements Runnable { //needs to be threaded so it can
 	private String name = "live"; //"live" because it's listening for real transmissions
 	private Timer myTimer; //how often to check. May be able to remove this and just have it block while
 							//listening
-	protected int lastSpeed; //the last reported speed of the car. Will probably 
+	public int speed; //the last reported speed of the car. Will probably 
 							//have a value for each possible value
+	public float totalVoltage;
+	public int stateOfCharge;
+	public Map<String,Integer> temperatures = new HashMap<String,Integer>();
+	public Map<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
 	
 	/**
 	 * default constructor.
@@ -27,12 +38,46 @@ public class DataReceiver implements Runnable { //needs to be threaded so it can
 		myCarController = toAdd;
 	}
 	
+	public static void main(String[] argv){
+		DataReceiver dr = new DataReceiver(null);
+		dr.loadJSONData(null);
+		System.out.println(dr.speed);
+		System.out.println(dr.totalVoltage);
+		System.out.println(dr.temperatures.toString());
+		System.out.println(dr.cellVoltages.toString());
+	}
+	
+	public void loadJSONData(String jsonData){
+		JSONObject data;
+		// test data
+		jsonData = "{\"speed\":100,\"totalVoltage\":44.4,\"stateOfCharge\":101,\"temperatures\":{\"bms\":40,\"motor\":50,\"pack0\":35,\"pack1\":36,\"pack2\":37,\"pack3\":38},\"cellVoltages\":{\"pack0\":[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2],\"pack1\":[1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2],\"pack2\":[2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3.0,3.1,3.2],\"pack3\":[3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4.0,4.1,4.2]}}\n";
+		try{
+			data = new JSONObject(jsonData);			
+		}catch(JSONException e){
+			return; //malformed (corrupted) data is ignored.
+		}
+		this.speed = (int) data.get("speed");
+		this.totalVoltage = (float) (double) data.get("totalVoltage");
+		JSONObject temperatures = ((JSONObject) data.get("temperatures"));
+		for(String key : JSONObject.getNames(temperatures))
+			this.temperatures.put(key, (int) temperatures.get(key));
+		JSONObject cellVoltages = ((JSONObject) data.get("cellVoltages"));
+		for(String key : JSONObject.getNames(cellVoltages)){
+			int packID = key.toCharArray()[key.length()-1] - 0x30;
+			this.cellVoltages.put(packID, new ArrayList<Float>());
+			JSONArray array = (JSONArray) cellVoltages.get(key);
+			for(int i=0; i<array.length(); i++)
+				this.cellVoltages.get(packID).add((float) array.getDouble(i));
+		}
+			
+	}
+	 	
 	/**
 	 * gets the last reported speed, in km/h. 
 	 * @return the last repoted speed, in km/h. 
 	 */
 	public int getLastReportedSpeed(){
-		return lastSpeed;
+		return speed;
 	}
 	
 	/**

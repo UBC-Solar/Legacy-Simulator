@@ -15,7 +15,7 @@ public class SimulatedDataReceiver extends DataReceiver {
 	
 	public SimulatedDataReceiver(CarController toAdd) {
 		super(toAdd);
-		lastSpeed = 0; 
+		speed = 0; 
 		isAccelerating = true;
 		name = "basic sim";
 		// TODO Auto-generated constructor stub
@@ -32,24 +32,24 @@ public class SimulatedDataReceiver extends DataReceiver {
 	 */
 	@Override
 	protected void checkForUpdate(){
-	if(lastSpeed == 0){
+	if(speed == 0){
 		isAccelerating = true;
-		lastSpeed++;
-		myCarController.adviseOfNewCarReport((new CarUpdateNotification(this.lastSpeed)));
+		speed++;
+		myCarController.adviseOfNewCarReport((new CarUpdateNotification(this.speed)));
 	}
-	else if(lastSpeed == 100){
+	else if(speed == 100){
 		isAccelerating = false;
-		lastSpeed --;
-		myCarController.adviseOfNewCarReport((new CarUpdateNotification(this.lastSpeed)));
+		speed --;
+		myCarController.adviseOfNewCarReport((new CarUpdateNotification(this.speed)));
 	}
 	else{
 		if(isAccelerating){
-			lastSpeed++;
+			speed++;
 		}
 		else{
-			lastSpeed --;
+			speed --;
 		}
-		myCarController.adviseOfNewCarReport((new CarUpdateNotification(this.lastSpeed)));
+		myCarController.adviseOfNewCarReport((new CarUpdateNotification(this.speed)));
 	}
 	}
 }
