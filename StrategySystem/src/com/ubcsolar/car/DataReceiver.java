@@ -32,12 +32,8 @@ public class DataReceiver implements Runnable,SerialPortEventListener { //needs 
 	protected CarController myCarController; //the parent to notify of a new result. 
 	private String name = "live"; //"live" because it's listening for real transmissions
 
-	// values from the last received data are cached in these variables...
-	public int speed;
-	public float totalVoltage;
-	public int stateOfCharge;
-	public Map<String,Integer> temperatures = new HashMap<String,Integer>();
-	public Map<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
+	// values from the last received data are cached in here...
+	public DataReceived data;
 
 	private InputStream inputStream;
 	private SerialPort serialPort;
@@ -86,6 +82,7 @@ public class DataReceiver implements Runnable,SerialPortEventListener { //needs 
 	
 	public void loadJSONData(String jsonData){
 		JSONObject data;
+		DataReceived newData = new DataReceived();
 		// test data
 		//jsonData = "{\"speed\":100,\"totalVoltage\":44.4,\"stateOfCharge\":101,\"temperatures\":{\"bms\":40,\"motor\":50,\"pack0\":35,\"pack1\":36,\"pack2\":37,\"pack3\":38},\"cellVoltages\":{\"pack0\":[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2],\"pack1\":[1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2],\"pack2\":[2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3.0,3.1,3.2],\"pack3\":[3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4.0,4.1,4.2]}}\n";
 		try{
@@ -93,28 +90,31 @@ public class DataReceiver implements Runnable,SerialPortEventListener { //needs 
 		}catch(JSONException e){
 			return; //malformed (corrupted) data is ignored.
 		}
-		this.speed = (int) data.get("speed");
-		this.totalVoltage = (float) (double) data.get("totalVoltage");
+		newData.speed = (int) data.get("speed");
+		newData.totalVoltage = (float) (double) data.get("totalVoltage");
 		JSONObject temperatures = ((JSONObject) data.get("temperatures"));
 		for(String key : JSONObject.getNames(temperatures))
-			this.temperatures.put(key, (int) temperatures.get(key));
+			newData.temperatures.put(key, (int) temperatures.get(key));
 		JSONObject cellVoltages = ((JSONObject) data.get("cellVoltages"));
 		for(String key : JSONObject.getNames(cellVoltages)){
 			int packID = key.toCharArray()[key.length()-1] - '0';
-			this.cellVoltages.put(packID, new ArrayList<Float>());
+			newData.cellVoltages.put(packID, new ArrayList<Float>());
 			JSONArray array = (JSONArray) cellVoltages.get(key);
 			for(int i=0; i<array.length(); i++)
-				this.cellVoltages.get(packID).add((float) array.getDouble(i));
+				newData.cellVoltages.get(packID).add((float) array.getDouble(i));
 		}
-			
+		
+		this.data = newData;	
 	}
 	 	
 	/**
+	 * DEPRECATED. Read the "data" variable instead.
 	 * gets the last reported speed, in km/h. 
 	 * @return the last repoted speed, in km/h. 
 	 */
+	@Deprecated
 	public int getLastReportedSpeed(){
-		return speed;
+		return 99999; // garbage value. 
 	}
 	
 	@Override
@@ -130,6 +130,8 @@ public class DataReceiver implements Runnable,SerialPortEventListener { //needs 
 
 	@Deprecated
 	protected void checkForUpdate(){
+		// test
+		loadJSONData("{\"speed\":100,\"totalVoltage\":44.4,\"stateOfCharge\":101,\"temperatures\":{\"bms\":40,\"motor\":50,\"pack0\":35,\"pack1\":36,\"pack2\":37,\"pack3\":38},\"cellVoltages\":{\"pack0\":[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2],\"pack1\":[1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2],\"pack2\":[2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3.0,3.1,3.2],\"pack3\":[3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4.0,4.1,4.2]}}\n");
 	}
 
 	/**
@@ -163,10 +165,7 @@ public class DataReceiver implements Runnable,SerialPortEventListener { //needs 
 						loadJSONData(new String(serialReadBuf));
 						serialReadBufPos = 0;
 
-						System.out.println(this.speed);
-						System.out.println(this.totalVoltage);
-						System.out.println(this.temperatures.toString());
-						System.out.println(this.cellVoltages.toString());
+						System.out.println(this.data.toString());
 					}else{
 						serialReadBufPos++;
 					}
