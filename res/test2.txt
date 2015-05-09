@@ -1,0 +1,12 @@
+Hello
+World
+My
+<coordinates>
+50.1113335,-120.78620560000002,601.0
+</coordinates>
+Name is jonas, I'm lost in a whale
+the end.
+<coordinates>
+</coordinates>
+test 1 
+test 2
