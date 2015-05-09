@@ -50,7 +50,7 @@ public class DataReceiver implements Runnable,SerialPortEventListener { //needs 
 		myCarController = toAdd;
 		myDataProcessor = theProcessor;
 		// for now it always takes the first serial port.
-		Enumeration portList = CommPortIdentifier.getPortIdentifiers();
+		/*Enumeration portList = CommPortIdentifier.getPortIdentifiers();
 		while(portList.hasMoreElements()){
 			CommPortIdentifier portId = (CommPortIdentifier) portList.nextElement();
 			if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL){
@@ -73,7 +73,7 @@ public class DataReceiver implements Runnable,SerialPortEventListener { //needs 
 				readThread = new Thread(this);
 				readThread.start();
 			}
-		}
+		}*/
 	}
 	
 	public static void main(String[] argv){

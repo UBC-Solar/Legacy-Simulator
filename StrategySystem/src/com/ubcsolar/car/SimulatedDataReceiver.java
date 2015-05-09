@@ -21,6 +21,10 @@ public class SimulatedDataReceiver extends DataReceiver {
 		// TODO Auto-generated constructor stub
 	}
 	
+	@Override
+	public void stop(){
+		
+	}
 	
 	@Override 
 	public String getName(){

@@ -20,6 +20,14 @@ public class Database {
 	}
 	
 	
+	/**needed because the UI is looking for this inititally 
+	 * 
+	 * @the last speed
+	 */
+	public int getLastSpeed(){
+		return 0;
+	}
+	
 	
 	
 	

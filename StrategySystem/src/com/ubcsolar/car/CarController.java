@@ -86,7 +86,7 @@ public class CarController extends ModuleController {
 	 */
 	public int getLastReportedSpeed(){
 		//TODO: consider moving this to a Double or float. 
-		return myDataReceiver.getLastReportedSpeed();
+		return myDatabase.getLastSpeed();
 	}
 
 	/**
