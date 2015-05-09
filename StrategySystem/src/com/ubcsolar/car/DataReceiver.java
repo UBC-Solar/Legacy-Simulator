@@ -40,15 +40,15 @@ public class DataReceiver implements Runnable,SerialPortEventListener { //needs 
 	private Thread readThread;
 	private byte[] serialReadBuf = new byte[500];
 	private int serialReadBufPos = 0;
-
+	private DataProcessor myDataProcessor;
 	/**
 	 * default constructor.
 	 * @param toAdd - the CarController to notify when it gets a new result
 	 */ 
 	 
-	public DataReceiver(CarController toAdd){
+	public DataReceiver(CarController toAdd, DataProcessor theProcessor){
 		myCarController = toAdd;
-
+		myDataProcessor = theProcessor;
 		// for now it always takes the first serial port.
 		Enumeration portList = CommPortIdentifier.getPortIdentifiers();
 		while(portList.hasMoreElements()){
@@ -77,7 +77,7 @@ public class DataReceiver implements Runnable,SerialPortEventListener { //needs 
 	}
 	
 	public static void main(String[] argv){
-		DataReceiver dr = new DataReceiver(null);
+		DataReceiver dr = new DataReceiver(null, null);
 	}
 	
 	public void loadJSONData(String jsonData){

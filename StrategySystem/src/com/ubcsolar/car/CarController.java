@@ -14,7 +14,10 @@ import com.ubcsolar.ui.GlobalController;
 
 // TODO: Check threading. Should be calling subclasses as their own thread
 public class CarController extends ModuleController {
-
+	
+	
+	private Database myDatabase;
+	private DataProcessor myDataProcessor;
 	private DataReceiver myDataReceiver; //what will capture the car's broadcasts
 	
 	/**
@@ -23,15 +26,17 @@ public class CarController extends ModuleController {
 	 */
 	public CarController(GlobalController toAdd) {
 		super(toAdd);
-		myDataReceiver = new SimulatedDataReceiver(this);
+		
+		myDataReceiver = new SimulatedDataReceiver(myDataProcessor, this);
 		myDataReceiver.run();
 		sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
+		myDatabase = new Database();
 		// TODO Auto-generated constructor stub
 	}
 	
 	public void startFakeCar(){
 		stopListeningToCar();
-		myDataReceiver = new SimulatedDataReceiver(this);
+		myDataReceiver = new SimulatedDataReceiver(myDataProcessor, this);
 		myDataReceiver.run();
 		sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
 	}
