@@ -23,7 +23,7 @@ public class CarController extends ModuleController {
 	 */
 	public CarController(GlobalController toAdd) {
 		super(toAdd);
-		myDataReceiver = new DataReceiver(this);
+		myDataReceiver = new SimulatedDataReceiver(this);
 		myDataReceiver.run();
 		sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
 		// TODO Auto-generated constructor stub
