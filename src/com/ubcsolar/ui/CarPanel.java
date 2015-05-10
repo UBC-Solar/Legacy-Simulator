@@ -3,80 +3,57 @@
  */
 package com.ubcsolar.ui;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JButton;
 
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.notification.CarUpdateNotification;
 import com.ubcsolar.notification.Notification;
 
-import javax.swing.SwingConstants;
-
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.factories.FormFactory;
-
-import javax.swing.JButton;
-
-public class CarPanel extends JPanel implements Listener{
+public class CarPanel extends JPanel implements Listener {
 	private GlobalController mySession;
 	private JLabel lblCarspeed;
 	private JLabel lblCar;
 	private GUImain parent;
-	public CarPanel(GlobalController session, GUImain parent){
+	
+	
+	public CarPanel(GlobalController session, GUImain parent) {
 		mySession = session;
 		this.parent = parent;
-		setLayout(new FormLayout(new ColumnSpec[] {
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,},
-			new RowSpec[] {
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,}));
+		setLayout(new GridBagLayout());
 		
 		lblCar = new JLabel("Car");
-		add(lblCar, "18, 2");
+		GridBagConstraints carConstraints = new GridBagConstraints();
+		carConstraints.gridy = 0;
+		carConstraints.weighty = 1;
+		carConstraints.anchor = GridBagConstraints.NORTH;
+		add(lblCar, carConstraints);
 		
 		lblCarspeed = new JLabel("No speed yet");
-		
-		add(lblCarspeed, "2, 6");
+		GridBagConstraints speedConstraints = new GridBagConstraints();
+		speedConstraints.gridy = 1;
+		speedConstraints.weighty = 0.7;
+		speedConstraints.fill = GridBagConstraints.HORIZONTAL;
+		add(lblCarspeed, speedConstraints);
 		
 		JButton btnSettings = new JButton("Settings");
-		add(btnSettings, "2, 8");
+		GridBagConstraints settingsConstraints = new GridBagConstraints();
+		settingsConstraints.gridy = 2;
+		settingsConstraints.weighty = 0.7;
+		add(btnSettings, settingsConstraints);
 		btnSettings.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				launchPerformance();
 			}
 		});
 		
-
-		if(mySession != null){ //NullPointerException protection. And now they'll show up in a 
+		if(mySession != null) { //NullPointerException protection. And now they'll show up in a 
 								//WYSIWYG editor. 
 		initializeValues();
 		register();
@@ -84,26 +61,27 @@ public class CarPanel extends JPanel implements Listener{
 	}
 	
 
-
 	private void initializeValues() {
 		updateCarSpeedLabel(mySession.getMyCarController().getLastReportedSpeed());
 		
 	}
 
 
-
 	/**
 	 * Asks the parent to launch the Performance window. 
 	 */
-	public void launchPerformance(){
+	public void launchPerformance() {
 		parent.launchPerformance();
 	}
+	
+	
 	/*
 	public void initialize(){
 		JLabel lblCar = new JLabel("Car");
 		lblCar.setHorizontalAlignment(SwingConstants.CENTER);
 		super.add(lblCar);
 	}*/
+	
 	
 	/**
 	 * updates the car Speed label with the right message
@@ -116,7 +94,7 @@ public class CarPanel extends JPanel implements Listener{
 	
 	@Override
 	public void notify(Notification n) {
-		if(n.getClass() == CarUpdateNotification.class){
+		if(n.getClass() == CarUpdateNotification.class) {
 			updateCarSpeedLabel(((CarUpdateNotification) n).getNewCarSpeed()); //for the CarSpeed label.
 		}
 		// TODO Auto-generated method stub

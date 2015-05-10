@@ -1,63 +1,57 @@
 package com.ubcsolar.ui;
 
 import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.notification.NewMetarReportLoadedNotification;
 import com.ubcsolar.notification.NewTafReportLoadedNotification;
 import com.ubcsolar.notification.Notification;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.factories.FormFactory;
-
-import javax.swing.JLabel;
-import javax.swing.JButton;
-
-import java.awt.BorderLayout;
-import java.awt.Panel;
-import java.awt.Label;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class WeatherPanel extends JPanel implements Listener {
 	private GlobalController mySession;
 	private JLabel lblWeatherHeader;
-	private Label lblMetar;
-	private Label lblTaf;
+	private JLabel lblMetar;
+	private JLabel lblTaf;
 	private GUImain parent;
+	
+	
 	public WeatherPanel(GlobalController session, GUImain parent){
-		setLayout(new BorderLayout(0, 0));
+		setLayout(new GridBagLayout());
 		this.parent = parent;
-		Panel panel = new Panel();
-		add(panel, BorderLayout.NORTH);
-		
+
 		lblWeatherHeader = new JLabel("Weather");
-		panel.add(lblWeatherHeader);
+		GridBagConstraints headerConstraints = new GridBagConstraints();
+		headerConstraints.gridy = 0;
+		headerConstraints.weighty = 1;
+		headerConstraints.anchor = GridBagConstraints.NORTH;
+		this.add(lblWeatherHeader, headerConstraints);
 		
-		Panel panel_1 = new Panel();
-		add(panel_1, BorderLayout.CENTER);
-		panel_1.setLayout(new FormLayout(new ColumnSpec[] {
-				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("max(44dlu;default)"),},
-			new RowSpec[] {
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,}));
+		lblMetar = new JLabel("Metar: ");
+		GridBagConstraints metarConstraints = new GridBagConstraints();
+		metarConstraints.gridy = 1;
+		metarConstraints.weighty = 0.7;
+		metarConstraints.fill = GridBagConstraints.HORIZONTAL;
+		this.add(lblMetar, metarConstraints);
 		
-		lblMetar = new Label("Metar: ");
-		panel_1.add(lblMetar, "2, 4, default, top");
-		
-		lblTaf = new Label("Taf: ");
-		panel_1.add(lblTaf, "2, 6");
+		lblTaf = new JLabel("Taf: ");
+		GridBagConstraints tafConstraints = new GridBagConstraints();
+		tafConstraints.gridy = 2;
+		tafConstraints.weighty = 0.7;
+		tafConstraints.fill = GridBagConstraints.HORIZONTAL;
+		this.add(lblTaf, tafConstraints);
 		
 		JButton btnAdvanced = new JButton("Advanced");
-		panel_1.add(btnAdvanced, "2, 8");
+		GridBagConstraints buttonConstraints = new GridBagConstraints();
+		buttonConstraints.gridy = 3;
+		buttonConstraints.weighty = 0.7;
+		this.add(btnAdvanced, buttonConstraints);
 		btnAdvanced.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				launchWeather();
