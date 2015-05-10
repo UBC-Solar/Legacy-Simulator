@@ -46,20 +46,19 @@ import org.openstreetmap.gui.jmapviewer.JMapViewer;
 
 public class GUImain implements Listener{
 
-	private JFrame frame;
+	private JFrame mainFrame;
 	private GlobalController mySession; 
 	private JLabel loadedMapName;
-	private JPanel carWindow;
+	private JPanel carPanel;
 	private JPanel mainPanel;
 	private JPanel simPanel;
-	private JPanel mapWindow;
-	private JPanel weatherWindow;
-	private JFrame myMap;
-	private JFrame myCar;
-	private JFrame myWeather;
-	private JFrame mySim;
-	private JPanel LoadStatusPanel;
-// this is a test comment
+	private JPanel mapPanel;
+	private JPanel weatherPanel;
+	private JFrame mapFrame;
+	private JFrame carFrame;
+	private JFrame weatherFrame;
+	private JFrame simFrame;
+	private JPanel loadStatusPanel;
 
 	/**
 	 * Launch the application.
@@ -70,7 +69,7 @@ public class GUImain implements Listener{
 			public void run() {
 				try {
 					GUImain window = new GUImain();
-					window.frame.setVisible(true);
+					window.mainFrame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -89,10 +88,10 @@ public class GUImain implements Listener{
 	 * creates all windows that can be launched from this main panel
 	 */
 	private void buildAllWindows(){
-		this.mySim = new Simulation(this.mySession); //Sim advanced window
-		this.myCar = new Performance(this.mySession); //Car advanced window
-		this.myMap = new Map(this.mySession); //Map advanced window
-		this.myWeather = new Weather(this.mySession); //Weather advanced window
+		this.simFrame = new Simulation(this.mySession); //Sim advanced window
+		this.carFrame = new Performance(this.mySession); //Car advanced window
+		this.mapFrame = new Map(this.mySession); //Map advanced window
+		this.weatherFrame = new Weather(this.mySession); //Weather advanced window
 	}
 	
 	/**
@@ -125,12 +124,12 @@ public class GUImain implements Listener{
 	private void initialize() {
 		mySession = new GlobalController(this);
 		
-		frame = new JFrame();
-		frame.setBounds(200, 200, 800, 800);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainFrame = new JFrame();
+		mainFrame.setBounds(200, 200, 800, 800);
+		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.buildAllWindows();
 		JMenuBar menuBar = new JMenuBar();
-		frame.setJMenuBar(menuBar);
+		mainFrame.setJMenuBar(menuBar);
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
 		
@@ -215,8 +214,9 @@ public class GUImain implements Listener{
 			}
 		});
 		mnModules.add(mntmStrategy);
+		
 		this.loadedMapName = new JLabel("None");
-		frame.getContentPane().setLayout(new FormLayout(new ColumnSpec[] {
+		mainFrame.getContentPane().setLayout(new FormLayout(new ColumnSpec[] {
 				ColumnSpec.decode("19px:grow"),
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),},
@@ -232,45 +232,45 @@ public class GUImain implements Listener{
 				RowSpec.decode("default:grow"),}));
 		
 		//THIS SECTION ADDS IN THE PANELS
-		LoadStatusPanel = new LoadStatusPanel(this.mySession);
-		LoadStatusPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+		loadStatusPanel = new LoadStatusPanel(this.mySession);
+		loadStatusPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		//frame.getContentPane().add(LoadStatusPanel);
-		frame.getContentPane().add(LoadStatusPanel, "1, 1, 3, 1, fill, fill");
+		mainFrame.getContentPane().add(loadStatusPanel, "1, 1, 3, 1, fill, fill");
 		//TODO: remove the fills. We don't want it to grow.
 		
-		weatherWindow = new WeatherPanel(this.mySession, this);
-		weatherWindow.setBorder(BorderFactory.createLineBorder(Color.black));
-		frame.getContentPane().add(weatherWindow, "1, 3, fill, fill");
+		weatherPanel = new WeatherPanel(this.mySession, this);
+		weatherPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+		mainFrame.getContentPane().add(weatherPanel, "1, 3, fill, fill");
 		
 		/*JLabel lblWeather = new JLabel("Weather");
 		weatherWindow.add(lblWeather);*/
 		
-		carWindow = new CarPanel(this.mySession, this);
-		carWindow.setBorder(BorderFactory.createLineBorder(Color.black));
-		frame.getContentPane().add(carWindow, "1, 5, fill, fill");
+		carPanel = new CarPanel(this.mySession, this);
+		carPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+		mainFrame.getContentPane().add(carPanel, "1, 5, fill, fill");
 
 		
 		
 		mainPanel = new JMapViewer();
 		mainPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-		frame.getContentPane().add(mainPanel, "3, 3, 1, 7, fill, fill");
+		mainFrame.getContentPane().add(mainPanel, "3, 3, 1, 7, fill, fill");
 		
 		JLabel lblMain = new JLabel("Main");
 		mainPanel.add(lblMain);
 		//TODO: turn these panels into their own classes, and set them up.
 		simPanel = new JPanel();
-		frame.getContentPane().add(simPanel, "1, 7, fill, fill");
+		mainFrame.getContentPane().add(simPanel, "1, 7, fill, fill");
 		simPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		
 		JLabel lblSim = new JLabel("Sim");
 		simPanel.add(lblSim);
 		
-		mapWindow = new JPanel();
-		frame.getContentPane().add(mapWindow, "1, 9, fill, fill");
-		mapWindow.setBorder(BorderFactory.createLineBorder(Color.black));
+		mapPanel = new JPanel();
+		mainFrame.getContentPane().add(mapPanel, "1, 9, fill, fill");
+		mapPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		
 		JLabel lblMap = new JLabel("Map");
-		mapWindow.add(lblMap);
+		mapPanel.add(lblMap);
 		
 		JButton btnAdvanced = new JButton("Advanced");
 		btnAdvanced.addActionListener(new ActionListener() {
@@ -279,7 +279,7 @@ public class GUImain implements Listener{
 			}
 		});
 
-		mapWindow.add(btnAdvanced);
+		mapPanel.add(btnAdvanced);
 		register(); //do last, in case a notification is sent before we're done building.
 		
 		
@@ -287,8 +287,8 @@ public class GUImain implements Listener{
 	}
 	
 	private void setTitleAndLogo(){
-		frame.setIconImage(mySession.iconImage.getImage());
-		frame.setTitle("TITUS-Main");
+		mainFrame.setIconImage(mySession.iconImage.getImage());
+		mainFrame.setTitle("TITUS-Main");
 	}
 	
 	
@@ -296,7 +296,7 @@ public class GUImain implements Listener{
 	 * launches the Sim window
 	 */
 	public void launchSim() {
-		mySim.setVisible(true);
+		simFrame.setVisible(true);
 		
 	}
 
@@ -304,21 +304,21 @@ public class GUImain implements Listener{
 	 * launches the Weather window
 	 */
 	public void launchWeather() {
-		myWeather.setVisible(true);
+		weatherFrame.setVisible(true);
 		
 	}
 	/**
 	 * launches the Car window
 	 */
 	public void launchPerformance() {
-		myCar.setVisible(true);
+		carFrame.setVisible(true);
 		
 	}
 	/**
 	 * launches the Map window
 	 */
 	public void launchMap(){
-		myMap.setVisible(true);
+		mapFrame.setVisible(true);
 	}
 	
 	
