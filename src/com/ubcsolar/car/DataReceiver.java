@@ -50,7 +50,11 @@ public class DataReceiver implements Runnable,SerialPortEventListener { //needs 
 			serialPort.openPort();
 			serialPort.setParams(115200, 8, 1, 0);
 			serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
-		}catch(SerialPortException e){e.printStackTrace();}
+		} catch(SerialPortException e) {
+			e.printStackTrace();
+		} catch(ArrayIndexOutOfBoundsException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void main(String[] argv){
@@ -98,7 +102,11 @@ public class DataReceiver implements Runnable,SerialPortEventListener { //needs 
 	public void run() {
 		try {
 			serialPort.addEventListener(this);
-		} catch (SerialPortException e) {System.out.println(e);}
+		} catch (SerialPortException e) {
+			System.out.println(e);
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
 	}
 		
 	public void stop(){
