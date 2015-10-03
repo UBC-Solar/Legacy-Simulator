@@ -56,7 +56,7 @@ public class Log {
 			// The following is so they all line up nicely on print.
 			// There's probably a better way to do this...
 			if(temp.get(i).reason == LogType.ERROR){
-				System.out.print("   ERROR     | ");
+				System.out.print("   ERROR      | ");
 			}
 			else if(temp.get(i).reason == LogType.NOTIFICATION){
 				System.out.print(LogType.NOTIFICATION + "  | ");

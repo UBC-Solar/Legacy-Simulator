@@ -6,6 +6,9 @@
 
 package com.ubcsolar.car;
 
+//import org.jfree.util.Log;
+
+import com.ubcsolar.common.*;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.notification.*;
 import com.ubcsolar.ui.GlobalController;
@@ -44,8 +47,11 @@ public class CarController extends ModuleController {
 		catch(SerialPortException e){
 			//Not able to create the datareceiver connection
 			//TODO handle this! 
-			sendNotification(new ExceptionNotification(e, "Unable to connect to Car, no Serial Port found"));
+			ExceptionNotification notification = new ExceptionNotification(e, "Unable to connect to Car, no Serial Port found"); 
+			Log.write(LogType.ERROR, notification.getTime(), notification.getMessage());
+			sendNotification(notification);
 			e.printStackTrace();
+			stopListeningToCar();
 		}
 	}
 	
