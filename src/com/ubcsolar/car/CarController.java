@@ -7,9 +7,7 @@
 package com.ubcsolar.car;
 
 import com.ubcsolar.common.ModuleController;
-import com.ubcsolar.notification.CarUpdateNotification;
-import com.ubcsolar.notification.NewCarLoadedNotification;
-import com.ubcsolar.notification.Notification;
+import com.ubcsolar.notification.*;
 import com.ubcsolar.ui.GlobalController;
 
 import jssc.SerialPortException;
@@ -46,7 +44,7 @@ public class CarController extends ModuleController {
 		catch(SerialPortException e){
 			//Not able to create the datareceiver connection
 			//TODO handle this! 
-			System.out.println("SDFSKDJFNSKDJNFSDKF");
+			sendNotification(new ExceptionNotification(e, "Unable to connect to Car, no Serial Port found"));
 			e.printStackTrace();
 		}
 	}

@@ -116,11 +116,13 @@ public class GUImain implements Listener{
 	
 		//TODO: Do something when notified. 
 		
+		if(n.getClass()== ExceptionNotification.class){
+			handleException((ExceptionNotification) n);
+		}
 	}
 	
-	
-	private void displayException(ExceptionNotification e){
-		
+	private void handleException(ExceptionNotification e){
+		JOptionPane.showMessageDialog(mainFrame, e.getMessage());
 	}
 	
 
