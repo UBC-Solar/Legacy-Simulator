@@ -53,8 +53,6 @@ public class DataReceiver implements Runnable,SerialPortEventListener{ //needs t
 			serialPort.openPort();
 			serialPort.setParams(115200, 8, 1, 0);
 			serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
-		} catch(SerialPortException e) {
-			e.printStackTrace();
 		} catch(ArrayIndexOutOfBoundsException e) {
 			e.printStackTrace();
 		}
