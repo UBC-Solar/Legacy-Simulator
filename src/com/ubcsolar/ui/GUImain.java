@@ -46,25 +46,28 @@ import org.openstreetmap.gui.jmapviewer.JMapViewer;
 
 public class GUImain implements Listener{
 
-	private JFrame mainFrame;
-	private GlobalController mySession; 
-	private JLabel loadedMapName;
-	private JPanel carPanel;
-	private JPanel mainPanel;
-	private JPanel simPanel;
-	private JPanel mapPanel;
-	private JPanel weatherPanel;
-	private JFrame mapFrame;
-	private JFrame carFrame;
-	private JFrame weatherFrame;
-	private JFrame simFrame;
-	private JPanel loadStatusPanel;
+	private JFrame mainFrame; //The main/root program window
+	private GlobalController mySession; //Global Controller for the program (interface between code and UI)
+	private JLabel loadedMapName; //a label for the loaded map
+	private JPanel carPanel; //Car status within the main window
+	private JPanel mainPanel; //Biggest panel in the main window; Shows amalgamated information
+	private JPanel simPanel; //Sim status within the main window
+	private JPanel mapPanel; //map status within the main window
+	private JPanel weatherPanel; //weather status within the main window
+	private JFrame mapFrame; //The map module's 'advanced' options menu
+	private JFrame carFrame; //The car module's 'advanced' options menu
+	private JFrame weatherFrame; //The weather module's 'advanced' options menu
+	private JFrame simFrame; //The sim module's 'advanced' options menu
+	private JPanel loadStatusPanel; //Shows the loaded status of modules at a quick glance
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
 		Log.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Application started");
+		//TODO Should we start the controller and rest of the code in their own threads here?
+		
+		//start Window in it's own thread
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -95,16 +98,12 @@ public class GUImain implements Listener{
 	}
 	
 	/**
-	 * registers for all classes that this window needs to listen for
+	 * registers for all notification classes that this window needs to listen for. 
 	 */
 	@Override
 	public void register() {
 			/*mySession.register(this, NewMapLoadedNotification.class);
-			mySession.register(this, CarUpdateNotification.class);*/
-		
-		
-		// TODO Auto-generated method stub
-		
+			mySession.register(this, CarUpdateNotification.class);*/	
 	}
 	
 	/**
@@ -119,75 +118,69 @@ public class GUImain implements Listener{
 	
 
 	/**
-	 * Initialize the contents of the frame.
+	 * This method basically creates the entire UI. 
+	 * Creates a new mainframe, then generates and adds all sub components. 
 	 */
 	private void initialize() {
-		mySession = new GlobalController(this);
-		
-		mainFrame = new JFrame();
+		mySession = new GlobalController(this); //creates the program's Global Controller
+		//TODO it's a little weird to be creating the controller from within the UI. Consider
+		//moving it up to the MAIN method. 
+		mainFrame = new JFrame(); //
 		mainFrame.setBounds(200, 200, 800, 800);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.buildAllWindows();
 		JMenuBar menuBar = new JMenuBar();
 		mainFrame.setJMenuBar(menuBar);
-		JMenu mnFile = new JMenu("File");
-		menuBar.add(mnFile);
 		
 		
-		JMenuItem mntmPrintLog = new JMenuItem("Print Log");
+		//THIS SECTION CREATES AND ADDS IN THE 'FILE' MENU
+		JMenu mnFile = new JMenu("File"); //Make a 'file' drop down list
+		menuBar.add(mnFile); //add that list to the main menu bar 
+		
+		
+		JMenuItem mntmPrintLog = new JMenuItem("Print Log"); //Print option
 		mntmPrintLog.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent arg0) {
 				Log.printOut();
 			}
 		});
-		mnFile.add(mntmPrintLog);
+		mnFile.add(mntmPrintLog); //add it to the File menu
 		
-		JMenuItem mntmExit = new JMenuItem("Exit");
+		JMenuItem mntmExit = new JMenuItem("Exit"); //Exit option in the menu
 		mntmExit.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent arg0) {
 				mySession.exit();
 			}
 		});
-		mnFile.add(mntmExit);
-		
-		/*JMenuItem mntmExit = new JMenuItem("Exit");
-		mntmExit.addActionListener(new ActionListener() {
+		mnFile.add(mntmExit); //add it to the File menu
 			
-			public void actionPerformed(ActionEvent arg0) {
-				mySession.exit();
-			}
-		});*/
-		
-		
+		//THIS SECTION CREATES ADDS IN THE MODULES DROP DOWN MENU
+		//Make and add the 'Modules' drop down menu to the main menu bar
 		JMenu mnModules = new JMenu("Modules");
 		menuBar.add(mnModules);
 		
+		//Make entry to open Map advanced options
 		JMenuItem mntmMap = new JMenuItem("Map");
 		mntmMap.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent arg0) {
-				//System.out.println("test");
-			/*	try{
-				mySession.getMapController().load("res\\ASC2014ClassicMapFull.kml");
-				}
-				catch(IOException ex){
-					JOptionPane.showMessageDialog(frame, ex.getMessage() + " Could not load map");
-				}*/
+				//Should launch the map advanced window when clicked on
 				launchMap();
 			}
 		});
 		mnModules.add(mntmMap);
 		
+		//Make entry to open Sim advanced options
 		JMenuItem mntmSimulator = new JMenuItem("Simulation");
 		mntmSimulator.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				launchSim();
-				
 			}
 		});
 		
+		//Make entry to open Weather advanced options
 		JMenuItem mntmWeather = new JMenuItem("Weather");
 		mntmWeather.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -197,15 +190,17 @@ public class GUImain implements Listener{
 		mnModules.add(mntmWeather);
 		mnModules.add(mntmSimulator);
 		
+		//Make entry to open Car (aka 'performance') advanced options
 		JMenuItem mntmPerformance = new JMenuItem("Performance");
 		mntmPerformance.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				launchPerformance();
-				
 			}
 		});
 		mnModules.add(mntmPerformance);
 		
+		//Make entry to open Strategy (aka 'performance') advanced options
+		//NOTE: This is where we should adjust the driving profile in the future
 		JMenuItem mntmStrategy = new JMenuItem("Strategy");
 		mntmStrategy.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -215,7 +210,14 @@ public class GUImain implements Listener{
 		});
 		mnModules.add(mntmStrategy);
 		
+		//THIS SECTION ADDS IN THE LABELS
 		this.loadedMapName = new JLabel("None");
+		//TODO set up the rest of the labels to initialize properly
+		//note: Pretty sure I've made them elsewhere in the code, 
+		//probably have to just consolidate them
+		
+		
+		//This sets up the layout for the main window
 		mainFrame.getContentPane().setLayout(new FormLayout(new ColumnSpec[] {
 				ColumnSpec.decode("19px:grow"),
 				FormFactory.RELATED_GAP_COLSPEC,
@@ -249,8 +251,6 @@ public class GUImain implements Listener{
 		carPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		mainFrame.getContentPane().add(carPanel, "1, 5, fill, fill");
 
-		
-		
 		mainPanel = new JMapViewer();
 		mainPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		mainFrame.getContentPane().add(mainPanel, "3, 3, 1, 7, fill, fill");
@@ -286,6 +286,9 @@ public class GUImain implements Listener{
 		setTitleAndLogo();
 	}
 	
+	/**
+	 * Sets the window title and logo. Currently Just what I came up with 
+	 */
 	private void setTitleAndLogo(){
 		mainFrame.setIconImage(mySession.iconImage.getImage());
 		mainFrame.setTitle("TITUS-Main");
@@ -293,9 +296,10 @@ public class GUImain implements Listener{
 	
 	
 	/**
-	 * launches the Sim window
+	 * launches the Sim window (should be created already)
 	 */
 	public void launchSim() {
+		//TODO add a check to see if it's been created yet (like an 'if null:' kind of check)
 		simFrame.setVisible(true);
 		
 	}
@@ -304,6 +308,7 @@ public class GUImain implements Listener{
 	 * launches the Weather window
 	 */
 	public void launchWeather() {
+		//TODO add a check to see if it's been created yet (like an 'if null:' kind of check)
 		weatherFrame.setVisible(true);
 		
 	}
@@ -311,6 +316,7 @@ public class GUImain implements Listener{
 	 * launches the Car window
 	 */
 	public void launchPerformance() {
+		//TODO add a check to see if it's been created yet (like an 'if null:' kind of check)
 		carFrame.setVisible(true);
 		
 	}
@@ -318,6 +324,7 @@ public class GUImain implements Listener{
 	 * launches the Map window
 	 */
 	public void launchMap(){
+		//TODO add a check to see if it's been created yet (like an 'if null:' kind of check)
 		mapFrame.setVisible(true);
 	}
 	
