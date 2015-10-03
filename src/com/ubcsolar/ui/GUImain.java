@@ -23,6 +23,7 @@ import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.Log;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.notification.CarUpdateNotification;
+import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 
@@ -113,6 +114,11 @@ public class GUImain implements Listener{
 	public void notify(Notification n){
 	
 		//TODO: Do something when notified. 
+		
+	}
+	
+	
+	private void displayException(ExceptionNotification e){
 		
 	}
 	

@@ -12,6 +12,8 @@ import com.ubcsolar.notification.NewCarLoadedNotification;
 import com.ubcsolar.notification.Notification;
 import com.ubcsolar.ui.GlobalController;
 
+import jssc.SerialPortException;
+
 // TODO: Check threading. Should be calling subclasses as their own thread
 public class CarController extends ModuleController {
 	
@@ -34,10 +36,17 @@ public class CarController extends ModuleController {
 	 */
 	public void establishNewConnection(){
 		//TODO set up the exceptions properly
-		stopListeningToCar(); //close any existing current connection
+		try{
+			stopListeningToCar(); //close any existing current connection
+		
 		myDataReceiver = new DataReceiver(this, myDataProcessor);
 		myDataReceiver.run();
 		sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
+		}
+		catch(SerialPortException e){
+			//Not able to create the datareceiver connection
+			//TODO handle this! 
+		}
 	}
 	
 	/**
@@ -47,12 +56,12 @@ public class CarController extends ModuleController {
 	 * specifying the car to connect to (ie fake or real). 
 	 */
 	public void startFakeCar(){
-		
+		/*
 		stopListeningToCar();
 		myDataReceiver = new SimulatedDataReceiver(myDataProcessor, this);
 		myDataReceiver.run();
 		sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
-		
+		*/
 	}
 	
 	/**

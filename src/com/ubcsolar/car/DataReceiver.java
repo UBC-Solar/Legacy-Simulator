@@ -22,7 +22,7 @@ import jssc.*;
 
 //TODO turn this class into an abstract one, and move the listening implementation into a concrete
 //subclass
-public class DataReceiver implements Runnable,SerialPortEventListener { //needs to be threaded so it can listen for a response
+public class DataReceiver implements Runnable,SerialPortEventListener{ //needs to be threaded so it can listen for a response
 
 	protected CarController myCarController; //the parent to notify of a new result. 
 	private String name = "live"; //"live" because it's listening for real transmissions
@@ -39,7 +39,7 @@ public class DataReceiver implements Runnable,SerialPortEventListener { //needs 
 	 * @param toAdd - the CarController to notify when it gets a new result
 	 */ 
 	 
-	public DataReceiver(CarController toAdd, DataProcessor theProcessor){
+	public DataReceiver(CarController toAdd, DataProcessor theProcessor) throws SerialPortException{
 		myCarController = toAdd;
 		myDataProcessor = theProcessor;
 		
@@ -60,7 +60,7 @@ public class DataReceiver implements Runnable,SerialPortEventListener { //needs 
 		}
 	}
 	
-	public static void main(String[] argv){
+	public static void main(String[] argv) throws SerialPortException{
 		DataReceiver dr = new DataReceiver(null, null);
 	}
 	
