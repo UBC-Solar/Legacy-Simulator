@@ -16,24 +16,38 @@ import com.ubcsolar.ui.GlobalController;
 public class CarController extends ModuleController {
 	
 	
-	private Database myDatabase;
-	private DataProcessor myDataProcessor;
-	private DataReceiver myDataReceiver; //what will capture the car's broadcasts
+	private Database myDatabase; //references to the data warehouse. Want to store the car's broadcasts
+	private DataProcessor myDataProcessor; //where to send the car's broadcasts for processing. 
+	private DataReceiver myDataReceiver; //what will capture the car's raw broadcasts
 	
 	/**
 	 * constructor
-	 * @param toAdd - the GlobalController to send notifications to.
+	 * @param myGlobalController - the GlobalController to send notifications to.
 	 */
-	public CarController(GlobalController toAdd) {
-		super(toAdd);
+	public CarController(GlobalController myGlobalController) {
+		super(myGlobalController);
 		
+
+		myDatabase = new Database();
+	}
+	
+	/**
+	 * Create a new connection to a car (will attempt to close any existing ones) 
+	 */
+	public void establishNewConnection(){
+		//TODO set up the exceptions properly
+		stopListeningToCar(); //close any existing current connection
 		myDataReceiver = new SimulatedDataReceiver(myDataProcessor, this);
 		myDataReceiver.run();
 		sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
-		myDatabase = new Database();
-		// TODO Auto-generated constructor stub
 	}
 	
+	/**
+	 * This method is a bit of a kludge; starts a data receiver that fakes receiving broadcasts
+	 * from the car. (To use for testing)
+	 * Should probably be able to set up the main newConnection method to be able to take an argument 
+	 * specifying the car to connect to (ie fake or real). 
+	 */
 	public void startFakeCar(){
 		stopListeningToCar();
 		myDataReceiver = new SimulatedDataReceiver(myDataProcessor, this);
@@ -46,6 +60,7 @@ public class CarController extends ModuleController {
 	 * If there is no dataReceiver loaded, silently ignores the command. 
 	 */
 	public void stopListeningToCar(){
+		//TODO set up exceptions properly. What if can't close? What if...? 
 		if(myDataReceiver != null){
 			myDataReceiver.stop();
 		}

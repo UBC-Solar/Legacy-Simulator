@@ -16,8 +16,8 @@ public abstract class ModuleController implements Listener {
 	 * Constructor, calls register() and creates the Global Controller reference;
 	 * @param toAdd - the GlobalController to reference/send notificatoins to
 	 */
-	public ModuleController(GlobalController toAdd){
-		mySession = toAdd;
+	public ModuleController(GlobalController myGlobalController){
+		mySession = myGlobalController;
 		register();
 		
 	}
