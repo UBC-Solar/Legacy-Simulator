@@ -72,7 +72,7 @@ public class DataReceiver implements Runnable,SerialPortEventListener { //needs 
 			return; //malformed (corrupted) data is ignored.
 		}
 		newData.speed = (int) jsonData.get("speed");
-		newData.totalVoltage = (float) (double) jsonData.get("totalVoltage");
+		newData.totalVoltage = (int) jsonData.get("totalVoltage");
 		JSONObject temperatures = ((JSONObject) jsonData.get("temperatures"));
 		for(String key : JSONObject.getNames(temperatures))
 			newData.temperatures.put(key, (int) temperatures.get(key));

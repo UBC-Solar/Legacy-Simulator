@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class DataReceived {
 	public int speed;
-	public float totalVoltage;
+	public int totalVoltage;
 	public int stateOfCharge;
 	public Map<String,Integer> temperatures = new HashMap<String,Integer>();
 	public Map<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
