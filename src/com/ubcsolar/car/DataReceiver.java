@@ -86,7 +86,8 @@ public class DataReceiver implements Runnable,SerialPortEventListener{ //needs t
 				newData.cellVoltages.get(packID).add((float) array.getDouble(i));
 		}
 		
-		this.data = newData;	
+		this.data = newData;
+		this.myDataProcessor.store(newData);
 	}
 	 	
 	/**
