@@ -26,8 +26,6 @@ public class CarController extends ModuleController {
 	 */
 	public CarController(GlobalController myGlobalController) {
 		super(myGlobalController);
-		
-
 		myDatabase = new Database();
 	}
 	
@@ -37,7 +35,7 @@ public class CarController extends ModuleController {
 	public void establishNewConnection(){
 		//TODO set up the exceptions properly
 		stopListeningToCar(); //close any existing current connection
-		myDataReceiver = new SimulatedDataReceiver(myDataProcessor, this);
+		myDataReceiver = new DataReceiver(this, myDataProcessor);
 		myDataReceiver.run();
 		sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
 	}
@@ -49,10 +47,12 @@ public class CarController extends ModuleController {
 	 * specifying the car to connect to (ie fake or real). 
 	 */
 	public void startFakeCar(){
+		
 		stopListeningToCar();
 		myDataReceiver = new SimulatedDataReceiver(myDataProcessor, this);
 		myDataReceiver.run();
 		sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
+		
 	}
 	
 	/**

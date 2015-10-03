@@ -76,6 +76,17 @@ public class Performance extends JFrame {
 			}
 		});
 		setTitleAndLogo();
+		
+		JButton btnStartRealCar = new JButton("Try Connect to Real Car");
+		GridBagConstraints gbc_btnStartRealCar = new GridBagConstraints();
+		gbc_btnStartFakeCar.gridx = 0;
+		gbc_btnStartFakeCar.gridy = 0;
+		contentPane.add(btnStartRealCar, gbc_btnStartRealCar);
+		btnStartRealCar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				startRealCar();
+			}
+		});
 	}
 	
 	private void setTitleAndLogo(){
@@ -83,6 +94,9 @@ public class Performance extends JFrame {
 		this.setTitle("Performance");
 	}
 	
+	private void startRealCar(){
+		mySession.getMyCarController().establishNewConnection();
+	}
 	private void startFakeCar(){
 		mySession.getMyCarController().startFakeCar();
 	}
