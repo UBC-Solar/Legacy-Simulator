@@ -46,6 +46,8 @@ public class CarController extends ModuleController {
 		catch(SerialPortException e){
 			//Not able to create the datareceiver connection
 			//TODO handle this! 
+			System.out.println("SDFSKDJFNSKDJNFSDKF");
+			e.printStackTrace();
 		}
 	}
 	

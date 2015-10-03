@@ -105,6 +105,7 @@ public class GUImain implements Listener{
 	public void register() {
 			/*mySession.register(this, NewMapLoadedNotification.class);
 			mySession.register(this, CarUpdateNotification.class);*/	
+			mySession.register(this, ExceptionNotification.class);
 	}
 	
 	/**
