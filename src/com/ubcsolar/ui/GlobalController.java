@@ -1,8 +1,8 @@
 /**
  * This class is the program Controller, and the main interface between
  * the UI and the model. 
- * All notifications sent here, and it sends them
- * to registered classes. 
+ * All notifications are sent here, and it sends them out
+ * to registered classes. (important for eventual threading) 
  * Holds the references to the other controllers, so all UI requests will go through here. 
  */
 
@@ -34,14 +34,11 @@ public class GlobalController {
 	private SimController mySimController; //the Sim controller
 	private WeatherController myWeatherController; //the Weather controller.
 	public final ImageIcon iconImage;
-	
-
-
-	
-	
+		
 	/**
 	 * constructor. 
 	 * @param mainWindow - the root window for the UI
+	 * (Note: could change that order of execution to do a GlobalController first, then the GUIMain
 	 */
 	public GlobalController(GUImain mainWindow){
 		iconImage = new ImageIcon("res/windowIcon.png");
@@ -49,14 +46,16 @@ public class GlobalController {
 		//TODO: turn the 2 lists into a KVP<Class<?extends Notification>, ArrayList<Listener>> 
 		//AKA a table indexed by the notifications. Look up the notification type, send it to all
 		//listeners registered for it. 
+		
+		//Currently structured as a 1:1 list; the Class in position 3 of the Listeners list
+		//is listening for the trigger in position 3 of the triggers list. 
+		//Tere are much more elegant and efficient ways of doing that. 
 		listOfListeners = new ArrayList<Listener>();
 		listOfTriggers = new ArrayList<Class<? extends Notification>>();
 		myMapController = new MapController(this);
 		myCarController = new CarController(this);
 		mySimController = new SimController(this);
-		myWeatherController = new WeatherController(this);
-
-		
+		myWeatherController = new WeatherController(this);	
 	}
 	
 	/**
@@ -66,6 +65,7 @@ public class GlobalController {
 	 * @param n - the notification that the class is looking for. 
 	 */
 	public synchronized void register(Listener l, Class<? extends Notification> n){
+		//The structure for storing these is a little kludgy, see the explanation above
 		listOfListeners.add(l);
 		listOfTriggers.add(n);
 		System.out.println(l.getClass() + " registered for " + n);
@@ -90,6 +90,11 @@ public class GlobalController {
 	}
 	
 	
+	//THESE METHODS ALLOW US TO GET THE EXISTING CONTROLLERS FROM ANY OTHER CLASS. 
+	//It ensures we only ever have one instantiated at a time. 
+	//Could probably turn them into Singleton methods, but this allows us to control them a bit. 
+	//May have to modify this architecture to get threading to work properly; My initial 
+	//plan was to have every controller in their own thread. 
 	public MapController getMapController(){
 		return myMapController;
 	}
@@ -102,7 +107,6 @@ public class GlobalController {
 	public CarController getMyCarController() {
 		return myCarController;
 	}
-
 
 	public WeatherController getMyWeatherController() {
 		return myWeatherController;

@@ -81,7 +81,7 @@ public class GUImain implements Listener{
 	}
 
 	/**
-	 * Create the application.
+	 * Constructor; Creates the application.
 	 */
 	public GUImain() {
 		initialize();
@@ -128,7 +128,8 @@ public class GUImain implements Listener{
 		mainFrame = new JFrame(); //
 		mainFrame.setBounds(200, 200, 800, 800);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.buildAllWindows();
+		//NOTE: Could consider not building all the windows at once in case of performance issues.
+		this.buildAllWindows(); //builds all the windows in one shot
 		JMenuBar menuBar = new JMenuBar();
 		mainFrame.setJMenuBar(menuBar);
 		
