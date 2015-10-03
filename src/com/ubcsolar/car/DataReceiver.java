@@ -45,8 +45,11 @@ public class DataReceiver implements Runnable,SerialPortEventListener { //needs 
 		
 		try{
 			String[] portNames = SerialPortList.getPortNames();
-			System.out.println(portNames[0]);
-			serialPort = new SerialPort(portNames[0]);
+			String portName = "NO SERIAL PORT";
+			if(portNames.length > 0)
+				portName = portNames[0];
+			System.out.println(portName);
+			serialPort = new SerialPort(portName);
 			serialPort.openPort();
 			serialPort.setParams(115200, 8, 1, 0);
 			serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
