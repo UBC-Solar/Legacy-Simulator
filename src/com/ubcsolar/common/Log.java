@@ -1,6 +1,6 @@
 /**
  * This class acts as a log for the program, and could be used for error bug-hunting,
- * and performance managment. 
+ * and performance management. It's a Singleton design pattern; there is only one Log object. 
  */
 package com.ubcsolar.common;
 

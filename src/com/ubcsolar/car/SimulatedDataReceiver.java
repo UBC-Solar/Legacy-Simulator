@@ -14,7 +14,8 @@ public class SimulatedDataReceiver extends DataReceiver {
 	private String name;
 	
 	public SimulatedDataReceiver(DataProcessor myProcessor, CarController toAdd) {
-		super(toAdd, myProcessor);
+		super(toAdd, myProcessor); //Curently breaks because DataReceiver was changed.
+		//TODO: modify and adjust so that I can have a fake car. 
 		speed = 0; 
 		isAccelerating = true;
 		name = "basic sim";

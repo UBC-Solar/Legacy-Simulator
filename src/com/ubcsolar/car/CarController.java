@@ -91,6 +91,9 @@ public class CarController extends ModuleController {
 	 * @return Name of the currently loaded car
 	 */
 	public String getLoadedCarName(){
+		if(myDataReceiver == null){
+			return "None";
+		}
 		return myDataReceiver.getName();
 	}
 
