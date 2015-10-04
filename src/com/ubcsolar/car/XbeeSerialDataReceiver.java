@@ -24,11 +24,9 @@ import jssc.*;
 //subclass
 public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runnable,SerialPortEventListener{ //needs to be threaded so it can listen for a response
 
-	protected CarController myCarController; //the parent to notify of a new result. 
-	private String name = "live"; //"live" because it's listening for real transmissions
 
 	// values from the last received data are cached in here...
-	public DataReceived data = new DataReceived();
+	public TelemDataPacket data = new TelemDataPacket();
 
 	private SerialPort serialPort;
 	private byte[] serialReadBuf = new byte[500];
@@ -64,7 +62,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 	
 	public void loadJSONData(String jsonString){
 		JSONObject jsonData;
-		DataReceived newData = new DataReceived();
+		TelemDataPacket newData = new TelemDataPacket();
 		// test data
 		//jsonData = "{\"speed\":100,\"totalVoltage\":44.4,\"stateOfCharge\":101,\"temperatures\":{\"bms\":40,\"motor\":50,\"pack0\":35,\"pack1\":36,\"pack2\":37,\"pack3\":38},\"cellVoltages\":{\"pack0\":[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2],\"pack1\":[1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2],\"pack2\":[2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3.0,3.1,3.2],\"pack3\":[3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4.0,4.1,4.2]}}\n";
 		try{

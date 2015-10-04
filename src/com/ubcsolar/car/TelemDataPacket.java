@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DataReceived {
+public class TelemDataPacket {
 	public int speed;
 	public int totalVoltage;
 	public int stateOfCharge;
