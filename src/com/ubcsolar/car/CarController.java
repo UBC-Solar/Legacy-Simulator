@@ -30,6 +30,7 @@ public class CarController extends ModuleController {
 	public CarController(GlobalController myGlobalController) {
 		super(myGlobalController);
 		myDatabase = new Database();
+		myDataProcessor = new DataProcessor(this); //TODO turn this into threaded properly.
 	}
 	
 	/**
@@ -63,7 +64,7 @@ public class CarController extends ModuleController {
 	 */
 	public void startFakeCar(){
 		stopListeningToCar();
-		myDataReceiver = new SimulatedDataReceiver(myDataProcessor, this);
+		myDataReceiver = new BasicSimulatedDataReceiver(myDataProcessor, this);
 		myDataReceiver.run();
 		sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
 	}

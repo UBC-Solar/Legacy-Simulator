@@ -17,6 +17,7 @@ public class DataProcessor {
 	public DataProcessor(CarController myController){
 		//this.myDatabase = database;
 		this.myController = myController;
+		list = new ArrayList<TelemDataPacket>();
 	}
 	
 	/**
@@ -33,6 +34,7 @@ public class DataProcessor {
 	 */
 	//NOTE: Overload this method if you want to pass it something else. 
 	public void store(TelemDataPacket newDataPacket){
+		System.out.println("GOT ONE!!");
 		list.add(newDataPacket);
 	}
 	

@@ -41,7 +41,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 	 * default constructor.
 	 * @param toAdd - the CarController to notify when it gets a new result
 	 */ 
-	 
+	 //TODO change this so TelemDataPacket doesn't need public variables. 
 	public XbeeSerialDataReceiver(CarController toAdd, DataProcessor theProcessor) throws SerialPortException{
 		super(toAdd, theProcessor);
 		

@@ -11,6 +11,15 @@ public class TelemDataPacket {
 	public Map<String,Integer> temperatures = new HashMap<String,Integer>();
 	public Map<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
 	
+	//NOAH: I want to make this a consructor, but XbeeDataReceiver relies on the default constructor. 
+	public void LoadNewData(int newSpeed, int newTotalVoltage,int newStateOfCharge,
+			Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages){
+		this.speed = newSpeed;
+		this.totalVoltage = newTotalVoltage;
+		this.stateOfCharge = newStateOfCharge;
+		this.temperatures = newTemperatures;
+		this.cellVoltages = newCellVoltages;
+	}
 	public int getSpeed(){
 		return speed;
 	}
