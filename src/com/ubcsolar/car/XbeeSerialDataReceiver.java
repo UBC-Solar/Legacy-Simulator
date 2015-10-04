@@ -22,7 +22,7 @@ import jssc.*;
 
 //TODO turn this class into an abstract one, and move the listening implementation into a concrete
 //subclass
-public class DataReceiver implements Runnable,SerialPortEventListener{ //needs to be threaded so it can listen for a response
+public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runnable,SerialPortEventListener{ //needs to be threaded so it can listen for a response
 
 	protected CarController myCarController; //the parent to notify of a new result. 
 	private String name = "live"; //"live" because it's listening for real transmissions
@@ -34,14 +34,18 @@ public class DataReceiver implements Runnable,SerialPortEventListener{ //needs t
 	private byte[] serialReadBuf = new byte[500];
 	private int serialReadBufPos = 0;
 	private DataProcessor myDataProcessor;
+	
+	@Override
+	void setName() {
+		this.name = "Real Car";
+	}
 	/**
 	 * default constructor.
 	 * @param toAdd - the CarController to notify when it gets a new result
 	 */ 
 	 
-	public DataReceiver(CarController toAdd, DataProcessor theProcessor) throws SerialPortException{
-		myCarController = toAdd;
-		myDataProcessor = theProcessor;
+	public XbeeSerialDataReceiver(CarController toAdd, DataProcessor theProcessor) throws SerialPortException{
+		super(toAdd, theProcessor);
 		
 		try{
 			String[] portNames = SerialPortList.getPortNames();
@@ -56,10 +60,6 @@ public class DataReceiver implements Runnable,SerialPortEventListener{ //needs t
 		} catch(ArrayIndexOutOfBoundsException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public static void main(String[] argv) throws SerialPortException{
-		DataReceiver dr = new DataReceiver(null, null);
 	}
 	
 	public void loadJSONData(String jsonString){
@@ -150,5 +150,7 @@ public class DataReceiver implements Runnable,SerialPortEventListener{ //needs t
 			}
 		} catch (SerialPortException e) {System.out.println(e);}
 	}
+
+
 
 }

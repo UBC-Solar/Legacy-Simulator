@@ -21,7 +21,7 @@ public class CarController extends ModuleController {
 	
 	private Database myDatabase; //references to the data warehouse. Want to store the car's broadcasts
 	private DataProcessor myDataProcessor; //where to send the car's broadcasts for processing. 
-	private DataReceiver myDataReceiver; //what will capture the car's raw broadcasts
+	private AbstractDataReceiver myDataReceiver; //what will capture the car's raw broadcasts
 	
 	/**
 	 * constructor
@@ -40,7 +40,7 @@ public class CarController extends ModuleController {
 		try{
 			stopListeningToCar(); //close any existing current connection
 		
-		myDataReceiver = new DataReceiver(this, myDataProcessor);
+		myDataReceiver = new XbeeSerialDataReceiver(this, myDataProcessor);
 		myDataReceiver.run();
 		sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
 		}
@@ -62,12 +62,10 @@ public class CarController extends ModuleController {
 	 * specifying the car to connect to (ie fake or real). 
 	 */
 	public void startFakeCar(){
-		/*
 		stopListeningToCar();
 		myDataReceiver = new SimulatedDataReceiver(myDataProcessor, this);
 		myDataReceiver.run();
 		sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
-		*/
 	}
 	
 	/**

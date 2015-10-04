@@ -8,14 +8,14 @@ import com.ubcsolar.notification.CarUpdateNotification;
 
 import jssc.SerialPortException;
 
-public class SimulatedDataReceiver extends DataReceiver {
+public class SimulatedDataReceiver extends AbstractDataReceiver {
 
 	int speed;
 	
 	private boolean isAccelerating;
 	private String name;
 	
-	public SimulatedDataReceiver(DataProcessor myProcessor, CarController toAdd) throws SerialPortException {
+	public SimulatedDataReceiver(DataProcessor myProcessor, CarController toAdd){
 		super(toAdd, myProcessor); //Curently breaks because DataReceiver was changed.
 		//TODO: modify and adjust so that I can have a fake car. 
 		speed = 0; 
@@ -25,6 +25,11 @@ public class SimulatedDataReceiver extends DataReceiver {
 	}
 	
 	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	public void stop(){
 		
 	}
@@ -37,7 +42,6 @@ public class SimulatedDataReceiver extends DataReceiver {
 	/**
 	 * generated a new speed. Accelerates up to 100, then slows back down to 0 linerally. 
 	 */
-	@Override
 	protected void checkForUpdate(){
 	if(speed == 0){
 		isAccelerating = true;
@@ -59,4 +63,13 @@ public class SimulatedDataReceiver extends DataReceiver {
 		myCarController.adviseOfNewCarReport((new CarUpdateNotification(this.speed)));
 	}
 	}
+
+	@Override
+	void setName() {
+		this.name = "fake!";
+		
+	}
+
+
+	
 }
