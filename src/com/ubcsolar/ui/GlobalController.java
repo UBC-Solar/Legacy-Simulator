@@ -17,7 +17,7 @@ import javax.swing.ImageIcon;
 
 import com.ubcsolar.car.CarController;
 import com.ubcsolar.common.Listener;
-import com.ubcsolar.common.Log;
+import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.map.MapController;
 import com.ubcsolar.notification.*;
@@ -77,7 +77,7 @@ public class GlobalController {
 	 * @param n - the notification being sent. 
 	 */
 	public synchronized void sendNotification(Notification n){
-		Log.write(LogType.NOTIFICATION, n.getTime(), n.getMessage());
+		SolarLog.write(LogType.NOTIFICATION, n.getTime(), n.getMessage());
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
 		
@@ -117,8 +117,8 @@ public class GlobalController {
 	 * allows for graceful shutdown
 	 */
 	public void exit() {
-		Log.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "System Quitting");
-		Log.printOut();
+		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "System Quitting");
+		SolarLog.printOut();
 		System.exit(0);
 		
 	}

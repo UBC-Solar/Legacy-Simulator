@@ -18,6 +18,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.ubcsolar.common.LogType;
+import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.sim.Log;
 
 import jssc.*;
@@ -81,6 +83,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 		try{
 			jsonData = new JSONObject(jsonString);
 		}catch(JSONException e){
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Received a Corrupt Packet");
 			System.out.println("Received a Corrupt Packet");
 			return; //malformed (corrupted) data is ignored.
 		}

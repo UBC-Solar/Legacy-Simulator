@@ -20,7 +20,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import com.ubcsolar.common.Listener;
-import com.ubcsolar.common.Log;
+import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.notification.CarUpdateNotification;
 import com.ubcsolar.notification.ExceptionNotification;
@@ -65,7 +65,7 @@ public class GUImain implements Listener{
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		Log.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Application started");
+		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Application started");
 		//TODO Should we start the controller and rest of the code in their own threads here?
 		
 		//start Window in it's own thread
@@ -152,7 +152,7 @@ public class GUImain implements Listener{
 		mntmPrintLog.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent arg0) {
-				Log.printOut();
+				SolarLog.printOut();
 			}
 		});
 		mnFile.add(mntmPrintLog); //add it to the File menu

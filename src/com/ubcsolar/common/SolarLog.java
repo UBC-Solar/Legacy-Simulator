@@ -15,8 +15,8 @@ import java.util.List;
  * @author Noah
  *
  */
-public class Log {
-	private static Log oneInstance;
+public class SolarLog {
+	private static SolarLog oneInstance;
 	
 	private List<LogEntry> theLog;
 	private class LogEntry{
@@ -30,15 +30,15 @@ public class Log {
 		}
 	}
 	
-	private Log(){
+	private SolarLog(){
 		theLog = new ArrayList<LogEntry>();
 		
 	}
 	
 	
-	private static Log getInstance(){
+	private static SolarLog getInstance(){
 		if(oneInstance == null){
-			oneInstance = new Log();
+			oneInstance = new SolarLog();
 		}
 		return oneInstance;
 	}
@@ -69,6 +69,15 @@ public class Log {
 		}
 	}
 	
+	/**
+	 * This method adds things to the log. I didn't want to add
+	 * and override because I want the time code to come from when
+	 * the reason for the log was encountered (i.e when error occured)
+	 * 
+	 * @param The entry type (error? Regular?)
+	 * @param The time the error occured
+	 * @param The message to enter into the log
+	 */
 	public static void write(LogType code, Long time, String entry){
 		getInstance().add(code, time, entry);
 		
