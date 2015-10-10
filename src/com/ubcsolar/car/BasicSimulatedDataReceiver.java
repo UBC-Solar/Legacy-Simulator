@@ -151,7 +151,7 @@ private class generateNewThings extends TimerTask{
 	 * @return the next TelemDataPacket in the series. 
 	 */
 	private TelemDataPacket generateNewTelemDataPack(){
-		TelemDataPacket tempPacket = new TelemDataPacket();
+		
 		int speed = 1 * iterations; //terrible algo. Please improve me. 
 									//Car should not be going faster than light after 
 									//running this program 1x1^23 iterations. 
@@ -162,7 +162,7 @@ private class generateNewThings extends TimerTask{
 		Map<String,Integer> temperatures = new HashMap<String,Integer>();
 		Map<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
 		//TODO not sure what these look like in the real car, need to program in some basic fakes
-		tempPacket.LoadNewData(speed, totalVoltage, stateOfCharge, temperatures, cellVoltages);
+		TelemDataPacket tempPacket = new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages);
 		iterations++;
 		return tempPacket;
 	}

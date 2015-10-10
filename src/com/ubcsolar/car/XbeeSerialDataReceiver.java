@@ -30,7 +30,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 
 
 	// values from the last received data are cached in here...
-	public TelemDataPacket data = new TelemDataPacket();
+	public TelemDataPacket lastLoadedDataPacket;
 
 	private SerialPort serialPort;
 	private byte[] serialReadBuf = new byte[500];
@@ -77,7 +77,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 	//(wouldn't need to rebuilt the entire serial port to recover, just the processor. 
 	public void loadJSONData(String jsonString){
 		JSONObject jsonData;
-		TelemDataPacket newData = new TelemDataPacket();
+		
 		// test data
 		//jsonData = "{\"speed\":100,\"totalVoltage\":44.4,\"stateOfCharge\":101,\"temperatures\":{\"bms\":40,\"motor\":50,\"pack0\":35,\"pack1\":36,\"pack2\":37,\"pack3\":38},\"cellVoltages\":{\"pack0\":[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2],\"pack1\":[1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2],\"pack2\":[2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3.0,3.1,3.2],\"pack3\":[3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4.0,4.1,4.2]}}\n";
 		try{
@@ -87,21 +87,25 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 			System.out.println("Received a Corrupt Packet");
 			return; //malformed (corrupted) data is ignored.
 		}
-		newData.speed = (int) jsonData.get("speed");
-		newData.totalVoltage = (int) jsonData.get("totalVoltage");
+		int speed = (int) jsonData.get("speed");
+		int totalVoltage = (int) jsonData.get("totalVoltage");
 		JSONObject temperatures = ((JSONObject) jsonData.get("temperatures"));
+		Map<String,Integer> mapForTemperatures = new HashMap<String,Integer>();
 		for(String key : JSONObject.getNames(temperatures))
-			newData.temperatures.put(key, (int) temperatures.get(key));
+			mapForTemperatures.put(key, (int) temperatures.get(key));
 		JSONObject cellVoltages = ((JSONObject) jsonData.get("cellVoltages"));
+		Map<Integer,ArrayList<Float>> mapForCellVoltages = new HashMap<Integer,ArrayList<Float>>();
 		for(String key : JSONObject.getNames(cellVoltages)){
 			int packID = key.toCharArray()[key.length()-1] - '0';
-			newData.cellVoltages.put(packID, new ArrayList<Float>());
+			mapForCellVoltages.put(packID, new ArrayList<Float>());
 			JSONArray array = (JSONArray) cellVoltages.get(key);
 			for(int i=0; i<array.length(); i++)
-				newData.cellVoltages.get(packID).add((float) array.getDouble(i));
+				mapForCellVoltages.get(packID).add((float) array.getDouble(i));
 		}
-		
-		this.data = newData;
+		/*(int newSpeed, int newTotalVoltage,int newStateOfCharge,
+			Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages){*/
+		TelemDataPacket newData = new TelemDataPacket(speed, totalVoltage, mapForTemperatures, mapForCellVoltages);
+		this.lastLoadedDataPacket = newData;
 		this.myDataProcessor.store(newData);
 	}
 	 	
@@ -162,7 +166,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 					loadJSONData(new String(serialReadBuf));
 					serialReadBufPos = 0;
 
-					System.out.println(this.data.toString());
+					System.out.println(this.lastLoadedDataPacket.toString());
 				}else{
 					serialReadBufPos++;
 				}
