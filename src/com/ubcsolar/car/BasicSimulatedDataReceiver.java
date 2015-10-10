@@ -69,6 +69,7 @@ public class BasicSimulatedDataReceiver extends AbstractDataReceiver {
 	 */
 	public void stop(){
 		autoGenerate.cancel();
+		autoGenerate.cancel();
 	}
 	
 	/**

@@ -17,7 +17,7 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Performance extends JFrame {
+public class CarAdvancedWindow extends JFrame {
 
 	private JPanel contentPane;
 	private GlobalController mySession;
@@ -42,7 +42,7 @@ public class Performance extends JFrame {
 	 * Create the frame.
 	 * @param mySession 
 	 */
-	public Performance(GlobalController mySession) {
+	public CarAdvancedWindow(GlobalController mySession) {
 		this.mySession = mySession;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -87,13 +87,25 @@ public class Performance extends JFrame {
 				startRealCar();
 			}
 		});
+		JButton btnStopCar = new JButton("Stop Car/Connection");
+		GridBagConstraints gbc_btnbtnStopCar = new GridBagConstraints();
+		gbc_btnStartFakeCar.gridx = 0;
+		gbc_btnStartFakeCar.gridy = 0;
+		contentPane.add(btnStopCar, gbc_btnbtnStopCar);
+		btnStopCar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				stopRealCar();
+			}
+		});
 	}
 	
 	private void setTitleAndLogo(){
 		this.setIconImage(mySession.iconImage.getImage());
 		this.setTitle("Performance");
 	}
-	
+	private void stopRealCar(){
+		mySession.getMyCarController().stopListeningToCar();
+	}
 	private void startRealCar(){
 		mySession.getMyCarController().establishNewConnection();
 	}

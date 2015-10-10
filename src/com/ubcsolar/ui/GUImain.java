@@ -93,7 +93,7 @@ public class GUImain implements Listener{
 	 */
 	private void buildAllWindows(){
 		this.simFrame = new Simulation(this.mySession); //Sim advanced window
-		this.carFrame = new Performance(this.mySession); //Car advanced window
+		this.carFrame = new CarAdvancedWindow(this.mySession); //Car advanced window
 		this.mapFrame = new Map(this.mySession); //Map advanced window
 		this.weatherFrame = new Weather(this.mySession); //Weather advanced window
 	}

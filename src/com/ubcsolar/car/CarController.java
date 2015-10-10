@@ -77,7 +77,9 @@ public class CarController extends ModuleController {
 		//TODO set up exceptions properly. What if can't close? What if...? 
 		if(myDataReceiver != null){
 			myDataReceiver.stop();
-		}
+			myDataReceiver = null; //Otherwise looks like it's connected. 
+			this.sendNotification(new NewCarLoadedNotification("DISCONNECTED"));
+		}	
 	}
 	
 	/**
