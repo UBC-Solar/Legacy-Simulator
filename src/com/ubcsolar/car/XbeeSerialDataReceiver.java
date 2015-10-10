@@ -18,6 +18,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.ubcsolar.sim.Log;
+
 import jssc.*;
 
 //TODO turn this class into an abstract one, and move the listening implementation into a concrete
@@ -49,17 +51,28 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 			String[] portNames = SerialPortList.getPortNames();
 			String portName = "NO SERIAL PORT";
 			if(portNames.length > 0)
-				portName = portNames[0];
+				portName = portNames[0]; //it always gets the first serial port available. 
 			System.out.println(portName);
 			serialPort = new SerialPort(portName);
 			serialPort.openPort();
-			serialPort.setParams(115200, 8, 1, 0);
+			serialPort.setParams(115200, 8, 1, 0); //where did these numbers come from?
 			serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
 		} catch(ArrayIndexOutOfBoundsException e) {
+			System.out.println("No serial ports");
+			Log.write("ERROR: No Serial Ports");
 			e.printStackTrace();
 		}
 	}
 	
+	/**
+	 * This method turns the JsonString that we received into a TelemDataPacket for 
+	 * transfer to the DataProcessor
+	 * @param jsonString - the string received from the xbee serial port. 
+	 */
+	//NOAH: Can we move this method into the data processor? Probably not 
+	//super big on processing, but it would help prevent a crash if this 
+	//enters an infinite loop or encounters an exception it couldn't handle. 
+	//(wouldn't need to rebuilt the entire serial port to recover, just the processor. 
 	public void loadJSONData(String jsonString){
 		JSONObject jsonData;
 		TelemDataPacket newData = new TelemDataPacket();
@@ -68,6 +81,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 		try{
 			jsonData = new JSONObject(jsonString);
 		}catch(JSONException e){
+			System.out.println("Received a Corrupt Packet");
 			return; //malformed (corrupted) data is ignored.
 		}
 		newData.speed = (int) jsonData.get("speed");
@@ -98,6 +112,10 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 		return 99999; // garbage value. 
 	}
 	
+	/**
+	 * This class is made to be it's own thread so it can block waiting for a 
+	 * new data packet from the car
+	 */
 	@Override
 	public void run() {
 		try {
@@ -110,7 +128,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 	}
 		
 	public void stop(){
-		try {
+		try { 
 			serialPort.removeEventListener();
 		} catch (SerialPortException e) {e.printStackTrace();}
 	}
