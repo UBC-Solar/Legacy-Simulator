@@ -33,6 +33,9 @@ public class DataProcessor {
 	 * @param newDataPacket
 	 */
 	//NOTE: Overload this method if you want to pass it something else. 
+	//'Storing' it by just adding it to the list without sending it anywhere might seem 
+	//counter-intuitive, but this way it can run in it's own thread, and 
+	//whatever other thread needs them can just check the list at their leisure. 
 	public void store(TelemDataPacket newDataPacket){
 		System.out.println("GOT ONE!!");
 		list.add(newDataPacket);
