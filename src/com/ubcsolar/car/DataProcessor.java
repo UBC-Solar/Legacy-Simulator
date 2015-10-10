@@ -8,6 +8,8 @@ package com.ubcsolar.car;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ubcsolar.notification.CarUpdateNotification;
+
 public class DataProcessor {
 //TODO make this implement Runnable. Want it to be a seperate thread than the one listening to inputs. 
 	//private Database myDatabase;
@@ -32,13 +34,20 @@ public class DataProcessor {
 	 * Easiest scenario; someone has done the work for you
 	 * @param newDataPacket
 	 */
+	
 	//NOTE: Overload this method if you want to pass it something else. 
+	
+	//NOTE: I would want this object to run in a differen thread than Controller,
+	//but not yet sure how to do it. One way is to store them in a mutually accesible list and 
+	//control it with locks. I'm doing a notify method on the parent. 
 	//'Storing' it by just adding it to the list without sending it anywhere might seem 
 	//counter-intuitive, but this way it can run in it's own thread, and 
 	//whatever other thread needs them can just check the list at their leisure. 
 	public void store(TelemDataPacket newDataPacket){
 		System.out.println("GOT ONE!!");
-		list.add(newDataPacket);
+		//list.add(newDataPacket); //use this for storing in list with locks. 
+		myController.adviseOfNewCarReport(new CarUpdateNotification(newDataPacket));
+		
 	}
 	
 	

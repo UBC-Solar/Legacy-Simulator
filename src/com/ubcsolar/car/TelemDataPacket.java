@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TelemDataPacket {
+	private double timeCreated;
 	public int speed;
 	public int totalVoltage;
 	public int stateOfCharge;
@@ -15,6 +16,7 @@ public class TelemDataPacket {
 	//public variables. 
 	public void LoadNewData(int newSpeed, int newTotalVoltage,int newStateOfCharge,
 			Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages){
+		this.timeCreated = System.currentTimeMillis();
 		this.speed = newSpeed;
 		this.totalVoltage = newTotalVoltage;
 		this.stateOfCharge = newStateOfCharge;
@@ -23,6 +25,10 @@ public class TelemDataPacket {
 	}
 	public int getSpeed(){
 		return speed;
+	}
+	
+	public double getTimeCreated(){
+		return this.timeCreated;
 	}
 	
 	public float getTotalVoltage(){

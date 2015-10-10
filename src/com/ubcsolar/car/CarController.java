@@ -130,7 +130,10 @@ public class CarController extends ModuleController {
 	public void adviseOfNewCarReport(CarUpdateNotification carUpdateNotification) {
 		// TODO store this in some kind of record. 
 		sendNotification(carUpdateNotification);
-		
 	}
 
+	
+	
+	
+	
 }

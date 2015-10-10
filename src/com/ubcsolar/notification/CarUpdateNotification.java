@@ -5,23 +5,28 @@
 
 package com.ubcsolar.notification;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import com.ubcsolar.car.TelemDataPacket;
 
 public class CarUpdateNotification extends Notification {
 
-	private final int carSpeed; //the speed of the car at the time of notification
+	private final TelemDataPacket thePacket; //the speed of the car at the time of notification
+	String message = null;
 	
-	public CarUpdateNotification(int carSpeed){
+	public CarUpdateNotification(TelemDataPacket dataPacket){
 		//may need to add things here as we figure out what information exactly we're getting from the car
 		super();
-		this.carSpeed = carSpeed;
+		this.thePacket = dataPacket;
 	}
 	
 	/**
 	 * return carSpeed
 	 * @return the speed of car
 	 */
-	public int getNewCarSpeed(){
-		return carSpeed;
+	public TelemDataPacket getDataPacket(){
+		return thePacket;
 	}
 	
 	
@@ -30,7 +35,17 @@ public class CarUpdateNotification extends Notification {
 	 */
 	@Override
 	public String getMessage() {
-		return "Car is now travelling at: " + carSpeed + "Km/h";
+		if (message == null){ //will be first time. No need to generate the string if we don't need to
+			SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//dd/MM/yyyy
+			Date now = new Date((long) (thePacket.getTimeCreated()));
+		    String strDate = sdfDate.format(now);
+			message = "Received new data pack from car at " + strDate;
+			return message;
+		}
+		else{
+			return message;
+		}
+		
 	}
 	
 }

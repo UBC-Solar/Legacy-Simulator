@@ -95,7 +95,7 @@ public class CarPanel extends JPanel implements Listener {
 	@Override
 	public void notify(Notification n) {
 		if(n.getClass() == CarUpdateNotification.class) {
-			updateCarSpeedLabel(((CarUpdateNotification) n).getNewCarSpeed()); //for the CarSpeed label.
+			updateCarSpeedLabel(((CarUpdateNotification) n).getDataPacket().getSpeed()); //for the CarSpeed label.
 		}
 		// TODO Auto-generated method stub
 		
