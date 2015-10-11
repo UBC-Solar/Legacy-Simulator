@@ -90,11 +90,11 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 		int speed = (int) jsonData.get("speed");
 		int totalVoltage = (int) jsonData.get("totalVoltage");
 		JSONObject temperatures = ((JSONObject) jsonData.get("temperatures"));
-		Map<String,Integer> mapForTemperatures = new HashMap<String,Integer>();
+		HashMap<String,Integer> mapForTemperatures = new HashMap<String,Integer>();
 		for(String key : JSONObject.getNames(temperatures))
 			mapForTemperatures.put(key, (int) temperatures.get(key));
 		JSONObject cellVoltages = ((JSONObject) jsonData.get("cellVoltages"));
-		Map<Integer,ArrayList<Float>> mapForCellVoltages = new HashMap<Integer,ArrayList<Float>>();
+		HashMap<Integer,ArrayList<Float>> mapForCellVoltages = new HashMap<Integer,ArrayList<Float>>();
 		for(String key : JSONObject.getNames(cellVoltages)){
 			int packID = key.toCharArray()[key.length()-1] - '0';
 			mapForCellVoltages.put(packID, new ArrayList<Float>());

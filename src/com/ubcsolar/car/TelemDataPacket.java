@@ -9,12 +9,12 @@ public class TelemDataPacket {
 	private int speed;
 	private int totalVoltage; //used to guesstimate state of charge
 	//TODO make these abstract
-	private Map<String,Integer> temperatures = new HashMap<String,Integer>();
-	private Map<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
+	private HashMap<String,Integer> temperatures;
+	private HashMap<Integer,ArrayList<Float>> cellVoltages;
 	
 	//NOAH: I want to make this a consructor, but XbeeDataReceiver relies on the default constructor and 
 	//public variables. 
-	public TelemDataPacket(int newSpeed, int newTotalVoltage, Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages){
+	public TelemDataPacket(int newSpeed, int newTotalVoltage, HashMap<String,Integer> newTemperatures, HashMap<Integer,ArrayList<Float>> newCellVoltages){
 		this.timeCreated = System.currentTimeMillis();
 		this.speed = newSpeed;
 		this.totalVoltage = newTotalVoltage;
@@ -33,14 +33,14 @@ public class TelemDataPacket {
 		return totalVoltage;
 	}
 		
-	public Map<String,Integer> getTemperatures(){
-		Map<String,Integer> copyTemperatures = new HashMap<String,Integer>();
+	public HashMap<String,Integer> getTemperatures(){
+		HashMap<String,Integer> copyTemperatures = new HashMap<String,Integer>();
 		copyTemperatures.putAll(temperatures);
 		return copyTemperatures;
 	}
 	
-	public Map<Integer,ArrayList<Float>> getCellVoltages(){
-		Map<Integer,ArrayList<Float>> copyCellVoltages = new HashMap<Integer,ArrayList<Float>>();
+	public HashMap<Integer,ArrayList<Float>> getCellVoltages(){
+		HashMap<Integer,ArrayList<Float>> copyCellVoltages = new HashMap<Integer,ArrayList<Float>>();
 		for(Integer key : cellVoltages.keySet()){
 			copyCellVoltages.put(key, new ArrayList<Float>(cellVoltages.get(key)));
 		}

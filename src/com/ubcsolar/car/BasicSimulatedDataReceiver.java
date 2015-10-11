@@ -160,8 +160,14 @@ private class generateNewThings extends TimerTask{
 		int stateOfCharge = 50; //voltage is changing while state of charge stays the same. 
 								//seems legit. 
 		
-		Map<String,Integer> temperatures = new HashMap<String,Integer>();
-		Map<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
+		HashMap<String,Integer> temperatures = new HashMap<String,Integer>();
+		temperatures.put("BMS", (35 + iterations));
+		temperatures.put("Motor", (40 + iterations));
+		temperatures.put("Pack0", (41+ iterations));
+		temperatures.put("Pack1", (42 + iterations));
+		temperatures.put("Pack2", (43 + iterations));
+		temperatures.put("Pack3", (44 + iterations));
+		HashMap<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
 		//TODO not sure what these look like in the real car, need to program in some basic fakes
 		TelemDataPacket tempPacket = new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages);
 		iterations++;

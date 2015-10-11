@@ -94,7 +94,7 @@ public class GUImain implements Listener{
 	private void buildAllWindows(){
 		this.simFrame = new Simulation(this.mySession); //Sim advanced window
 		this.carFrame = new CarAdvancedWindow(this.mySession); //Car advanced window
-		this.mapFrame = new Map(this.mySession); //Map advanced window
+		this.mapFrame = new MapAdvancedWindow(this.mySession); //Map advanced window
 		this.weatherFrame = new Weather(this.mySession); //Weather advanced window
 	}
 	
@@ -201,10 +201,10 @@ public class GUImain implements Listener{
 		mnModules.add(mntmSimulator);
 		
 		//Make entry to open Car (aka 'performance') advanced options
-		JMenuItem mntmPerformance = new JMenuItem("Performance");
+		JMenuItem mntmPerformance = new JMenuItem("Car Advanced");
 		mntmPerformance.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				launchPerformance();
+				launchCarAdvancedWindow();
 			}
 		});
 		mnModules.add(mntmPerformance);
@@ -325,7 +325,7 @@ public class GUImain implements Listener{
 	/**
 	 * launches the Car window
 	 */
-	public void launchPerformance() {
+	public void launchCarAdvancedWindow() {
 		//TODO add a check to see if it's been created yet (like an 'if null:' kind of check)
 		carFrame.setVisible(true);
 		

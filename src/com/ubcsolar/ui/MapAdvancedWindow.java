@@ -59,7 +59,7 @@ import com.jgoodies.forms.layout.RowSpec;
 
 
 
-public class Map extends JFrame implements Listener {
+public class MapAdvancedWindow extends JFrame implements Listener {
 
 	private JPanel contentPane;
 	private GlobalController mySession;
@@ -114,7 +114,7 @@ public class Map extends JFrame implements Listener {
 	 * constructor
 	 * @param toAdd - the session to refer to for the controllers, and to register with
 	 */
-	public Map(GlobalController toAdd) {
+	public MapAdvancedWindow(GlobalController toAdd) {
 		mySession = toAdd;
 		register();
 		buildDefaultChart();
