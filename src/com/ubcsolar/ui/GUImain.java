@@ -229,11 +229,11 @@ public class GUImain implements Listener{
 		
 		//This sets up the layout for the main window
 		mainFrame.getContentPane().setLayout(new FormLayout(new ColumnSpec[] {
-				ColumnSpec.decode("19px:grow"),
+				ColumnSpec.decode("300px"),
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),},
 			new RowSpec[] {
-				RowSpec.decode("14px:grow"),
+				RowSpec.decode("40px"), //this is the row for the status panel 
 				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("default:grow"),
 				FormFactory.RELATED_GAP_ROWSPEC,
@@ -247,7 +247,7 @@ public class GUImain implements Listener{
 		loadStatusPanel = new LoadStatusPanel(this.mySession);
 		loadStatusPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		//frame.getContentPane().add(LoadStatusPanel);
-		mainFrame.getContentPane().add(loadStatusPanel, "1, 1, 3, 1, fill, fill");
+		mainFrame.getContentPane().add(loadStatusPanel, "1, 1, 3, 1, fill, top");
 		//TODO: remove the fills. We don't want it to grow.
 		
 		weatherPanel = new WeatherPanel(this.mySession, this);
