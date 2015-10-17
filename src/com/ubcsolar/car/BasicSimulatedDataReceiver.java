@@ -168,10 +168,22 @@ private class generateNewThings extends TimerTask{
 		temperatures.put("pack2", (43 + iterations));
 		temperatures.put("pack3", (44 + iterations));
 		HashMap<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
-		//TODO not sure what these look like in the real car, need to program in some basic fakes
+		for(int i = 0; i<4; i++){ //Current number of cells coming in pack is 4. Will probably have to adjust that.
+			cellVoltages.put(i, generatePackVoltages());
+		}
 		TelemDataPacket tempPacket = new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages);
 		iterations++;
 		return tempPacket;
+	}
+	
+	private ArrayList<Float> generatePackVoltages(){
+		ArrayList<Float> cell1 = new ArrayList<Float>();
+		Random rng = new Random();
+		
+		for(int i = 0; i<10; i++){
+			cell1.add(rng.nextFloat() * 10);
+		}
+		return cell1;
 	}
 }
 
