@@ -13,7 +13,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-public class Weather extends JFrame {
+public class WeatherAdvancedWindow extends JFrame {
 
 	private JPanel contentPane;
 	private GlobalController mySession;
@@ -38,7 +38,7 @@ public class Weather extends JFrame {
 	 * Create the frame.
 	 * @param mySession 
 	 */
-	public Weather(final GlobalController mySession) {
+	public WeatherAdvancedWindow(final GlobalController mySession) {
 		setTitle("Advanced Weather");
 		this.mySession = mySession;
 		setTitle("Weather");

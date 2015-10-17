@@ -19,7 +19,7 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-public class Simulation extends JFrame {
+public class SimulationAdvancedWindow extends JFrame {
 
 	private JPanel contentPane;
 	private GlobalController mySession;
@@ -44,7 +44,7 @@ public class Simulation extends JFrame {
 	 * Create the frame.
 	 * @param mySession 
 	 */
-	public Simulation(GlobalController mySession) {
+	public SimulationAdvancedWindow(GlobalController mySession) {
 		this.mySession = mySession;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);

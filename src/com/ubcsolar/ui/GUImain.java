@@ -92,10 +92,10 @@ public class GUImain implements Listener{
 	 * creates all windows that can be launched from this main panel
 	 */
 	private void buildAllWindows(){
-		this.simFrame = new Simulation(this.mySession); //Sim advanced window
+		this.simFrame = new SimulationAdvancedWindow(this.mySession); //Sim advanced window
 		this.carFrame = new CarAdvancedWindow(this.mySession); //Car advanced window
 		this.mapFrame = new MapAdvancedWindow(this.mySession); //Map advanced window
-		this.weatherFrame = new Weather(this.mySession); //Weather advanced window
+		this.weatherFrame = new WeatherAdvancedWindow(this.mySession); //Weather advanced window
 	}
 	
 	/**
@@ -135,7 +135,8 @@ public class GUImain implements Listener{
 		//TODO it's a little weird to be creating the controller from within the UI. Consider
 		//moving it up to the MAIN method. 
 		mainFrame = new JFrame(); //
-		mainFrame.setBounds(200, 200, 800, 800);
+		//public void setBounds(int x, int y, int width, int height)
+		mainFrame.setBounds(150, 50, 1000, 600); //main window size on opening
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//NOTE: Could consider not building all the windows at once in case of performance issues.
 		this.buildAllWindows(); //builds all the windows in one shot
