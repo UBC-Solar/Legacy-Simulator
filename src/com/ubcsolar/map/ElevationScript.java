@@ -1,9 +1,8 @@
 package com.ubcsolar.map;
 
+// im here
 
-
-/*
-Google key: AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek
+/*Google key: AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek
 No IP address restrictions currently on, but if you're having trouble,
 maybe check that. (maybe I dev'ed it at UBC, and my IP address is wrong
 					now that I'm in the field?)
