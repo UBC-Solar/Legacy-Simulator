@@ -161,12 +161,12 @@ private class generateNewThings extends TimerTask{
 								//seems legit. 
 		
 		HashMap<String,Integer> temperatures = new HashMap<String,Integer>();
-		temperatures.put("BMS", (35 + iterations));
-		temperatures.put("Motor", (40 + iterations));
-		temperatures.put("Pack0", (41+ iterations));
-		temperatures.put("Pack1", (42 + iterations));
-		temperatures.put("Pack2", (43 + iterations));
-		temperatures.put("Pack3", (44 + iterations));
+		temperatures.put("bms", (35 + iterations));
+		temperatures.put("motor", (40 + iterations));
+		temperatures.put("pack0", (41+ iterations));
+		temperatures.put("pack1", (42 + iterations));
+		temperatures.put("pack2", (43 + iterations));
+		temperatures.put("pack3", (44 + iterations));
 		HashMap<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
 		//TODO not sure what these look like in the real car, need to program in some basic fakes
 		TelemDataPacket tempPacket = new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages);
