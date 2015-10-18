@@ -15,6 +15,7 @@ import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.notification.CarUpdateNotification;
+import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewCarLoadedNotification;
 import com.ubcsolar.notification.Notification;
 import java.awt.Insets;
@@ -285,38 +286,63 @@ public class CarPanel extends JPanel implements Listener {
 	 */
 	private void updateLabels(TelemDataPacket recentPacket){
 		//TODO make the labels turn red in case of danger values (label.setForeground(Color.RED))
+		
+	/*
+	 * The best way to do these labels would be to pull the keys
+	 * out of the sets, and then sort alphabetically
+	 * and add them to dynamically-generated and added
+	 * labels. However, I don't expect the labels to change that
+	 * much, and I don't want to add that much processing load
+	 * to do on every received packet. So now the keys are 
+	 * generated here, and the algo requests the exact keys that 
+	 * are here, so if we ever update which keys we are using 
+	 * in the Telem Data Packet, we'll need to update the list of keys
+	 * here. This is a trade-off we could re-examine in the future. 
+	 * 
+	 * However, they're still displaying the exactly value returned by the keys
+	 * so we don't have  to worry about showing the wrong number next to an 
+	 * incorrect label
+	 */
 	if(voltageLabelKeys == null){
-		voltageLabelKeys = generateVoltageLabelKeys();
+		voltageLabelKeys = generateVoltageLabelKeys(); //only generate this list once per program
 	}
 	if(temperatureLabelKeys == null){
-		temperatureLabelKeys = generateTemperatureLabelKeys();
+		temperatureLabelKeys = generateTemperatureLabelKeys(); //also only generate this list once per program. 
 	}
-	HashMap<String, Integer> temps = recentPacket.getTemperatures();
-	HashMap<Integer,ArrayList<Float>> voltages = recentPacket.getCellVoltages();
-	ArrayList<String> temperatureLabels = extractTempLabels(temps);
+	HashMap<String, Integer> temps = recentPacket.getTemperatures(); //pull it out of the telemDataPack
+	HashMap<Integer,ArrayList<Float>> voltages = recentPacket.getCellVoltages(); 
+	
+	//This ArrayList is the exact text to set the labels to, generated from the extractTempLabels method.
+	//Will need to modify this to make any values appear red; currently the strings have the label and value
+	//and no easy way to set a rule like "if x>100, set.red"
+	ArrayList<String> temperatureLabels = extractTempLabels(temps); 
+	
 	lblTempitem1.setText(temperatureLabels.get(0)); //first temp item
 	lblTempitem_2_1.setText(temperatureLabels.get(1)); //2nd temp item
 	lblTempitem_3_1.setText(temperatureLabels.get(2)); //3rd item in temperature list
 	lblTempitem_4.setText(temperatureLabels.get(3)); //4th...
 	lblTempitem_5.setText(temperatureLabels.get(4));//5th
 	
+	
+	//Calculate and display the average value of each pack voltage. 
 	ArrayList<String> voltageLabels = new ArrayList();
-	for(int i = 0; i<voltageLabelKeys.size(); i++){
-		
+	
+	for(int i = 0; i<voltageLabelKeys.size(); i++){	
 	if(voltages.get(voltageLabelKeys.get(i)) != null){
 		ArrayList<Float> tempVoltages = voltages.get(voltageLabelKeys.get(i));
 		float averageVolt = calculateAverage(tempVoltages);
-		DecimalFormat decVal = new DecimalFormat("##.##");
+		DecimalFormat decVal = new DecimalFormat("##.##"); //May need to change to ###.## if we're talking hundreds of volts
 		voltageLabels.add("Pack" + voltageLabelKeys.get(i) + ": " + decVal.format(averageVolt)); 	
 	}
 	}
-	
 	
 	//TODO should probably add these to a list or something. 
 	lblPackv1.setText(voltageLabels.get(0)); //first item in volt-age pack list
 	lblPackv2.setText(voltageLabels.get(1)); //second item in voltage pack list
 	lblPackv_3.setText(voltageLabels.get(2)); //the third
 	lblPackv_4.setText(voltageLabels.get(3)); //and fourth. Can add more as needed 
+
+	//easy to update the speed. 
 	lblSpeed.setText(""+recentPacket.getSpeed());; //the label showing speed (update this one!)
 
 	SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");
@@ -325,11 +351,16 @@ public class CarPanel extends JPanel implements Listener {
 	lblLastDataReceived.setText("Last Received: " + strDate); //Time of last data received
 	}
 	
-	private float calculateAverage(ArrayList<Float> tempVoltages) {
+	/**
+	 * This method is used to average the cell voltages in a pack. No limit on total number of items. 
+	 * @param tempVoltages - the list of floats to average 
+	 * @return - the average value. 
+	 */
+	private float calculateAverage(List<Float> tempVoltages) {
 		
 		float runningTotal = 0;
 		for(float i : tempVoltages){
-		runningTotal += i;
+			runningTotal += i;
 		}
 		runningTotal /= tempVoltages.size();
 		return runningTotal;
@@ -342,7 +373,11 @@ public class CarPanel extends JPanel implements Listener {
 		return null;
 	}
 
-
+	/*
+	 * This method made a lot more sense until I realized that the keys for the cell voltage arrays
+	 * in the TelemDataPack are integers rather than Strings. If we change the number of 
+	 * packs to display, will need to edit this. 
+	 */
 	private ArrayList<Integer> generateVoltageLabelKeys() {
 		// duct tape workaround. I don't really want to hard-code the values in,
 		//(what happens if Jason changes the name of a key in the TelemDataPacket?), 
@@ -400,7 +435,9 @@ public class CarPanel extends JPanel implements Listener {
 		return labels;
 	}
 
-
+	/**
+	 * Sets all labels to default values (first label to 'NONE', remainder to "" so they disappear. 
+	 */
 	private void setLabelsTODefaultValues(){
 		lblTempitem1.setText("NONE"); //first temp item
 		lblTempitem_2_1.setText(""); //2nd temp item
@@ -421,12 +458,12 @@ public class CarPanel extends JPanel implements Listener {
 	public void notify(Notification n) {
 		if(n.getClass() == CarUpdateNotification.class) {
 			try{
-			updateLabels(((CarUpdateNotification) n).getDataPacket()); //for the CarSpeed label.
+				updateLabels(((CarUpdateNotification) n).getDataPacket()); //for the CarSpeed label.
 			}
 			catch(Exception e){
 				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), e.getClass().getName() + 
 						"error while updating the labels on the car panel");
-				
+				mySession.sendNotification(new ExceptionNotification(e, "Error updating the labels on the Car Panel"));
 			}
 		}
 		if(n.getClass() == NewCarLoadedNotification.class){

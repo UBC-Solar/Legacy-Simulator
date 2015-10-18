@@ -121,12 +121,12 @@ public class GUImain implements Listener{
 		}
 	}
 	
-	private void handleException(ExceptionNotification e){
+	public void handleException(ExceptionNotification e){
 		JOptionPane.showMessageDialog(mainFrame, e.getMessage());
 	}
 	// To display urgent messages to the user, but not neccesarily an exception
 	//i.e battery pack at dangerous temperatures
-	private void handleException(String e){
+	public void showPupupToUser(String e){
 		JOptionPane.showMessageDialog(mainFrame, e);
 	}
 	
