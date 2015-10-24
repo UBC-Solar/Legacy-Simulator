@@ -1,10 +1,22 @@
-package com.ubcsolar.car;
+package com.ubcsolar.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TelemDataPacket {
+public class TelemDataPacket extends DataUnit{
+
+@Override
+public Map<String, Object> getAllValues() {
+	HashMap<String, Object> allValues = new HashMap();
+	allValues.put("speed", this.getSpeed());
+	allValues.put("total voltage", this.getTotalVoltage());
+	allValues.put("temperatures", this.getTemperatures());
+	allValues.put("cell voltages", this.getCellVoltages());
+	
+	return allValues;
+}
+
 	private double timeCreated;
 	private int speed;
 	private int totalVoltage; //used to guesstimate state of charge
@@ -12,8 +24,7 @@ public class TelemDataPacket {
 	private HashMap<String,Integer> temperatures;
 	private HashMap<Integer,ArrayList<Float>> cellVoltages;
 	
-	//NOAH: I want to make this a consructor, but XbeeDataReceiver relies on the default constructor and 
-	//public variables. 
+
 	public TelemDataPacket(int newSpeed, int newTotalVoltage, HashMap<String,Integer> newTemperatures, HashMap<Integer,ArrayList<Float>> newCellVoltages){
 		this.timeCreated = System.currentTimeMillis();
 		this.speed = newSpeed;
@@ -52,5 +63,7 @@ public class TelemDataPacket {
 				+ Float.toString(this.totalVoltage) + "\n"
 				+ this.temperatures.toString() + "\n"
 				+ this.cellVoltages.toString() + "\n";
-	}
+	
 }
+
+	}

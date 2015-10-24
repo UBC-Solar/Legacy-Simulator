@@ -8,7 +8,7 @@ package com.ubcsolar.notification;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.ubcsolar.car.TelemDataPacket;
+import com.ubcsolar.common.TelemDataPacket;
 
 public class CarUpdateNotification extends Notification {
 

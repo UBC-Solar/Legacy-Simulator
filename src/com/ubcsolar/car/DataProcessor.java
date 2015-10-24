@@ -8,6 +8,7 @@ package com.ubcsolar.car;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ubcsolar.common.TelemDataPacket;
 import com.ubcsolar.notification.CarUpdateNotification;
 
 public class DataProcessor {

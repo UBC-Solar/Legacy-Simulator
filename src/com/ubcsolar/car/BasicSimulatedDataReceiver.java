@@ -14,6 +14,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.ubcsolar.common.TelemDataPacket;
 import com.ubcsolar.notification.CarUpdateNotification;
 
 import jssc.SerialPortException;

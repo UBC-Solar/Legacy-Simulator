@@ -9,11 +9,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import java.util.*;
-import java.util.Map;
-import com.ubcsolar.car.TelemDataPacket;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.common.TelemDataPacket;
 import com.ubcsolar.notification.CarUpdateNotification;
 import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewCarLoadedNotification;
@@ -56,7 +55,12 @@ public class CarPanel extends JPanel implements Listener {
 	private ArrayList<String> temperatureLabelKeys; //the keys for the temperature labels
 	
 	
-	
+	/**
+	 * Most of the code in the constructor was done automatically by the WSYIWG I installed to Eclipse. 
+	 * Mostly it's building things. 
+	 * @param session the GUIMain for the program, in case I need to send a notification or something. 
+	 * @param parent the parent UI object, mostly to pass things for jDialog and advanced window stuff
+	 */
 	public CarPanel(GlobalController session, GUImain parent) {
 		mySession = session;
 		this.parent = parent;

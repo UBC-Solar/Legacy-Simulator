@@ -20,6 +20,7 @@ import org.json.JSONObject;
 
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.common.TelemDataPacket;
 import com.ubcsolar.sim.Log;
 
 import jssc.*;
