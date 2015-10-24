@@ -8,9 +8,10 @@ package com.ubcsolar.notification;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.ubcsolar.common.DataUnit;
 import com.ubcsolar.common.TelemDataPacket;
 
-public class CarUpdateNotification extends Notification {
+public class CarUpdateNotification extends NewDataUnitNotification {
 
 	private final TelemDataPacket thePacket; //the speed of the car at the time of notification
 	String message = null;
@@ -46,6 +47,11 @@ public class CarUpdateNotification extends Notification {
 			return message;
 		}
 		
+	}
+
+	@Override
+	public DataUnit getDataUnit() {
+		return this.thePacket;
 	}
 	
 }

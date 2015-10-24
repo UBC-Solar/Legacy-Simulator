@@ -18,6 +18,7 @@ import javax.swing.ImageIcon;
 import com.ubcsolar.car.CarController;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.database.DatabaseController;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.map.MapController;
 import com.ubcsolar.notification.*;
@@ -32,6 +33,7 @@ public class GlobalController {
 	private MapController myMapController; //the Map controller
 	private CarController myCarController; //the Car controller
 	private SimController mySimController; //the Sim controller
+	private DatabaseController myDatabaseController; //the database controller
 	private WeatherController myWeatherController; //the Weather controller.
 	public final ImageIcon iconImage;
 		
@@ -56,6 +58,7 @@ public class GlobalController {
 		myCarController = new CarController(this);
 		mySimController = new SimController(this);
 		myWeatherController = new WeatherController(this);	
+		myDatabaseController = new DatabaseController(this);
 	}
 	
 	/**
@@ -80,8 +83,8 @@ public class GlobalController {
 		SolarLog.write(LogType.NOTIFICATION, n.getTime(), n.getMessage());
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
-		
-		System.out.println(dateFormat.format(cal.getTime()) + "- Global Controller got a notification " + n.getClass() );
+		//Can turn this on if you need to see when notifications go out.
+		//System.out.println(dateFormat.format(cal.getTime()) + "- Global Controller got a notification " + n.getClass() );
 		for(int i=0; i<listOfTriggers.size(); i++){
 			if(listOfTriggers.get(i) == n.getClass()){
 				listOfListeners.get(i).notify(n);
@@ -111,7 +114,9 @@ public class GlobalController {
 	public WeatherController getMyWeatherController() {
 		return myWeatherController;
 	}
-
+	public DatabaseController getMyDataBaseController(){
+		return this.myDatabaseController;
+	}
 	
 	/**
 	 * allows for graceful shutdown
