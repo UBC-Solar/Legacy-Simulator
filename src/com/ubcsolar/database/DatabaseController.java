@@ -16,8 +16,8 @@ public class DatabaseController extends ModuleController {
 
 	@Override
 	public void notify(Notification n) {
-		System.out.println("got notification!");
-		if(n.getClass() == NewDataUnitNotification.class){
+		System.out.println("got notification!: ");
+		if(n instanceof NewDataUnitNotification){
 			
 			store(((NewDataUnitNotification) n).getDataUnit());
 		}

@@ -86,7 +86,7 @@ public class GlobalController {
 		//Can turn this on if you need to see when notifications go out.
 		//System.out.println(dateFormat.format(cal.getTime()) + "- Global Controller got a notification " + n.getClass() );
 		for(int i=0; i<listOfTriggers.size(); i++){
-			if(listOfTriggers.get(i) == n.getClass()){
+			if(listOfTriggers.get(i).isInstance(n)){
 				listOfListeners.get(i).notify(n);
 			}
 		}
