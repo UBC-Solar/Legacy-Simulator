@@ -1,3 +1,6 @@
+/**
+ * All bottom-level data units in the program should extend this, so the Database can properly 
+ */
 package com.ubcsolar.common;
 
 import java.util.List;

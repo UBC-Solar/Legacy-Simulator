@@ -8,6 +8,7 @@
 
 package com.ubcsolar.ui;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class GlobalController {
 	private SimController mySimController; //the Sim controller
 	private DatabaseController myDatabaseController; //the database controller
 	private WeatherController myWeatherController; //the Weather controller.
-	public final ImageIcon iconImage;
+	public final ImageIcon iconImage; //the icon for the program
 		
 	/**
 	 * constructor. 
@@ -57,8 +58,15 @@ public class GlobalController {
 		myMapController = new MapController(this);
 		myCarController = new CarController(this);
 		mySimController = new SimController(this);
-		myWeatherController = new WeatherController(this);	
-		myDatabaseController = new DatabaseController(this);
+		myWeatherController = new WeatherController(this);
+		
+		try {
+			myDatabaseController = new DatabaseController(this);
+		} catch (IOException e) {
+			// Means that it couldn't create the DB file (currently a .csv)
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "IO Error when creating DB, check file name and location");
+			this.sendNotification(new ExceptionNotification(e, "IO Error when creating DB, check file name and location"));
+		}
 	}
 	
 	/**
