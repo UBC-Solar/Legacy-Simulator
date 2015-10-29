@@ -23,7 +23,7 @@ public class DatabaseController extends ModuleController {
 		
 		//TODO write the code that generates the filename
 		//TODO add it to a buffered outputstream (so that it only writes when it has a full page)
-		myFileWriter = new FileWriter("test");
+		myFileWriter = new FileWriter(System.currentTimeMillis() + "test.txt");
 		
 		writingQueue = new PriorityQueue<String>();
 		 setUpTables();
