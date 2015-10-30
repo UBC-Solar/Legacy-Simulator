@@ -148,6 +148,7 @@ public class CSVDatabase extends Database {
 		//catch(Cast exception e){
 			//throw illigal arument exception
 			//}
+			//TODO handle nulls. 
 		return this.recallStuff.get(intKey);
 	}
 
