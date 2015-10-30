@@ -10,6 +10,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -24,6 +26,10 @@ public class CSVDatabase extends Database {
 	FileWriter myFileWriter; //used to write. 
 	int entryCounter; //used to generate primary keys. 
 	DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss:SSS"); //time format. ss = seconds, SSS = ms
+	boolean isDBConnected = false; //FileWriter didn't seem to have a 'isConnected' or 'isOpen' method. 
+								//this is the workaround. 
+	Map<Integer,DataUnit> recallStuff = new HashMap<Integer, DataUnit>();
+	
 	/**
 	 * Constructor; Create and set up database 
 	 * @param filename - filename for the .csv
@@ -34,33 +40,33 @@ public class CSVDatabase extends Database {
 		setup(filename);
 	}
 	
-	private void setup(String filename) throws IOException{
-		entryCounter = 0; //TODO write a check for the last value if reopening a database
-						//don't want to overwrite
-		//TODO: add a check for the '.csv' so we don't duplicate it. 
-		//TODO add it to a buffered outputstream (so that it only writes when it has a full page)
-		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
-				"CSV Database created with name " + filename + ".csv");
-		myFileWriter = new FileWriter(filename + ".csv");
-		writingQueue = new PriorityQueue<String>();
-		setUpTables();
-	}
-	
 	/**
 	 * Build a standard CSV database with the system time as the filename.
 	 * @throws IOException
 	 */
 	public CSVDatabase() throws IOException {
 		super();
-		setup(""+System.currentTimeMillis()); //gaurenteed to be a unique filename. (unless you're making more than 1 per ms
+		setup(""+System.currentTimeMillis()); //Guaranteed to be a unique filename. (unless you're making more than 1 per ms
 											//in which case you have other problems to worry about)
 	}
+	
+	private void setup(String filename) throws IOException{
+		entryCounter = 0; //TODO write a check for the last value if reopening a database
+						//don't want to overwrite
+		//TODO: add a check for the '.csv' so we don't duplicate it. 
+		//TODO add it to a buffered OutPutStream (so that it only writes when it has a full page)
+		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
+				"CSV Database created with name " + filename + ".csv");
+		myFileWriter = new FileWriter(filename + ".csv");
+		writingQueue = new PriorityQueue<String>();
+		this.isDBConnected = true;
+		setUpTables();
+	}
+	
 
-	
-	
 	/*
 	 * This method is used to generate the queries needed to set up the tables
-	 * in the Database. For this CSV it will just be the coloumn headers. 
+	 * in the Database. For this CSV it will just be the column headers. 
 	 */
 	private void setUpTables() throws IOException{
 		//Currently assuming a .csv file
@@ -70,6 +76,15 @@ public class CSVDatabase extends Database {
 		flushAndSave();
 	}
 	
+	/* Commented out until LatLongs introduced
+	private void store(LatLong toStore){
+		
+	}*/
+	
+	/* Commented out until LatLongs introduced
+	 private void store(metar toStore){
+	 }
+	 */
 	
 	/*
 	 * This is a klugey method. It has to be here in case the system crashes and needs to 
@@ -88,16 +103,25 @@ public class CSVDatabase extends Database {
 		
 	}
 	
+	/**
+	 * Returns true IFF the database is currently connected and not closed
+	 * @return
+	 */
+	public boolean isConnected(){
+		return this.isDBConnected;
+	}
 
 
 	@Override
 	public void saveAndDisconnect() throws IOException {
 		flushAndSave();
 		myFileWriter.close();
+		this.isDBConnected = false; 
 	}
 	
 	private void store(TelemDataPacket toStore) throws IOException{
 		//tableSetup = "Entry,Time,Speed,TtlVltg,SOC,Temps";
+		this.recallStuff.put(entryCounter, toStore);
 		writingQueue.add("" + 
 				this.entryCounter++ + "," + 
 				dateFormat.format(System.currentTimeMillis()) + "," +
@@ -105,9 +129,7 @@ public class CSVDatabase extends Database {
 				toStore.getTotalVoltage() + "," +
 				toStore.getTotalVoltage()*10 + "," +
 				toStore.getTemperatures().get("bms"));
-		this.flushAndSave();
-		System.out.println("STORED A THING!");
-		
+		this.flushAndSave();		
 	}
 	@Override
 	public void store(DataUnit toStore) throws IOException {
@@ -120,8 +142,13 @@ public class CSVDatabase extends Database {
 
 	@Override
 	public DataUnit get(String key) {
-		// TODO Auto-generated method stub
-		return null;
+		int intKey;
+		//try{
+			intKey = Integer.parseInt(key);
+		//catch(Cast exception e){
+			//throw illigal arument exception
+			//}
+		return this.recallStuff.get(intKey);
 	}
 
 }

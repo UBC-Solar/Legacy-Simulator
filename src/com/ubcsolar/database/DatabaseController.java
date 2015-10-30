@@ -22,42 +22,37 @@ public class DatabaseController extends ModuleController {
 	Database myDatabase;
 	public DatabaseController(GlobalController myGlobalController)throws IOException {
 		super(myGlobalController);
+		buildNewDatabase();
+	}
+	
+  /**
+   * This method used to build the connection to the database.
+   * Could probably do some work here so that we could specify the database type. 
+   * @throws IOException
+   */
+	public void buildNewDatabase() throws IOException{
+		if(myDatabase.isConnected()){
+			myDatabase.saveAndDisconnect();
+		}
 		myDatabase = new CSVDatabase();
 	}
-
 	
-	/*
-	 * This method is used to generate the queries needed to set up the tables
-	 * in the Database
+	/* Maybe use these? would like to make them more abstract than that. 
+	public void buildNewCSVDatabase() throws IOException{
+		myDatabase = new CSVDatabase();
+	}*/
+	
+	/**
+	 * finalize database, save everything to disk, and then close or disconnect it. 
+	 * @throws IOException - if it can't disconnect the database. 
 	 */
-	private void setUpTables() throws IOException{
-		//Currently assuming a .csv file
-		String tableSetup;
-		tableSetup = "Entry,Time,Speed,TtlVltg,SOC,Temps";
-		writingQueue.add(tableSetup);
-		printAllQueued();
-	}
-	
 	public void saveAndDisconnect() throws IOException{
 		this.myDatabase.saveAndDisconnect();
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Database saved and disconnected");
 	}
-	/*
-	 * This is a klugey method. It has to be here in case the system crashes and needs to 
-	 * force the DB to flush everything to file. 
-	 * Currently, its the only way to actually write anything to file,
-	 * but eventually I will add in a thread to do that asyncronously.
-	 * NOTE: There may be a stock java structure that does that 
-	 * (maintains performance benefit and doesn't lock the program with slow writes to file)
-	 * possibly bufferedOutputStream?
-	 */
-	public void printAllQueued() throws IOException{
-		while(this.writingQueue.size()>0){
-			myFileWriter.write(writingQueue.remove()+'\n');
-		}
-		myFileWriter.flush();
-		
-	}
+	
+	
+	
 	@Override
 	public void notify(Notification n) {
 		System.out.println("got notification!: ");
@@ -78,19 +73,8 @@ public class DatabaseController extends ModuleController {
 		this.mySession.register(this, NewDataUnitNotification.class);
 
 	}
-	private void store(TelemDataPacket toStore){
-		System.out.println("Database storage method for a TelemDataPacket activated");
-	}
 	
-	/* Commented out until LatLongs introduced
-	private void store(LatLong toStore){
-		
-	}*/
-	
-	/* Commented out until LatLongs introduced
-	 private void store(metar toStore){
-	 }
-	 */
+
 	public void store(DataUnit toStore) throws IOException{
 		if(toStore.getClass() == TelemDataPacket.class){
 			this.myDatabase.store(toStore);

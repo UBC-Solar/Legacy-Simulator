@@ -20,12 +20,19 @@ public abstract class Database {
 	public Database() {
 		// TODO Auto-generated constructor stub
 	}
+	
 	/**
 	 * Flush and save everything to database. To be used in case of program crash,
 	 * it will run this. 
 	 * @throws IOException 
 	 */
 	abstract public void flushAndSave() throws IOException;
+	
+	/**
+	 * Returns true IFF the database is currently connected and not closed
+	 * @return
+	 */
+	abstract public boolean isConnected();
 	
 	/**
 	 * Save everything and close/cut ties to Database. I.e close the File if a .csv
