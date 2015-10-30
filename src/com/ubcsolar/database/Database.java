@@ -36,8 +36,9 @@ public abstract class Database {
 	/**
 	 * Store a DataUnit in the database
 	 * @param toStore - the DataUnit to be stored in the DB. 
+	 * @throws IOException 
 	 */
-	abstract public void store(DataUnit toStore);
+	abstract public void store(DataUnit toStore) throws IOException;
 	
 	/**
 	 * Get an element

@@ -8,18 +8,22 @@ package com.ubcsolar.database;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
 import com.ubcsolar.common.DataUnit;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.common.TelemDataPacket;
 
 public class CSVDatabase extends Database {
 	
 	Queue<String> writingQueue; //will read from here and then write. 
 	FileWriter myFileWriter; //used to write. 
-	
+	int entryCounter; //used to generate primary keys. 
+	DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss:SSS"); //time format. ss = seconds, SSS = ms
 	/**
 	 * Constructor; Create and set up database 
 	 * @param filename - filename for the .csv
@@ -31,7 +35,10 @@ public class CSVDatabase extends Database {
 	}
 	
 	private void setup(String filename) throws IOException{
+		entryCounter = 0; //TODO write a check for the last value if reopening a database
+						//don't want to overwrite
 		//TODO: add a check for the '.csv' so we don't duplicate it. 
+		//TODO add it to a buffered outputstream (so that it only writes when it has a full page)
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
 				"CSV Database created with name " + filename + ".csv");
 		myFileWriter = new FileWriter(filename + ".csv");
@@ -75,7 +82,7 @@ public class CSVDatabase extends Database {
 	 */
 	public void flushAndSave() throws IOException{
 		while(this.writingQueue.size()>0){
-			myFileWriter.write(writingQueue.remove());
+			myFileWriter.write(writingQueue.remove() + '\n');
 		}
 		myFileWriter.flush();
 		
@@ -88,9 +95,25 @@ public class CSVDatabase extends Database {
 		flushAndSave();
 		myFileWriter.close();
 	}
-
+	
+	private void store(TelemDataPacket toStore) throws IOException{
+		//tableSetup = "Entry,Time,Speed,TtlVltg,SOC,Temps";
+		writingQueue.add("" + 
+				this.entryCounter++ + "," + 
+				dateFormat.format(System.currentTimeMillis()) + "," +
+				toStore.getSpeed() + "," +
+				toStore.getTotalVoltage() + "," +
+				toStore.getTotalVoltage()*10 + "," +
+				toStore.getTemperatures().get("bms"));
+		this.flushAndSave();
+		System.out.println("STORED A THING!");
+		
+	}
 	@Override
-	public void store(DataUnit toStore) {
+	public void store(DataUnit toStore) throws IOException {
+		if(toStore instanceof TelemDataPacket){
+			store((TelemDataPacket) toStore);
+		}
 		// TODO Auto-generated method stub
 
 	}

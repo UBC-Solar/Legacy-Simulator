@@ -130,6 +130,14 @@ public class GlobalController {
 	 * allows for graceful shutdown
 	 */
 	public void exit() {
+		//TODO do something better with a disconnect failure. 
+		try {
+			this.myDatabaseController.saveAndDisconnect();
+		} catch (IOException e) {
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "IOException disconnecting from Database");
+			this.sendNotification(new ExceptionNotification(e, "IOException disconnecting from Database"));
+			e.printStackTrace();
+		}
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "System Quitting");
 		SolarLog.printOut();
 		System.exit(0);

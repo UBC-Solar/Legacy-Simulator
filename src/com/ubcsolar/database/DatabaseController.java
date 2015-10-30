@@ -3,6 +3,7 @@ package com.ubcsolar.database;
 import com.ubcsolar.common.*;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.TelemDataPacket;
+import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewDataUnitNotification;
 import com.ubcsolar.notification.Notification;
 import com.ubcsolar.ui.GlobalController;
@@ -18,16 +19,10 @@ public class DatabaseController extends ModuleController {
 	//when I actually implement a database (could be a SQL query). 
 	Queue<String> writingQueue; //will read from here and then write. 
 	FileWriter myFileWriter;
+	Database myDatabase;
 	public DatabaseController(GlobalController myGlobalController)throws IOException {
 		super(myGlobalController);
-		
-		//TODO write the code that generates the filename
-		//TODO add it to a buffered outputstream (so that it only writes when it has a full page)
-		myFileWriter = new FileWriter(System.currentTimeMillis() + "test.txt");
-		
-		writingQueue = new PriorityQueue<String>();
-		 setUpTables();
-		// TODO Auto-generated constructor stub
+		myDatabase = new CSVDatabase();
 	}
 
 	
@@ -43,6 +38,10 @@ public class DatabaseController extends ModuleController {
 		printAllQueued();
 	}
 	
+	public void saveAndDisconnect() throws IOException{
+		this.myDatabase.saveAndDisconnect();
+		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Database saved and disconnected");
+	}
 	/*
 	 * This is a klugey method. It has to be here in case the system crashes and needs to 
 	 * force the DB to flush everything to file. 
@@ -54,7 +53,7 @@ public class DatabaseController extends ModuleController {
 	 */
 	public void printAllQueued() throws IOException{
 		while(this.writingQueue.size()>0){
-			myFileWriter.write(writingQueue.remove());
+			myFileWriter.write(writingQueue.remove()+'\n');
 		}
 		myFileWriter.flush();
 		
@@ -64,7 +63,12 @@ public class DatabaseController extends ModuleController {
 		System.out.println("got notification!: ");
 		if(n instanceof NewDataUnitNotification){
 			
-			store(((NewDataUnitNotification) n).getDataUnit());
+			try {
+				store(((NewDataUnitNotification) n).getDataUnit());
+			} catch (IOException e) {
+				this.mySession.sendNotification(new ExceptionNotification(e, "Error storing lastest data unit"));
+				e.printStackTrace();
+			}
 		}
 
 	}
@@ -87,9 +91,9 @@ public class DatabaseController extends ModuleController {
 	 private void store(metar toStore){
 	 }
 	 */
-	public void store(DataUnit toStore){
+	public void store(DataUnit toStore) throws IOException{
 		if(toStore.getClass() == TelemDataPacket.class){
-			store((TelemDataPacket) toStore);
+			this.myDatabase.store(toStore);
 			System.out.println("GOT A DATA UNIT: " + toStore.getClass()); 
 		}
 		
