@@ -73,10 +73,10 @@ public class WeatherPanel extends JPanel implements Listener {
 	@Override
 	public void notify(Notification n) {
 		if(n.getClass() == NewMetarReportLoadedNotification.class){
-			updateMetarLabel("" + n.getTime());
+			updateMetarLabel("" + n.getTimeCreated());
 		}
 		else if(n.getClass() == NewTafReportLoadedNotification.class){
-			updateTafLabel("" + n.getTime());
+			updateTafLabel("" + n.getTimeCreated());
 		}
 		
 		

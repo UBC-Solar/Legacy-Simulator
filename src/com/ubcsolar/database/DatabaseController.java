@@ -37,6 +37,13 @@ public class DatabaseController extends ModuleController {
 		myDatabase = new CSVDatabase();
 	}
 	
+	public boolean isDBConnected(){
+		if(myDatabase == null){
+			return false;
+		}
+		else return myDatabase.isConnected();
+	}
+	
 	/* Maybe use these? would like to make them more abstract than that. 
 	public void buildNewCSVDatabase() throws IOException{
 		myDatabase = new CSVDatabase();

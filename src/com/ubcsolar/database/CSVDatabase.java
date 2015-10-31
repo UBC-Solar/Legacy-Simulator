@@ -27,8 +27,8 @@ public class CSVDatabase extends Database {
 	FileWriter myFileWriter; //used to write. 
 	int entryCounter; //used to generate primary keys. 
 	DateFormat actualDateFormat = new SimpleDateFormat("HH:mm:ss:SSS"); //time format. ss = seconds, SSS = ms
-	//couldn't manage to format milleseconds in a way that Excel can handle as time
-	//so just generated a second coloumn to be able to graph it properly. 
+	//couldn't manage to format milliseconds in a way that Excel can handle as time
+	//so just generated a second column to be able to graph it properly. 
 	DateFormat excelDateFormat = new SimpleDateFormat("HH:mm:ss"); //time format. ss = seconds, SSS = ms
 	boolean isDBConnected = false; //FileWriter didn't seem to have a 'isConnected' or 'isOpen' method. 
 								//this is the workaround. 
@@ -78,7 +78,7 @@ public class CSVDatabase extends Database {
 	}
 	
 	/**
-	 * returns a string containly exactly the number of commas specificed
+	 * returns a string containing exactly the number of commas specified
 	 * (useful for adding empty rows of data to a .csv)
 	 * @param numberOfCommas
 	 * @return a String consisting solely of commas. 

@@ -88,7 +88,7 @@ public class GlobalController {
 	 * @param n - the notification being sent. 
 	 */
 	public synchronized void sendNotification(Notification n){
-		SolarLog.write(LogType.NOTIFICATION, n.getTime(), n.getMessage());
+		SolarLog.write(LogType.NOTIFICATION, n.getTimeCreated(), n.getMessage());
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
 		//Can turn this on if you need to see when notifications go out.

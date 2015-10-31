@@ -20,7 +20,7 @@ public abstract class Notification { //abstract because it can't be used itself,
 	/**
 	 * returns the time that the notification was created
 	 */
-	public long getTime(){
+	public long getTimeCreated(){
 		return time;
 	}
 	

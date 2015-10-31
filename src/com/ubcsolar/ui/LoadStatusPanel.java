@@ -104,10 +104,10 @@ public class LoadStatusPanel extends JPanel implements Listener {
 			updateCarLabel(((NewCarLoadedNotification) n).getNameOfCar()); //to update the car label
 		}
 		else if(n.getClass() == NewMetarReportLoadedNotification.class){
-			updateMetarLabel("" + n.getTime());
+			updateMetarLabel("" + n.getTimeCreated());
 		}
 		else if(n.getClass() == NewMetarReportLoadedNotification.class){
-			updateTafLabel("" + n.getTime());
+			updateTafLabel("" + n.getTimeCreated());
 		}
 		
 		/*//TODO implement these
