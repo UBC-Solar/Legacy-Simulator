@@ -3,6 +3,8 @@ package com.ubcsolar.database;
 import com.ubcsolar.common.*;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.TelemDataPacket;
+import com.ubcsolar.notification.DatabaseCreatedOrConnectedNotification;
+import com.ubcsolar.notification.DatabaseDisconnectedOrClosed;
 import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewDataUnitNotification;
 import com.ubcsolar.notification.Notification;
@@ -20,6 +22,7 @@ public class DatabaseController extends ModuleController {
 	Queue<String> writingQueue; //will read from here and then write. 
 	FileWriter myFileWriter;
 	Database myDatabase;
+	String databaseName;
 	public DatabaseController(GlobalController myGlobalController)throws IOException {
 		super(myGlobalController);
 		buildNewDatabase();
@@ -35,6 +38,8 @@ public class DatabaseController extends ModuleController {
 			myDatabase.saveAndDisconnect();
 		}
 		myDatabase = new CSVDatabase();
+		databaseName = ".csv";
+		this.mySession.sendNotification(new DatabaseCreatedOrConnectedNotification(databaseName));
 	}
 	
 	public boolean isDBConnected(){
@@ -42,6 +47,13 @@ public class DatabaseController extends ModuleController {
 			return false;
 		}
 		else return myDatabase.isConnected();
+	}
+	
+	public String getDatabaseName(){
+		if(myDatabase == null || !myDatabase.isConnected()){
+			return null;
+		}
+		else return databaseName;
 	}
 	
 	/* Maybe use these? would like to make them more abstract than that. 
@@ -56,6 +68,8 @@ public class DatabaseController extends ModuleController {
 	public void saveAndDisconnect() throws IOException{
 		this.myDatabase.saveAndDisconnect();
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Database saved and disconnected");
+		this.mySession.sendNotification(new DatabaseDisconnectedOrClosed(this.databaseName));
+		this.databaseName = null;
 	}
 	
 	

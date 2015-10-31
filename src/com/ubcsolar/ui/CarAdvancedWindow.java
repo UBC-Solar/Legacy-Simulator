@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 public class CarAdvancedWindow extends JFrame {
 
@@ -95,7 +96,14 @@ public class CarAdvancedWindow extends JFrame {
 		btnStopCar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				stopRealCar();
+				try {
+					mySession.getMyDataBaseController().saveAndDisconnect();
+				} catch (IOException e1) {
+					// TODO remove this. Added for a test.
+					e1.printStackTrace();
+				}
 			}
+			
 		});
 	}
 	

@@ -343,7 +343,4 @@ public class GUImain implements Listener{
 		//TODO add a check to see if it's been created yet (like an 'if null:' kind of check)
 		mapFrame.setVisible(true);
 	}
-	
-	
-
 }
