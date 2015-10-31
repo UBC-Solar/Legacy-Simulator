@@ -71,7 +71,7 @@ public class CSVDatabase extends Database {
 		//TODO add it to a buffered OutPutStream (so that it only writes when it has a full page)
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
 				"CSV Database created with name " + filename + ".csv");
-		myFileWriter = new FileWriter(filename + ".csv");
+		myFileWriter = new FileWriter("Output\\"+ filename + ".csv");
 		writingQueue = new PriorityQueue<String>();
 		this.isDBConnected = true;
 		setUpTables();
