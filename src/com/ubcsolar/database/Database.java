@@ -15,13 +15,6 @@ import com.ubcsolar.common.*;
 public abstract class Database {
 
 	/**
-	 * 
-	 */
-	public Database() {
-		// TODO Auto-generated constructor stub
-	}
-	
-	/**
 	 * Flush and save everything to database. To be used in case of program crash,
 	 * it will run this. 
 	 * @throws IOException 

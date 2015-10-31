@@ -22,10 +22,10 @@ public class NewMetarReportLoadedNotification extends Notification {
 	 */
 	@Override
 	public String getMessage() {
-		// TODO Auto-generated method stub
+		//TODO add a better message than 'null'
 		return null;
 	}
-
+	
 	public NewMetarReportLoadedNotification(List<METAR> listOfMetars){
 		listOfMetars = new ArrayList<METAR>(listOfMetars);
 	}

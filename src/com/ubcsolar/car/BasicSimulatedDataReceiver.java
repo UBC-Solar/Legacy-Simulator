@@ -21,18 +21,11 @@ import jssc.SerialPortException;
 
 public class BasicSimulatedDataReceiver extends AbstractDataReceiver {
 
-	int speed;
-	
-	private boolean isAccelerating;
 	private String name;
 	private Timer autoGenerate;
 	public BasicSimulatedDataReceiver(DataProcessor myProcessor, CarController toAdd){
-		super(toAdd, myProcessor); //Curently breaks because DataReceiver was changed.
-		//TODO: modify and adjust so that I can have a fake car. 
-		speed = 0; 
-		isAccelerating = true;
+		super(toAdd, myProcessor); 
 		name = "basic sim";
-		// TODO Auto-generated constructor stub
 	}
 	
 	private void receiveNewPacket(TelemDataPacket newPacket){
@@ -57,7 +50,7 @@ public class BasicSimulatedDataReceiver extends AbstractDataReceiver {
 	}
 	
 	private void createNewTimer(){
-		Long startDelay = (long) 0.0; //Start immideately 
+		Long startDelay = (long) 0.0; //Start immediately 
 		Long repetitionDelayInMS = (long) 1000; //once per second seems reasonable. 
 												//will need to tune to match the actual speed of the car. 
 		autoGenerate = new Timer("TheFakeCar");

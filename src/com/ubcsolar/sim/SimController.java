@@ -5,7 +5,6 @@
  */
 
 package com.ubcsolar.sim;
-//TODO: implement
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.notification.Notification;
 import com.ubcsolar.ui.GlobalController;
@@ -14,7 +13,6 @@ public class SimController extends ModuleController {
 
 	public SimController(GlobalController toAdd) {
 		super(toAdd);
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -24,7 +22,7 @@ public class SimController extends ModuleController {
 	 */
 	@Override
 	public void notify(Notification n) {
-		//TODO handle any notifications that were registered for
+		//handle any notifications that were registered for here
 
 	}
 
@@ -33,7 +31,7 @@ public class SimController extends ModuleController {
 	 */
 	@Override
 	public void register() {
-		// TODO Auto-generated method stub
+		// Do stuff here
 
 	}
 }

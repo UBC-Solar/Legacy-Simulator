@@ -9,7 +9,6 @@ public class WeatherController extends ModuleController {
 
 	public WeatherController(GlobalController toAdd) {
 		super(toAdd);
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -31,7 +30,7 @@ public class WeatherController extends ModuleController {
 	 */
 	@Override
 	public void notify(Notification n) {
-		// TODO Auto-generated method stub
+		
 		/*if(n.getClass() == NewMapLoadedNotification.class){ //example notification handler
 			//Do something
 		}*/
@@ -43,7 +42,7 @@ public class WeatherController extends ModuleController {
 	 */
 	@Override
 	public void register() {
-		// TODO Auto-generated method stub
+
 		//this.mySession.register(this, NewMapLoadedNotification.class); //example line.
 		
 	}

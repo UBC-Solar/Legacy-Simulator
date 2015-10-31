@@ -36,7 +36,6 @@ public class MapController extends ModuleController{
 	 */
 	@Override
 	public void register() {
-		// TODO Auto-generated method stub
 
 	}
 	

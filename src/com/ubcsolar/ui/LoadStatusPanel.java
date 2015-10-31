@@ -142,7 +142,6 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		}
 		//mySession.register(this, SimDonwRunningNotificaiton.class); //TODO implement when I get there. 
 		//mySession.register(this,  NewWeatherLoadedNotification.class); //TODO implement when this gets created
-		// TODO Auto-generated method stub
 		
 	}
 	

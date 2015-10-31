@@ -23,7 +23,7 @@ public class NewTafReportLoadedNotification extends Notification {
 	 */
 	@Override
 	public String getMessage() {
-		// TODO Auto-generated method stub
+		// TODO write a mesage for this
 		return null;
 	}
 
