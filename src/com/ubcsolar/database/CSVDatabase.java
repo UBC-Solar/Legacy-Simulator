@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -25,13 +26,21 @@ public class CSVDatabase extends Database {
 	Queue<String> writingQueue; //will read from here and then write. 
 	FileWriter myFileWriter; //used to write. 
 	int entryCounter; //used to generate primary keys. 
-	DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss:SSS"); //time format. ss = seconds, SSS = ms
+	DateFormat actualDateFormat = new SimpleDateFormat("HH:mm:ss:SSS"); //time format. ss = seconds, SSS = ms
+	//couldn't manage to format milleseconds in a way that Excel can handle as time
+	//so just generated a second coloumn to be able to graph it properly. 
+	DateFormat excelDateFormat = new SimpleDateFormat("HH:mm:ss"); //time format. ss = seconds, SSS = ms
 	boolean isDBConnected = false; //FileWriter didn't seem to have a 'isConnected' or 'isOpen' method. 
 								//this is the workaround. 
+	final String columnTitles = "entry,RealTime,ExcelTime,Speed,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,"
+							+ "Pck0Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
+							+ "Pck1Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
+							+ "Pck2Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
+							+ "Pck3Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg";
 	Map<Integer,DataUnit> recallStuff = new HashMap<Integer, DataUnit>();
 	
 	/**
-	 * Constructor; Create and set up database 
+	 * Constructor; Create and set up database. ALWAYS CREATES A NEW FILE. //TODO add an append method
 	 * @param filename - filename for the .csv
 	 * @throws IOException - if it can't create the file for some reason. 
 	 */
@@ -50,6 +59,11 @@ public class CSVDatabase extends Database {
 											//in which case you have other problems to worry about)
 	}
 	
+	/**
+	 * Sets up and builds the first Database. 
+	 * @param filename
+	 * @throws IOException
+	 */
 	private void setup(String filename) throws IOException{
 		entryCounter = 0; //TODO write a check for the last value if reopening a database
 						//don't want to overwrite
@@ -63,7 +77,21 @@ public class CSVDatabase extends Database {
 		setUpTables();
 	}
 	
-
+	/**
+	 * returns a string containly exactly the number of commas specificed
+	 * (useful for adding empty rows of data to a .csv)
+	 * @param numberOfCommas
+	 * @return a String consisting solely of commas. 
+	 */
+	private String numberOfCommas(int numberOfCommas){
+		String toReturn = "";
+		for(int i=0; i<numberOfCommas; i++){
+			toReturn += ',';
+		}
+		
+		return toReturn;
+	}
+	
 	/*
 	 * This method is used to generate the queries needed to set up the tables
 	 * in the Database. For this CSV it will just be the column headers. 
@@ -71,7 +99,7 @@ public class CSVDatabase extends Database {
 	private void setUpTables() throws IOException{
 		//Currently assuming a .csv file
 		String tableSetup;
-		tableSetup = "Entry,Time,Speed,TtlVltg,SOC,Temps";
+		tableSetup = this.columnTitles;
 		writingQueue.add(tableSetup);
 		flushAndSave();
 	}
@@ -119,16 +147,42 @@ public class CSVDatabase extends Database {
 		this.isDBConnected = false; 
 	}
 	
+	/**
+	 * Parse a TelemDataPacket into String that can be written straight to the CSV. 
+	 * @param toStore - the TelemDataPacket to store
+	 * @throws IOException - if there are issues writing it. 
+	 */
 	private void store(TelemDataPacket toStore) throws IOException{
-		//tableSetup = "Entry,Time,Speed,TtlVltg,SOC,Temps";
+		//"entry,Time,Speed,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,Pck0Vltg,Pck2Vltg,Pck3Vltg";
 		this.recallStuff.put(entryCounter, toStore);
-		writingQueue.add("" + 
+		HashMap<String, Integer> temperatures = toStore.getTemperatures();
+		HashMap<Integer, ArrayList<Float>> voltages = toStore.getCellVoltages();
+		String toPrint ="" + 
 				this.entryCounter++ + "," + 
-				dateFormat.format(System.currentTimeMillis()) + "," +
+				actualDateFormat.format(toStore.getTimeCreated()) + "," +
+				excelDateFormat.format(toStore.getTimeCreated()) + "," +
 				toStore.getSpeed() + "," +
-				toStore.getTotalVoltage() + "," +
-				toStore.getTotalVoltage()*10 + "," +
-				toStore.getTemperatures().get("bms"));
+				temperatures.get("bms")  + "," +
+				temperatures.get("motor") + "," +
+				temperatures.get("pack0") + "," +
+				temperatures.get("pack1") + "," +
+				temperatures.get("pack2") + "," +
+				temperatures.get("pack3") + "," +
+				toStore.getTotalVoltage() + ",";
+				for(Float f : voltages.get(0)){
+					toPrint += f + ",";
+				}
+				for(Float f : voltages.get(1)){
+					toPrint += f + ",";
+				}
+				for(Float f : voltages.get(2)){
+					toPrint += f + ",";
+				}
+				for(Float f : voltages.get(3)){
+					toPrint += f + ",";
+				}
+				
+		this.writingQueue.add(toPrint);
 		this.flushAndSave();		
 	}
 	@Override
@@ -136,8 +190,6 @@ public class CSVDatabase extends Database {
 		if(toStore instanceof TelemDataPacket){
 			store((TelemDataPacket) toStore);
 		}
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override

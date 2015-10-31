@@ -31,7 +31,7 @@ public class DatabaseController extends ModuleController {
    * @throws IOException
    */
 	public void buildNewDatabase() throws IOException{
-		if(myDatabase.isConnected()){
+		if(myDatabase != null && myDatabase.isConnected()){
 			myDatabase.saveAndDisconnect();
 		}
 		myDatabase = new CSVDatabase();
@@ -55,7 +55,6 @@ public class DatabaseController extends ModuleController {
 	
 	@Override
 	public void notify(Notification n) {
-		System.out.println("got notification!: ");
 		if(n instanceof NewDataUnitNotification){
 			
 			try {
@@ -78,7 +77,6 @@ public class DatabaseController extends ModuleController {
 	public void store(DataUnit toStore) throws IOException{
 		if(toStore.getClass() == TelemDataPacket.class){
 			this.myDatabase.store(toStore);
-			System.out.println("GOT A DATA UNIT: " + toStore.getClass()); 
 		}
 		
 		
