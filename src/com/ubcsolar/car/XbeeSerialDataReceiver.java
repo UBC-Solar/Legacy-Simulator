@@ -25,8 +25,6 @@ import com.ubcsolar.sim.Log;
 
 import jssc.*;
 
-//TODO turn this class into an abstract one, and move the listening implementation into a concrete
-//subclass
 public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runnable,SerialPortEventListener{ //needs to be threaded so it can listen for a response
 
 
