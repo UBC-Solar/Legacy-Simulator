@@ -21,6 +21,8 @@ import com.ubcsolar.notification.Notification;
 
 import javax.swing.JLabel;
 import java.awt.FlowLayout;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.awt.Component;
 import javax.swing.Box;
 
@@ -38,6 +40,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	private Component horizontalGlue_2;
 	private Component horizontalGlue_3;
 	private Component horizontalGlue_4;
+	private DateFormat labelTimeFormat = new SimpleDateFormat("HH:mm:ss");
 	
 	/**
 	 * constructor
@@ -93,10 +96,10 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		lblCar.setText("Car: " + mySession.getMyCarController().getLoadedCarName());
 		lblMap.setText("Map loaded: " + mySession.getMapController().getLoadedMapName());
 		if((mySession.getMyDataBaseController()).getDatabaseName() != null){
-		lblDatabase.setText("Database: " + mySession.getMyDataBaseController().getDatabaseName());
+		this.updateDatabaseLabel(mySession.getMyDataBaseController().getDatabaseName(), false, System.currentTimeMillis());
 		}
 		else{
-			lblDatabase.setText("Database: DISCONNECTED");
+			this.updateDatabaseLabel(null, true, System.currentTimeMillis());
 		}
 	}
 	
@@ -117,13 +120,13 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	}
 	
 	private void updateDatabaseLabel(String databaseName, boolean isClosed, double time){
+		//Could consider breaking this into two different methods; don't need the name for a 
+		//disconnection. 
 		if(isClosed){
-		this.lblDatabase.setText("Database: DISCONECTED@" + time);
-		//TODO update the time to be properly formatted. 
+		this.lblDatabase.setText("Database: DISCONECTED@" + labelTimeFormat.format(time)); 
 		}
 		else{
-			this.lblDatabase.setText("Database: " + databaseName + "@" + time);
-			//TODO format time properly (Search for a SimpleDateFormat)
+			this.lblDatabase.setText("Database: " + databaseName + "@" + labelTimeFormat.format(time));
 		}
 	}
 	
