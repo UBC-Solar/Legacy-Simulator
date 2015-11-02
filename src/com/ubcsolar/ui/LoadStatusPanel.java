@@ -21,6 +21,8 @@ import com.ubcsolar.notification.Notification;
 
 import javax.swing.JLabel;
 import java.awt.FlowLayout;
+import java.awt.Component;
+import javax.swing.Box;
 
 public class LoadStatusPanel extends JPanel implements Listener {
 	private GlobalController mySession;
@@ -31,6 +33,11 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	private JLabel lblCar; //displays the name of the loaded car (simulated or real?)
 	private JLabel lblTaf; //displays the name of the loaded Taf report
 	private JLabel lblDatabase; //displays the status of the Database. 
+	private Component horizontalGlue;
+	private Component horizontalGlue_1;
+	private Component horizontalGlue_2;
+	private Component horizontalGlue_3;
+	private Component horizontalGlue_4;
 	
 	/**
 	 * constructor
@@ -45,19 +52,34 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		lblMap = new JLabel("Map loaded: None");
 		add(lblMap);
 		
+		horizontalGlue = Box.createHorizontalGlue();
+		add(horizontalGlue);
+		
 		//lblWeather = new JLabel(mySession.getMyWeatherController().getLoadedWeatherName());
 		//TODO add these in as we develop the model
 		lblMetar = new JLabel("Metar: none");
 		add(lblMetar);
 		
+		horizontalGlue_1 = Box.createHorizontalGlue();
+		add(horizontalGlue_1);
+		
 		lblTaf = new JLabel("TAF: none");
 		add(lblTaf);
+		
+		horizontalGlue_2 = Box.createHorizontalGlue();
+		add(horizontalGlue_2);
 		
 		lblSim = new JLabel("Sim: Has not run");
 		add(lblSim);
 		
+		horizontalGlue_3 = Box.createHorizontalGlue();
+		add(horizontalGlue_3);
+		
 		lblCar = new JLabel("Car Loaded: None");
 		add(lblCar);
+		
+		horizontalGlue_4 = Box.createHorizontalGlue();
+		add(horizontalGlue_4);
 		
 		lblDatabase = new JLabel("Database: unknown");
 		add(lblDatabase);
