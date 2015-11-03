@@ -35,12 +35,12 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	private JLabel lblCar; //displays the name of the loaded car (simulated or real?)
 	private JLabel lblTaf; //displays the name of the loaded Taf report
 	private JLabel lblDatabase; //displays the status of the Database. 
-	private Component horizontalGlue;
+	private Component horizontalGlue; //These glues add space between and grow the labels properly.
 	private Component horizontalGlue_1;
 	private Component horizontalGlue_2;
 	private Component horizontalGlue_3;
 	private Component horizontalGlue_4;
-	private DateFormat labelTimeFormat = new SimpleDateFormat("HH:mm:ss");
+	private DateFormat labelTimeFormat = new SimpleDateFormat("HH:mm:ss"); //the format for the times on the labels.
 	
 	/**
 	 * constructor
@@ -132,7 +132,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	
 	@Override
 	public void notify(Notification n) {
-		//TODO add support for additional notifications as they come. 
+		//Add support for additional notifications as they come. 
 		if(n.getClass() == NewMapLoadedNotification.class){
 			updateMapLabel(((NewMapLoadedNotification) n).getMapLoadedName()); //to update the map label
 		}

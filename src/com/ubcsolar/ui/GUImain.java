@@ -89,13 +89,22 @@ public class GUImain implements Listener{
 	}
 	
 	/**
-	 * creates all windows that can be launched from this main panel
+	 * creates all windows that can be launched from this main panel.
+	 * Does not overwrite any that currently exist! Should close those before calling this. 
 	 */
 	private void buildAllWindows(){
+		if(this.simFrame == null){
 		this.simFrame = new SimulationAdvancedWindow(this.mySession); //Sim advanced window
+		}
+		if(this.carFrame == null){
 		this.carFrame = new CarAdvancedWindow(this.mySession); //Car advanced window
+		}
+		if(this.mapFrame == null){
 		this.mapFrame = new MapAdvancedWindow(this.mySession); //Map advanced window
+		}
+		if(this.weatherFrame == null){
 		this.weatherFrame = new WeatherAdvancedWindow(this.mySession); //Weather advanced window
+		}
 	}
 	
 	/**
@@ -315,7 +324,11 @@ public class GUImain implements Listener{
 	 * launches the Sim window (should be created already)
 	 */
 	public void launchSim() {
-		//TODO add a check to see if it's been created yet (like an 'if null:' kind of check)
+		if(simFrame == null){ //Shouldn't happen
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(),
+					"Tried to open the Sim advanced window, but was null");
+			this.buildAllWindows();
+		}
 		simFrame.setVisible(true);
 		
 	}
@@ -324,7 +337,11 @@ public class GUImain implements Listener{
 	 * launches the Weather window
 	 */
 	public void launchWeather() {
-		//TODO add a check to see if it's been created yet (like an 'if null:' kind of check)
+		if(weatherFrame == null){ //Shouldn't happen
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(),
+					"Tried to open the Weather advanced window, but was null");
+			this.buildAllWindows();
+		}
 		weatherFrame.setVisible(true);
 		
 	}
@@ -332,7 +349,11 @@ public class GUImain implements Listener{
 	 * launches the Car window
 	 */
 	public void launchCarAdvancedWindow() {
-		//TODO add a check to see if it's been created yet (like an 'if null:' kind of check)
+		if(carFrame == null){ //Shouldn't happen
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(),
+					"Tried to open the Car advanced window, but was null");
+			this.buildAllWindows();
+		}
 		carFrame.setVisible(true);
 		
 	}
@@ -340,7 +361,12 @@ public class GUImain implements Listener{
 	 * launches the Map window
 	 */
 	public void launchMap(){
-		//TODO add a check to see if it's been created yet (like an 'if null:' kind of check)
-		mapFrame.setVisible(true);
+			if(mapFrame == null){ //Shouldn't happen
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(),
+						"Tried to open the Map advanced window, but was null");
+				this.buildAllWindows();
+			}
+			
+			mapFrame.setVisible(true);
 	}
 }

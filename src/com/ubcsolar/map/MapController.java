@@ -71,7 +71,7 @@ public class MapController extends ModuleController{
 		if(currentRoute == null){
 			return null;
 		}
-		//TODO: chenge it from network path to just file name
+		//TODO: change it from network path to just file name
 		else{
 			return currentRoute.getFileName();
 		}
@@ -82,8 +82,7 @@ public class MapController extends ModuleController{
 	 * Receives any notifications it registered for here. 
 	 */
 	@Override
-	public void notify(Notification n) {
-		// TODO place to call things if something changes. 
+	public void notify(Notification n) { 
 		//don't imagine Map needs to know any notifications. 
 		
 	}
