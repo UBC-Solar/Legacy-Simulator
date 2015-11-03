@@ -123,7 +123,7 @@ public class GUImain implements Listener{
 	@Override
 	public void notify(Notification n){
 	
-		//TODO: Do something when notified. 
+		//Do something here when notified. 
 		
 		if(n.getClass()== ExceptionNotification.class){
 			handleException((ExceptionNotification) n);

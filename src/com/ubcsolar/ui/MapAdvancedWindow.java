@@ -84,7 +84,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	 */
 	@Override
 	public void notify(Notification n){
-		//TODO add any notifications here
+		//add any notifications here
 		
 		//A new map has been loaded into the program
 		if(n.getClass() == NewMapLoadedNotification.class){ //when a new map is loaded, propogate the new name. 
@@ -107,7 +107,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		mySession.register(this, NewMapLoadedNotification.class); //need this for the map label and tool bar.
 		mySession.register(this, RouteDataAsRequestedNotification.class); //for when route data is processed and sent out. Likely requested
 																		//by this class
-		//TODO add any notifications you need to listen for here. 
+		//add any notifications you need to listen for here. 
 	}
 	
 	/**

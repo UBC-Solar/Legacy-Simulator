@@ -52,7 +52,7 @@ public class GlobalController {
 		
 		//Currently structured as a 1:1 list; the Class in position 3 of the Listeners list
 		//is listening for the trigger in position 3 of the triggers list. 
-		//Tere are much more elegant and efficient ways of doing that. 
+		//there are much more elegant and efficient ways of doing that. 
 		listOfListeners = new ArrayList<Listener>();
 		listOfTriggers = new ArrayList<Class<? extends Notification>>();
 		myMapController = new MapController(this);
@@ -77,6 +77,9 @@ public class GlobalController {
 	 */
 	public synchronized void register(Listener l, Class<? extends Notification> n){
 		//The structure for storing these is a little kludgy, see the explanation above
+		//TODO update the structures for these: Should use a Map<Triggerclasses, listOfClassesToNotify>, 
+		//and then we can just pull up the exception directly rather than going therough the entire list
+		//every time there is a notification (which could be a performance hit)
 		listOfListeners.add(l);
 		listOfTriggers.add(n);
 		System.out.println(l.getClass() + " registered for " + n);

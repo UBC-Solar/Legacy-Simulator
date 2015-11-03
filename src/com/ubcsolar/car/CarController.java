@@ -80,6 +80,9 @@ public class CarController extends ModuleController {
 			myDataReceiver = null; //Otherwise looks like it's connected. 
 			this.sendNotification(new NewCarLoadedNotification("DISCONNECTED")); 
 		}	
+		
+		//TODO consider something about the DB here. It should probably do something if a new
+		//car is loaded, but do we handle that here or in the DB?
 	}
 	
 	/**
