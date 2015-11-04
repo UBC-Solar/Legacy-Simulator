@@ -121,6 +121,15 @@ public class GlobalController {
 		Calendar cal = Calendar.getInstance();
 		//Can turn this on if you need to see when notifications go out.
 		//System.out.println(dateFormat.format(cal.getTime()) + "- Global Controller got a notification " + n.getClass() );
+		
+		//Hoping this will be much faster than the alternative. 
+		//TODO verify that a LinkedList iterator is O(n), and 
+		//not O(n^2) (as it would be for (for int i=0; i++)
+		for(Listener l : this.triggerNotifyMap.get(n)){
+			//l.notify(n); //turn on when ready to replace old way below. 
+			//don't want to run both at once. 
+		}
+		
 		for(int i=0; i<listOfTriggers.size(); i++){
 			if(listOfTriggers.get(i).isInstance(n)){
 				listOfListeners.get(i).notify(n);
