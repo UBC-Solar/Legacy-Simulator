@@ -123,13 +123,16 @@ public class GlobalController {
 		//System.out.println(dateFormat.format(cal.getTime()) + "- Global Controller got a notification " + n.getClass() );
 		
 		//Hoping this will be much faster than the alternative. 
-		//TODO verify that a LinkedList iterator is O(n), and 
-		//not O(n^2) (as it would be for (for int i=0; i++)
-		for(Listener l : this.triggerNotifyMap.get(n)){
+		/*TODO verify that a LinkedList iterator is O(n), and 
+		not O(n^2) (as it would be for (for int i=0; i++)*/
+		//for(Listener l : this.triggerNotifyMap.get(n)){ //TODO Handle nulls (notifications that 
+		//no one has registered for. 
 			//l.notify(n); //turn on when ready to replace old way below. 
 			//don't want to run both at once. 
-		}
-		
+		//}
+		/*TODO add check for sending notifications that aren't regsitered for yet. 
+		May not be a bug, but would be good to know if the setup registration/notifications are 
+		out of order.*/ 
 		for(int i=0; i<listOfTriggers.size(); i++){
 			if(listOfTriggers.get(i).isInstance(n)){
 				listOfListeners.get(i).notify(n);
