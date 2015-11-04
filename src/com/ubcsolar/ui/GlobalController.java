@@ -13,7 +13,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
 import javax.swing.ImageIcon;
 
 import com.ubcsolar.car.CarController;
@@ -37,6 +41,7 @@ public class GlobalController {
 	private DatabaseController myDatabaseController; //the database controller
 	private WeatherController myWeatherController; //the Weather controller.
 	public final ImageIcon iconImage; //the icon for the program
+	private Map<Class<? extends Notification>, List<Listener>> triggerNotifyMap;
 		
 	/**
 	 * constructor. 
@@ -46,6 +51,7 @@ public class GlobalController {
 	public GlobalController(GUImain mainWindow){
 		iconImage = new ImageIcon("res/windowIcon.png");
 		this.mainWindow = mainWindow;
+		triggerNotifyMap = new HashMap<Class<? extends Notification>, List<Listener>>();
 		//TODO: turn the 2 lists into a KVP<Class<?extends Notification>, ArrayList<Listener>> 
 		//AKA a table indexed by the notifications. Look up the notification type, send it to all
 		//listeners registered for it. 
@@ -82,8 +88,27 @@ public class GlobalController {
 		//every time there is a notification (which could be a performance hit)
 		listOfListeners.add(l);
 		listOfTriggers.add(n);
+		
+		
+		//Design decision here: It appears that setting up a map 
+		//and making/adding to the list each time may be slower
+		//at registering than the old dual-list system.
+		//But it should be faster at sending them out(don't have to traverse the whole list
+		//every time for every notification).
+		//Each window only registers once, but I anticipate lots of sending notifications
+		//(especially as the program grows in size!) so trade-off is likely worth it. 
+		if(triggerNotifyMap.containsKey(n)){
+			triggerNotifyMap.get(n).add(l);
+		}
+		else{
+			List<Listener> temp = new LinkedList<Listener>();
+			//Gotta make sure to initialize it.
+			temp.add(l);
+			triggerNotifyMap.put(n, temp); //Will have one value. 
+		}
 		System.out.println(l.getClass() + " registered for " + n);
 		System.out.println("Total number registered: " + listOfListeners.size());
+		System.out.println("Map Size: " + triggerNotifyMap.size());
 	}
 	
 	/**

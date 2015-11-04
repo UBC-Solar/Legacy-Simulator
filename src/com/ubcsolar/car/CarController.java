@@ -46,8 +46,7 @@ public class CarController extends ModuleController {
 		sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
 		}
 		catch(SerialPortException e){
-			//Not able to create the datareceiver connection
-			//TODO handle this! 
+			//Not able to create the datareceiver connection 
 			ExceptionNotification notification = new ExceptionNotification(e, "Unable to connect to Car, no Serial Port found"); 
 			SolarLog.write(LogType.ERROR, notification.getTimeCreated(), notification.getMessage());
 			sendNotification(notification);
