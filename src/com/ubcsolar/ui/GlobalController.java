@@ -31,7 +31,9 @@ import com.ubcsolar.sim.SimController;
 import com.ubcsolar.weather.WeatherController;
 
 public class GlobalController {
+	@Deprecated //replaced by the Map. It worked though, so could re-enable if bugs show up. 
 	private List<Listener> listOfListeners; //listeners, waiting for a trigger listed in triggers/. 
+	@Deprecated //replaced by Map
 	private List<Class<? extends Notification>> listOfTriggers; //list of Notifcations that Listeners are waiting for. 
 								//listener in pos. 1 is waiting for the trigger in pos. 1, etc. 
 	private GUImain mainWindow; //the root panel for the UI
@@ -76,27 +78,33 @@ public class GlobalController {
 	}
 	
 	/**
-	 * adds the listener to the registry for that notification. If a notification comes in,
+	 * Adds the listener to the registry for that notification. If a notification comes in,
 	 * it will be sent to every class that registered for it. 
+	 * Note: Uses the '==' or .equals() methods for check, so extended notification classes are treated
+	 * as their own. 
 	 * @param l - the class to receive the notification
 	 * @param n - the notification that the class is looking for. 
 	 */
-	public synchronized void register(Listener l, Class<? extends Notification> n){
-		//The structure for storing these is a little kludgy, see the explanation above
-		//TODO update the structures for these: Should use a Map<Triggerclasses, listOfClassesToNotify>, 
-		//and then we can just pull up the exception directly rather than going therough the entire list
-		//every time there is a notification (which could be a performance hit)
-		
+	public synchronized void register(Listener l, Class<? extends Notification> n){		
 		//oldRegister(l, n);
+		/* Design decision here: It appears that setting up a map 
+		 * and making/adding to the list each time may be slower 
+		 * at registering than the old dual-list system. 
+		 * But it should be faster at sending them out(don't have to traverse the whole list 
+		 * every time for every notification). 
+		 * Each window only registers once, but I anticipate lots of sending notifications 
+		 * (especially as the program grows in size!) so trade-off is likely worth it. 
+		 */
 		
-		
-		//Design decision here: It appears that setting up a map 
-		//and making/adding to the list each time may be slower
-		//at registering than the old dual-list system.
-		//But it should be faster at sending them out(don't have to traverse the whole list
-		//every time for every notification).
-		//Each window only registers once, but I anticipate lots of sending notifications
-		//(especially as the program grows in size!) so trade-off is likely worth it. 
+		/*
+		 * Second design decision note: OldRegister used '.instanceOf' to compare classes,
+		 * so that one could register for an abstract parent class and get 
+		 * notified for every instance of concrete sub-classes. 
+		 * However Map uses .equals() or '==' to compare the keys, so it can't handle extended classes. 
+		 * It might be possible to add that ability in in the future, but would likely come with a
+		 * performance hit. The only place so far I wanted to use it was the Database, but it's not that
+		 * hard to change it to register for each concrete subclass. 
+		 */
 		if(triggerNotifyMap.containsKey(n)){
 			triggerNotifyMap.get(n).add(l);
 		}
@@ -107,16 +115,18 @@ public class GlobalController {
 			triggerNotifyMap.put(n, temp); //Will have one value. 
 		}
 		System.out.println(l.getClass() + " registered for " + n);
-		System.out.println("Total number registered: " + listOfListeners.size());
 		System.out.println("Map Size: " + triggerNotifyMap.size());
 	}
 	
 	/*trying to upgrade the registration system to be able to use
 	 * a Map for performance reasons. This is the old way and I know it works.   
 	 */
+	@SuppressWarnings("unused")
+	@Deprecated 
 	private void oldRegister(Listener l, Class<? extends Notification> n) {
 		listOfListeners.add(l);
 		listOfTriggers.add(n);
+		System.out.println("Total number registered: " + listOfListeners.size());
 	}
 
 	/**
@@ -134,6 +144,8 @@ public class GlobalController {
 		//Hoping this will be much faster than the alternative. 
 		/*TODO verify that a LinkedList iterator is O(n), and 
 		not O(n^2) (as it would be for (for int i=0; i++)*/
+		//TODO consider implementing an ArrayList or Vector instead. I though performance would be worse
+		//but a brief search of StackOverflow suggests it might actually be better. 
 		
 		List<Listener> temp = this.triggerNotifyMap.get(n.getClass());
 		if(temp != null){
@@ -143,9 +155,10 @@ public class GlobalController {
 			}
 		}
 		else{
-			/*TODO add check for sending notifications that aren't registered for yet. 
-			May not be a bug, but would be good to know if the setup registration/notifications are 
-			out of order.*/
+			/* If you reached here, either there is no entry for the notification class
+			 * or there has been no list created for it (either way, no one wants it) 
+			 * May not be a bug, but would be good to know if the setup registration/notifications are
+			 * out of order.*/
 			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
 					"When sent, no object wanted: " + n.getClass());
 			
@@ -158,6 +171,8 @@ public class GlobalController {
 	/* Trying to implement the notification system
 	 * using a Map for performance reasons. This is the old way which I know works. 
 	 */
+	@SuppressWarnings("unused")
+	@Deprecated
 	private void oldSendNotification(Notification n) {
 		for(int i=0; i<listOfTriggers.size(); i++){
 			if(listOfTriggers.get(i).isInstance(n)){
@@ -179,7 +194,6 @@ public class GlobalController {
 	public SimController getMySimController() {
 		return mySimController;
 	}
-
 
 	public CarController getMyCarController() {
 		return myCarController;
