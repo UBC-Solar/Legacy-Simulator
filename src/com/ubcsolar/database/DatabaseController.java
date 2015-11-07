@@ -3,6 +3,7 @@ package com.ubcsolar.database;
 import com.ubcsolar.common.*;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.TelemDataPacket;
+import com.ubcsolar.notification.CarUpdateNotification;
 import com.ubcsolar.notification.DatabaseCreatedOrConnectedNotification;
 import com.ubcsolar.notification.DatabaseDisconnectedOrClosed;
 import com.ubcsolar.notification.ExceptionNotification;
@@ -74,23 +75,36 @@ public class DatabaseController extends ModuleController {
 	
 	
 	
-	@Override
-	public void notify(Notification n) {
-		if(n instanceof NewDataUnitNotification){
-			
-			try {
-				store(((NewDataUnitNotification) n).getDataUnit());
-			} catch (IOException e) {
-				this.mySession.sendNotification(new ExceptionNotification(e, "Error storing lastest data unit"));
-				e.printStackTrace();
-			}
-		}
 
-	}
 
 	@Override
 	public void register() {
 		this.mySession.register(this, NewDataUnitNotification.class);
+		this.mySession.register(this, CarUpdateNotification.class);
+
+	}
+	
+	@Override
+	public void notify(Notification n) {
+		try {
+		if(n.getClass() == CarUpdateNotification.class){
+			
+				store(((CarUpdateNotification) n).getDataUnit());
+				//TODO add 'store' methods that are more concrete. 
+				return; //otherwise we get double entries with the fail-safe data-unit catch. 
+			
+		}
+		//This was when the Register/Notify system could handle extended notifications. 
+		//Left in here as a failsafe, but should be using only concrete classes. 
+		if(n instanceof NewDataUnitNotification){
+			store(((NewDataUnitNotification) n).getDataUnit());
+		}
+		
+		
+		} catch (IOException e) {
+			this.mySession.sendNotification(new ExceptionNotification(e, "Error storing lastest data unit"));
+			e.printStackTrace();
+		}
 
 	}
 	
