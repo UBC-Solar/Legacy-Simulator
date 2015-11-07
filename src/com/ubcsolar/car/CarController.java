@@ -18,7 +18,7 @@ import jssc.SerialPortException;
 // TODO: Check threading. Should be calling subclasses as their own thread
 public class CarController extends ModuleController {
 	
-	
+	//TODO update this and refactor code to use the database module
 	private Database myDatabase; //references to the data warehouse. Want to store the car's broadcasts
 	private DataProcessor myDataProcessor; //where to send the car's broadcasts for processing. 
 	private AbstractDataReceiver myDataReceiver; //what will capture the car's raw broadcasts

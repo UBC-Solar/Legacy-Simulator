@@ -86,8 +86,8 @@ public class GlobalController {
 		//TODO update the structures for these: Should use a Map<Triggerclasses, listOfClassesToNotify>, 
 		//and then we can just pull up the exception directly rather than going therough the entire list
 		//every time there is a notification (which could be a performance hit)
-		listOfListeners.add(l);
-		listOfTriggers.add(n);
+		
+		oldRegister(l, n);
 		
 		
 		//Design decision here: It appears that setting up a map 
@@ -111,6 +111,14 @@ public class GlobalController {
 		System.out.println("Map Size: " + triggerNotifyMap.size());
 	}
 	
+	/*trying to upgrade the registration system to be able to use
+	 * a Map for performance reasons. This is the old way and I know it works.   
+	 */
+	private void oldRegister(Listener l, Class<? extends Notification> n) {
+		listOfListeners.add(l);
+		listOfTriggers.add(n);
+	}
+
 	/**
 	 * sends the notification to all classes that have registered to receive it. 
 	 * @param n - the notification being sent. 
@@ -122,6 +130,7 @@ public class GlobalController {
 		//Can turn this on if you need to see when notifications go out.
 		//System.out.println(dateFormat.format(cal.getTime()) + "- Global Controller got a notification " + n.getClass() );
 		
+		newSendNotification(n);
 		//Hoping this will be much faster than the alternative. 
 		/*TODO verify that a LinkedList iterator is O(n), and 
 		not O(n^2) (as it would be for (for int i=0; i++)*/
@@ -139,14 +148,22 @@ public class GlobalController {
 			out of order.*/ 
 			}
 
+
+	}
+	
+	
+	/* Trying to implement the notification system
+	 * using a Map for performance reasons. This is the old way which I know works. 
+	 */
+	private void newSendNotification(Notification n) {
 		for(int i=0; i<listOfTriggers.size(); i++){
 			if(listOfTriggers.get(i).isInstance(n)){
 				listOfListeners.get(i).notify(n);
 			}
 		}
+		
 	}
-	
-	
+
 	//THESE METHODS ALLOW US TO GET THE EXISTING CONTROLLERS FROM ANY OTHER CLASS. 
 	//It ensures we only ever have one instantiated at a time. 
 	//Could probably turn them into Singleton methods, but this allows us to control them a bit. 
