@@ -129,6 +129,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 	public void stop(){
 		try { 
 			serialPort.removeEventListener();
+			serialPort.closePort();
 		} catch (SerialPortException e) {e.printStackTrace();}
 	}
 

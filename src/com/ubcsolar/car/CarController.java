@@ -97,7 +97,7 @@ public class CarController extends ModuleController {
 	 */
 	@Override
 	public void notify(Notification n) {
-		//TODO handle any notifications that were registered for
+		//handle any notifications that were registered for
 
 	}
 
