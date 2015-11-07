@@ -9,15 +9,11 @@ package com.ubcsolar.car;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import com.ubcsolar.common.TelemDataPacket;
-import com.ubcsolar.notification.CarUpdateNotification;
-
-import jssc.SerialPortException;
 
 public class BasicSimulatedDataReceiver extends AbstractDataReceiver {
 
@@ -151,8 +147,6 @@ private class generateNewThings extends TimerTask{
 									//Car should not be going faster than light after 
 									//running this program 1x1^23 iterations. 
 		int totalVoltage = 1 * iterations; //also terrible algo. 
-		int stateOfCharge = 50; //voltage is changing while state of charge stays the same. 
-								//seems legit. 
 		
 		HashMap<String,Integer> temperatures = new HashMap<String,Integer>();
 		temperatures.put("bms", (35 + iterations));

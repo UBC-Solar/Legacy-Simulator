@@ -4,15 +4,8 @@
 
 package com.ubcsolar.car;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.TooManyListenersException;
 
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -8,7 +8,7 @@ public class TelemDataPacket extends DataUnit{
 
 @Override
 public Map<String, Object> getAllValues() {
-	HashMap<String, Object> allValues = new HashMap();
+	HashMap<String, Object> allValues = new HashMap<String, Object>();
 	allValues.put("speed", this.getSpeed());
 	allValues.put("total voltage", this.getTotalVoltage());
 	allValues.put("temperatures", this.getTemperatures());
