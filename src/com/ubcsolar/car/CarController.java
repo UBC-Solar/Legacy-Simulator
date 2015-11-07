@@ -10,6 +10,7 @@ package com.ubcsolar.car;
 
 import com.ubcsolar.common.*;
 import com.ubcsolar.common.ModuleController;
+import com.ubcsolar.database.DatabaseController;
 import com.ubcsolar.notification.*;
 import com.ubcsolar.ui.GlobalController;
 
@@ -19,9 +20,11 @@ import jssc.SerialPortException;
 public class CarController extends ModuleController {
 	
 	//TODO update this and refactor code to use the database module
-	private Database myDatabase; //references to the data warehouse. Want to store the car's broadcasts
+	private DatabaseController myDatabase; //references to the data warehouse. Want to store the car's broadcasts
 	private DataProcessor myDataProcessor; //where to send the car's broadcasts for processing. 
 	private AbstractDataReceiver myDataReceiver; //what will capture the car's raw broadcasts
+	private TelemDataPacket lastReceived; //last datapacket received. 
+	//TODO implement a proper cache for this. Not sure exactly what the parameters are for it. 
 	
 	/**
 	 * constructor
@@ -29,7 +32,7 @@ public class CarController extends ModuleController {
 	 */
 	public CarController(GlobalController myGlobalController) {
 		super(myGlobalController);
-		myDatabase = new Database();
+		myDatabase = mySession.getMyDataBaseController();
 		myDataProcessor = new DataProcessor(this); //TODO turn this into threaded properly.
 	}
 	
@@ -117,12 +120,22 @@ public class CarController extends ModuleController {
 
 	/**
 	 * gets the last reported speed of the car. 
-	 * Returns 0 if no speed has ever been reported.  
+	 * Returns -1 if no speed has ever been reported.  
 	 * @return the last reported speed of the car. 
 	 */
 	public int getLastReportedSpeed(){
 		//TODO: consider moving this to a Double or float. 
-		return myDatabase.getLastSpeed();
+		//TODO cache the last couple TelemDataPackets here somewhere
+		//TODO configure this to actually get the needed ones from the DB 
+		//if they're not in the cache. 
+		if(this.lastReceived == null){
+			return -1;
+			//TODO check DB to see if it's ever received one.
+		}
+		else{
+			return this.lastReceived.getSpeed();
+		}
+		//return myDatabase.getLastSpeed();
 	}
 
 	/**
@@ -131,9 +144,9 @@ public class CarController extends ModuleController {
 	 * If broadcasting is turned on, it will send a notification out.  
 	 * @param carUpdateNotification - the notification to send out. 
 	 */
-	public void adviseOfNewCarReport(CarUpdateNotification carUpdateNotification) {
-		// TODO store this in some kind of record. 
-		sendNotification(carUpdateNotification);
+	public void adviseOfNewCarReport(TelemDataPacket newPacket) {
+		this.lastReceived = newPacket; //cache the latest one. 
+		sendNotification(new CarUpdateNotification(newPacket));
 	}
 
 	

@@ -46,7 +46,7 @@ public class DataProcessor {
 	//whatever other thread needs them can just check the list at their leisure. 
 	public void store(TelemDataPacket newDataPacket){
 		//list.add(newDataPacket); //use this for storing in list with locks. 
-		myController.adviseOfNewCarReport(new CarUpdateNotification(newDataPacket));
+		myController.adviseOfNewCarReport(newDataPacket);
 		
 	}
 	
