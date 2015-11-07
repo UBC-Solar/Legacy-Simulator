@@ -87,7 +87,7 @@ public class GlobalController {
 		//and then we can just pull up the exception directly rather than going therough the entire list
 		//every time there is a notification (which could be a performance hit)
 		
-		oldRegister(l, n);
+		//oldRegister(l, n);
 		
 		
 		//Design decision here: It appears that setting up a map 
@@ -130,22 +130,25 @@ public class GlobalController {
 		//Can turn this on if you need to see when notifications go out.
 		//System.out.println(dateFormat.format(cal.getTime()) + "- Global Controller got a notification " + n.getClass() );
 		
-		newSendNotification(n);
+		//oldSendNotification(n);
 		//Hoping this will be much faster than the alternative. 
 		/*TODO verify that a LinkedList iterator is O(n), and 
 		not O(n^2) (as it would be for (for int i=0; i++)*/
 		
-		List<Listener> temp = this.triggerNotifyMap.get(n);
+		List<Listener> temp = this.triggerNotifyMap.get(n.getClass());
 		if(temp != null){
-			for(Listener l : this.triggerNotifyMap.get(n)){
-			//l.notify(n); //turn on when ready to replace old way below. 
+			for(Listener l : this.triggerNotifyMap.get(n.getClass())){
+			l.notify(n); //turn on when ready to replace old way below. 
 			//don't want to run both at once. 
 			}
 		}
 		else{
-			/*TODO add check for sending notifications that aren't regsitered for yet. 
+			/*TODO add check for sending notifications that aren't registered for yet. 
 			May not be a bug, but would be good to know if the setup registration/notifications are 
-			out of order.*/ 
+			out of order.*/
+			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
+					"When sent, no object wanted: " + n.getClass());
+			
 			}
 
 
@@ -155,7 +158,7 @@ public class GlobalController {
 	/* Trying to implement the notification system
 	 * using a Map for performance reasons. This is the old way which I know works. 
 	 */
-	private void newSendNotification(Notification n) {
+	private void oldSendNotification(Notification n) {
 		for(int i=0; i<listOfTriggers.size(); i++){
 			if(listOfTriggers.get(i).isInstance(n)){
 				listOfListeners.get(i).notify(n);
