@@ -72,7 +72,8 @@ public class CarController extends ModuleController {
 	}
 	
 	/**
-	 * stops listening to updates. If it's a simulated car, stops producing new notifications. 
+	 * stops listening to updates. If it's a simulated car, stops producing new notifications.
+	 * Clear any lastReceived caches. 
 	 * If there is no dataReceiver loaded, silently ignores the command. 
 	 */
 	public void stopListeningToCar(){
@@ -82,6 +83,9 @@ public class CarController extends ModuleController {
 			myDataReceiver = null; //Otherwise looks like it's connected. 
 			this.sendNotification(new NewCarLoadedNotification("DISCONNECTED")); 
 		}	
+		if(this.lastReceived != null){
+			this.lastReceived = null;
+		}
 		
 		//TODO consider something about the DB here. It should probably do something if a new
 		//car is loaded, but do we handle that here or in the DB?
@@ -125,9 +129,9 @@ public class CarController extends ModuleController {
 	 */
 	public int getLastReportedSpeed(){
 		//TODO: consider moving this to a Double or float. 
-		//TODO cache the last couple TelemDataPackets here somewhere
 		//TODO configure this to actually get the needed ones from the DB 
-		//if they're not in the cache. 
+		//if they're not in the cache.
+		//TODO consider if this is even needed. Could this be replaced by the getLastTelemDataPacket?
 		if(this.lastReceived == null){
 			return -1;
 			//TODO check DB to see if it's ever received one.
@@ -136,6 +140,14 @@ public class CarController extends ModuleController {
 			return this.lastReceived.getSpeed();
 		}
 		//return myDatabase.getLastSpeed();
+	}
+	
+	/**
+	 * Gets the last received TelemDataPacket. 
+	 * @return the last TelemDataPacket, or null if there hasn't yet been one. 
+	 */
+	public TelemDataPacket getLastTelemDataPacket(){
+		return this.lastReceived;
 	}
 
 	/**
@@ -146,6 +158,7 @@ public class CarController extends ModuleController {
 	 */
 	public void adviseOfNewCarReport(TelemDataPacket newPacket) {
 		this.lastReceived = newPacket; //cache the latest one. 
+		//TODO set up proper caching
 		sendNotification(new CarUpdateNotification(newPacket));
 	}
 
