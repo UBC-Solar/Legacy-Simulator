@@ -6,6 +6,9 @@
 
 package com.ubcsolar.car;
 
+import java.util.LinkedList;
+import java.util.List;
+
 //import org.jfree.util.Log;
 
 import com.ubcsolar.common.*;
@@ -19,12 +22,12 @@ import jssc.SerialPortException;
 // TODO: Check threading. Should be calling subclasses as their own thread
 public class CarController extends ModuleController {
 	
-	//TODO update this and refactor code to use the database module
 	private DatabaseController myDatabase; //references to the data warehouse. Want to store the car's broadcasts
 	private DataProcessor myDataProcessor; //where to send the car's broadcasts for processing. 
 	private AbstractDataReceiver myDataReceiver; //what will capture the car's raw broadcasts
 	private TelemDataPacket lastReceived; //last datapacket received. 
-	//TODO implement a proper cache for this. Not sure exactly what the parameters are for it. 
+	//Could consider adding a cache for this here, but for now we will rely on the 
+	//cache in the DB. 
 	
 	/**
 	 * constructor
@@ -77,9 +80,13 @@ public class CarController extends ModuleController {
 	 * If there is no dataReceiver loaded, silently ignores the command. 
 	 */
 	public void stopListeningToCar(){
-		//TODO set up exceptions properly. What if can't close? What if...? 
 		if(myDataReceiver != null){
-			myDataReceiver.stop();
+				try {
+					myDataReceiver.stop();
+				} catch (SerialPortException e) {
+					mySession.sendNotification(new ExceptionNotification(e, "Failed at closing serial connection, "
+							+ e.getClass()));
+				}
 			myDataReceiver = null; //Otherwise looks like it's connected. 
 			this.sendNotification(new NewCarLoadedNotification("DISCONNECTED")); 
 		}	
@@ -122,25 +129,6 @@ public class CarController extends ModuleController {
 		return myDataReceiver.getName();
 	}
 
-	/**
-	 * gets the last reported speed of the car. 
-	 * Returns -1 if no speed has ever been reported.  
-	 * @return the last reported speed of the car. 
-	 */
-	public int getLastReportedSpeed(){
-		//TODO: consider moving this to a Double or float. 
-		//TODO configure this to actually get the needed ones from the DB 
-		//if they're not in the cache.
-		//TODO consider if this is even needed. Could this be replaced by the getLastTelemDataPacket?
-		if(this.lastReceived == null){
-			return -1;
-			//TODO check DB to see if it's ever received one.
-		}
-		else{
-			return this.lastReceived.getSpeed();
-		}
-		//return myDatabase.getLastSpeed();
-	}
 	
 	/**
 	 * Gets the last received TelemDataPacket. 
@@ -158,9 +146,11 @@ public class CarController extends ModuleController {
 	 */
 	public void adviseOfNewCarReport(TelemDataPacket newPacket) {
 		this.lastReceived = newPacket; //cache the latest one. 
-		//TODO set up proper caching
+		//See the note at the top about further caching. For now, lets just use DB.
 		sendNotification(new CarUpdateNotification(newPacket));
 	}
+	
+	
 
 	
 	

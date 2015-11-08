@@ -37,7 +37,6 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 	 * default constructor.
 	 * @param toAdd - the CarController to notify when it gets a new result
 	 */ 
-	 //TODO change this so TelemDataPacket doesn't need public variables. 
 	public XbeeSerialDataReceiver(CarController toAdd, DataProcessor theProcessor) throws SerialPortException{
 		super(toAdd, theProcessor);
 		
@@ -63,7 +62,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 	 * transfer to the DataProcessor
 	 * @param jsonString - the string received from the xbee serial port. 
 	 */
-	//NOAH: Can we move this method into the data processor? Probably not 
+	//TODO Consider moving this method into the data processor? Probably not 
 	//super big on processing, but it would help prevent a crash if this 
 	//enters an infinite loop or encounters an exception it couldn't handle. 
 	//(wouldn't need to rebuilt the entire serial port to recover, just the processor. 
@@ -126,11 +125,11 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 		}
 	}
 		
-	public void stop(){
-		try { 
+	public void stop()throws SerialPortException{
+		
 			serialPort.removeEventListener();
 			serialPort.closePort();
-		} catch (SerialPortException e) {e.printStackTrace();}
+		
 	}
 
 	@Deprecated

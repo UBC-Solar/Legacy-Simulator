@@ -6,6 +6,8 @@
 
 package com.ubcsolar.car;
 
+import jssc.SerialPortException;
+
 public abstract class AbstractDataReceiver implements Runnable {
 	protected CarController myCarController; //the parent to notify of a new result. 
 	protected String name; //Each receiver should have a name in case we have multiple connections
@@ -22,7 +24,7 @@ public abstract class AbstractDataReceiver implements Runnable {
 	}
 	//These two methods needed to implement Runnable
 	public abstract void run();
-	public abstract void stop();
+	public abstract void stop() throws SerialPortException;
 	/**
 	 * Used to set the name of the Receiver (for multiple cars, etc)
 	 */
