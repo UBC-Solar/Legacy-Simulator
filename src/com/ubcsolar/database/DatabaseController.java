@@ -10,8 +10,6 @@ import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewDataUnitNotification;
 import com.ubcsolar.notification.Notification;
 import com.ubcsolar.ui.GlobalController;
-
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
@@ -20,8 +18,6 @@ public class DatabaseController extends ModuleController {
 	//Added a queue to do asynchronous writes to the permanent storage. 
 	//NOTE: Currently string, but will probably change this
 	//when I actually implement a database (could be a SQL query). 
-	Queue<String> writingQueue; //will read from here and then write. 
-	FileWriter myFileWriter;
 	Database myDatabase;
 	String databaseName;
 	public DatabaseController(GlobalController myGlobalController)throws IOException {
