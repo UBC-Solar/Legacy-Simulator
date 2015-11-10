@@ -124,7 +124,46 @@ public class DatabaseController extends ModuleController {
 	public void store(LatLong toStore) throws IOException{
 		this.myDatabase.store(toStore);
 	}*/
-
+	
+	/**
+	 * Returns all current data units of type X. 
+	 * This list may be updated a new dataunits come in, but no guarantees 
+	 * made based on time. 
+	 * @return
+	 */
+	public <X> ProtectedList<X> getAll(){
+		//TODO implement this
+		return null;
+	}
+	
+	/**
+	 * returns the last num dataunits of type X, or all of them if num>size. 
+	 * This list may be updated a new dataunits come in, but no guarantees 
+	 * made based on time. 
+	 * @param num
+	 * @return
+	 */
+	public <X> ProtectedList<X> getLast(int num){
+		return null;
+	}
+	
+	/**
+	 * Returns all current data units of type X received since TIME. 
+	 * This list may be updated a new dataunits come in, but no guarantees 
+	 * made based on time. 
+	 * @param startTime, in double format. Will return data units such that their time >= startTime
+	 * @return
+	 */
+	public <X> ProtectedList<X> getAllSince(Double startTime){
+		//TODO implement this
+		return null;
+	}
+	/* This one I figured we'll need when we implement weather reports. (grab all weather reports in 
+	 * in a 5km radius)
+	public <X> ProtectedList<X> getAllCurrentNearby(LatLong spot, int radius){
+		//TODO implement this
+		return null;
+	}*/
 	 
 }
 
