@@ -95,6 +95,7 @@ public class DatabaseController extends ModuleController {
 			
 		}
 		//This was when the Register/Notify system could handle extended notifications. 
+		//(i.e would know that a newTelemDataPacket is also a NewDataUnitNotification)
 		//Left in here as a failsafe, but should be using only concrete classes. 
 		if(n instanceof NewDataUnitNotification){
 			store(((NewDataUnitNotification) n).getDataUnit());
@@ -110,11 +111,20 @@ public class DatabaseController extends ModuleController {
 	
 
 	public void store(DataUnit toStore) throws IOException{
+		System.out.println("DATAUNIT Method USED TO STORE");
 		if(toStore.getClass() == TelemDataPacket.class){
 			this.myDatabase.store(toStore);
 		}
-		
-		
 	}
+	
+	public void store(TelemDataPacket toStore) throws IOException{
+		this.myDatabase.store(toStore);
+	}
+	/* save until we implement LatLongs. 
+	public void store(LatLong toStore) throws IOException{
+		this.myDatabase.store(toStore);
+	}*/
 
+	 
 }
+
