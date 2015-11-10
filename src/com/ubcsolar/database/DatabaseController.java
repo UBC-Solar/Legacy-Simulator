@@ -127,37 +127,75 @@ public class DatabaseController extends ModuleController {
 	
 	/**
 	 * Returns all current data units of type X. 
-	 * This list may be updated a new dataunits come in, but no guarantees 
-	 * made based on time. 
+	 *  
 	 * @return
 	 */
-	public <X> ProtectedList<X> getAll(){
+	public <X> ArrayList<X> getAll(){
 		//TODO implement this
 		return null;
 	}
 	
+	
 	/**
-	 * returns the last num dataunits of type X, or all of them if num>size. 
 	 * This list may be updated a new dataunits come in, but no guarantees 
-	 * made based on time. 
+	 * made based on time.
+	 * @return
+	 */
+	public <X> ProtectedList<X> getAllUpdating(){
+		//TODO implement me. Should just be a case of building the protectedList. 
+		return null;
+	}
+	
+	
+	/**
+	 * returns the last num dataunits of type X, or all of them if num>size.
 	 * @param num
 	 * @return
 	 */
-	public <X> ProtectedList<X> getLast(int num){
+	public <X> ArrayList<X> getLast(int num){
+		//TODO implement me
 		return null;
 	}
 	
+	public ArrayList<TelemDataPacket> getLastTelemDataPacket(int num){
+		//TODO implement me
+		return null;
+	}
+	/* Commented out until LatLongs implemented
+	public LatLong getLastLatLong(int num){
+		//TODO implement me
+		return null
+	}*/
+	/* commented out until Metars implemented in program
+	public ArrayList<Metar> getLastMetar(int num){
+		return null;
+	}*/
+	
 	/**
 	 * Returns all current data units of type X received since TIME. 
-	 * This list may be updated a new dataunits come in, but no guarantees 
-	 * made based on time. 
 	 * @param startTime, in double format. Will return data units such that their time >= startTime
 	 * @return
 	 */
-	public <X> ProtectedList<X> getAllSince(Double startTime){
+	public <X> ArrayList<X> getAllSince(Double startTime){
 		//TODO implement this
 		return null;
 	}
+	
+	public ArrayList<TelemDataPacket> getAllTelemDataPacketsSince(double startTime){
+		//TODO implement this
+		return null;
+	}
+	
+	/* commented out until LatLongs implemented
+	public ArrayList<LatLong> getAllLatLongsSince(double startTime){
+		return null;
+		//TODO implement this
+	}*/
+	
+	/* commented out until Metars implemented in program
+	public ArrayList<Metar> getAllMetarsSince(int num){
+		return null;
+	}*/
 	/* This one I figured we'll need when we implement weather reports. (grab all weather reports in 
 	 * in a 5km radius)
 	public <X> ProtectedList<X> getAllCurrentNearby(LatLong spot, int radius){

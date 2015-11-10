@@ -15,6 +15,7 @@
  */
 package com.ubcsolar.database;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -42,6 +43,20 @@ public class ProtectedList<T>{
 	
 	public int size(){
 		return base.size();
+	}
+	
+	
+	//TODO fix the description to be more professional and clear
+	/**
+	 * used if the object wants to create a copy they can modify
+	 * THIS WILL BREAK THE LINK WITH DB AND WON'T BE UPDATED AS NEW RESULTS COME IN
+	 * @return
+	 */
+	public ArrayList<T> getCopyOfList(){
+		ArrayList<T> test = new ArrayList<T>();
+		// COPY BASE INTO TEMP
+		
+		return test;
 	}
 	
 
