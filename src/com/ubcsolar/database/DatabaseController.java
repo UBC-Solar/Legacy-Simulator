@@ -14,7 +14,23 @@ import java.io.IOException;
 import java.util.*;
 
 public class DatabaseController extends ModuleController {
-
+/* NOTE from NOAH at Nov 11, 2015.
+ * Currently struggling to decide if I want to make the methods more abstract
+ * (i.e GetAll(class Unit) ) or more concrete,i.e getAllTelemDataPackets. 
+ * I think the more abstract way is better, then we could introduce more types of 
+ * data units without touching the database module. 
+ * 
+ * However, it needs to be implemented well, and doing it gets complicated. 
+ * As a compromise, I'll do them with the concrete implementations for now and get it
+ * working, and then come back and upgrade it later. 
+ * 
+ * I'm not anticipating adding many brand-new data types, at least, not so many 
+ * that manually adding in more concrete methods would be a hardship. So I'll make it work first, then 
+ * make it work well (KISS!)
+ * 
+ * I'll leave the more abstract ones commented out until we decide to implement them. 
+ */
+	
 	//Added a queue to do asynchronous writes to the permanent storage. 
 	//NOTE: Currently string, but will probably change this
 	//when I actually implement a database (could be a SQL query). 
@@ -130,6 +146,7 @@ public class DatabaseController extends ModuleController {
 		//TODO implement this
 		return null;
 	}
+	
 	
 	
 	/**
