@@ -37,7 +37,11 @@ public class CSVDatabase extends Database {
 							+ "Pck1Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
 							+ "Pck2Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
 							+ "Pck3Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg";
-	Map<Integer,DataUnit> recallStuff = new HashMap<Integer, DataUnit>();
+	
+	//Using this as a kluge until I implement actually reading from the CSV instead of just writing to it. 
+	Map<Double,TelemDataPacket> recallStuff = new HashMap<Double, TelemDataPacket>();
+	//Also a little kludgy, but lets me do the 'last X' method. (not sure how to do that in a map)
+	ArrayList<TelemDataPacket> recallStuffList = new ArrayList<TelemDataPacket>();
 	
 	/**
 	 * Constructor; Create and set up database. ALWAYS CREATES A NEW FILE. //TODO add an append method
@@ -75,6 +79,64 @@ public class CSVDatabase extends Database {
 		writingQueue = new PriorityQueue<String>();
 		this.isDBConnected = true;
 		setUpTables();
+	}
+	
+	/**
+	 * Returns a COPY of the last 'num' telemDataPacets received. 
+	 * @param num
+	 * @return
+	 */
+	public ArrayList<TelemDataPacket> getLastTelemDataPacket(int num){
+		ArrayList<TelemDataPacket> temp = new ArrayList<TelemDataPacket>(num); //might as well make it the right size. 
+		for(int i = (this.recallStuffList.size() - (num+1)); i<this.recallStuffList.size(); i++){
+			//TODO double check that initial i value calculation. Don't want an off-by-one error.
+			temp.add(this.recallStuffList.get(i));
+		}
+		return temp;
+	}
+	
+	public ArrayList<TelemDataPacket> getAllTelemDataPacketsSince(double startTime){
+		
+		int start = findPosOfFirstPktPastTime(startTime, this.recallStuffList);
+		if(start == -1){
+			return null;
+		}
+		//TODO double check that below, it creates an ArrayList of the right size right off the bat.
+		//important because we don't want it copying halfway done arrays a bunch of times. 
+		ArrayList<TelemDataPacket> toReturn = new ArrayList<TelemDataPacket>(this.recallStuffList.size() - start);
+		for(int i = start; i<this.recallStuffList.size(); i++){
+			toReturn.add(this.recallStuffList.get(i));
+		}
+		return toReturn;
+	}
+	
+	
+	/**
+	 * Assumes they're in chronological order. Returns the lowest position
+	 * where the dataUnit's creation time is later than start time. 
+	 * Returns -1 if none exist. 
+	 * @param startTime
+	 * @param toSearch
+	 * @return
+	 */
+	private int findPosOfFirstPktPastTime(double startTime, ArrayList<TelemDataPacket> toSearch){
+		//TODO change this to a better search algo (binary search?)
+		for(int i=1; i<toSearch.size()-1; i++){
+			if(toSearch.get(i).getTimeCreated()>startTime){
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	/**
+	 * Returns a COPY of a list of all telemdatapackets received
+	 * @return
+	 */
+	public ArrayList<TelemDataPacket> getAllTelemDataPacket(){
+		//TODO double check that this works.
+		ArrayList<TelemDataPacket> toReturn = new ArrayList<TelemDataPacket>(this.recallStuffList);
+		return toReturn;
 	}
 	
 	/**
@@ -154,7 +216,8 @@ public class CSVDatabase extends Database {
 	 */
 	private void store(TelemDataPacket toStore) throws IOException{
 		//"entry,Time,Speed,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,Pck0Vltg,Pck2Vltg,Pck3Vltg";
-		this.recallStuff.put(entryCounter, toStore);
+		this.recallStuff.put(toStore.getTimeCreated(), toStore);
+		this.recallStuffList.add(toStore);
 		HashMap<String, Integer> temperatures = toStore.getTemperatures();
 		HashMap<Integer, ArrayList<Float>> voltages = toStore.getCellVoltages();
 		String toPrint ="" + 

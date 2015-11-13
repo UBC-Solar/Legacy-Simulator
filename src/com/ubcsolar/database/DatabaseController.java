@@ -123,7 +123,6 @@ public class DatabaseController extends ModuleController {
 	
 
 	public void store(DataUnit toStore) throws IOException{
-		System.out.println("DATAUNIT Method USED TO STORE");
 		if(toStore.getClass() == TelemDataPacket.class){
 			this.myDatabase.store(toStore);
 		}
@@ -141,11 +140,11 @@ public class DatabaseController extends ModuleController {
 	 * Returns all current data units of type X. 
 	 *  
 	 * @return
-	 */
+	 *//*
 	public <X> ArrayList<X> getAll(){
 		//TODO implement this
 		return null;
-	}
+	}*/
 	
 	
 	
@@ -153,9 +152,14 @@ public class DatabaseController extends ModuleController {
 	 * This list may be updated a new dataunits come in, but no guarantees 
 	 * made based on time.
 	 * @return
-	 */
+	 *//*
 	public <X> ProtectedList<X> getAllUpdating(){
 		//TODO implement me. Should just be a case of building the protectedList. 
+		return null;
+	}*/
+	
+	public ArrayList<TelemDataPacket> getAllTelemDataPacket(){
+		//TODO implement me
 		return null;
 	}
 	
@@ -164,11 +168,11 @@ public class DatabaseController extends ModuleController {
 	 * returns the last num dataunits of type X, or all of them if num>size.
 	 * @param num
 	 * @return
-	 */
+	 *//*
 	public <X> ArrayList<X> getLast(int num){
 		//TODO implement me
 		return null;
-	}
+	}*/
 	
 	public ArrayList<TelemDataPacket> getLastTelemDataPacket(int num){
 		//TODO implement me
@@ -188,11 +192,11 @@ public class DatabaseController extends ModuleController {
 	 * Returns all current data units of type X received since TIME. 
 	 * @param startTime, in double format. Will return data units such that their time >= startTime
 	 * @return
-	 */
+	 *//*
 	public <X> ArrayList<X> getAllSince(Double startTime){
 		//TODO implement this
 		return null;
-	}
+	}*/
 	
 	public ArrayList<TelemDataPacket> getAllTelemDataPacketsSince(double startTime){
 		//TODO implement this
