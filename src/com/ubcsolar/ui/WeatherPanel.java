@@ -9,6 +9,7 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.notification.NewMetarReportLoadedNotification;
 import com.ubcsolar.notification.NewTafReportLoadedNotification;

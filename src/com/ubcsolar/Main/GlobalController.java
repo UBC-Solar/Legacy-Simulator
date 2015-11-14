@@ -6,8 +6,9 @@
  * Holds the references to the other controllers, so all UI requests will go through here. 
  */
 
-package com.ubcsolar.ui;
+package com.ubcsolar.Main;
 
+import java.awt.EventQueue;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -19,17 +20,17 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 
 import com.ubcsolar.car.CarController;
-import com.ubcsolar.common.DataUnit;
 import com.ubcsolar.common.Listener;
-import com.ubcsolar.common.SolarLog;
-import com.ubcsolar.common.TelemDataPacket;
-import com.ubcsolar.database.DatabaseController;
 import com.ubcsolar.common.LogType;
+import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.database.DatabaseController;
 import com.ubcsolar.map.MapController;
 import com.ubcsolar.notification.*;
 import com.ubcsolar.sim.SimController;
+import com.ubcsolar.ui.GUImain;
 import com.ubcsolar.weather.WeatherController;
 
 public class GlobalController {
@@ -52,9 +53,9 @@ public class GlobalController {
 	 * @param mainWindow - the root window for the UI
 	 * (Note: could change that order of execution to do a GlobalController first, then the GUIMain
 	 */
-	public GlobalController(GUImain mainWindow){
+	public GlobalController(){
 		iconImage = new ImageIcon("res/windowIcon.png");
-		this.mainWindow = mainWindow;
+		
 		triggerNotifyMap = new HashMap<Class<? extends Notification>, List<Listener>>();
 		//TODO: turn the 2 lists into a KVP<Class<?extends Notification>, ArrayList<Listener>> 
 		//AKA a table indexed by the notifications. Look up the notification type, send it to all
@@ -70,6 +71,7 @@ public class GlobalController {
 		mySimController = new SimController(this);
 		myWeatherController = new WeatherController(this);
 		
+		
 		try {
 			myDatabaseController = new DatabaseController(this);
 		} catch (IOException e) {
@@ -77,8 +79,29 @@ public class GlobalController {
 			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "IO Error when creating DB, check file name and location");
 			this.sendNotification(new ExceptionNotification(e, "IO Error when creating DB, check file name and location"));
 		}
+		
+		mainWindow = new GUImain(this); //See note below about starting this as a Runnable.
+		
+		//TODO start Window in it's own thread. Here's the original boilerplate code 
+		/*
+				EventQueue.invokeLater(new Runnable() {
+					public void run() {
+						try {
+							GUImain window = new GUImain(this);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});*/
 	}
 	
+/**
+ * Kluge method for the Runnable needed for the UI. 
+ * @return
+ */
+	public GlobalController getGlobalController(){
+		return this;
+	}
 	/**
 	 * Adds the listener to the registry for that notification. If a notification comes in,
 	 * it will be sent to every class that registered for it. 

@@ -5,6 +5,7 @@
  */
 package com.ubcsolar.ui;
 
+import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.DistanceUnit;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.map.*;

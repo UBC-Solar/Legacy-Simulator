@@ -9,6 +9,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import java.util.*;
+
+import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SolarLog;

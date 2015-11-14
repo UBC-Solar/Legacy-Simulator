@@ -1,9 +1,9 @@
 package com.ubcsolar.weather;
 
+import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
-import com.ubcsolar.ui.GlobalController;
 
 public class WeatherController extends ModuleController {
 

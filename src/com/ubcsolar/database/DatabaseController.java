@@ -1,15 +1,14 @@
 package com.ubcsolar.database;
 
+import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.*;
-import com.ubcsolar.common.ModuleController;
-import com.ubcsolar.common.TelemDataPacket;
 import com.ubcsolar.notification.CarUpdateNotification;
 import com.ubcsolar.notification.DatabaseCreatedOrConnectedNotification;
 import com.ubcsolar.notification.DatabaseDisconnectedOrClosed;
 import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewDataUnitNotification;
 import com.ubcsolar.notification.Notification;
-import com.ubcsolar.ui.GlobalController;
+
 import java.io.IOException;
 import java.util.*;
 

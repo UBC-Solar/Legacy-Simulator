@@ -15,11 +15,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.notification.RouteDataAsRequestedNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
-import com.ubcsolar.ui.GlobalController;
 
 public class MapController extends ModuleController{
 

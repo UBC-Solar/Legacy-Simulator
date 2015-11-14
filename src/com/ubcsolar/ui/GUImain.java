@@ -19,6 +19,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.LogType;
@@ -61,31 +62,12 @@ public class GUImain implements Listener{
 	private JFrame simFrame; //The sim module's 'advanced' options menu
 	private JPanel loadStatusPanel; //Shows the loaded status of modules at a quick glance
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Application started");
-		//TODO Should we start the controller and rest of the code in their own threads here?
-		
-		//start Window in it's own thread
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					GUImain window = new GUImain();
-					window.mainFrame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Constructor; Creates the application.
 	 */
-	public GUImain() {
-		initialize();
+	public GUImain(GlobalController parent) {
+		initialize(parent);
 	}
 	
 	/**
@@ -143,15 +125,17 @@ public class GUImain implements Listener{
 	/**
 	 * This method basically creates the entire UI. 
 	 * Creates a new mainframe, then generates and adds all sub components. 
+	 * @param parent 
 	 */
-	private void initialize() {
-		mySession = new GlobalController(this); //creates the program's Global Controller
+	private void initialize(GlobalController parent) {
+		mySession = parent; //adds parent
 		//TODO it's a little weird to be creating the controller from within the UI. Consider
 		//moving it up to the MAIN method. 
 		mainFrame = new JFrame(); //
 		//public void setBounds(int x, int y, int width, int height)
 		mainFrame.setBounds(150, 50, 1000, 600); //main window size on opening
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainFrame.setVisible(true);
 		//NOTE: Could consider not building all the windows at once in case of performance issues.
 		this.buildAllWindows(); //builds all the windows in one shot
 		JMenuBar menuBar = new JMenuBar();

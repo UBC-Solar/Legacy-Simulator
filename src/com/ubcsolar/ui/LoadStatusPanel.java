@@ -9,6 +9,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import com.jgoodies.forms.factories.FormFactory;
+import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.database.DatabaseController;
 import com.ubcsolar.notification.DatabaseCreatedOrConnectedNotification;

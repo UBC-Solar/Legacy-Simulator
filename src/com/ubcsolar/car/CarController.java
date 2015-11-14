@@ -9,13 +9,13 @@ package com.ubcsolar.car;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.ubcsolar.Main.GlobalController;
+
 //import org.jfree.util.Log;
 
 import com.ubcsolar.common.*;
-import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.database.DatabaseController;
 import com.ubcsolar.notification.*;
-import com.ubcsolar.ui.GlobalController;
 
 import jssc.SerialPortException;
 
