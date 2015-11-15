@@ -18,8 +18,21 @@ public class CSVDatabaseTest {
 	CSVDatabase toTest;
 	CSVDatabase toTestTwo;
 	
+	/*
+	 * Needs to throw an exception, currently should be IOException
+	 */
+	@Test(expected  = IOException.class)
+	public void flushAndSaveWhenDCdShouldThrowException() throws IOException{
+		try {
+			toTest.saveAndDisconnect();
+		} catch (IOException e) {fail("should not have had exception here");}
+		toTest.flushAndSave();
+	}
 	
-	
+	/*
+	 * I thought it would error because it's open by another program.
+	 * It didn't... but still should be able to overwrite an open DB
+	 */
 	@Test(expected = IOException.class)
 	public void creatingDatabaseWithOneOpenShouldThrowException() throws IOException{
 		try{
@@ -36,6 +49,10 @@ public class CSVDatabaseTest {
 		
 	}
 	
+	/*
+	 * If something accidentally says to disconnect and it's already disconnected,
+	 * it shouldn't error (or have any other effect)
+	 */
 	@Test
 	public void saveAndDisconnectTwiceShouldNotThrowException() throws IOException{
 		try {
@@ -51,6 +68,11 @@ public class CSVDatabaseTest {
 			fail("Threw exception on double disconnect. Possibly a file isue, but probably not");
 		}
 	}
+	
+	/*
+	 * Straight forward test. Given a name, it should make a
+	 * file with specified name
+	 */
 	@Test
 	public void constructorWithStringShouldMakeName() throws IOException{
 		CSVDatabase test = new CSVDatabase("hello");
@@ -59,6 +81,10 @@ public class CSVDatabaseTest {
 		
 	}
 	
+	/*
+	 * Test the 'isConnected' method, should
+	 * be true if connected, and false if not. 
+	 */
 	@Test
 	public void testIsConnected() throws IOException{
 		CSVDatabase test = new CSVDatabase();
@@ -89,6 +115,7 @@ public class CSVDatabaseTest {
 		//runs after all the tests have run
 		//used for things like closing connections to databases. 
 	}
+
 	@Before
 	public void setUp() throws IOException {
 		for(int i = 0; i<15; i++){
