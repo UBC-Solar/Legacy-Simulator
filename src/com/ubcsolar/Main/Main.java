@@ -11,7 +11,7 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Application started");
-		theProgram = new GlobalController();
+		theProgram = new GlobalController(true);
 	}
 
 }

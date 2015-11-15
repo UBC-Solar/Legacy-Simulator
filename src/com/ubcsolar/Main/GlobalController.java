@@ -53,7 +53,7 @@ public class GlobalController {
 	 * @param mainWindow - the root window for the UI
 	 * (Note: could change that order of execution to do a GlobalController first, then the GUIMain
 	 */
-	public GlobalController(){
+	public GlobalController(boolean doBuildUI){
 		iconImage = new ImageIcon("res/windowIcon.png");
 		
 		triggerNotifyMap = new HashMap<Class<? extends Notification>, List<Listener>>();		
@@ -78,7 +78,9 @@ public class GlobalController {
 			this.sendNotification(new ExceptionNotification(e, "IO Error when creating DB, check file name and location"));
 		}
 		
-		mainWindow = new GUImain(this); //See note below about starting this as a Runnable.
+		if(doBuildUI){
+			mainWindow = new GUImain(this); //See note below about starting this as a Runnable.
+		}
 		
 		//TODO start Window in it's own thread. Here's the original boilerplate code 
 		/*
