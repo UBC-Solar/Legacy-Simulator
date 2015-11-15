@@ -56,14 +56,12 @@ public class GlobalController {
 	public GlobalController(){
 		iconImage = new ImageIcon("res/windowIcon.png");
 		
-		triggerNotifyMap = new HashMap<Class<? extends Notification>, List<Listener>>();
-		//TODO: turn the 2 lists into a KVP<Class<?extends Notification>, ArrayList<Listener>> 
-		//AKA a table indexed by the notifications. Look up the notification type, send it to all
-		//listeners registered for it. 
-		
+		triggerNotifyMap = new HashMap<Class<? extends Notification>, List<Listener>>();		
 		//Currently structured as a 1:1 list; the Class in position 3 of the Listeners list
 		//is listening for the trigger in position 3 of the triggers list. 
 		//there are much more elegant and efficient ways of doing that. 
+		
+		//TODO Confirm the notification system is working and remove these
 		listOfListeners = new ArrayList<Listener>();
 		listOfTriggers = new ArrayList<Class<? extends Notification>>();
 		myMapController = new MapController(this);
