@@ -58,6 +58,7 @@ public Map<String, Object> getAllValues() {
 		return copyCellVoltages;
 	}
 	
+	@Override
 	public String toString(){
 		return Integer.toString(this.speed) + "\n"
 				+ Float.toString(this.totalVoltage) + "\n"

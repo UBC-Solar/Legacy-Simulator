@@ -289,7 +289,6 @@ public class CSVDatabaseTest {
 		}
 	}
 	
-	
 	//=================== Helper Functions ========================
 	
 	//public TelemDataPacket(int newSpeed, int newTotalVoltage,
