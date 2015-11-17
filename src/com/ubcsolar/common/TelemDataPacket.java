@@ -26,6 +26,9 @@ public Map<String, Object> getAllValues() {
 	
 
 	public TelemDataPacket(int newSpeed, int newTotalVoltage, HashMap<String,Integer> newTemperatures, HashMap<Integer,ArrayList<Float>> newCellVoltages){
+		if(newTemperatures == null || newCellVoltages == null){
+			throw new NullPointerException("Can't created a DataUnit with a null value");
+		}
 		this.timeCreated = System.currentTimeMillis();
 		this.speed = newSpeed;
 		this.totalVoltage = newTotalVoltage;

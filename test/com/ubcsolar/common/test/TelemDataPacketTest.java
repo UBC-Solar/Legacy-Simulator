@@ -67,18 +67,23 @@ public class TelemDataPacketTest {
 		
 	}
 	
-	@Test
-	public void nullConstructorShouldNotThrowExcptns(){
-		try{
+	/*
+	 * Shouldn't allow data units to be made with null values. 
+	 * If they try, should throw an exception. 
+	 * Not sure if Null Pointer Exception is the right one (Illegal Argument Exception?)
+	 */
+	@Test(expected = NullPointerException.class)
+	public void nullConstructorShouldThrowNullPointerExcptns(){
 			TelemDataPacket test = new TelemDataPacket(-1,-1,null,null);
-		}
-		catch(Exception e){
-			fail("Exception "  + e.getClass() + " thrown");
-		}
 	}
 	
+	/*
+	 *Up for debate, but I don't think we should enforce a 'no null' rule on
+	 *the actual data. What if something happens and one value comes
+	 *back null? Wouldn't want to toss the rest of the data.  
+	 */
 	@Test
-	public void constructorMapsWithNullValuesShouldNotThrowExcptns(){
+	public void constructorMapsWithNullValuesShouldNotThrowNullPointerExcptns(){
 		HashMap<String, Integer> tempWithNulls = new HashMap<String, Integer>();
 		tempWithNulls.put("null value", null);
 		tempWithNulls.put(null, 2);
@@ -97,7 +102,7 @@ public class TelemDataPacketTest {
 					new TelemDataPacket(defaultSpeed,defaultTotalVoltage,tempWithNulls, cellVoltagesWithNulls);
 		}
 		catch(Exception e){
-			fail("Exception "  + e.getClass() + " thrown");
+			fail("Threw exception: " + e.getClass());
 		}
 	}
 	
