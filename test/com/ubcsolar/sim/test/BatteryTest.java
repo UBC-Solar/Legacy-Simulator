@@ -1,4 +1,4 @@
-package com.ubcsolar.test;
+package com.ubcsolar.sim.test;
 
 import static org.junit.Assert.*;
 
