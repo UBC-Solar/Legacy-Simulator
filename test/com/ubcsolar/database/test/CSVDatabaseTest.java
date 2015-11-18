@@ -31,6 +31,11 @@ public class CSVDatabaseTest {
 			//to guarantee a new DB name
 		}
 		toTest = new CSVDatabase();
+		
+		for(int i = 0; i<15; i++){
+			//force it to take at least one ms before creating next DB
+			//to guarantee a new DB name
+		}
 	}
 
 	@After
@@ -54,6 +59,8 @@ public class CSVDatabaseTest {
 	public static void afterAllTestTearDown() throws Exception{
 		//runs after all the tests have run
 		//used for things like closing connections to databases. 
+		
+		//TODO delete the .csv's created by this round of tests. 
 	}
 
 	//===================Constructor tests ==========================
@@ -289,6 +296,65 @@ public class CSVDatabaseTest {
 		}
 	}
 	
+	//=================== getLastTelemDataPacket() tests ==========
+	
+	private void testZeroAndNegativeInputsShouldGiveSizeZeroLists(CSVDatabase toCheck){
+		assertTrue(toCheck.getLastTelemDataPacket(-1) != null);
+		assertTrue(toCheck.getLastTelemDataPacket(-1).size() == 0);
+		assertTrue(toCheck.getLastTelemDataPacket(0) != null);
+		assertTrue(toCheck.getLastTelemDataPacket(0).size() == 0);
+		assertTrue(toCheck.getLastTelemDataPacket(1) != null);
+		// we can't know what this result will be, commented out.
+		//assertTrue(toTest.getLastTelemDataPacket(0).size() == 0);
+	}
+	
+	@Test
+	public void shouldNotGetErrorIfGiveNegatives(){
+		try{
+			toTest.getLastTelemDataPacket(-1);
+		}catch(Exception e){
+			fail("Threw " + e.getClass());
+		}
+	}
+	
+	@Test
+	public void emptyDataBaseShouldGiveEmptyListNoMatterArgs(){
+		this.testZeroAndNegativeInputsShouldGiveSizeZeroLists(this.toTest);
+		ArrayList<TelemDataPacket> returnedList;
+		returnedList = this.toTest.getLastTelemDataPacket(25);
+		assertTrue(returnedList != null && returnedList.size() == 0);
+	}
+	
+	@Test
+	public void sizeOneDataBaseShouldGiveMeListSizeOneNoMatterArgs() throws IOException{
+		TelemDataPacket testingPacket = this.generateStandardTelemDataPacket();
+		this.toTest.store(testingPacket);
+		this.testZeroAndNegativeInputsShouldGiveSizeZeroLists(toTest);
+		
+		assertTrue(this.toTest.getLastTelemDataPacket(1).size() == 1);
+		assertTrue(this.toTest.getLastTelemDataPacket(1).get(0).equals(testingPacket));
+		//if asking for more, just return all
+		assertTrue(this.toTest.getLastTelemDataPacket(2).size() == 1);
+		assertTrue(this.toTest.getLastTelemDataPacket(2).get(0).equals(testingPacket));
+	}
+	
+	@Test
+	public void sizeTwoDataBaseShouldOnlyGiveWhatsAsked() throws IOException{
+		TelemDataPacket testingPacket = this.generateStandardTelemDataPacket();
+		TelemDataPacket secondTestingPacket = this.generateTerribleTelemDataPacket();
+		this.toTest.store(testingPacket);
+		this.toTest.store(secondTestingPacket);
+		this.testZeroAndNegativeInputsShouldGiveSizeZeroLists(toTest);
+		
+		assertTrue(this.toTest.getLastTelemDataPacket(1).size() == 1);
+		assertTrue(this.toTest.getLastTelemDataPacket(1).get(0).equals(secondTestingPacket));
+		
+		assertTrue(this.toTest.getLastTelemDataPacket(2).size() == 2);
+		assertTrue(this.toTest.getLastTelemDataPacket(2).get(0).equals(secondTestingPacket));
+		assertTrue(this.toTest.getLastTelemDataPacket(2).get(1).equals(testingPacket));
+	}
+	
+	
 	//=================== Helper Functions ========================
 	
 	//public TelemDataPacket(int newSpeed, int newTotalVoltage,
@@ -325,7 +391,7 @@ public class CSVDatabaseTest {
 	private TelemDataPacket generateTerribleTelemDataPacket(){
 		int speed = -1;
 		int totalVoltage = -2;
-		return new TelemDataPacket(speed, totalVoltage, null, null);
+		return new NullTelemDataPacket(speed, totalVoltage, new HashMap<String, Integer>(), new HashMap<Integer, ArrayList<Float>>());
 	}
 	
 	private TelemDataPacket generateEmptyMapsTelemDataPacket(){
