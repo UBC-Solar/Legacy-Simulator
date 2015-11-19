@@ -296,7 +296,7 @@ public class CSVDatabaseTest {
 		}
 	}
 	
-	//=================== getLastTelemDataPacket() tests ==========
+	//================ getLastTelemDataPacket() tests ===============
 	
 	private void testZeroAndNegativeInputsShouldGiveSizeZeroLists(CSVDatabase toCheck){
 		assertTrue(toCheck.getLastTelemDataPacket(-1) != null);
@@ -354,6 +354,156 @@ public class CSVDatabaseTest {
 		assertTrue(this.toTest.getLastTelemDataPacket(2).get(1).equals(testingPacket));
 	}
 	
+	/*
+	 * Because of their time, the DB should be able to sort them, at the very 
+	 * least when they're returned to the program. 
+	 * Not sure what the database looks like though.
+	 */
+	@Test
+	public void packetsStoredOutOfOrderShouldReturnInOrder() throws IOException{
+		ArrayList<TelemDataPacket> packets = new ArrayList<TelemDataPacket>();
+		for(int i = 0; i<2; i++){
+			packets.add(this.generateStandardTelemDataPacket());
+		}
+		for(int i = 0; i<2; i++){
+			packets.add(this.generateTerribleTelemDataPacket());
+		}
+		for(int i = 0; i<2; i++){
+			packets.add(this.generateEmptyMapsTelemDataPacket());
+		}
+		
+		this.toTest.store(packets.get(3));
+		this.toTest.store(packets.get(0));
+		this.toTest.store(packets.get(5));
+		this.testZeroAndNegativeInputsShouldGiveSizeZeroLists(toTest);
+		
+		ArrayList<TelemDataPacket> returned = toTest.getLastTelemDataPacket(3);
+		
+		assertTrue(returned.size() == 3);
+		assertTrue(returned.get(0).equals(packets.get(0)));
+		assertTrue(returned.get(1).equals(packets.get(3)));
+		assertTrue(returned.get(2).equals(packets.get(5)));
+		
+		
+	}
+	
+	//========= getAllTelemDataPacketsSince(Double) tests===========
+	
+	
+	private void testFutureTimeShouldGiveSizeZeroLists(CSVDatabase toCheck){
+		double futureTime = System.currentTimeMillis() + 1000;
+		assertTrue(toCheck.getAllTelemDataPacketsSince(futureTime) != null);
+		assertTrue(toCheck.getAllTelemDataPacketsSince(futureTime).size() == 0);
+	}
+
+	
+	/*
+	 * Not sure exactly what I should do for illegal values.
+	 *
+	 */ //TODO check simpleDateFormat for examples on what to do if given
+	//an invalid double instead of time. 
+	@Test(expected  = IllegalArgumentException.class)
+	public void negativeValuesShouldThrowException(){
+		toTest.getAllTelemDataPacketsSince(-1);
+	}
+	
+	@Test
+	public void emptyDBShouldGiveNothing(){
+		this.testFutureTimeShouldGiveSizeZeroLists(toTest);
+		assertTrue(
+				this.toTest.getAllTelemDataPacketsSince(System.currentTimeMillis()).size() == 0);
+	}
+	
+	@Test
+	public void dbSizeOneShouldGiveListSizeOne() throws IOException{
+		double startTime = System.currentTimeMillis();
+		TelemDataPacket test = this.generateStandardTelemDataPacket();
+		toTest.store(test);
+		this.testFutureTimeShouldGiveSizeZeroLists(toTest);
+		ArrayList<TelemDataPacket> theList = toTest.getAllTelemDataPacketsSince(startTime);
+		assertTrue(theList.size() == 1);
+		assertTrue(theList.get(0).equals(test));
+	}
+	
+	@Test
+	public void dbSizeTwoShouldGiveOnlyWhatIsSpecified() throws IOException{
+		TelemDataPacket testOne = this.generateStandardTelemDataPacket();
+		TelemDataPacket testTwo = this.generateTerribleTelemDataPacket();
+		TelemDataPacket testThree = this.generateEmptyMapsTelemDataPacket();
+		toTest.store(testOne);
+		toTest.store(testTwo);
+		toTest.store(testThree);
+		this.testFutureTimeShouldGiveSizeZeroLists(toTest);
+		ArrayList<TelemDataPacket> theList = toTest.getAllTelemDataPacketsSince(testThree.getTimeCreated()-10);
+		assertTrue(theList.size() == 1);
+		assertTrue(theList.get(0).equals(testThree));
+		
+		theList = toTest.getAllTelemDataPacketsSince(testTwo.getTimeCreated()-10);
+		assertTrue(theList.size() == 2);
+		assertTrue(theList.get(0).equals(testTwo));
+		assertTrue(theList.get(1).equals(testThree));
+		
+		theList = toTest.getAllTelemDataPacketsSince(testOne.getTimeCreated()-10);
+		assertTrue(theList.size() == 3);
+		assertTrue(theList.get(0).equals(testOne));
+		assertTrue(theList.get(1).equals(testTwo));
+		assertTrue(theList.get(2).equals(testThree));
+	}
+	
+	@Test
+	public void storingOutOfOrderShouldComeBackInOrder() throws IOException{
+		TelemDataPacket testOne = this.generateStandardTelemDataPacket();
+		TelemDataPacket testTwo = this.generateTerribleTelemDataPacket();
+		TelemDataPacket testThree = this.generateEmptyMapsTelemDataPacket();
+		toTest.store(testTwo);
+		toTest.store(testThree);
+		toTest.store(testOne);
+		
+		this.testFutureTimeShouldGiveSizeZeroLists(toTest);
+		ArrayList<TelemDataPacket> theList = toTest.getAllTelemDataPacketsSince(testThree.getTimeCreated()-10);
+		assertTrue(theList.size() == 1);
+		assertTrue(theList.get(0).equals(testThree));
+		
+		theList = toTest.getAllTelemDataPacketsSince(testTwo.getTimeCreated()-10);
+		assertTrue(theList.size() == 2);
+		assertTrue(theList.get(0).equals(testTwo));
+		assertTrue(theList.get(1).equals(testThree));
+		
+		theList = toTest.getAllTelemDataPacketsSince(testOne.getTimeCreated()-10);
+		assertTrue(theList.size() == 3);
+		assertTrue(theList.get(0).equals(testOne));
+		assertTrue(theList.get(1).equals(testTwo));
+		assertTrue(theList.get(2).equals(testThree));
+	}
+	
+	//==================getAllTelemDataPacket()====================
+	
+	@Test
+	public void emptyDBShouldGiveEmptyList(){
+		assertTrue(toTest.getAllTelemDataPacket() != null);
+		assertTrue(toTest.getAllTelemDataPacket().size() == 0);
+	}
+	
+	@Test
+	public void dbWithOneShouldGIveListSizeOne() throws IOException{
+		TelemDataPacket testPacket = this.generateStandardTelemDataPacket();
+		toTest.store(testPacket);
+		assertTrue(toTest.getAllTelemDataPacket() != null);
+		assertTrue(toTest.getAllTelemDataPacket().size() == 1);
+		assertTrue(toTest.getAllTelemDataPacket().get(0).equals(testPacket));
+	}
+	
+	@Test
+	public void dbWithLotsShouldGiveBigList() throws IOException{
+		int number = 1000;
+		for(int i= 0; i<number; i++){
+			toTest.store(this.generateStandardTelemDataPacket());
+		}
+		
+		assertTrue(toTest.getAllTelemDataPacket().size() == number);
+		
+		
+	}
 	
 	//=================== Helper Functions ========================
 	
@@ -391,6 +541,7 @@ public class CSVDatabaseTest {
 	private TelemDataPacket generateTerribleTelemDataPacket(){
 		int speed = -1;
 		int totalVoltage = -2;
+		//NullTelemDataPacket will store the empty maps as 'null's
 		return new NullTelemDataPacket(speed, totalVoltage, new HashMap<String, Integer>(), new HashMap<Integer, ArrayList<Float>>());
 	}
 	
