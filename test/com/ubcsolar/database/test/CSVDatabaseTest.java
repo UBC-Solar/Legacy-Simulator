@@ -26,13 +26,13 @@ public class CSVDatabaseTest {
 
 	@Before
 	public void setUp() throws IOException {
-		for(int i = 0; i<15; i++){
+		for(int i = 0; i<1000; i++){
 			//force it to take at least one ms before creating next DB
 			//to guarantee a new DB name
 		}
 		toTest = new CSVDatabase();
 		
-		for(int i = 0; i<15; i++){
+		for(int i = 0; i<1000; i++){
 			//force it to take at least one ms before creating next DB
 			//to guarantee a new DB name
 		}
@@ -129,6 +129,12 @@ public class CSVDatabaseTest {
 		this.toTest = new CSVDatabase("");
 	}
 	
+	/*
+	 * If pasing a null value, the user/program is not expecting a 
+	 * 'null.csv' file to be made. 
+	 * 
+	 * If you actually want a database named that, pass in "null". 
+	 */
 	@Test
 	public void nullNameShouldThrowException() throws IOException{
 		try{
@@ -162,7 +168,10 @@ public class CSVDatabaseTest {
 		
 	}
 
-	
+	/*
+	 * It won't be able to make th file and needs to tell the system that; 
+	 * it won't be able to proceed. 
+	 */
 	@Test(expected = IOException.class)
 	public void creatingDBWithInvalidNameShouldThrowException() throws IOException{
 		try{
@@ -246,6 +255,10 @@ public class CSVDatabaseTest {
 	
 	//==================== store() tests ==========================
 	
+	/*
+	 * the basic vanilla test. If this fails; check file write permission settings
+	 * on the Output folder. 
+	 */
 	@Test
 	public void storeShouldNotThrowException(){
 		try {
@@ -255,6 +268,9 @@ public class CSVDatabaseTest {
 		}
 	}
 	
+	/*
+	 * Should take as wide a range as possible without complaining. 
+	 */
 	@Test
 	public void storingNullShouldNotThrowException(){
 		try {
@@ -298,6 +314,13 @@ public class CSVDatabaseTest {
 	
 	//================ getLastTelemDataPacket() tests ===============
 	
+	/*
+	 * Should check this with an empty DB and a db of different sizes. 
+	 * Want to support as wide range of values as possible.
+	 * 
+	 *  Not set up as a unique test because every test in this section should
+	 *  call it after they load in their test data.  
+	 */
 	private void testZeroAndNegativeInputsShouldGiveSizeZeroLists(CSVDatabase toCheck){
 		assertTrue(toCheck.getLastTelemDataPacket(-1) != null);
 		assertTrue(toCheck.getLastTelemDataPacket(-1).size() == 0);
@@ -308,6 +331,9 @@ public class CSVDatabaseTest {
 		//assertTrue(toTest.getLastTelemDataPacket(0).size() == 0);
 	}
 	
+	/*
+	 * If it asks for -1 values, just give back an empty list. No need to crash the program.
+	 */
 	@Test
 	public void shouldNotGetErrorIfGiveNegatives(){
 		try{
@@ -317,6 +343,9 @@ public class CSVDatabaseTest {
 		}
 	}
 	
+	/*
+	 * if Database is empty, should not return any data.  
+	 */
 	@Test
 	public void emptyDataBaseShouldGiveEmptyListNoMatterArgs(){
 		this.testZeroAndNegativeInputsShouldGiveSizeZeroLists(this.toTest);
@@ -325,6 +354,11 @@ public class CSVDatabaseTest {
 		assertTrue(returnedList != null && returnedList.size() == 0);
 	}
 	
+	/*
+	 * If this list has one thing, it should return it if 
+	 * it's asked for x things, if x>=1, and empty lists is x<=0. Should
+	 * definitely not error.  
+	 */
 	@Test
 	public void sizeOneDataBaseShouldGiveMeListSizeOneNoMatterArgs() throws IOException{
 		TelemDataPacket testingPacket = this.generateStandardTelemDataPacket();
@@ -338,6 +372,12 @@ public class CSVDatabaseTest {
 		assertTrue(this.toTest.getLastTelemDataPacket(2).get(0).equals(testingPacket));
 	}
 	
+	/*
+	 * First non-trivial test. If amount of data is 2, should give 
+	 * the right number according to the argument 
+	 * (Empty list if x<=0, one if x = 1, two if x>=2). 
+	 * Should not throw errors for negative or overlarge inputs. 
+	 */
 	@Test
 	public void sizeTwoDataBaseShouldOnlyGiveWhatsAsked() throws IOException{
 		TelemDataPacket testingPacket = this.generateStandardTelemDataPacket();
@@ -352,12 +392,17 @@ public class CSVDatabaseTest {
 		assertTrue(this.toTest.getLastTelemDataPacket(2).size() == 2);
 		assertTrue(this.toTest.getLastTelemDataPacket(2).get(0).equals(secondTestingPacket));
 		assertTrue(this.toTest.getLastTelemDataPacket(2).get(1).equals(testingPacket));
+		
+		assertTrue(this.toTest.getLastTelemDataPacket(3).size() == 2);
+		assertTrue(this.toTest.getLastTelemDataPacket(3).get(0).equals(secondTestingPacket));
+		assertTrue(this.toTest.getLastTelemDataPacket(3).get(1).equals(testingPacket));
 	}
 	
 	/*
 	 * Because of their time, the DB should be able to sort them, at the very 
 	 * least when they're returned to the program. 
-	 * Not sure what the database looks like though.
+	 * Not sure what the database looks like though (could be stored out of order
+	 * and just the result is sorted)
 	 */
 	@Test
 	public void packetsStoredOutOfOrderShouldReturnInOrder() throws IOException{
@@ -387,9 +432,31 @@ public class CSVDatabaseTest {
 		
 	}
 	
+	/*
+	 * Should not throw exceptions storing and returning telemDataPackets
+	 * that have nulls or are weird.
+	 * 
+	 */ //TODO: consider having DB just silently drop null telem packets. 
+	//We'd be losing data, but they're improper anyway? 
+	@Test
+	public void retrievingBadInputsWithGetLastShouldNotThrowException() throws IOException{
+		ArrayList<TelemDataPacket> testPkts = this.loadGoodBadEmptyTelemPackets();
+		testZeroAndNegativeInputsShouldGiveSizeZeroLists(toTest);
+		
+		try{
+			ArrayList<TelemDataPacket> returned = toTest.getLastTelemDataPacket(3);
+		}catch(Exception e){
+			fail("threw exception pulling out weird-value telemPackets");
+		}
+	}
+	
 	//========= getAllTelemDataPacketsSince(Double) tests===========
 	
-	
+	/*
+	 * Should never throw an error if given a time that's in the future. 
+	 * This method is called by every other test in this section to ensure
+	 * Compliance with any sort of inputs/stored data
+	 */
 	private void testFutureTimeShouldGiveSizeZeroLists(CSVDatabase toCheck){
 		double futureTime = System.currentTimeMillis() + 1000;
 		assertTrue(toCheck.getAllTelemDataPacketsSince(futureTime) != null);
@@ -476,6 +543,19 @@ public class CSVDatabaseTest {
 		assertTrue(theList.get(2).equals(testThree));
 	}
 	
+	@Test
+	public void retrievingBadInputsWithGetSinceShouldNotThrowException() throws IOException{
+		double startTime = System.currentTimeMillis();
+		ArrayList<TelemDataPacket> testPkts = this.loadGoodBadEmptyTelemPackets();
+		testZeroAndNegativeInputsShouldGiveSizeZeroLists(toTest);
+		
+		try{
+			ArrayList<TelemDataPacket> returned = toTest.getAllTelemDataPacketsSince(startTime);
+		}catch(Exception e){
+			fail("threw exception pulling out weird-value telemPackets");
+		}
+	}
+	
 	//==================getAllTelemDataPacket()====================
 	
 	@Test
@@ -505,7 +585,24 @@ public class CSVDatabaseTest {
 		
 	}
 	
+	//=================== get(double) tests =======================
+	
+	//TODO write these. 
+	
 	//=================== Helper Functions ========================
+	
+	private ArrayList<TelemDataPacket> loadGoodBadEmptyTelemPackets() throws IOException{
+		ArrayList<TelemDataPacket> toReturn = new ArrayList<TelemDataPacket>();
+		toReturn.add(this.generateStandardTelemDataPacket());
+		toReturn.add(this.generateTerribleTelemDataPacket());
+		toReturn.add(this.generateEmptyMapsTelemDataPacket());
+		
+		for(TelemDataPacket t : toReturn){
+			toTest.store(t);
+		}
+		
+		return toReturn;		
+	}
 	
 	//public TelemDataPacket(int newSpeed, int newTotalVoltage,
 	//HashMap<String,Integer> newTemperatures, HashMap<Integer,ArrayList<Float>> newCellVoltages){
@@ -552,7 +649,19 @@ public class CSVDatabaseTest {
 		HashMap<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
 		return new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages);
 	}
-
+	
+	@Test
+	public void retrievingBadInputsWithGetAllShouldNotThrowException() throws IOException{
+		double startTime = System.currentTimeMillis();
+		ArrayList<TelemDataPacket> testPkts = this.loadGoodBadEmptyTelemPackets();
+		testZeroAndNegativeInputsShouldGiveSizeZeroLists(toTest);
+		
+		try{
+			ArrayList<TelemDataPacket> returned = toTest.getAllTelemDataPacket();
+		}catch(Exception e){
+			fail("threw exception pulling out weird-value telemPackets");
+		}
+	}
 
 
 	
