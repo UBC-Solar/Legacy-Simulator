@@ -255,16 +255,19 @@ public class CSVDatabase extends Database {
 		}
 	}
 
+	private TelemDataPacket getTelemDataPacket(double key) {
+		return this.recallStuff.get(key);
+	}
+
 	@Override
-	public DataUnit get(String key) {
-		int intKey;
-		//try{
-			intKey = Integer.parseInt(key);
-		//catch(Cast exception e){
-			//throw illigal arument exception
-			//}
-			//TODO handle nulls. 
-		return this.recallStuff.get(intKey);
+	public TelemDataPacket getTelemDataPacket(String key) {
+		double doubleKey;
+		try{
+			doubleKey = Double.parseDouble(key);
+		}catch(Exception e){
+			return null;
+		}
+		return this.getTelemDataPacket(doubleKey);
 	}
 
 }

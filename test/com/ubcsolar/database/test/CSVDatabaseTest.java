@@ -26,13 +26,13 @@ public class CSVDatabaseTest {
 
 	@Before
 	public void setUp() throws IOException {
-		for(int i = 0; i<1000; i++){
+		for(int i = 0; i<10000; i++){
 			//force it to take at least one ms before creating next DB
 			//to guarantee a new DB name
 		}
 		toTest = new CSVDatabase();
 		
-		for(int i = 0; i<1000; i++){
+		for(int i = 0; i<10000; i++){
 			//force it to take at least one ms before creating next DB
 			//to guarantee a new DB name
 		}
@@ -587,7 +587,31 @@ public class CSVDatabaseTest {
 	
 	//=================== get(double) tests =======================
 	
-	//TODO write these. 
+	@Test
+	public void givingCreatedTimeShouldGetBackProperPacket() throws IOException{
+		TelemDataPacket toStore = this.generateStandardTelemDataPacket();
+		toTest.store(toStore);
+		TelemDataPacket gotBack = (TelemDataPacket) toTest.getTelemDataPacket("" + toStore.getTimeCreated());
+		assertTrue(gotBack.equals(toStore));
+	}
+	
+	@Test
+	public void givingNonexistentKeyShouldReturnNull(){
+		assertTrue(toTest.getTelemDataPacket("" + System.currentTimeMillis()) == null);
+	}
+	
+	@Test
+	public void givingEmptyKeyShouldReturnNull(){
+		assertTrue(toTest.getTelemDataPacket("") == null);
+	}
+	@Test
+	public void givingBadlyFormattedKeyShouldReturnNull(){
+		try{
+		assertTrue(toTest.getTelemDataPacket("4dfNotADouble") == null);
+		}catch(NumberFormatException e){
+			fail("Threw a casting exception");
+		}
+	}
 	
 	//=================== Helper Functions ========================
 	

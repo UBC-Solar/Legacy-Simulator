@@ -45,6 +45,9 @@ public abstract class Database {
 	 * @param Item's unique key
 	 * @return the DataUnit belonging to the key. 
 	 */
+	/*
 	abstract public DataUnit get(String key);
+*/
+	abstract public TelemDataPacket getTelemDataPacket(String key);
 	
 }
