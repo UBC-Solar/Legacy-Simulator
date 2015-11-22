@@ -19,6 +19,14 @@ import com.ubcsolar.database.CSVDatabase;
 
 public class CSVDatabaseTest {
 	
+	//NOTE: TESTS MAY NOT BE ACCURATE AS LONG AS TELEMDATAPACKET's .equals() 
+	//IS THE DEFAULT Object's .equals(). (if it loads the write values into a 
+	//file, and then creates one with identical values loaded from that file,
+	//they'll be different objects in Java's eyes. Need to update the .equal's to check
+	//values instead of pointers. 
+	
+	//Also, the NULL telemdatapackets might fail if they get loaded back with empty maps instead 
+	//of null. Will have to update the tests when that happens. 
 	CSVDatabase toTest;
 	CSVDatabase toTestTwo;
 	//======================SETTING UP THE TESTS=========================
@@ -59,8 +67,6 @@ public class CSVDatabaseTest {
 	public static void afterAllTestTearDown() throws Exception{
 		//runs after all the tests have run
 		//used for things like closing connections to databases. 
-		
-		//TODO delete the .csv's created by this round of tests. 
 	}
 
 	//===================Constructor tests ==========================
@@ -466,14 +472,22 @@ public class CSVDatabaseTest {
 	
 	/*
 	 * Not sure exactly what I should do for illegal values.
-	 *
-	 */ //TODO check simpleDateFormat for examples on what to do if given
-	//an invalid double instead of time. 
-	@Test(expected  = IllegalArgumentException.class)
-	public void negativeValuesShouldThrowException(){
+	 * Following Date's practices on exceptions. Negative values
+	 * are just dates before Jan 1 1970. 
+	 */
+	@Test
+	public void negativeValuesShouldNotThrowException(){
+		try{
 		toTest.getAllTelemDataPacketsSince(-1);
+		}
+		catch(Exception e){
+			fail("threw an exception");
+		}
 	}
 	
+	/*
+	 * If it has nothing, it shouldn't return any values. 
+	 */
 	@Test
 	public void emptyDBShouldGiveNothing(){
 		this.testFutureTimeShouldGiveSizeZeroLists(toTest);
@@ -481,6 +495,9 @@ public class CSVDatabaseTest {
 				this.toTest.getAllTelemDataPacketsSince(System.currentTimeMillis()).size() == 0);
 	}
 	
+	/*
+	 * If it only has one value, it should return it when asked. 
+	 */
 	@Test
 	public void dbSizeOneShouldGiveListSizeOne() throws IOException{
 		double startTime = System.currentTimeMillis();
@@ -490,8 +507,14 @@ public class CSVDatabaseTest {
 		ArrayList<TelemDataPacket> theList = toTest.getAllTelemDataPacketsSince(startTime);
 		assertTrue(theList.size() == 1);
 		assertTrue(theList.get(0).equals(test));
+		
+		ArrayList<TelemDataPacket> theOtherList = toTest.getAllTelemDataPacketsSince(System.currentTimeMillis());
+		assertTrue(theOtherList.size() == 0);
 	}
 	
+	/*
+	 * Should only return values created later than the specified time. 
+	 */
 	@Test
 	public void dbSizeTwoShouldGiveOnlyWhatIsSpecified() throws IOException{
 		TelemDataPacket testOne = this.generateStandardTelemDataPacket();
@@ -517,6 +540,12 @@ public class CSVDatabaseTest {
 		assertTrue(theList.get(2).equals(testThree));
 	}
 	
+	/*
+	 * The DB should return the as sorted, and shouldn't miss any 
+	 * if they were stored out-of-order. 
+	 * Doesn't really matter if the DB stores them in order or not, or if it just 
+	 * sorts on return. (But probably should sort on 'store'). 
+	 */
 	@Test
 	public void storingOutOfOrderShouldComeBackInOrder() throws IOException{
 		TelemDataPacket testOne = this.generateStandardTelemDataPacket();
@@ -542,7 +571,11 @@ public class CSVDatabaseTest {
 		assertTrue(theList.get(1).equals(testTwo));
 		assertTrue(theList.get(2).equals(testThree));
 	}
-	
+	/*
+	 * It shouldn't throw an exception (should be able to handle nulls)
+	 * but it would be ok if they weren't quite the same on return 
+	 * (i.e the one's with null values should return as just empty lists). 
+	 */
 	@Test
 	public void retrievingBadInputsWithGetSinceShouldNotThrowException() throws IOException{
 		double startTime = System.currentTimeMillis();
@@ -556,14 +589,21 @@ public class CSVDatabaseTest {
 		}
 	}
 	
-	//==================getAllTelemDataPacket()====================
+	//================== getAllTelemDataPacket() tests ====================
 	
+	/*
+	 * Straight forward. If nothing saved, don't return anything. 
+	 */
 	@Test
 	public void emptyDBShouldGiveEmptyList(){
 		assertTrue(toTest.getAllTelemDataPacket() != null);
 		assertTrue(toTest.getAllTelemDataPacket().size() == 0);
 	}
 	
+	/*
+	 * If there has been one item stored, 'get all' should return a list
+	 * of size one. 
+	 */
 	@Test
 	public void dbWithOneShouldGIveListSizeOne() throws IOException{
 		TelemDataPacket testPacket = this.generateStandardTelemDataPacket();
@@ -573,6 +613,9 @@ public class CSVDatabaseTest {
 		assertTrue(toTest.getAllTelemDataPacket().get(0).equals(testPacket));
 	}
 	
+	/*
+	 * More of a stress test; didn't bog down the system like I thought it would. 
+	 */
 	@Test
 	public void dbWithLotsShouldGiveBigList() throws IOException{
 		int number = 1000;
@@ -583,6 +626,51 @@ public class CSVDatabaseTest {
 		assertTrue(toTest.getAllTelemDataPacket().size() == number);
 		
 		
+	}
+	
+	/*
+	 * Shouldn't throw any exceptions (should handle nulls), but
+	 * the null ones may not be exactly the same (empty maps instead of nulls on return). 
+	 */
+	@Test
+	public void retrievingBadInputsWithGetAllShouldNotThrowException() throws IOException{
+		double startTime = System.currentTimeMillis();
+		ArrayList<TelemDataPacket> testPkts = this.loadGoodBadEmptyTelemPackets();
+		testZeroAndNegativeInputsShouldGiveSizeZeroLists(toTest);
+		
+		try{
+			ArrayList<TelemDataPacket> returned = toTest.getAllTelemDataPacket();
+		}catch(Exception e){
+			fail("threw exception pulling out weird-value telemPackets");
+		}
+	}
+	
+	
+	/*
+	 * If stored out of order, should be returned in order and without missing any. 
+	 */
+	@Test
+	public void outOfOrderItemsShouldBeReturnedInOrder() throws IOException{
+		ArrayList<TelemDataPacket> testValues = new ArrayList<TelemDataPacket>();
+		testValues.add(this.generateStandardTelemDataPacket());
+		testValues.add(this.generateStandardTelemDataPacket());
+		testValues.add(this.generateEmptyMapsTelemDataPacket());
+		testValues.add(this.generateEmptyMapsTelemDataPacket());
+		testValues.add(this.generateTerribleTelemDataPacket());
+		testValues.add(this.generateTerribleTelemDataPacket());
+		
+		toTest.store(testValues.get(4));
+		toTest.store(testValues.get(2));
+		toTest.store(testValues.get(3));
+		toTest.store(testValues.get(1));
+		
+		
+		ArrayList<TelemDataPacket> returnedValues = toTest.getAllTelemDataPacket();
+		assertTrue(returnedValues.size() == 4);
+		assertTrue(returnedValues.get(0).equals(testValues.get(1)));
+		assertTrue(returnedValues.get(1).equals(testValues.get(2)));
+		assertTrue(returnedValues.get(2).equals(testValues.get(3)));
+		assertTrue(returnedValues.get(3).equals(testValues.get(4)));
 	}
 	
 	//=================== get(double) tests =======================
@@ -674,18 +762,8 @@ public class CSVDatabaseTest {
 		return new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages);
 	}
 	
-	@Test
-	public void retrievingBadInputsWithGetAllShouldNotThrowException() throws IOException{
-		double startTime = System.currentTimeMillis();
-		ArrayList<TelemDataPacket> testPkts = this.loadGoodBadEmptyTelemPackets();
-		testZeroAndNegativeInputsShouldGiveSizeZeroLists(toTest);
-		
-		try{
-			ArrayList<TelemDataPacket> returned = toTest.getAllTelemDataPacket();
-		}catch(Exception e){
-			fail("threw exception pulling out weird-value telemPackets");
-		}
-	}
+	
+	
 
 
 	
