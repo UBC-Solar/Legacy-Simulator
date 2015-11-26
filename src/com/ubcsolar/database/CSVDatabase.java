@@ -61,6 +61,9 @@ public class CSVDatabase extends Database {
 		super();
 		setup(""+System.currentTimeMillis()); //Guaranteed to be a unique filename. (unless you're making more than 1 per ms
 											//in which case you have other problems to worry about)
+		
+		//TODO change this to System.nanoSeconds(); DBs are being overwritten in the tests,
+		//and we will be updating it to throw an exception so it needs to handle it. 
 	}
 	
 	/**
