@@ -16,19 +16,48 @@ public Map<String, Object> getAllValues() {
 	
 	return allValues;
 }
-
-	private double timeCreated;
-	private int speed;
-	private int totalVoltage; //used to guesstimate state of charge
+	//TODO override toHash to make it consistent with .equals();
+	private final double timeCreated;
+	private final int speed;
+	private final int totalVoltage; //used to guesstimate state of charge
 	//TODO make these abstract
-	private HashMap<String,Integer> temperatures;
-	private HashMap<Integer,ArrayList<Float>> cellVoltages;
+	private final HashMap<String,Integer> temperatures;
+	private final HashMap<Integer,ArrayList<Float>> cellVoltages;
 	
-
+	/**
+	 * This constructor used if packet was received at an earlier time and needs to be specified.
+	 * I.e pulled out of a database. 
+	 */
+	public TelemDataPacket(int newSpeed, int newTotalVoltage, HashMap<String,Integer> newTemperatures, HashMap<Integer,ArrayList<Float>> newCellVoltages, double timeCreated){
+		if(newTemperatures == null || newCellVoltages == null){
+			throw new NullPointerException("Can't created a DataUnit with a null value");
+		}
+		this.timeCreated = timeCreated;
+		this.speed = newSpeed;
+		this.totalVoltage = newTotalVoltage;
+		this.temperatures = newTemperatures;
+		this.cellVoltages = newCellVoltages;
+	}
+	
+	/**
+	 * 
+	 * @param newSpeed speed of the car
+	 * @param newTotalVoltage total voltage of the car
+	 * @param newTemperatures map of temperatures of the car
+	 * @param newCellVoltages a map of cell voltages.
+	 */
 	public TelemDataPacket(int newSpeed, int newTotalVoltage, HashMap<String,Integer> newTemperatures, HashMap<Integer,ArrayList<Float>> newCellVoltages){
 		if(newTemperatures == null || newCellVoltages == null){
 			throw new NullPointerException("Can't created a DataUnit with a null value");
 		}
+		
+		for(int i=0; i<1000; i++){ //to force a new time
+			for(int j = 0; j<100; j++){
+				i--;
+				i++;
+			}
+		}
+		//TODO turn this into System.nanoTime(), more accurate. 
 		this.timeCreated = System.currentTimeMillis();
 		this.speed = newSpeed;
 		this.totalVoltage = newTotalVoltage;
@@ -68,6 +97,99 @@ public Map<String, Object> getAllValues() {
 				+ this.temperatures.toString() + "\n"
 				+ this.cellVoltages.toString() + "\n";
 	
-}
+	}
+	
+	@Override
+	public boolean equals(Object toCheckAgainst){
+		if(super.equals(toCheckAgainst)){
+			return true; //shortcut: if they're the same object, they
+						//must be equal
+		}
+		
+		if(toCheckAgainst.getClass() != TelemDataPacket.class){
+			return false; 
+		}
+		TelemDataPacket toCompare; 
+		try{
+		toCompare = (TelemDataPacket) toCheckAgainst;
+		}
+		catch(Exception e){//casting exception??
+			return false; //if it fails at casting, obviously not a TelemDataPacket and therefore not equal. 
+		}
+		
+		if(toCompare == null){
+			return false; //could not cast. 
+		}
+		
+		if(Math.abs((toCompare.timeCreated - this.timeCreated))>0.000000000000001){
+			return false; //timeCreated not the same. 
+		}
+		
+		if(toCompare.speed != this.speed){
+			return false; 
+		}
+		
+		if(toCompare.totalVoltage != this.totalVoltage){
+			return false;
+		}
+		
+		//TODO ensure that hashMap has an implementation of Equals and 
+		//it's not just pointer-checking. 
+		if(!toCompare.cellVoltages.equals(this.cellVoltages)){
+			return false;
+		}
+		
+		if(!toCompare.temperatures.equals(this.temperatures)){
+			return false;
+		}
+		
+		/* if the hash codes don't work like I think they do, then can uncomment these. 
+		 * (I was assuming it would generate a unique hash based on the keys and values so we can compare.)
+		 * Javadoc was unavailable for me at this time to check .
+		if(toCompare.cellVoltages.size() != this.cellVoltages.size()){
+			return false;
+		}
+		
+		if(toCompare.temperatures.size() != this.temperatures.size()){
+			return false;
+		}
+		*/
+		
+		
+		/*
+		 * If the hashmap's equals only checks pointers (see above todo; don't have access to javadoc right now)
+		 * the you can uncomment the methods below to compare values. 
+		 */
+		/*
+		for(int i : this.cellVoltages.keySet()){
+			if(!toCompare.cellVoltages.containsKey(i)){
+				return false; 
+			}
+			if(this.cellVoltages.get(i).size() != toCompare.cellVoltages.get(i).size()){
+				return false;
+			}
+			for(int j = 0; j<this.cellVoltages.size(); j++){
+				if(Math.abs(this.cellVoltages.get(i).get(j) - toCompare.cellVoltages.get(i).get(j))>0.000000001){
+					return false;
+				}
+			}
+		}
+		
+		for(String i : this.temperatures.keySet()){
+			if(!toCompare.temperatures.containsKey(i)){
+				return false; 
+			}
+			if(this.temperatures.get(i) != toCompare.temperatures.get(i)){
+				return false;
+			}
+		}
+		
+		
+		*/
+		
+		
+		return true; //Got here after all the checks, must be the same. 
+		
+	}
 
 	}

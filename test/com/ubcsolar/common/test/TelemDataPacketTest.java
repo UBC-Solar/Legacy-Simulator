@@ -164,9 +164,126 @@ public class TelemDataPacketTest {
 		assertFalse(test.getCellVoltages().get(1) == null);
 	}
 	
+//================== equals() tests =======================
+	
+	@Test
+	public void identicalPacketShouldBeEqual(){
+		TelemDataPacket toTest = this.makeDefaultTelemDataPacket();
+		
+		assertTrue(toTest.equals(toTest));
+	}
+	
+	@Test
+	public void differentTimesShouldNotBeEqual(){
+		TelemDataPacket toTestOne = this.makeDefaultTelemDataPacket();
+		TelemDataPacket toTestTwo = this.makeTelemPacketWithTime(System.currentTimeMillis()+10);
+		assertFalse(toTestOne.equals(toTestTwo));
+		
+	}
+	
+	@Test
+	public void differentSpeedsShouldNotBeEqual(){
+		TelemDataPacket toTestOne = this.makeDefaultTelemDataPacket();
+		this.defaultSpeed++;
+		TelemDataPacket toTestTwo = this.makeTelemPacketWithTime(toTestOne.getTimeCreated());
+		this.defaultSpeed--;
+		
+		assertFalse(toTestOne.equals(toTestTwo));	
+	}
+	
+	@Test
+	public void differentTotalVoltageShouldNotBeEqual(){
+		TelemDataPacket toTestOne = this.makeDefaultTelemDataPacket();
+		this.defaultTotalVoltage++;
+		TelemDataPacket toTestTwo = this.makeTelemPacketWithTime(toTestOne.getTimeCreated());
+		this.defaultTotalVoltage--;
+		
+		assertFalse(toTestOne.equals(toTestTwo));	
+	}
+	
+	@Test
+	public void temperaturesShortAValueShouldNotBeEqual(){
+		TelemDataPacket toTestOne = this.makeDefaultTelemDataPacket();
+		String keyToRemove = defaultTemperatures.keySet().iterator().next();
+		int valueToRemove = defaultTemperatures.get(keyToRemove);
+		this.defaultTemperatures.remove(keyToRemove);
+		TelemDataPacket toTestTwo = this.makeTelemPacketWithTime(toTestOne.getTimeCreated());
+		this.defaultTemperatures.put(keyToRemove, valueToRemove);
+		
+		assertFalse(toTestOne.equals(toTestTwo));	
+	}
+	
+	@Test
+	public void temperaturesExtraAValueShouldNotBeEqual(){
+		TelemDataPacket toTestOne = this.makeDefaultTelemDataPacket();
+		this.defaultTemperatures.put("TEST", 42);
+		TelemDataPacket toTestTwo = this.makeTelemPacketWithTime(toTestOne.getTimeCreated());
+		
+		
+		assertFalse(toTestOne.equals(toTestTwo));	
+	}
+	
+	@Test
+	public void seperateButSameTemperatureMapsShouldBeEqual(){
+		TelemDataPacket toTestOne = this.makeDefaultTelemDataPacket();
+		HashMap<String, Integer> newTempMap = new HashMap<String, Integer>();
+		for(String key : this.defaultTemperatures.keySet()){
+			newTempMap.put(key, defaultTemperatures.get(key));
+		}
+		
+		TelemDataPacket toTestTwo = new TelemDataPacket(defaultSpeed, defaultTotalVoltage,newTempMap,defaultCellVoltages,toTestOne.getTimeCreated());
+		
+		assertTrue(toTestOne.equals(toTestTwo));	
+	}
+	
+	
+	@Test
+	public void cellVoltagesShortAValueShouldNotBeEqual(){
+		TelemDataPacket toTestOne = this.makeDefaultTelemDataPacket();
+		int keyToRemove = defaultCellVoltages.keySet().iterator().next();
+		ArrayList<Float> valueToRemove = defaultCellVoltages.get(keyToRemove);
+		this.defaultCellVoltages.remove(keyToRemove);
+		TelemDataPacket toTestTwo = this.makeTelemPacketWithTime(toTestOne.getTimeCreated());
+		this.defaultCellVoltages.put(keyToRemove, valueToRemove);
+		
+		assertFalse(toTestOne.equals(toTestTwo));	
+	}
+	
+	@Test
+	public void cellVoltagesWithExtraAValueShouldNotBeEqual(){
+		TelemDataPacket toTestOne = this.makeDefaultTelemDataPacket();
+		int randomKey = 27;
+		this.defaultCellVoltages.put(randomKey, new ArrayList<Float>());
+		TelemDataPacket toTestTwo = this.makeTelemPacketWithTime(toTestOne.getTimeCreated());
+		this.defaultCellVoltages.remove(randomKey);
+		
+		assertFalse(toTestOne.equals(toTestTwo));	
+	}
+	
+	
+	@Test
+	public void seperateButSameCellVoltageMapsShouldBeEqual(){
+		TelemDataPacket toTestOne = this.makeDefaultTelemDataPacket();
+		HashMap<Integer, ArrayList<Float>> newCellVMap = new HashMap<Integer, ArrayList<Float>>();
+		for(int key : this.defaultCellVoltages.keySet()){
+			newCellVMap.put(key, defaultCellVoltages.get(key));
+		}
+		
+		TelemDataPacket toTestTwo = new TelemDataPacket(defaultSpeed, defaultTotalVoltage,defaultTemperatures,newCellVMap,toTestOne.getTimeCreated());
+		
+		assertTrue(toTestOne.equals(toTestTwo));	
+	}
+	
+	//TODO need to verify 1) changed values for both the maps, 2) that different-but-same-value arrayLists<floats>
+	//are equal for the cell voltages., and 3) if a value is added, changed, or removed on a cellVoltage
+	//ArrayList, that it is picked up as not equals. 
+	
 	
 // ================= Helper Functions ===============
 	
+	private TelemDataPacket makeTelemPacketWithTime(double milliSecondTime){
+		return new TelemDataPacket(defaultSpeed, defaultTotalVoltage,defaultTemperatures,defaultCellVoltages,milliSecondTime);
+	}
 	private TelemDataPacket makeDefaultTelemDataPacket(){
 		return new TelemDataPacket(defaultSpeed, defaultTotalVoltage,defaultTemperatures,defaultCellVoltages);
 	}
