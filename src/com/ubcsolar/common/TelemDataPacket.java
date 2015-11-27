@@ -35,8 +35,11 @@ public Map<String, Object> getAllValues() {
 		this.timeCreated = timeCreated;
 		this.speed = newSpeed;
 		this.totalVoltage = newTotalVoltage;
-		this.temperatures = newTemperatures;
-		this.cellVoltages = newCellVoltages;
+		//Don't want changes to the objects after construction to affect them.  
+		//TODO double check documentation on hashmap constructor with Hashmap argument. 
+		//(wrote this without access to javadoc)
+		this.temperatures = new HashMap<String,Integer>(newTemperatures);
+		this.cellVoltages = new HashMap<Integer, ArrayList<Float>>(newCellVoltages);
 	}
 	
 	/**
@@ -99,6 +102,7 @@ public Map<String, Object> getAllValues() {
 	
 	}
 	
+	
 	@Override
 	public boolean equals(Object toCheckAgainst){
 		if(super.equals(toCheckAgainst)){
@@ -118,7 +122,7 @@ public Map<String, Object> getAllValues() {
 		}
 		
 		if(toCompare == null){
-			return false; //could not cast. 
+			return false; //won't get here, leaving it here for code readibility
 		}
 		
 		if(Math.abs((toCompare.timeCreated - this.timeCreated))>0.000000000000001){
@@ -143,18 +147,16 @@ public Map<String, Object> getAllValues() {
 			return false;
 		}
 		
-		/* if the hash codes don't work like I think they do, then can uncomment these. 
-		 * (I was assuming it would generate a unique hash based on the keys and values so we can compare.)
-		 * Javadoc was unavailable for me at this time to check .
-		if(toCompare.cellVoltages.size() != this.cellVoltages.size()){
+		if(toCompare.getCellVoltages().size() != this.cellVoltages.size()){
 			return false;
 		}
 		
-		if(toCompare.temperatures.size() != this.temperatures.size()){
+		if(toCompare.getTemperatures().size() != this.temperatures.size()){
 			return false;
 		}
-		*/
 		
+		System.out.print(toCompare.getTemperatures().size());
+		System.out.println(this.temperatures.size());
 		
 		/*
 		 * If the hashmap's equals only checks pointers (see above todo; don't have access to javadoc right now)
@@ -190,6 +192,14 @@ public Map<String, Object> getAllValues() {
 		
 		return true; //Got here after all the checks, must be the same. 
 		
+	}
+	
+	@Override
+	public int hashCode(){
+		//this is a terrible hash, but simple and it will work.
+		//Probably not all that much better than a hash function that returns a constant. 
+		//TODO come up with a better hash function. Possibly all values added together?
+		return this.getSpeed();
 	}
 
 	}

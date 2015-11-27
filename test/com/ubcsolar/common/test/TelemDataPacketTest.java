@@ -215,7 +215,7 @@ public class TelemDataPacketTest {
 	}
 	
 	@Test
-	public void temperaturesExtraAValueShouldNotBeEqual(){
+	public void temperaturesWithExtraValueShouldNotBeEqual(){
 		TelemDataPacket toTestOne = this.makeDefaultTelemDataPacket();
 		this.defaultTemperatures.put("TEST", 42);
 		TelemDataPacket toTestTwo = this.makeTelemPacketWithTime(toTestOne.getTimeCreated());
@@ -262,7 +262,7 @@ public class TelemDataPacketTest {
 	}
 	
 	@Test
-	public void cellVoltagesWithExtraAValueShouldNotBeEqual(){
+	public void cellVoltagesWithExtraValueShouldNotBeEqual(){
 		TelemDataPacket toTestOne = this.makeDefaultTelemDataPacket();
 		int randomKey = 27;
 		this.defaultCellVoltages.put(randomKey, new ArrayList<Float>());
@@ -286,7 +286,7 @@ public class TelemDataPacketTest {
 		this.defaultCellVoltages.put(keyToRemove, definitelyDifferent);
 		TelemDataPacket toTestTwo = this.makeTelemPacketWithTime(toTestOne.getTimeCreated());
 		
-		assertFalse(toTestOne.equals(toTestTwo));	
+		assertFalse(toTestOne.equals(toTestTwo));	 
 	}
 	
 	@Test
