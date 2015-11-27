@@ -357,7 +357,6 @@ public class TelemDataPacketTest {
 		//dynamic selection; arbitrary value and now guaranteed to not have index out of range. 
 		oneCellVoltageList.remove(oneCellVoltageList.size() -1 ); 
 		TelemDataPacket toTestTwo = this.makeTelemPacketWithTime(toTestOne.getTimeCreated());
-		assertFalse(toTestOne.equals(toTestTwo));
 	}
 	
 	

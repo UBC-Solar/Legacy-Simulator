@@ -39,9 +39,23 @@ public Map<String, Object> getAllValues() {
 		//TODO double check documentation on hashmap constructor with Hashmap argument. 
 		//(wrote this without access to javadoc)
 		this.temperatures = new HashMap<String,Integer>(newTemperatures);
-		this.cellVoltages = new HashMap<Integer, ArrayList<Float>>(newCellVoltages);
+		this.cellVoltages = new HashMap<Integer, ArrayList<Float>>();//(newCellVoltages);
+		this.copyOverCellVoltages(cellVoltages,newCellVoltages);
 	}
 	
+	/*
+	 * Creates identical objects for each entry and adds them to the 
+	 * new Map. (Needed to make seperate ArrayLists so they couldn't
+	 * be changed after creating the TelemDataPacket). 
+	 */
+	private void copyOverCellVoltages(HashMap<Integer, ArrayList<Float>> copyTo,
+			HashMap<Integer, ArrayList<Float>> copyFrom) {
+		for(Integer key : copyFrom.keySet()){
+			copyTo.put(key, new ArrayList<Float>(copyFrom.get(key)));
+		}
+		
+	}
+
 	/**
 	 * 
 	 * @param newSpeed speed of the car
@@ -59,7 +73,8 @@ public Map<String, Object> getAllValues() {
 		this.speed = newSpeed;
 		this.totalVoltage = newTotalVoltage;
 		this.temperatures = new HashMap<String,Integer>(newTemperatures);
-		this.cellVoltages = new HashMap<Integer, ArrayList<Float>>(newCellVoltages);
+		this.cellVoltages = new HashMap<Integer, ArrayList<Float>>();//(newCellVoltages);
+		this.copyOverCellVoltages(cellVoltages,newCellVoltages);
 	}
 	public int getSpeed(){
 		return speed;
