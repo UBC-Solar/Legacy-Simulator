@@ -67,6 +67,22 @@ public class TelemDataPacketTest {
 		
 	}
 	
+	@Test
+	public void givenTimeConstructorShouldNotThrowExcptns(){
+		TelemDataPacket test;
+		long startTime = System.currentTimeMillis();
+		try{
+			test = this.makeTelemPacketWithTime(startTime);
+		}
+		catch(Exception e){
+			fail("Exception "  + e.getClass() + " thrown");
+			return;
+		}
+		
+		assertTrue(Math.abs(test.getTimeCreated() - startTime)<0.0000000001);
+		
+	}
+	
 	/*
 	 * Shouldn't allow data units to be made with null values. 
 	 * If they try, should throw an exception. 
@@ -217,9 +233,12 @@ public class TelemDataPacketTest {
 	@Test
 	public void temperaturesWithExtraValueShouldNotBeEqual(){
 		TelemDataPacket toTestOne = this.makeDefaultTelemDataPacket();
+		System.out.println(this.defaultTemperatures.size());
 		this.defaultTemperatures.put("TEST", 42);
+		System.out.println(this.defaultTemperatures.size());
 		TelemDataPacket toTestTwo = this.makeTelemPacketWithTime(toTestOne.getTimeCreated());
-		
+		System.out.println(toTestOne.getTemperatures().size());
+		System.out.println(toTestTwo.getTemperatures().size());
 		
 		assertFalse(toTestOne.equals(toTestTwo));	
 	}

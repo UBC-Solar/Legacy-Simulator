@@ -54,18 +54,12 @@ public Map<String, Object> getAllValues() {
 			throw new NullPointerException("Can't created a DataUnit with a null value");
 		}
 		
-		for(int i=0; i<1000; i++){ //to force a new time
-			for(int j = 0; j<100; j++){
-				i--;
-				i++;
-			}
-		}
 		//TODO turn this into System.nanoTime(), more accurate. 
 		this.timeCreated = System.currentTimeMillis();
 		this.speed = newSpeed;
 		this.totalVoltage = newTotalVoltage;
-		this.temperatures = newTemperatures;
-		this.cellVoltages = newCellVoltages;
+		this.temperatures = new HashMap<String,Integer>(newTemperatures);
+		this.cellVoltages = new HashMap<Integer, ArrayList<Float>>(newCellVoltages);
 	}
 	public int getSpeed(){
 		return speed;
@@ -122,9 +116,12 @@ public Map<String, Object> getAllValues() {
 		}
 		
 		if(toCompare == null){
-			return false; //won't get here, leaving it here for code readibility
+			return false; //won't get here, but leaving it here for code readibility
 		}
 		
+		
+		//TODO double check this calculation and how to compare doubles. 
+		//May switch to System.nanoTime(), is that enough digits?
 		if(Math.abs((toCompare.timeCreated - this.timeCreated))>0.000000000000001){
 			return false; //timeCreated not the same. 
 		}
@@ -155,8 +152,6 @@ public Map<String, Object> getAllValues() {
 			return false;
 		}
 		
-		System.out.print(toCompare.getTemperatures().size());
-		System.out.println(this.temperatures.size());
 		
 		/*
 		 * If the hashmap's equals only checks pointers (see above todo; don't have access to javadoc right now)
