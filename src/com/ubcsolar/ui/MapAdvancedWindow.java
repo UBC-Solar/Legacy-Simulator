@@ -9,7 +9,7 @@ import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.DistanceUnit;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.map.Point;
-import com.ubcsolar.map.test.*;
+
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 import com.ubcsolar.notification.RouteDataAsRequestedNotification;
