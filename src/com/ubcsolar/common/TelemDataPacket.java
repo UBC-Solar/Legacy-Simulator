@@ -45,13 +45,20 @@ public Map<String, Object> getAllValues() {
 	
 	/*
 	 * Creates identical objects for each entry and adds them to the 
-	 * new Map. (Needed to make seperate ArrayLists so they couldn't
+	 * new Map. (Needed to make separate ArrayLists so they couldn't
 	 * be changed after creating the TelemDataPacket). 
+	 * NOTE: This will create identical maps ONLY if the copyTo map is empty
+	 * otherwise will simply add the values.
 	 */
 	private void copyOverCellVoltages(HashMap<Integer, ArrayList<Float>> copyTo,
 			HashMap<Integer, ArrayList<Float>> copyFrom) {
 		for(Integer key : copyFrom.keySet()){
+			if(copyFrom.get(key) == null){
+				copyTo.put(key, new ArrayList<Float>());
+			}
+			else{
 			copyTo.put(key, new ArrayList<Float>(copyFrom.get(key)));
+			}
 		}
 		
 	}
