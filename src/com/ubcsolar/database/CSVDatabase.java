@@ -249,8 +249,20 @@ public class CSVDatabase extends Database {
 	 */
 	private void store(TelemDataPacket toStore) throws IOException{
 		//"entry,Time,Speed,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,Pck0Vltg,Pck2Vltg,Pck3Vltg";
-		this.recallStuff.put(toStore.getTimeCreated(), toStore);
-		this.recallStuffList.add(toStore);
+		/*
+		 * right now in this basic implementation, the RAM and the csv
+		 * are two different things, and we don't actually have a way
+		 * of retrieving packets from the .csv, so this 'store' method
+		 * may need to be re-written to accommodate that when it's implemented. 
+		 */
+		TelemDataPacket sanitizedPacket = sanitizeInput(toStore);
+		putIntoRAM(sanitizedPacket);
+		putIntoCSV(sanitizedPacket);
+				
+	}
+	
+	private void putIntoCSV(TelemDataPacket toStore) throws IOException {
+		//TODO this algorithm needs to be improved! More dynamic
 		HashMap<String, Integer> temperatures = toStore.getTemperatures();
 		HashMap<Integer, ArrayList<Float>> voltages = toStore.getCellVoltages();
 		String toPrint ="" + 
@@ -279,8 +291,58 @@ public class CSVDatabase extends Database {
 				}
 				
 		this.writingQueue.add(toPrint);
-		this.flushAndSave();		
+		this.flushAndSave();
+		
 	}
+
+	/*
+	 * sanitizes the TelemDataPacket so that the DB can store properly
+	 * (mostly just replaces 'null' with empty maps).
+	 * 
+	 * The basic TelemDataPacket will reject all nulls, but it's 
+	 * good to check for them anyway so we don't break the later 
+	 * parts of DB processing. (I made an extended DataPacket that 
+	 * returned nulls for the maps; it's possible.)
+	 */
+	private TelemDataPacket sanitizeInput(TelemDataPacket toStore) {
+		//NOTE: The basic TelemDataPacket
+		double creationTime = toStore.getTimeCreated();
+		int speed = toStore.getSpeed();
+		float totalVoltage = toStore.getTotalVoltage();
+		HashMap<String,Integer> temperatures = toStore.getTemperatures();
+		if(temperatures == null){
+			temperatures = new HashMap<String, Integer>();
+		}
+		
+		HashMap<Integer,ArrayList<Float>> cellVoltages = toStore.getCellVoltages();
+		if(cellVoltages == null){
+			cellVoltages = new HashMap<Integer, ArrayList<Float>>();
+		}
+		
+		if(cellVoltages.containsValue(null)){
+			for(Integer key : cellVoltages.keySet()){
+				if(cellVoltages.get(key) == null){
+					cellVoltages.replace(key, new ArrayList<Float>());
+				}
+			}
+		}
+		System.out.println("has null?" + cellVoltages.containsValue(null));
+		return new TelemDataPacket(speed, (int) totalVoltage, temperatures, cellVoltages, creationTime);
+		
+		
+	}
+
+	//Puts the telemdatapacket into the right place in the list
+	private void putIntoRAM(TelemDataPacket toStore) {
+
+		//this is what was here, will need to be improved to make sure it
+		//puts the packet in the right spot. 
+		//TODO make it put stuff in the right spot. 
+		this.recallStuff.put(toStore.getTimeCreated(), toStore);
+		this.recallStuffList.add(toStore);
+		
+	}
+
 	@Override
 	public void store(DataUnit toStore) throws IOException {
 		if(toStore instanceof TelemDataPacket){
