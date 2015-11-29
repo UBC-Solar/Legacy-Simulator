@@ -35,6 +35,9 @@ public class CSVDatabase extends Database {
 	private DateFormat excelDateFormat = new SimpleDateFormat("HH:mm:ss"); //time format. ss = seconds, SSS = ms
 	private boolean isDBConnected = false; //FileWriter didn't seem to have a 'isConnected' or 'isOpen' method. 
 								//this is the workaround. 
+	
+	//This String provides the structure for the csv. 
+	//NOTE: If you change this, change the buildCSVEntryRow method to match.
 	private final String columnTitles = "entry,RealTime,ExcelTime,Speed,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,"
 							+ "Pck0Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
 							+ "Pck1Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
@@ -57,6 +60,7 @@ public class CSVDatabase extends Database {
 		if(filename == null){
 			filename = "null";
 		}
+		
 		
 		if(filename.length() == 0){
 			throw new IOException("Blank filename is Invalid filename");
@@ -193,9 +197,7 @@ public class CSVDatabase extends Database {
 	 */
 	private void setUpTables() throws IOException{
 		//Currently assuming a .csv file
-		String tableSetup;
-		tableSetup = this.columnTitles;
-		writingQueue.add(tableSetup);
+		writingQueue.add(columnTitles);
 		flushAndSave();
 	}
 	
@@ -257,41 +259,53 @@ public class CSVDatabase extends Database {
 		 */
 		TelemDataPacket sanitizedPacket = sanitizeInput(toStore);
 		putIntoRAM(sanitizedPacket);
-		putIntoCSV(sanitizedPacket);
+		String rowToPrint = buildCSVEntryRow(sanitizedPacket);
+		this.writingQueue.add(rowToPrint);
+		this.flushAndSave();
 				
 	}
 	
-	private void putIntoCSV(TelemDataPacket toStore) throws IOException {
-		//TODO this algorithm needs to be improved! More dynamic
+	/*
+	 * Sets up the row to be printed to the .csv. It's relatively static though,
+	 * so if the coloumn title change or number of entries change then this will have 
+	 * to be redone to print in the proper order. 
+	 */
+	private String buildCSVEntryRow(TelemDataPacket toStore) throws IOException {
 		HashMap<String, Integer> temperatures = toStore.getTemperatures();
 		HashMap<Integer, ArrayList<Float>> voltages = toStore.getCellVoltages();
-		String toPrint ="" + 
-				this.entryCounter++ + "," + 
-				actualDateFormat.format(toStore.getTimeCreated()) + "," +
-				excelDateFormat.format(toStore.getTimeCreated()) + "," +
-				toStore.getSpeed() + "," +
-				temperatures.get("bms")  + "," +
-				temperatures.get("motor") + "," +
-				temperatures.get("pack0") + "," +
-				temperatures.get("pack1") + "," +
-				temperatures.get("pack2") + "," +
-				temperatures.get("pack3") + "," +
-				toStore.getTotalVoltage() + ",";
+		String toPrint = "";
+		toPrint += this.entryCounter + ","; 
+		this.entryCounter++;
+		toPrint += actualDateFormat.format(toStore.getTimeCreated()) + ",";
+		toPrint += excelDateFormat.format(toStore.getTimeCreated()) + ",";
+		toPrint += toStore.getSpeed() + ",";
+		toPrint += temperatures.get("bms")  + ","; //if the temperature calls return 'null', so be it.
+												  // it can be written as such to the DB. 
+		toPrint += temperatures.get("motor") + ",";
+		toPrint += temperatures.get("pack0") + ",";
+		toPrint += temperatures.get("pack1") + ",";
+		toPrint += temperatures.get("pack2") + ",";
+		toPrint += temperatures.get("pack3") + ",";
+		toPrint += toStore.getTotalVoltage() + ",";
+		
+		//assumes that they have been loaded with the standard number of voltage entries
+		//NOTE: May need to modify this if you change the number of cells on the car, 
+		//or the amount per pack.
+		int expectedNumOfCells = 10;
+		
+		for(int i = 0; i<4; i++){
+			if(voltages.get(i) == null){ //will need to offset this so the rest are in position
+				toPrint += this.numberOfCommas(expectedNumOfCells);
+			}
+			else{
 				for(Float f : voltages.get(0)){
 					toPrint += f + ",";
 				}
-				for(Float f : voltages.get(1)){
-					toPrint += f + ",";
-				}
-				for(Float f : voltages.get(2)){
-					toPrint += f + ",";
-				}
-				for(Float f : voltages.get(3)){
-					toPrint += f + ",";
-				}
-				
-		this.writingQueue.add(toPrint);
-		this.flushAndSave();
+			}
+		}
+		
+		return toPrint;
+		
 		
 	}
 
