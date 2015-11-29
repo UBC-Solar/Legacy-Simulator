@@ -6,6 +6,7 @@
  */
 package com.ubcsolar.database;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -16,23 +17,25 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import javax.swing.filechooser.FileView;
+
 import com.ubcsolar.common.DataUnit;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.TelemDataPacket;
 
 public class CSVDatabase extends Database {
-	
-	Queue<String> writingQueue; //will read from here and then write. 
-	FileWriter myFileWriter; //used to write. 
-	int entryCounter; //used to generate primary keys. 
-	DateFormat actualDateFormat = new SimpleDateFormat("HH:mm:ss:SSS"); //time format. ss = seconds, SSS = ms
+	private final String folderpath = "Output\\"; //default save directory
+	private Queue<String> writingQueue; //will read from here and then write. 
+	private FileWriter myFileWriter; //used to write. 
+	private int entryCounter; //used to generate primary keys. 
+	private DateFormat actualDateFormat = new SimpleDateFormat("HH:mm:ss:SSS"); //time format. ss = seconds, SSS = ms
 	//couldn't manage to format milliseconds in a way that Excel can handle as time
 	//so just generated a second column to be able to graph it properly. 
-	DateFormat excelDateFormat = new SimpleDateFormat("HH:mm:ss"); //time format. ss = seconds, SSS = ms
-	boolean isDBConnected = false; //FileWriter didn't seem to have a 'isConnected' or 'isOpen' method. 
+	private DateFormat excelDateFormat = new SimpleDateFormat("HH:mm:ss"); //time format. ss = seconds, SSS = ms
+	private boolean isDBConnected = false; //FileWriter didn't seem to have a 'isConnected' or 'isOpen' method. 
 								//this is the workaround. 
-	final String columnTitles = "entry,RealTime,ExcelTime,Speed,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,"
+	private final String columnTitles = "entry,RealTime,ExcelTime,Speed,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,"
 							+ "Pck0Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
 							+ "Pck1Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
 							+ "Pck2Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
@@ -49,8 +52,32 @@ public class CSVDatabase extends Database {
 	 * @throws IOException - if it can't create the file for some reason. 
 	 */
 	public CSVDatabase(String filename) throws IOException {
-		super();
+		//might as well set it to be "null". Can make a "null.csv". By setting the value
+		//we don't get null pointer exceptions. 
+		if(filename == null){
+			filename = "null";
+		}
+		
+		if(filename.length() == 0){
+			throw new IOException("Blank filename is Invalid filename");
+		}
+		File testForExistence = new File(folderpath+filename + ".csv");
+		if(testForExistence.exists()){
+			throw new IOException("file already exists");
+		}
+		
+		//if it's less than four chracters it's obviously not '.csv'.
+		if(filename.length()<4){
+			setup(filename);
+			return;
+		}
+		//don't want to duplicate the '.csv' on the file name if someone puts it on there automatically. 		
+		if(filename.substring(filename.length()-4).compareToIgnoreCase(".csv") == 0){
+			setup(filename.substring(0, filename.length() - 4));
+		}
+		else{	
 		setup(filename);
+		}
 	}
 	
 	/**
@@ -58,16 +85,13 @@ public class CSVDatabase extends Database {
 	 * @throws IOException
 	 */
 	public CSVDatabase() throws IOException {
-		super();
-		setup(""+System.currentTimeMillis()); //Guaranteed to be a unique filename. (unless you're making more than 1 per ms
+		setup(""+System.nanoTime()); //Guaranteed to be a unique filename. (unless you're making more than 1 per ms
 											//in which case you have other problems to worry about)
-		
-		//TODO change this to System.nanoSeconds(); DBs are being overwritten in the tests,
 		//and we will be updating it to throw an exception so it needs to handle it. 
 	}
 	
 	/**
-	 * Sets up and builds the first Database. 
+	 * Sets up and builds the first Database. File name created is filename.csv
 	 * @param filename
 	 * @throws IOException
 	 */
@@ -78,7 +102,7 @@ public class CSVDatabase extends Database {
 		//TODO add it to a buffered OutPutStream (so that it only writes when it has a full page)
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
 				"CSV Database created with name " + filename + ".csv");
-		myFileWriter = new FileWriter("Output\\"+ filename + ".csv");
+		myFileWriter = new FileWriter(folderpath+ filename + ".csv");
 		writingQueue = new PriorityQueue<String>();
 		this.isDBConnected = true;
 		setUpTables();

@@ -19,11 +19,9 @@ import com.ubcsolar.database.CSVDatabase;
 
 public class CSVDatabaseTest {
 	
-	//NOTE: TESTS MAY NOT BE ACCURATE AS LONG AS TELEMDATAPACKET's .equals() 
-	//IS THE DEFAULT Object's .equals(). (if it loads the write values into a 
-	//file, and then creates one with identical values loaded from that file,
-	//they'll be different objects in Java's eyes. Need to update the .equal's to check
-	//values instead of pointers. 
+	//NOTE: THESE TESTS ASSUME AN EMPTY 'OUTPUT' FOLDER. 
+	//Some of them test specific names; if they're there from previous
+	//tests, it will fail. 
 	
 	//Also, the NULL telemdatapackets might fail if they get loaded back with empty maps instead 
 	//of null. Will have to update the tests when that happens. 
@@ -137,16 +135,17 @@ public class CSVDatabaseTest {
 	
 	/*
 	 * If pasing a null value, the user/program is not expecting a 
-	 * 'null.csv' file to be made. 
-	 * 
-	 * If you actually want a database named that, pass in "null". 
+	 * 'null.csv' file to be made, but it should be able to handle it
+	 * anyway. 
+	 *  
 	 */
 	@Test
-	public void nullNameShouldThrowException() throws IOException{
+	public void nullNameShouldNotThrowException() throws IOException{
 		try{
 			tearDown();
 		}catch(IOException e){fail("Should not have gotten exception here");}
-		
+		File testFile = new File("null.csv");
+		System.out.println(testFile.exists());
 		try{this.toTest = new CSVDatabase(null);}
 		catch(IOException e){
 			throw e;
@@ -160,7 +159,6 @@ public class CSVDatabaseTest {
 	/*
 	 * The class should be able to detect and ignore any extra csv suffix
 	 */
-	@Test(expected = IOException.class)
 	public void csvSuffixShouldNotBeDuplicated(){
 		try{
 			tearDown();

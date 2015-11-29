@@ -55,7 +55,7 @@ public class TelemDataPacketTest {
 	public void tearDown() throws Exception {
 	}
 
-//====================CONSTRUCTOR TESTS======================
+//====================Constructor tests======================
 	@Test
 	public void stndrdConstructorShouldNotThrowExcptns(){
 		try{
@@ -233,13 +233,8 @@ public class TelemDataPacketTest {
 	@Test
 	public void temperaturesWithExtraValueShouldNotBeEqual(){
 		TelemDataPacket toTestOne = this.makeDefaultTelemDataPacket();
-		System.out.println(this.defaultTemperatures.size());
 		this.defaultTemperatures.put("TEST", 42);
-		System.out.println(this.defaultTemperatures.size());
-		TelemDataPacket toTestTwo = this.makeTelemPacketWithTime(toTestOne.getTimeCreated());
-		System.out.println(toTestOne.getTemperatures().size());
-		System.out.println(toTestTwo.getTemperatures().size());
-		
+		TelemDataPacket toTestTwo = this.makeTelemPacketWithTime(toTestOne.getTimeCreated());		
 		assertFalse(toTestOne.equals(toTestTwo));	
 	}
 	
