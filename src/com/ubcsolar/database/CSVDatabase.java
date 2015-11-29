@@ -326,7 +326,6 @@ public class CSVDatabase extends Database {
 				}
 			}
 		}
-		System.out.println("has null?" + cellVoltages.containsValue(null));
 		return new TelemDataPacket(speed, (int) totalVoltage, temperatures, cellVoltages, creationTime);
 		
 		

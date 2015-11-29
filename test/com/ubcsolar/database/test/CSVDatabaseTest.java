@@ -145,7 +145,6 @@ public class CSVDatabaseTest {
 			tearDown();
 		}catch(IOException e){fail("Should not have gotten exception here");}
 		File testFile = new File("null.csv");
-		System.out.println(testFile.exists());
 		try{this.toTest = new CSVDatabase(null);}
 		catch(IOException e){
 			throw e;
