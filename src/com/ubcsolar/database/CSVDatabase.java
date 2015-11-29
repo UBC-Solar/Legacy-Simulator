@@ -85,9 +85,8 @@ public class CSVDatabase extends Database {
 	 * @throws IOException
 	 */
 	public CSVDatabase() throws IOException {
-		setup(""+System.nanoTime()); //Guaranteed to be a unique filename. (unless you're making more than 1 per ms
-											//in which case you have other problems to worry about)
-		//and we will be updating it to throw an exception so it needs to handle it. 
+		setup(""+System.nanoTime()); //pretty much guaranteed to be a unique filename. (unless you're making them faster than 1 per ns
+									//but that is unlikely. 
 	}
 	
 	/**
@@ -98,7 +97,6 @@ public class CSVDatabase extends Database {
 	private void setup(String filename) throws IOException{
 		entryCounter = 0; //TODO write a check for the last value if reopening a database
 						//don't want to overwrite
-		//TODO: add a check for the '.csv' so we don't duplicate it. 
 		//TODO add it to a buffered OutPutStream (so that it only writes when it has a full page)
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
 				"CSV Database created with name " + filename + ".csv");

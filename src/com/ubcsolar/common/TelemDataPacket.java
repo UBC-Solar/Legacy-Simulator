@@ -16,7 +16,6 @@ public Map<String, Object> getAllValues() {
 	
 	return allValues;
 }
-	//TODO override toHash to make it consistent with .equals();
 	private final double timeCreated;
 	private final int speed;
 	private final int totalVoltage; //used to guesstimate state of charge
@@ -35,9 +34,7 @@ public Map<String, Object> getAllValues() {
 		this.timeCreated = timeCreated;
 		this.speed = newSpeed;
 		this.totalVoltage = newTotalVoltage;
-		//Don't want changes to the objects after construction to affect them.  
-		//TODO double check documentation on hashmap constructor with Hashmap argument. 
-		//(wrote this without access to javadoc)
+		//Don't want changes to the objects after construction to affect them. 
 		this.temperatures = new HashMap<String,Integer>(newTemperatures);
 		this.cellVoltages = new HashMap<Integer, ArrayList<Float>>();//(newCellVoltages);
 		this.copyOverCellVoltages(cellVoltages,newCellVoltages);
@@ -126,7 +123,7 @@ public Map<String, Object> getAllValues() {
 						//must be equal
 		}
 		
-		if(toCheckAgainst.getClass() != TelemDataPacket.class){
+		if(toCheckAgainst.getClass() != this.getClass()){
 			return false; 
 		}
 		TelemDataPacket toCompare; 
@@ -140,7 +137,6 @@ public Map<String, Object> getAllValues() {
 		if(toCompare == null){
 			return false; //won't get here, but leaving it here for code readibility
 		}
-		
 		
 		//TODO double check this calculation and how to compare doubles. 
 		//May switch to System.nanoTime(), is that enough digits?
@@ -156,8 +152,6 @@ public Map<String, Object> getAllValues() {
 			return false;
 		}
 		
-		//TODO ensure that hashMap has an implementation of Equals and 
-		//it's not just pointer-checking. 
 		if(!toCompare.cellVoltages.equals(this.cellVoltages)){
 			return false;
 		}
@@ -166,47 +160,14 @@ public Map<String, Object> getAllValues() {
 			return false;
 		}
 		
-		if(toCompare.getCellVoltages().size() != this.cellVoltages.size()){
+		if(toCompare.cellVoltages.size() != this.cellVoltages.size()){
 			return false;
 		}
 		
-		if(toCompare.getTemperatures().size() != this.temperatures.size()){
+		if(toCompare.temperatures.size() != this.temperatures.size()){
 			return false;
 		}
-		
-		
-		/*
-		 * If the hashmap's equals only checks pointers (see above todo; don't have access to javadoc right now)
-		 * the you can uncomment the methods below to compare values. 
-		 */
-		/*
-		for(int i : this.cellVoltages.keySet()){
-			if(!toCompare.cellVoltages.containsKey(i)){
-				return false; 
-			}
-			if(this.cellVoltages.get(i).size() != toCompare.cellVoltages.get(i).size()){
-				return false;
-			}
-			for(int j = 0; j<this.cellVoltages.size(); j++){
-				if(Math.abs(this.cellVoltages.get(i).get(j) - toCompare.cellVoltages.get(i).get(j))>0.000000001){
-					return false;
-				}
-			}
-		}
-		
-		for(String i : this.temperatures.keySet()){
-			if(!toCompare.temperatures.containsKey(i)){
-				return false; 
-			}
-			if(this.temperatures.get(i) != toCompare.temperatures.get(i)){
-				return false;
-			}
-		}
-		
-		
-		*/
-		
-		
+				
 		return true; //Got here after all the checks, must be the same. 
 		
 	}
