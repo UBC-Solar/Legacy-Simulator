@@ -112,19 +112,27 @@ public class CSVDatabase extends Database {
 	 * @return
 	 */
 	public ArrayList<TelemDataPacket> getLastTelemDataPacket(int num){
+		if(num <= 0){
+			return new ArrayList<TelemDataPacket>();
+		}
+		
+		if(num >= recallStuffList.size()){
+			num = recallStuffList.size();
+		}
+		
 		ArrayList<TelemDataPacket> temp = new ArrayList<TelemDataPacket>(num); //might as well make it the right size. 
-		for(int i = (this.recallStuffList.size() - (num+1)); i<this.recallStuffList.size(); i++){
-			//TODO double check that initial i value calculation. Don't want an off-by-one error.
+		for(int i = (this.recallStuffList.size() - (num)); i<this.recallStuffList.size(); i++){
 			temp.add(this.recallStuffList.get(i));
 		}
 		return temp;
 	}
 	
+
 	public ArrayList<TelemDataPacket> getAllTelemDataPacketsSince(double startTime){
 		
 		int start = findPosOfFirstPktPastTime(startTime, this.recallStuffList);
 		if(start == -1){
-			return null;
+			return new ArrayList<TelemDataPacket>();
 		}
 		//TODO double check that below, it creates an ArrayList of the right size right off the bat.
 		//important because we don't want it copying halfway done arrays a bunch of times. 
@@ -146,7 +154,7 @@ public class CSVDatabase extends Database {
 	 */
 	private int findPosOfFirstPktPastTime(double startTime, ArrayList<TelemDataPacket> toSearch){
 		//TODO change this to a better search algo (binary search?)
-		for(int i=1; i<toSearch.size()-1; i++){
+		for(int i=0; i<toSearch.size(); i++){
 			if(toSearch.get(i).getTimeCreated()>startTime){
 				return i;
 			}
