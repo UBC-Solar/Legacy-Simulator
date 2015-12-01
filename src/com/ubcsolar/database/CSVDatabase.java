@@ -238,10 +238,12 @@ public class CSVDatabase extends Database {
 
 	@Override
 	public void saveAndDisconnect() throws IOException {
-		if(writingQueue.size() > 0){
+		if(isDBConnected){ //gotta make sure we don't mess up the db connected state. 
+							//check is here so multiple calls to 'save and disconnected'
+							//don't throw errors. 
 		flushAndSave();
-		}
 		myFileWriter.close();
+		}
 		this.isDBConnected = false; 
 	}
 	
