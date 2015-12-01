@@ -17,8 +17,8 @@ import com.ubcsolar.common.TelemDataPacket;
 public class NullTelemDataPacket extends TelemDataPacket {
 	
 	
-	private HashMap<String,Integer> temperatures;
-	private HashMap<Integer,ArrayList<Float>> cellVoltages;
+	private HashMap<String,Integer> myTemperatures;
+	private HashMap<Integer,ArrayList<Float>> myCellVoltages;
 	
 
 
@@ -27,15 +27,15 @@ public class NullTelemDataPacket extends TelemDataPacket {
 		super(newSpeed, newTotalVoltage,newTemperatures, newCellVoltages);
 	
 		if(newTemperatures.size() == 0){
-			this.temperatures = null;
+			this.myTemperatures = null;
 		}else{
-			this.temperatures = newTemperatures;
+			this.myTemperatures = newTemperatures;
 		}
 		
 		if(newCellVoltages.size() == 0){
-			this.cellVoltages = null;
+			this.myCellVoltages = null;
 		}else{
-			this.cellVoltages = newCellVoltages;
+			this.myCellVoltages = newCellVoltages;
 		}
 	}
 	
@@ -44,22 +44,22 @@ public class NullTelemDataPacket extends TelemDataPacket {
 		super(newSpeed, newTotalVoltage,newTemperatures, newCellVoltages, timeInMillis);
 	
 		if(newTemperatures.size() == 0){
-			this.temperatures = null;
+			this.myTemperatures = null;
 		}else{
-			this.temperatures = newTemperatures;
+			this.myTemperatures = newTemperatures;
 		}
 		
 		if(newCellVoltages.size() == 0){
-			this.cellVoltages = null;
+			this.myCellVoltages = null;
 		}else{
-			this.cellVoltages = newCellVoltages;
+			this.myCellVoltages = newCellVoltages;
 		}
 	}
 	
 	
 	@Override
 	public HashMap<String,Integer> getTemperatures(){
-		if(temperatures == null){
+		if(myTemperatures == null){
 			return null;
 		}
 		else{
@@ -69,7 +69,7 @@ public class NullTelemDataPacket extends TelemDataPacket {
 	
 	@Override
 	public HashMap<Integer,ArrayList<Float>> getCellVoltages(){
-		if(cellVoltages == null){
+		if(myCellVoltages == null){
 			return null;
 		}
 		else{

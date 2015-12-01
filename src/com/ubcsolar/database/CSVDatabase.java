@@ -352,7 +352,6 @@ public class CSVDatabase extends Database {
 		//TODO make it put stuff in the right spot. 
 		this.recallStuff.put(toStore.getTimeCreated(), toStore);
 		int storePos = this.findPosOfFirstPktPastTime(toStore.getTimeCreated(), this.recallStuffList);
-		System.out.println("store in: " + storePos + " out of " + recallStuffList.size());
 		this.recallStuffList.add(storePos, toStore);
 		
 	}

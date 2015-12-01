@@ -384,7 +384,7 @@ public class CSVDatabaseTest {
 	@Test
 	public void sizeTwoDataBaseShouldOnlyGiveWhatsAsked() throws IOException{
 		TelemDataPacket testingPacket = this.generateStandardTelemDataPacket();
-		TelemDataPacket secondTestingPacket = this.generateTerribleTelemDataPacket();
+		TelemDataPacket secondTestingPacket = this.generateTerribleTelemDataPacket(testingPacket.getTimeCreated() + 3);
 		this.toTest.store(testingPacket);
 		this.toTest.store(secondTestingPacket);
 		this.testZeroAndNegativeInputsShouldGiveSizeZeroLists(toTest);
@@ -393,12 +393,12 @@ public class CSVDatabaseTest {
 		assertTrue(this.toTest.getLastTelemDataPacket(1).get(0).equals(secondTestingPacket));
 		
 		assertTrue(this.toTest.getLastTelemDataPacket(2).size() == 2);
-		assertTrue(this.toTest.getLastTelemDataPacket(2).get(0).equals(secondTestingPacket));
-		assertTrue(this.toTest.getLastTelemDataPacket(2).get(1).equals(testingPacket));
+		assertTrue(this.toTest.getLastTelemDataPacket(2).get(0).equals(testingPacket));
+		assertTrue(this.toTest.getLastTelemDataPacket(2).get(1).equals(secondTestingPacket));
 		
 		assertTrue(this.toTest.getLastTelemDataPacket(3).size() == 2);
-		assertTrue(this.toTest.getLastTelemDataPacket(3).get(0).equals(secondTestingPacket));
-		assertTrue(this.toTest.getLastTelemDataPacket(3).get(1).equals(testingPacket));
+		assertTrue(this.toTest.getLastTelemDataPacket(3).get(0).equals(testingPacket));
+		assertTrue(this.toTest.getLastTelemDataPacket(3).get(1).equals(secondTestingPacket));
 	}
 	
 	/*

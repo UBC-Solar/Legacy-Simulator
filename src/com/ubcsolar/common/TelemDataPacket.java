@@ -127,7 +127,7 @@ public Map<String, Object> getAllValues() {
 						//must be equal
 		}
 		
-		if(toCheckAgainst.getClass() != this.getClass()){
+		if(!(toCheckAgainst instanceof TelemDataPacket)){
 			return false; 
 		}
 		TelemDataPacket toCompare; 
@@ -164,14 +164,6 @@ public Map<String, Object> getAllValues() {
 			return false;
 		}
 		
-		if(toCompare.cellVoltages.size() != this.cellVoltages.size()){
-			return false;
-		}
-		
-		if(toCompare.temperatures.size() != this.temperatures.size()){
-			return false;
-		}
-				
 		return true; //Got here after all the checks, must be the same. 
 		
 	}
