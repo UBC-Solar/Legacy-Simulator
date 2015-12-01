@@ -121,8 +121,6 @@ public Map<String, Object> getAllValues() {
 	
 	@Override
 	public boolean equals(Object toCheckAgainst){
-		//TODO Tweak this so that it uses the getter methods from the other class
-		//in case of extended classes (i.e the null telem data packet).
 		if(super.equals(toCheckAgainst)){
 			return true; //shortcut: if they're the same object, they
 						//must be equal
@@ -139,12 +137,11 @@ public Map<String, Object> getAllValues() {
 			return false; //if it fails at casting, obviously not a TelemDataPacket and therefore not equal. 
 		}
 		
+		/*
 		if(toCompare == null){
 			return false; //won't get here, but leaving it here for code readibility
-		}
+		}*/ //commented out to get rid of the Eclipse warnings. 
 		
-		//TODO double check this calculation and how to compare doubles. 
-		//May switch to System.nanoTime(), is that enough digits?
 		if(Math.abs((toCompare.timeCreated - this.timeCreated))>0.000000000000001){
 			return false; //timeCreated not the same. 
 		}
@@ -171,10 +168,12 @@ public Map<String, Object> getAllValues() {
 	
 	@Override
 	public int hashCode(){
-		//this is a terrible hash, but simple and it will work.
-		//Probably not all that much better than a hash function that returns a constant. 
-		//TODO come up with a better hash function. Possibly all values added together?
-		return this.getSpeed();
+		int hashCode = 0;
+		hashCode += this.cellVoltages.hashCode();
+		hashCode += this.temperatures.hashCode();
+		hashCode += this.totalVoltage;
+		hashCode += this.speed*100; //wil be the main thing different between packs. 
+		return hashCode;
 	}
 
 	}
