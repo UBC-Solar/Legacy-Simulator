@@ -17,8 +17,6 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import javax.swing.filechooser.FileView;
-
 import com.ubcsolar.common.DataUnit;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SolarLog;
@@ -100,7 +98,6 @@ public class CSVDatabase extends Database {
 	 */
 	private void setup(String filename) throws IOException{
 		entryCounter = 0; 
-		//TODO add it to a buffered OutPutStream (so that it only writes when it has a full page)
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
 				"CSV Database created with name " + filename + ".csv");
 		myFileWriter = new FileWriter(folderpath+ filename + ".csv");

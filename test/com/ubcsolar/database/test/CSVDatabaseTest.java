@@ -442,9 +442,7 @@ public class CSVDatabaseTest {
 	/*
 	 * Should not throw exceptions storing and returning telemDataPackets
 	 * that have nulls or are weird.
-	 * 
-	 */ //TODO: consider having DB just silently drop null telem packets. 
-	//We'd be losing data, but they're improper anyway? 
+	 */ 
 	@Test
 	public void retrievingBadInputsWithGetLastShouldNotThrowException() throws IOException{
 		ArrayList<TelemDataPacket> testPkts = this.loadGoodBadEmptyTelemPackets();
@@ -675,19 +673,7 @@ public class CSVDatabaseTest {
 		assertTrue(returnedValues.get(2).equals(testValues.get(3)));
 		assertTrue(returnedValues.get(3).equals(testValues.get(4)));
 	}
-	
-	private void wasteAMillisecond(){
-		int v = 0;
-		for(int first=0; first<100000; first++){
-			for(int scnd = 0; scnd<100000; scnd++){
-				for(int third = 0; third<50; third++){
-					v++;
-					v--;
-				}
-			}
-		}
-	}
-	
+		
 	//=================== get(double) tests =======================
 	
 	@Test
