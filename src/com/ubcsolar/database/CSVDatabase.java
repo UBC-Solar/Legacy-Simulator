@@ -155,13 +155,20 @@ public class CSVDatabase extends Database {
 	 * @return
 	 */
 	private int findPosOfFirstPktPastTime(double startTime, ArrayList<TelemDataPacket> toSearch){
-		//TODO change this to a better search algo (binary search?)
-		for(int i=0; i<toSearch.size(); i++){
-			if(toSearch.get(i).getTimeCreated()>startTime){
+		if(toSearch.size()== 0){
+			return 0;
+		}
+		/*
+		 * This search algo could probably use some optimizing (if it's earliest it takes O(n)),
+		 * but in most cases we'll be be storing the latest packet, and so putting it at the 
+		 * end is actually best case (should be O(1))
+		 */
+		for(int i = toSearch.size(); i>0; i--){
+			if(toSearch.get(i-1).getTimeCreated()<=startTime){
 				return i;
 			}
 		}
-		return toSearch.size(); //protects against size 0 arrays and is a good default. 
+		return 0; //obviously none in the loop were less than, so it should go at the beginning.  
 	}
 	
 	
