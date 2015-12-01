@@ -19,7 +19,6 @@ public Map<String, Object> getAllValues() {
 	private final double timeCreated;
 	private final int speed;
 	private final int totalVoltage; //used to guesstimate state of charge
-	//TODO make these abstract
 	private final HashMap<String,Integer> temperatures;
 	private final HashMap<Integer,ArrayList<Float>> cellVoltages;
 	
@@ -27,7 +26,7 @@ public Map<String, Object> getAllValues() {
 	 * This constructor used if packet was received at an earlier time and needs to be specified.
 	 * I.e pulled out of a database. 
 	 */
-	public TelemDataPacket(int newSpeed, int newTotalVoltage, HashMap<String,Integer> newTemperatures, HashMap<Integer,ArrayList<Float>> newCellVoltages, double timeCreated){
+	public TelemDataPacket(int newSpeed, int newTotalVoltage, Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages, double timeCreated){
 		if(newTemperatures == null || newCellVoltages == null){
 			throw new NullPointerException("Can't created a DataUnit with a null value");
 		}
@@ -47,8 +46,8 @@ public Map<String, Object> getAllValues() {
 	 * NOTE: This will create identical maps ONLY if the copyTo map is empty
 	 * otherwise will simply add the values.
 	 */
-	private void copyOverCellVoltages(HashMap<Integer, ArrayList<Float>> copyTo,
-			HashMap<Integer, ArrayList<Float>> copyFrom) {
+	private void copyOverCellVoltages(Map<Integer, ArrayList<Float>> copyTo,
+			Map<Integer, ArrayList<Float>> copyFrom) {
 		for(Integer key : copyFrom.keySet()){
 			if(copyFrom.get(key) == null){
 				copyTo.put(key, new ArrayList<Float>());
@@ -67,7 +66,7 @@ public Map<String, Object> getAllValues() {
 	 * @param newTemperatures map of temperatures of the car
 	 * @param newCellVoltages a map of cell voltages.
 	 */
-	public TelemDataPacket(int newSpeed, int newTotalVoltage, HashMap<String,Integer> newTemperatures, HashMap<Integer,ArrayList<Float>> newCellVoltages){
+	public TelemDataPacket(int newSpeed, int newTotalVoltage, Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages){
 		if(newTemperatures == null || newCellVoltages == null){
 			throw new NullPointerException("Can't created a DataUnit with a null value");
 		}
