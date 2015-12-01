@@ -493,7 +493,7 @@ public class CSVDatabaseTest {
 		assertTrue(
 				this.toTest.getAllTelemDataPacketsSince(System.currentTimeMillis()).size() == 0);
 	}
-	
+	//adding a comment
 	/*
 	 * If it only has one value, it should return it when asked. 
 	 */
@@ -507,7 +507,7 @@ public class CSVDatabaseTest {
 		assertTrue(theList.size() == 1);
 		assertTrue(theList.get(0).equals(test));
 		
-		ArrayList<TelemDataPacket> theOtherList = toTest.getAllTelemDataPacketsSince(System.currentTimeMillis());
+		ArrayList<TelemDataPacket> theOtherList = toTest.getAllTelemDataPacketsSince(startTime + 3);
 		assertTrue(theOtherList.size() == 0);
 	}
 	
