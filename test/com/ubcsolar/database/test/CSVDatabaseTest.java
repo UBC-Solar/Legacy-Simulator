@@ -410,14 +410,18 @@ public class CSVDatabaseTest {
 	@Test
 	public void packetsStoredOutOfOrderShouldReturnInOrder() throws IOException{
 		ArrayList<TelemDataPacket> packets = new ArrayList<TelemDataPacket>();
+		double startTime =System.currentTimeMillis() - 15;
 		for(int i = 0; i<2; i++){
-			packets.add(this.generateStandardTelemDataPacket());
+			packets.add(this.generateStandardTelemDataPacket(startTime + (3*i)));
 		}
+		startTime += 6;
+		
 		for(int i = 0; i<2; i++){
-			packets.add(this.generateTerribleTelemDataPacket());
+			packets.add(this.generateTerribleTelemDataPacket(startTime + (3*i)));
 		}
+		startTime += 6;
 		for(int i = 0; i<2; i++){
-			packets.add(this.generateEmptyMapsTelemDataPacket());
+			packets.add(this.generateEmptyMapsTelemDataPacket(startTime + (3*i)));
 		}
 		
 		this.toTest.store(packets.get(3));
@@ -473,7 +477,7 @@ public class CSVDatabaseTest {
 	 * are just dates before Jan 1 1970. 
 	 */
 	@Test
-	public void negativeValuesShouldNotThrowException(){
+	public void getAllSinceNegativeValuesShouldNotThrowException(){
 		try{
 		toTest.getAllTelemDataPacketsSince(-1);
 		}
@@ -486,7 +490,7 @@ public class CSVDatabaseTest {
 	 * If it has nothing, it shouldn't return any values. 
 	 */
 	@Test
-	public void emptyDBShouldGiveNothing(){
+	public void getAllSinceEmptyDBShouldGiveNothing(){
 		this.testFutureTimeShouldGiveSizeZeroLists(toTest);
 		assertTrue(
 				this.toTest.getAllTelemDataPacketsSince(System.currentTimeMillis()).size() == 0);
@@ -496,12 +500,12 @@ public class CSVDatabaseTest {
 	 * If it only has one value, it should return it when asked. 
 	 */
 	@Test
-	public void dbSizeOneShouldGiveListSizeOne() throws IOException{
+	public void getAllSinceDBSizeOneShouldGiveListSizeOne() throws IOException{
 		double startTime = System.currentTimeMillis();
 		TelemDataPacket test = this.generateStandardTelemDataPacket();
 		toTest.store(test);
 		this.testFutureTimeShouldGiveSizeZeroLists(toTest);
-		ArrayList<TelemDataPacket> theList = toTest.getAllTelemDataPacketsSince(startTime);
+		ArrayList<TelemDataPacket> theList = toTest.getAllTelemDataPacketsSince(startTime-3);
 		assertTrue(theList.size() == 1);
 		assertTrue(theList.get(0).equals(test));
 		
@@ -513,24 +517,24 @@ public class CSVDatabaseTest {
 	 * Should only return values created later than the specified time. 
 	 */
 	@Test
-	public void dbSizeTwoShouldGiveOnlyWhatIsSpecified() throws IOException{
+	public void getAllSinceDBSizeTwoShouldGiveOnlyWhatIsSpecified() throws IOException{
 		TelemDataPacket testOne = this.generateStandardTelemDataPacket();
-		TelemDataPacket testTwo = this.generateTerribleTelemDataPacket();
-		TelemDataPacket testThree = this.generateEmptyMapsTelemDataPacket();
+		TelemDataPacket testTwo = this.generateTerribleTelemDataPacket(testOne.getTimeCreated() + 3);
+		TelemDataPacket testThree = this.generateEmptyMapsTelemDataPacket(testTwo.getTimeCreated() + 5);
 		toTest.store(testOne);
 		toTest.store(testTwo);
 		toTest.store(testThree);
 		this.testFutureTimeShouldGiveSizeZeroLists(toTest);
-		ArrayList<TelemDataPacket> theList = toTest.getAllTelemDataPacketsSince(testThree.getTimeCreated()-10);
-		assertTrue(theList.size() == 1);
+		ArrayList<TelemDataPacket> theList = toTest.getAllTelemDataPacketsSince(testThree.getTimeCreated()-1);
+		assertTrue("Should be size 1, is" + theList.size(),theList.size() == 1);
 		assertTrue(theList.get(0).equals(testThree));
 		
-		theList = toTest.getAllTelemDataPacketsSince(testTwo.getTimeCreated()-10);
+		theList = toTest.getAllTelemDataPacketsSince(testTwo.getTimeCreated()-1);
 		assertTrue(theList.size() == 2);
 		assertTrue(theList.get(0).equals(testTwo));
 		assertTrue(theList.get(1).equals(testThree));
 		
-		theList = toTest.getAllTelemDataPacketsSince(testOne.getTimeCreated()-10);
+		theList = toTest.getAllTelemDataPacketsSince(testOne.getTimeCreated()-1);
 		assertTrue(theList.size() == 3);
 		assertTrue(theList.get(0).equals(testOne));
 		assertTrue(theList.get(1).equals(testTwo));
@@ -544,25 +548,25 @@ public class CSVDatabaseTest {
 	 * sorts on return. (But probably should sort on 'store'). 
 	 */
 	@Test
-	public void storingOutOfOrderShouldComeBackInOrder() throws IOException{
+	public void getAllSinceStoringOutOfOrderShouldComeBackInOrder() throws IOException{
 		TelemDataPacket testOne = this.generateStandardTelemDataPacket();
-		TelemDataPacket testTwo = this.generateTerribleTelemDataPacket();
-		TelemDataPacket testThree = this.generateEmptyMapsTelemDataPacket();
+		TelemDataPacket testTwo = this.generateTerribleTelemDataPacket(testOne.getTimeCreated() + 3);
+		TelemDataPacket testThree = this.generateEmptyMapsTelemDataPacket(testTwo.getTimeCreated() + 5);
 		toTest.store(testTwo);
 		toTest.store(testThree);
 		toTest.store(testOne);
 		
 		this.testFutureTimeShouldGiveSizeZeroLists(toTest);
-		ArrayList<TelemDataPacket> theList = toTest.getAllTelemDataPacketsSince(testThree.getTimeCreated()-10);
+		ArrayList<TelemDataPacket> theList = toTest.getAllTelemDataPacketsSince(testThree.getTimeCreated()-1);
 		assertTrue(theList.size() == 1);
 		assertTrue(theList.get(0).equals(testThree));
 		
-		theList = toTest.getAllTelemDataPacketsSince(testTwo.getTimeCreated()-10);
+		theList = toTest.getAllTelemDataPacketsSince(testTwo.getTimeCreated()-1);
 		assertTrue(theList.size() == 2);
 		assertTrue(theList.get(0).equals(testTwo));
 		assertTrue(theList.get(1).equals(testThree));
 		
-		theList = toTest.getAllTelemDataPacketsSince(testOne.getTimeCreated()-10);
+		theList = toTest.getAllTelemDataPacketsSince(testOne.getTimeCreated()-1);
 		assertTrue(theList.size() == 3);
 		assertTrue(theList.get(0).equals(testOne));
 		assertTrue(theList.get(1).equals(testTwo));
@@ -574,7 +578,7 @@ public class CSVDatabaseTest {
 	 * (i.e the one's with null values should return as just empty lists). 
 	 */
 	@Test
-	public void retrievingBadInputsWithGetSinceShouldNotThrowException() throws IOException{
+	public void getAllSinceRetrievingBadInputsWithGetSinceShouldNotThrowException() throws IOException{
 		double startTime = System.currentTimeMillis();
 		ArrayList<TelemDataPacket> testPkts = this.loadGoodBadEmptyTelemPackets();
 		testZeroAndNegativeInputsShouldGiveSizeZeroLists(toTest);
@@ -615,7 +619,7 @@ public class CSVDatabaseTest {
 	 */
 	@Test
 	public void dbWithLotsShouldGiveBigList() throws IOException{
-		int number = 1000;
+		int number = 10;//00;
 		for(int i= 0; i<number; i++){
 			toTest.store(this.generateStandardTelemDataPacket());
 		}
@@ -647,15 +651,22 @@ public class CSVDatabaseTest {
 	 * If stored out of order, should be returned in order and without missing any. 
 	 */
 	@Test
-	public void outOfOrderItemsShouldBeReturnedInOrder() throws IOException{
+	public void getAllOutOfOrderItemsShouldBeReturnedInOrder() throws IOException{
 		ArrayList<TelemDataPacket> testValues = new ArrayList<TelemDataPacket>();
-		testValues.add(this.generateStandardTelemDataPacket());
-		testValues.add(this.generateStandardTelemDataPacket());
-		testValues.add(this.generateEmptyMapsTelemDataPacket());
-		testValues.add(this.generateEmptyMapsTelemDataPacket());
-		testValues.add(this.generateTerribleTelemDataPacket());
-		testValues.add(this.generateTerribleTelemDataPacket());
-		
+		double startTime = System.currentTimeMillis();
+		System.out.println("startTest");
+		testValues.add(this.generateStandardTelemDataPacket(startTime - 7));
+		testValues.add(this.generateStandardTelemDataPacket(startTime - 5));
+		testValues.add(this.generateEmptyMapsTelemDataPacket(startTime - 3));
+		testValues.add(this.generateEmptyMapsTelemDataPacket(startTime - 1));
+		testValues.add(this.generateTerribleTelemDataPacket(startTime + 1));
+		testValues.add(this.generateTerribleTelemDataPacket(startTime + 3));
+		//A better approach would just be to specify times but you'd have to redo the
+		// generateTerrible and Empty pckts.
+		System.out.println("Times going in");
+		for(TelemDataPacket e : testValues){
+			System.out.println("time: " + e.getTimeCreated() + " speed " + e.getSpeed());
+		}
 		toTest.store(testValues.get(4));
 		toTest.store(testValues.get(2));
 		toTest.store(testValues.get(3));
@@ -664,10 +675,26 @@ public class CSVDatabaseTest {
 		
 		ArrayList<TelemDataPacket> returnedValues = toTest.getAllTelemDataPacket();
 		assertTrue(returnedValues.size() == 4);
+		System.out.println("testing");
+		for(TelemDataPacket pkt : returnedValues){
+			System.out.println("time: " + pkt.getTimeCreated() + " " + pkt.toString());
+		}
 		assertTrue(returnedValues.get(0).equals(testValues.get(1)));
 		assertTrue(returnedValues.get(1).equals(testValues.get(2)));
 		assertTrue(returnedValues.get(2).equals(testValues.get(3)));
 		assertTrue(returnedValues.get(3).equals(testValues.get(4)));
+	}
+	
+	private void wasteAMillisecond(){
+		int v = 0;
+		for(int first=0; first<100000; first++){
+			for(int scnd = 0; scnd<100000; scnd++){
+				for(int third = 0; third<50; third++){
+					v++;
+					v--;
+				}
+			}
+		}
 	}
 	
 	//=================== get(double) tests =======================
@@ -734,6 +761,25 @@ public class CSVDatabaseTest {
 		
 	}
 	
+	private TelemDataPacket generateStandardTelemDataPacket(double timeInMillis){
+		int speed = 5;
+		int totalVoltage = 6;
+		HashMap<String, Integer> temperatures = new HashMap<String, Integer>();		
+		temperatures.put("bms", (35));
+		temperatures.put("motor", (40));
+		temperatures.put("pack0", (41));
+		temperatures.put("pack1", (42));
+		temperatures.put("pack2", (43));
+		temperatures.put("pack3", (44));
+		HashMap<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
+		for(int i = 0; i<4; i++){ //Current number of cells coming in pack is 4. Will probably have to adjust that.
+			cellVoltages.put(i, generatePackVoltages());
+		}
+		
+		return new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages, timeInMillis);
+		
+	}
+	
 	private ArrayList<Float> generatePackVoltages(){
 		ArrayList<Float> cell1 = new ArrayList<Float>();
 		Random rng = new Random();
@@ -751,12 +797,27 @@ public class CSVDatabaseTest {
 		return new NullTelemDataPacket(speed, totalVoltage, new HashMap<String, Integer>(), new HashMap<Integer, ArrayList<Float>>());
 	}
 	
-	private TelemDataPacket generateEmptyMapsTelemDataPacket(){
+	private TelemDataPacket generateTerribleTelemDataPacket(double timeCreatedInMillis){
 		int speed = -1;
+		int totalVoltage = -2;
+		//NullTelemDataPacket will store the empty maps as 'null's
+		return new NullTelemDataPacket(speed, totalVoltage, new HashMap<String, Integer>(), new HashMap<Integer, ArrayList<Float>>(), timeCreatedInMillis);
+	}
+	
+	private TelemDataPacket generateEmptyMapsTelemDataPacket(){
+		int speed = -3;
 		int totalVoltage = -2;
 		HashMap<String, Integer> temperatures = new HashMap<String, Integer>();	
 		HashMap<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
 		return new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages);
+	}
+	
+	private TelemDataPacket generateEmptyMapsTelemDataPacket(double timeInMillis){
+		int speed = -3;
+		int totalVoltage = -2;
+		HashMap<String, Integer> temperatures = new HashMap<String, Integer>();	
+		HashMap<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
+		return new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages, timeInMillis);
 	}
 	
 	

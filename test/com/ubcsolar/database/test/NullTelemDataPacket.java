@@ -39,6 +39,23 @@ public class NullTelemDataPacket extends TelemDataPacket {
 		}
 	}
 	
+	public NullTelemDataPacket(int newSpeed, int newTotalVoltage, HashMap<String, Integer> newTemperatures,
+			HashMap<Integer, ArrayList<Float>> newCellVoltages, double timeInMillis) {
+		super(newSpeed, newTotalVoltage,newTemperatures, newCellVoltages, timeInMillis);
+	
+		if(newTemperatures.size() == 0){
+			this.temperatures = null;
+		}else{
+			this.temperatures = newTemperatures;
+		}
+		
+		if(newCellVoltages.size() == 0){
+			this.cellVoltages = null;
+		}else{
+			this.cellVoltages = newCellVoltages;
+		}
+	}
+	
 	
 	@Override
 	public HashMap<String,Integer> getTemperatures(){

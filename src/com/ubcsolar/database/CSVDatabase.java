@@ -151,7 +151,7 @@ public class CSVDatabase extends Database {
 	/**
 	 * Assumes they're in chronological order. Returns the lowest position
 	 * where the dataUnit's creation time is later than start time. 
-	 * Returns -1 if none exist. 
+	 * Returns the array's size if none exist. 
 	 * @param startTime
 	 * @param toSearch
 	 * @return
@@ -163,7 +163,7 @@ public class CSVDatabase extends Database {
 				return i;
 			}
 		}
-		return -1;
+		return toSearch.size();
 	}
 	
 	/**
@@ -171,7 +171,6 @@ public class CSVDatabase extends Database {
 	 * @return
 	 */
 	public ArrayList<TelemDataPacket> getAllTelemDataPacket(){
-		//TODO double check that this works.
 		ArrayList<TelemDataPacket> toReturn = new ArrayList<TelemDataPacket>(this.recallStuffList);
 		return toReturn;
 	}
@@ -352,10 +351,19 @@ public class CSVDatabase extends Database {
 		//puts the packet in the right spot. 
 		//TODO make it put stuff in the right spot. 
 		this.recallStuff.put(toStore.getTimeCreated(), toStore);
-		this.recallStuffList.add(toStore);
+		int storePos = this.findPosOfFirstPktPastTime(toStore.getTimeCreated(), this.recallStuffList);
+		System.out.println("store in: " + storePos + " out of " + recallStuffList.size());
+		this.recallStuffList.add(storePos, toStore);
 		
 	}
 
+	/*
+	 * Stores the dataunit in the database.
+	 * NOTE: generally stores in chronological order, and where multiple dataunits
+	 * have the same createdTime (i.e within the same millisecond), in an arbitrary order. 
+	 * (non-Javadoc)
+	 * @see com.ubcsolar.database.Database#store(com.ubcsolar.common.DataUnit)
+	 */
 	@Override
 	public void store(DataUnit toStore) throws IOException {
 		if(toStore instanceof TelemDataPacket){

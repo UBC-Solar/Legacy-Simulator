@@ -71,8 +71,7 @@ public Map<String, Object> getAllValues() {
 		if(newTemperatures == null || newCellVoltages == null){
 			throw new NullPointerException("Can't created a DataUnit with a null value");
 		}
-		
-		//TODO turn this into System.nanoTime(), more accurate. 
+		 
 		this.timeCreated = System.currentTimeMillis();
 		this.speed = newSpeed;
 		this.totalVoltage = newTotalVoltage;
@@ -84,6 +83,10 @@ public Map<String, Object> getAllValues() {
 		return speed;
 	}
 	
+	/**
+	 * 
+	 * @return 
+	 */
 	public double getTimeCreated(){
 		return this.timeCreated;
 	}
@@ -108,7 +111,8 @@ public Map<String, Object> getAllValues() {
 	
 	@Override
 	public String toString(){
-		return Integer.toString(this.speed) + "\n"
+		return this.timeCreated + "\n"
+				+ Integer.toString(this.speed) + "\n"
 				+ Float.toString(this.totalVoltage) + "\n"
 				+ this.temperatures.toString() + "\n"
 				+ this.cellVoltages.toString() + "\n";
