@@ -122,6 +122,8 @@ public Map<String, Object> getAllValues() {
 	
 	@Override
 	public boolean equals(Object toCheckAgainst){
+		//TODO Tweak this so that it uses the getter methods from the other class
+		//in case of extended classes (i.e the null telem data packet).
 		if(super.equals(toCheckAgainst)){
 			return true; //shortcut: if they're the same object, they
 						//must be equal

@@ -238,7 +238,9 @@ public class CSVDatabase extends Database {
 
 	@Override
 	public void saveAndDisconnect() throws IOException {
+		if(writingQueue.size() > 0){
 		flushAndSave();
+		}
 		myFileWriter.close();
 		this.isDBConnected = false; 
 	}
