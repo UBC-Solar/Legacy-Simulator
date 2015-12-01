@@ -619,7 +619,7 @@ public class CSVDatabaseTest {
 	 */
 	@Test
 	public void dbWithLotsShouldGiveBigList() throws IOException{
-		int number = 10;//00;
+		int number = 1000;
 		for(int i= 0; i<number; i++){
 			toTest.store(this.generateStandardTelemDataPacket());
 		}
@@ -654,7 +654,6 @@ public class CSVDatabaseTest {
 	public void getAllOutOfOrderItemsShouldBeReturnedInOrder() throws IOException{
 		ArrayList<TelemDataPacket> testValues = new ArrayList<TelemDataPacket>();
 		double startTime = System.currentTimeMillis();
-		System.out.println("startTest");
 		testValues.add(this.generateStandardTelemDataPacket(startTime - 7));
 		testValues.add(this.generateStandardTelemDataPacket(startTime - 5));
 		testValues.add(this.generateEmptyMapsTelemDataPacket(startTime - 3));
@@ -663,10 +662,6 @@ public class CSVDatabaseTest {
 		testValues.add(this.generateTerribleTelemDataPacket(startTime + 3));
 		//A better approach would just be to specify times but you'd have to redo the
 		// generateTerrible and Empty pckts.
-		System.out.println("Times going in");
-		for(TelemDataPacket e : testValues){
-			System.out.println("time: " + e.getTimeCreated() + " speed " + e.getSpeed());
-		}
 		toTest.store(testValues.get(4));
 		toTest.store(testValues.get(2));
 		toTest.store(testValues.get(3));
@@ -675,10 +670,6 @@ public class CSVDatabaseTest {
 		
 		ArrayList<TelemDataPacket> returnedValues = toTest.getAllTelemDataPacket();
 		assertTrue(returnedValues.size() == 4);
-		System.out.println("testing");
-		for(TelemDataPacket pkt : returnedValues){
-			System.out.println("time: " + pkt.getTimeCreated() + " " + pkt.toString());
-		}
 		assertTrue(returnedValues.get(0).equals(testValues.get(1)));
 		assertTrue(returnedValues.get(1).equals(testValues.get(2)));
 		assertTrue(returnedValues.get(2).equals(testValues.get(3)));

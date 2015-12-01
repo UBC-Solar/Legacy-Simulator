@@ -50,7 +50,7 @@ public class CSVDatabase extends Database {
 	ArrayList<TelemDataPacket> recallStuffList = new ArrayList<TelemDataPacket>();
 	
 	/**
-	 * Constructor; Create and set up database. ALWAYS CREATES A NEW FILE. //TODO add an append method
+	 * Constructor; Create and set up database. ALWAYS CREATES A NEW FILE.
 	 * @param filename - filename for the .csv
 	 * @throws IOException - if it can't create the file for some reason. 
 	 */
@@ -99,8 +99,7 @@ public class CSVDatabase extends Database {
 	 * @throws IOException
 	 */
 	private void setup(String filename) throws IOException{
-		entryCounter = 0; //TODO write a check for the last value if reopening a database
-						//don't want to overwrite
+		entryCounter = 0; 
 		//TODO add it to a buffered OutPutStream (so that it only writes when it has a full page)
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
 				"CSV Database created with name " + filename + ".csv");
@@ -138,8 +137,7 @@ public class CSVDatabase extends Database {
 		if(start == -1){
 			return new ArrayList<TelemDataPacket>();
 		}
-		//TODO double check that below, it creates an ArrayList of the right size right off the bat.
-		//important because we don't want it copying halfway done arrays a bunch of times. 
+		
 		ArrayList<TelemDataPacket> toReturn = new ArrayList<TelemDataPacket>(this.recallStuffList.size() - start);
 		for(int i = start; i<this.recallStuffList.size(); i++){
 			toReturn.add(this.recallStuffList.get(i));
@@ -163,11 +161,13 @@ public class CSVDatabase extends Database {
 				return i;
 			}
 		}
-		return toSearch.size();
+		return toSearch.size(); //protects against size 0 arrays and is a good default. 
 	}
 	
+	
+	
 	/**
-	 * Returns a COPY of a list of all telemdatapackets received
+	 * Returns a COPY of a list of all TelemDataPackets received
 	 * @return
 	 */
 	public ArrayList<TelemDataPacket> getAllTelemDataPacket(){
@@ -350,10 +350,6 @@ public class CSVDatabase extends Database {
 
 	//Puts the telemdatapacket into the right place in the list
 	private void putIntoRAM(TelemDataPacket toStore) {
-
-		//this is what was here, will need to be improved to make sure it
-		//puts the packet in the right spot. 
-		//TODO make it put stuff in the right spot. 
 		this.recallStuff.put(toStore.getTimeCreated(), toStore);
 		int storePos = this.findPosOfFirstPktPastTime(toStore.getTimeCreated(), this.recallStuffList);
 		this.recallStuffList.add(storePos, toStore);
