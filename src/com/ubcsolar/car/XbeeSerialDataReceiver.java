@@ -62,10 +62,6 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 	 * transfer to the DataProcessor
 	 * @param jsonString - the string received from the xbee serial port. 
 	 */
-	//TODO Consider moving this method into the data processor? Probably not 
-	//super big on processing, but it would help prevent a crash if this 
-	//enters an infinite loop or encounters an exception it couldn't handle. 
-	//(wouldn't need to rebuilt the entire serial port to recover, just the processor. 
 	public void loadJSONData(String jsonString){
 		JSONObject jsonData;
 		
@@ -75,7 +71,6 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 			jsonData = new JSONObject(jsonString);
 		}catch(JSONException e){
 			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Received a Corrupt Packet");
-			System.out.println("Received a Corrupt Packet");
 			return; //malformed (corrupted) data is ignored.
 		}
 		int speed = (int) jsonData.get("speed");
@@ -100,15 +95,6 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 		this.myDataProcessor.store(newData);
 	}
 	 	
-	/**
-	 * DEPRECATED. Read the "data" variable instead.
-	 * gets the last reported speed, in km/h. 
-	 * @return the last repoted speed, in km/h. 
-	 */
-	@Deprecated
-	public int getLastReportedSpeed(){
-		return 99999; // garbage value. 
-	}
 	
 	/**
 	 * This class is made to be it's own thread so it can block waiting for a 
@@ -130,12 +116,6 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 			serialPort.removeEventListener();
 			serialPort.closePort();
 		
-	}
-
-	@Deprecated
-	protected void checkForUpdate(){
-		// test
-		loadJSONData("{\"speed\":100,\"totalVoltage\":44.4,\"stateOfCharge\":101,\"temperatures\":{\"bms\":40,\"motor\":50,\"pack0\":35,\"pack1\":36,\"pack2\":37,\"pack3\":38},\"cellVoltages\":{\"pack0\":[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2],\"pack1\":[1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2],\"pack2\":[2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3.0,3.1,3.2],\"pack3\":[3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4.0,4.1,4.2]}}\n");
 	}
 
 	/**

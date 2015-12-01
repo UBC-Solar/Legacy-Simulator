@@ -500,7 +500,7 @@ public class CSVDatabaseTest {
 	@Test
 	public void getAllSinceDBSizeOneShouldGiveListSizeOne() throws IOException{
 		double startTime = System.currentTimeMillis();
-		TelemDataPacket test = this.generateStandardTelemDataPacket();
+		TelemDataPacket test = this.generateStandardTelemDataPacket(startTime);
 		toTest.store(test);
 		this.testFutureTimeShouldGiveSizeZeroLists(toTest);
 		ArrayList<TelemDataPacket> theList = toTest.getAllTelemDataPacketsSince(startTime-3);

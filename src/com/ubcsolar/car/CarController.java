@@ -6,9 +6,6 @@
 
 package com.ubcsolar.car;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.ubcsolar.Main.GlobalController;
 
 //import org.jfree.util.Log;
@@ -19,7 +16,6 @@ import com.ubcsolar.notification.*;
 
 import jssc.SerialPortException;
 
-// TODO: Check threading. Should be calling subclasses as their own thread
 public class CarController extends ModuleController {
 	
 	private DatabaseController myDatabase; //references to the data warehouse. Want to store the car's broadcasts
@@ -36,14 +32,13 @@ public class CarController extends ModuleController {
 	public CarController(GlobalController myGlobalController) {
 		super(myGlobalController);
 		myDatabase = mySession.getMyDataBaseController();
-		myDataProcessor = new DataProcessor(this); //TODO turn this into threaded properly.
+		myDataProcessor = new DataProcessor(this);
 	}
 	
 	/**
 	 * Create a new connection to a car (will attempt to close any existing ones) 
 	 */
 	public void establishNewConnection(){
-		//TODO set up the exceptions properly
 		try{
 			stopListeningToCar(); //close any existing current connection
 		
@@ -93,9 +88,6 @@ public class CarController extends ModuleController {
 		if(this.lastReceived != null){
 			this.lastReceived = null;
 		}
-		
-		//TODO consider something about the DB here. It should probably do something if a new
-		//car is loaded, but do we handle that here or in the DB?
 	}
 	
 	/**

@@ -8,10 +8,8 @@ package com.ubcsolar.car;
 import java.util.ArrayList;
 
 import com.ubcsolar.common.TelemDataPacket;
-import com.ubcsolar.notification.CarUpdateNotification;
 
 public class DataProcessor {
-//TODO make this implement Runnable. Want it to be a seperate thread than the one listening to inputs. 
 	//private Database myDatabase;
 	private CarController myController;
 	private ArrayList<TelemDataPacket> list;

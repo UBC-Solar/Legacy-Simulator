@@ -71,35 +71,7 @@ public class BasicSimulatedDataReceiver extends AbstractDataReceiver {
 	public String getName(){
 		return name;
 	}
-	/*
-	 * This was a super simple algorithm method from when I first built the class.
-	 * Been replaced by the Timer Task. 
-
-	/**
-	 * generated a new speed. Accelerates up to 100, then slows back down to 0 linerally. 
-	 */ /*
-	protected void checkForUpdate(){
-	if(speed == 0){
-		isAccelerating = true;
-		speed++;
-		myCarController.adviseOfNewCarReport((new CarUpdateNotification(this.speed)));
-	}
-	else if(speed == 100){
-		isAccelerating = false;
-		speed --;
-		myCarController.adviseOfNewCarReport((new CarUpdateNotification(this.speed)));
-	}
-	else{
-		if(isAccelerating){
-			speed++;
-		}
-		else{
-			speed --;
-		}
-		myCarController.adviseOfNewCarReport((new CarUpdateNotification(this.speed)));
-	}
-	}*/
-
+	
 	@Override
 	void setName() {
 		this.name = "fake!";

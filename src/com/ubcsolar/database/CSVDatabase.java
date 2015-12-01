@@ -127,7 +127,12 @@ public class CSVDatabase extends Database {
 		return temp;
 	}
 	
-
+	/**
+	 * Returns All TelemDataPackets created later than the specified time, or the entire
+	 * list if there are no packets earlier than the startTime. 
+	 * @param startTime
+	 * @return the ArrayList of all 
+	 */
 	public ArrayList<TelemDataPacket> getAllTelemDataPacketsSince(double startTime){
 		
 		int start = findPosOfFirstPktPastTime(startTime, this.recallStuffList);
@@ -161,7 +166,7 @@ public class CSVDatabase extends Database {
 		 * end is actually best case (should be O(1))
 		 */
 		for(int i = toSearch.size(); i>0; i--){
-			if(toSearch.get(i-1).getTimeCreated()<=startTime){
+			if(toSearch.get(i-1).getTimeCreated()<startTime){
 				return i;
 			}
 		}
@@ -240,6 +245,10 @@ public class CSVDatabase extends Database {
 	}
 
 
+	/**
+	 * Saves all currently pending packets to the database and closes the fileStream and file. 
+	 * Call before closing the program to ensure proper disconnection. 
+	 */
 	@Override
 	public void saveAndDisconnect() throws IOException {
 		if(isDBConnected){ //gotta make sure we don't mess up the db connected state. 
@@ -320,13 +329,12 @@ public class CSVDatabase extends Database {
 	 * sanitizes the TelemDataPacket so that the DB can store properly
 	 * (mostly just replaces 'null' with empty maps).
 	 * 
-	 * The basic TelemDataPacket will reject all nulls, but it's 
+	 * The TelemDataPacket class will reject all nulls, but it's 
 	 * good to check for them anyway so we don't break the later 
 	 * parts of DB processing. (I made an extended DataPacket that 
 	 * returned nulls for the maps; it's possible.)
 	 */
 	private TelemDataPacket sanitizeInput(TelemDataPacket toStore) {
-		//NOTE: The basic TelemDataPacket
 		double creationTime = toStore.getTimeCreated();
 		int speed = toStore.getSpeed();
 		float totalVoltage = toStore.getTotalVoltage();
@@ -352,7 +360,7 @@ public class CSVDatabase extends Database {
 		
 	}
 
-	//Puts the telemdatapacket into the right place in the list
+	//Puts the TelemDataPacket into the right place in the list
 	private void putIntoRAM(TelemDataPacket toStore) {
 		this.recallStuff.put(toStore.getTimeCreated(), toStore);
 		int storePos = this.findPosOfFirstPktPastTime(toStore.getTimeCreated(), this.recallStuffList);
