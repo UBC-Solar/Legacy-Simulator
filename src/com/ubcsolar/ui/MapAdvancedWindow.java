@@ -268,9 +268,9 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 				double[][] data = new double[2][listOfPoints.size()];
 				if(listOfPoints.size() > 1){
 					data[0][0] = tripDistance; //first distance is zero.
-					data[1][0] = listOfPoints.get(0).getElevationInMeters();
-					minHeight = listOfPoints.get(0).getElevationInMeters();
-					maxHeight = listOfPoints.get(0).getElevationInMeters();
+					data[1][0] = listOfPoints.get(0).getElevation();
+					minHeight = listOfPoints.get(0).getElevation();
+					maxHeight = listOfPoints.get(0).getElevation();
 					
 					
 					for(int i = 1; i<listOfPoints.size(); i++){
@@ -279,7 +279,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 						data[0][i] = tripDistance;
 						
 						//TODO make this change from feet to anything
-						double tempHeight = listOfPoints.get(i).getElevationInMeters();
+						double tempHeight = listOfPoints.get(i).getElevation();
 						data[1][i] = tempHeight;
 						if(tempHeight - minHeight < 0){
 							minHeight = tempHeight; //new low

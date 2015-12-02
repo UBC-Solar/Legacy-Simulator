@@ -12,5 +12,5 @@
 package com.ubcsolar.common;
 
 public enum DistanceUnit {
-	MILES, KILOMETERS, FEET
+	MILES, KILOMETERS, FEET, METERS
 }

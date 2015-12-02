@@ -1,118 +1,41 @@
 package com.ubcsolar.common;
 
-public class GeoCoord {
+import java.util.HashMap;
+import java.util.Map;
+
+public class GeoCoord extends DataUnit {
 private final double lat;
 private final double lon;
 private final double elevation; //in meters
+private final double timeCreated;
 private String information;
 
 public GeoCoord(double lat, double lon, double elevationInMeters){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
+	this.timeCreated = System.currentTimeMillis();
 }
 
-public GeoCoord(int lat, int lon, int elevationInMeters){
+public GeoCoord(double lat, double lon, double elevationInMeters, String information){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
+	this.timeCreated = System.currentTimeMillis();
 }
-
-public GeoCoord(int lat, double lon, double elevationInMeters){
+public GeoCoord(double lat, double lon, double elevationInMeters, double timeCreated){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
+	this.timeCreated = timeCreated;
 }
 
-public GeoCoord(double lat, int lon, double elevationInMeters){
+public GeoCoord(double lat, double lon, double elevationInMeters, String information, double timeCreated){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
+	this.timeCreated = timeCreated;
 }
-
-public GeoCoord(double lat, double lon, int elevationInMeters){
-	this.lat = lat;
-	this.lon = lon;
-	this.elevation = elevationInMeters;
-}
-
-public GeoCoord(int lat, double lon, int elevationInMeters){
-	this.lat = lat;
-	this.lon = lon;
-	this.elevation = elevationInMeters;
-}
-
-
-public GeoCoord(int lat, int lon, double elevationInMeters){
-	this.lat = lat;
-	this.lon = lon;
-	this.elevation = elevationInMeters;
-}
-
-public GeoCoord(double lat, int lon, int elevationInMeters){
-	this.lat = lat;
-	this.lon = lon;
-	this.elevation = elevationInMeters;
-}
-
-public GeoCoord(int lat, int lon, int elevationInMeters, String note){
-	this.lat = lat;
-	this.lon = lon;
-	this.elevation = elevationInMeters;
-	information = note;
-}
-
-public GeoCoord(int lat, double lon, double elevationInMeters, String note){
-	this.lat = lat;
-	this.lon = lon;
-	this.elevation = elevationInMeters;
-	information = note;
-}
-
-public GeoCoord(double lat, int lon, double elevationInMeters, String note){
-	this.lat = lat;
-	this.lon = lon;
-	this.elevation = elevationInMeters;
-	information = note;
-}
-
-public GeoCoord(double lat, double lon, int elevationInMeters, String note){
-	this.lat = lat;
-	this.lon = lon;
-	this.elevation = elevationInMeters;
-	information = note;
-}
-
-public GeoCoord(int lat, double lon, int elevationInMeters, String note){
-	this.lat = lat;
-	this.lon = lon;
-	this.elevation = elevationInMeters;
-	information = note;
-}
-
-
-public GeoCoord(int lat, int lon, double elevationInMeters, String note){
-	this.lat = lat;
-	this.lon = lon;
-	this.elevation = elevationInMeters;
-	information = note;
-}
-
-public GeoCoord(double lat, int lon, int elevationInMeters, String note){
-	this.lat = lat;
-	this.lon = lon;
-	this.elevation = elevationInMeters;
-	information = note;
-}
-
-
-public GeoCoord(double lat, double lon, double elevationInMeters, String note){
-	this.lat = lat;
-	this.lon = lon;
-	this.elevation = elevationInMeters;
-	information = note;
-}
-
 
 /**
  * @override
@@ -127,7 +50,7 @@ public boolean equals(GeoCoord toCheck){
 	double minDelta = delta*-1;
 	double latDiff = toCheck.getLat() - lat;
 	double lonDiff = toCheck.getLon() - lon;
-	double elevationDiff = toCheck.getElevationInMeters() - elevation;
+	double elevationDiff = toCheck.getElevation() - elevation;
 	
 	if(
 			latDiff<delta &&
@@ -170,8 +93,6 @@ public double calculateDistance(GeoCoord ending, DistanceUnit unit){
 	return -1.0;
 }
 
-
-
 /**
  * Calculates the distance in km between two lat/long points
  * using the haversine formula.
@@ -195,12 +116,6 @@ public static double haversine(
     double d = r * c;
     return d;
 }
-
-
-
-
-
-
 
 /**
  * returns a String sumaraizing the Point.
@@ -227,16 +142,45 @@ public double getLon(){
 	return lon;
 }
 
-public double getElevationInMeters(){
+/**
+ * returns in meters by default
+ * @return
+ */
+public double getElevation(){
 	return elevation;
 }
 
-public double getElevationInFeet(){
-	return convertToFeet(elevation);
+public double getElevation(DistanceUnit unit){
+	switch(unit){
+		case METERS: return this.elevation;
+		case FEET: return this.convertToFeet(this.elevation);
+		case KILOMETERS: return this.elevation/1000;
+		case MILES: return this.elevation/1609.34;
+		default: return -1;
+	}
 }
 
 private double convertToFeet(double meters) {
 	return meters*3.28084;
+}
+
+@Override
+public double getTimeCreated() {
+	return this.timeCreated;
+}
+
+@Override
+public Map<String, ? extends Object> getAllValues() {
+	HashMap<String, Object> keyValues = new HashMap<String, Object>();
+	keyValues.put("Time Created", this.timeCreated);
+	keyValues.put("Latitude", this.lat);
+	keyValues.put("Longitude", this.lon);
+	keyValues.put("Elevation", this.elevation);
+	if(this.information != null){
+		keyValues.put("Note", this.information);
+	}
+	
+	return keyValues;
 }
 
 
