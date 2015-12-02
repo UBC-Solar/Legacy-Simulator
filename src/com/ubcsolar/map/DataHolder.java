@@ -21,10 +21,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.ubcsolar.common.GeoCoord;
+
 public class DataHolder {
 	private MapController myMapController;
 	private String filename;
-	private ArrayList<Point> theDataList;
+	private ArrayList<GeoCoord> theDataList;
 	
 	/**
 	 * Constructor. 
@@ -51,7 +53,7 @@ public class DataHolder {
 	/**
 	 * @return all points currently loaded
 	 */
-	public ArrayList<Point> getAllPoints(){
+	public ArrayList<GeoCoord> getAllPoints(){
 		return theDataList;
 	}
 	
@@ -64,9 +66,9 @@ public class DataHolder {
 	 * @throws ParserConfigurationException - issue with the SAX parser.
 	 */
 	private void pureLoad(String filename) throws IOException, SAXException, ParserConfigurationException{
-		theDataList = new ArrayList<Point>();
+		theDataList = new ArrayList<GeoCoord>();
 		SaxKmlParser parser = new SaxKmlParser();
-		ArrayList<Point> allPoints = new ArrayList<Point>();
+		ArrayList<GeoCoord> allPoints = new ArrayList<GeoCoord>();
 		parser.parseToPoints(theDataList, filename);
 		
 		// for testing, print out the points that were just loaded

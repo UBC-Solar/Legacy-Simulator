@@ -16,6 +16,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;  
 import org.xml.sax.helpers.LocatorImpl;
+
+import com.ubcsolar.common.GeoCoord;
   
 public class SaxKmlParser extends DefaultHandler{
 	  
@@ -24,7 +26,7 @@ public class SaxKmlParser extends DefaultHandler{
 	String placemarkTag = "open";
 	String pointName = "";
 	String coordinates = "";
-	List<Point> toFill;
+	List<GeoCoord> toFill;
 	// parse the XML specified in the given path and uses supplied  
 	// handler to parse the document  
 	// this calls startElement(), endElement() and character() methods  
@@ -43,7 +45,7 @@ public class SaxKmlParser extends DefaultHandler{
 	 * @throws IOException - if something is wrong with the file (not found etc)
 	 * @throws ParserConfigurationException 
 	 */
-	public <InputClass extends List<Point>> InputClass parseToPoints(InputClass toFill, String file) throws SAXException, IOException, ParserConfigurationException{  
+	public <InputClass extends List<GeoCoord>> InputClass parseToPoints(InputClass toFill, String file) throws SAXException, IOException, ParserConfigurationException{  
 	this.toFill = toFill;
 
 	   
@@ -139,9 +141,9 @@ public class SaxKmlParser extends DefaultHandler{
 							new LocatorImpl());
 				}
 				
-				Point temp;
+				GeoCoord temp;
 				try{
-				temp = new Point(Double.parseDouble(coordinatePieces[0]),
+				temp = new GeoCoord(Double.parseDouble(coordinatePieces[0]),
 										Double.parseDouble(coordinatePieces[1]),
 										Double.parseDouble(coordinatePieces[2]));
 				}

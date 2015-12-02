@@ -7,9 +7,8 @@ package com.ubcsolar.ui;
 
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.DistanceUnit;
+import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
-import com.ubcsolar.map.Point;
-
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 import com.ubcsolar.notification.RouteDataAsRequestedNotification;
@@ -249,7 +248,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	 * @param numOfDistanceRequested - the distance they cover (or were requested to)
 	 * @param unitMeasuredBy - units. 
 	 */
-	private void updateMap(ArrayList<Point> listOfPoints,
+	private void updateMap(ArrayList<GeoCoord> listOfPoints,
 			int numOfDistanceRequested, DistanceUnit unitMeasuredBy) {
 		contentPane.remove(this.cp);
 		//if there are no points, make an empty graph?

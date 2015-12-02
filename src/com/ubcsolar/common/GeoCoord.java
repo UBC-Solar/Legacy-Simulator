@@ -1,106 +1,89 @@
-package com.ubcsolar.map;
+package com.ubcsolar.common;
 
-import com.ubcsolar.common.DistanceUnit;
-
-public class Point {
-private double lat;
-private double lon;
-private double elevation; //in meters
+public class GeoCoord {
+private final double lat;
+private final double lon;
+private final double elevation; //in meters
 private String information;
 
-public Point(double lat, double lon, double elevationInMeters){
+public GeoCoord(double lat, double lon, double elevationInMeters){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
 }
 
-public Point(int lat, int lon, int elevationInMeters){
+public GeoCoord(int lat, int lon, int elevationInMeters){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
 }
 
-public Point(int lat, double lon, double elevationInMeters){
+public GeoCoord(int lat, double lon, double elevationInMeters){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
 }
 
-public Point(double lat, int lon, double elevationInMeters){
+public GeoCoord(double lat, int lon, double elevationInMeters){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
 }
 
-public Point(double lat, double lon, int elevationInMeters){
+public GeoCoord(double lat, double lon, int elevationInMeters){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
 }
 
-public Point(int lat, double lon, int elevationInMeters){
+public GeoCoord(int lat, double lon, int elevationInMeters){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
 }
 
 
-public Point(int lat, int lon, double elevationInMeters){
+public GeoCoord(int lat, int lon, double elevationInMeters){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
 }
 
-public Point(double lat, int lon, int elevationInMeters){
+public GeoCoord(double lat, int lon, int elevationInMeters){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
 }
 
-public Point(int lat, int lon, int elevationInMeters, String note){
-	this.lat = lat;
-	this.lon = lon;
-	this.elevation = elevationInMeters;
-	information = note;
-}
-
-public Point(int lat, double lon, double elevationInMeters, String note){
+public GeoCoord(int lat, int lon, int elevationInMeters, String note){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
 	information = note;
 }
 
-public Point(double lat, int lon, double elevationInMeters, String note){
+public GeoCoord(int lat, double lon, double elevationInMeters, String note){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
 	information = note;
 }
 
-public Point(double lat, double lon, int elevationInMeters, String note){
+public GeoCoord(double lat, int lon, double elevationInMeters, String note){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
 	information = note;
 }
 
-public Point(int lat, double lon, int elevationInMeters, String note){
+public GeoCoord(double lat, double lon, int elevationInMeters, String note){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
 	information = note;
 }
 
-
-public Point(int lat, int lon, double elevationInMeters, String note){
-	this.lat = lat;
-	this.lon = lon;
-	this.elevation = elevationInMeters;
-	information = note;
-}
-
-public Point(double lat, int lon, int elevationInMeters, String note){
+public GeoCoord(int lat, double lon, int elevationInMeters, String note){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
@@ -108,7 +91,22 @@ public Point(double lat, int lon, int elevationInMeters, String note){
 }
 
 
-public Point(double lat, double lon, double elevationInMeters, String note){
+public GeoCoord(int lat, int lon, double elevationInMeters, String note){
+	this.lat = lat;
+	this.lon = lon;
+	this.elevation = elevationInMeters;
+	information = note;
+}
+
+public GeoCoord(double lat, int lon, int elevationInMeters, String note){
+	this.lat = lat;
+	this.lon = lon;
+	this.elevation = elevationInMeters;
+	information = note;
+}
+
+
+public GeoCoord(double lat, double lon, double elevationInMeters, String note){
 	this.lat = lat;
 	this.lon = lon;
 	this.elevation = elevationInMeters;
@@ -123,7 +121,7 @@ public Point(double lat, double lon, double elevationInMeters, String note){
  * 
  * @return
  */
-public boolean equals(Point toCheck){
+public boolean equals(GeoCoord toCheck){
 
 	double delta = 0.000000000000001;
 	double minDelta = delta*-1;
@@ -152,7 +150,7 @@ public boolean equals(Point toCheck){
  * @param unit - the unit the distance should be reported in
  * @return the absolute distance between this point and another
  */
-public double calculateDistance(Point ending, DistanceUnit unit){
+public double calculateDistance(GeoCoord ending, DistanceUnit unit){
 	double kmDistance = Math.abs(
 							haversine(this.lat,
 									this.lon, 
