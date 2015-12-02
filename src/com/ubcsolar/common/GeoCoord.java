@@ -38,19 +38,32 @@ public GeoCoord(double lat, double lon, double elevationInMeters, String informa
 }
 
 /**
- * @override
- * @param toCheck - the point to compare to
+ *
+ * @param toCheckAgainst - the point to compare to
  * returns true if the lats, longs, and elevations are the same (within a delta)
  * 
  * @return
  */
-public boolean equals(GeoCoord toCheck){
-
+@Override
+public boolean equals(Object toCheck){
+	
+	if(!(toCheck instanceof GeoCoord)){
+		return false;
+	}
+	
+	GeoCoord toCheckAgainst;
+	try{
+		toCheckAgainst = (GeoCoord) toCheck;
+	}catch(ClassCastException e){
+		return false; //if it didn't cast, obviously not equal. 
+	}
+	
+	
 	double delta = 0.000000000000001;
 	double minDelta = delta*-1;
-	double latDiff = toCheck.getLat() - lat;
-	double lonDiff = toCheck.getLon() - lon;
-	double elevationDiff = toCheck.getElevation() - elevation;
+	double latDiff = toCheckAgainst.getLat() - lat;
+	double lonDiff = toCheckAgainst.getLon() - lon;
+	double elevationDiff = toCheckAgainst.getElevation() - elevation;
 	
 	if(
 			latDiff<delta &&
