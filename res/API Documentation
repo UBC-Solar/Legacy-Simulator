@@ -1,0 +1,12 @@
+Documentation on APIs used. 
+
+MAP
+1) using the MyMaps web interface, you can create/save a map, and then export to xml (see steps below)
+	https://www.google.com/maps/d/splash?app=mp
+	registered under: no one. I didn't bother saving them on MyMaps. 
+	
+2) The KML does not include elevations (and is a mess). You can use Google's Elevations API to get them
+	https://developers.google.com/maps/documentation/elevation/intro
+	Program key: AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek
+	registered under: Strategy@ubcsolar.com
+	
