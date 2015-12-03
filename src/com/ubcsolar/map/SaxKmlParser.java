@@ -152,11 +152,11 @@ public class SaxKmlParser extends DefaultHandler{
 							+ " Invalid Character?"
 							, new LocatorImpl());
 				}
-				if(pointCount == 0){
+			/*	if(pointCount == 0){
 					temp.setInformation(pointName2); //if it's the first one, set the name as the info. 
 													//first one in a route will be 'directions from __ to__'
 													//first (and only) in a point will be the city name.
-				}
+				}*/
 				toFill.add(temp); //add to end of the toFill list. 
 				pointCount++; //because the number of points may be different than array position (blanks, etc). 
 			

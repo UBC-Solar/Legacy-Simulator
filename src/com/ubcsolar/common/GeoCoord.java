@@ -8,7 +8,6 @@ private final double lat;
 private final double lon;
 private final double elevation; //in meters
 private final double timeCreated;
-private String information;
 
 public GeoCoord(double lat, double lon, double elevationInMeters){
 	this.lat = lat;
@@ -135,16 +134,7 @@ public static double haversine(
  * Form: "name lat,long,elevation"
  */
 public String toString(){
-	return this.information + " " + this.lat + "," + this.lon + "," + this.elevation;
-}
-
-
-public String getInformation(){
-	return information;
-}
-
-public void setInformation(String newInfo){
-	information = newInfo;
+	return this.lat + "," + this.lon + "," + this.elevation + "(m)";
 }
 
 public double getLat(){
@@ -189,9 +179,6 @@ public Map<String, ? extends Object> getAllValues() {
 	keyValues.put("Latitude", this.lat);
 	keyValues.put("Longitude", this.lon);
 	keyValues.put("Elevation", this.elevation);
-	if(this.information != null){
-		keyValues.put("Note", this.information);
-	}
 	
 	return keyValues;
 }

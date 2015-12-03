@@ -1,2 +1,8 @@
 JUnit documentation
 http://junit.sourceforge.net/javadoc/
+
+geoTools library (might be more complicated than we need)
+http://docs.geotools.org/latest/userguide/tutorial/quickstart/eclipse.html
+
+Google Maps engine library (might be useful to replace OpenStreetMap)
+https://developers.google.com/api-client-library/java/apis/mapsengine/v1?hl=en
