@@ -16,12 +16,6 @@ public GeoCoord(double lat, double lon, double elevationInMeters){
 	this.timeCreated = System.currentTimeMillis();
 }
 
-public GeoCoord(double lat, double lon, double elevationInMeters, String information){
-	this.lat = lat;
-	this.lon = lon;
-	this.elevation = elevationInMeters;
-	this.timeCreated = System.currentTimeMillis();
-}
 public GeoCoord(double lat, double lon, double elevationInMeters, double timeCreated){
 	this.lat = lat;
 	this.lon = lon;
@@ -29,12 +23,6 @@ public GeoCoord(double lat, double lon, double elevationInMeters, double timeCre
 	this.timeCreated = timeCreated;
 }
 
-public GeoCoord(double lat, double lon, double elevationInMeters, String information, double timeCreated){
-	this.lat = lat;
-	this.lon = lon;
-	this.elevation = elevationInMeters;
-	this.timeCreated = timeCreated;
-}
 
 /**
  *

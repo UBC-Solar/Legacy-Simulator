@@ -19,6 +19,7 @@ public class GeoCoordTest {
 	@Test
 	public void testGetTimeCreated() {
 		fail("Not yet implemented"); // TODO
+		Integer.parseInt("21");
 	}
 
 	@Test

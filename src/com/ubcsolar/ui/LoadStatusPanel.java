@@ -96,11 +96,13 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	private void initializeValues(){
 		lblCar.setText("Car: " + mySession.getMyCarController().getLoadedCarName());
 		lblMap.setText("Map loaded: " + mySession.getMapController().getLoadedMapName());
+		if(mySession.getMyDataBaseController() != null){
 		if((mySession.getMyDataBaseController()).getDatabaseName() != null){
 		this.updateDatabaseLabel(mySession.getMyDataBaseController().getDatabaseName(), false, System.currentTimeMillis());
 		}
 		else{
 			this.updateDatabaseLabel(null, true, System.currentTimeMillis());
+		}
 		}
 	}
 	
