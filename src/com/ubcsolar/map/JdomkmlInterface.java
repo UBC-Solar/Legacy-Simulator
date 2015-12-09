@@ -8,8 +8,10 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.LocatorImpl;
 
 import com.ubcsolar.common.GeoCoord;
+import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.PointOfInterest;
 import com.ubcsolar.common.Route;
+import com.ubcsolar.common.SolarLog;
 
 public class JdomkmlInterface {
 
@@ -83,7 +85,6 @@ public class JdomkmlInterface {
 		//Note: element names are case-sensitive. 
 			if(placeMarkToCheck.getChild("Point",theNameSpace) != null){
 				String name = placeMarkToCheck.getChildText("name",theNameSpace);
-				System.out.println("name: " + name);
 				GeoCoord location = parseString(placeMarkToCheck.getChild("Point",theNameSpace).getChildText("coordinates",theNameSpace));
 				String description = "";
 				//TODO add in support for description (it's a 'cdata' tag, so I'm not sure)
@@ -104,13 +105,37 @@ public class JdomkmlInterface {
 
 
 	private ArrayList<GeoCoord> parseTrack(String childText) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		String[] roughCoordinates = childText.split("\\s");
+		System.out.println(roughCoordinates.length);
+		
+		//Factor of half is a pretty good estimate/place to start. Minimize number of array
+		//re-allocations.
+		ArrayList<String> coordinates = new ArrayList<String>(roughCoordinates.length/2);
+		
+		for(String s : roughCoordinates){
+			if(s.length()>5){ //(two commas, 3 numbers)
+				coordinates.add(s);
+			}
+		}
+		
+		//it'll be the same size, might as well set that size before we start. 
+		ArrayList<GeoCoord> toReturn = new ArrayList<GeoCoord>(coordinates.size());
+		for(String s : coordinates){
+			try {
+				toReturn.add(parseString(s));
+			} catch (JDOMException e) {
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Rejected a coordinate while importing the KML; parsing error");
+				e.printStackTrace();
+			}
+		}
+		System.out.println("before: " + coordinates.size());
+		System.out.println("after: " + toReturn.size());
+		return toReturn;
 	}
 
 
 	private GeoCoord parseString(String childText) throws JDOMException {
-		System.out.println("coordinate: " + childText);
 		childText = childText.replaceAll("\\s", ""); //to get rid of any tabs or spaces. 
 		String[] coordinatePieces = childText.split("[,\\s]+");
 		if(coordinatePieces.length<3){ //i.e not a valid coordinate. (even altitude 0 would be ok)
