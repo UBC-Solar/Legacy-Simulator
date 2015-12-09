@@ -4,6 +4,8 @@ import java.util.*;
 import org.jdom2.*;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.LocatorImpl;
 
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.PointOfInterest;
@@ -48,7 +50,7 @@ public class JdomkmlInterface {
 	}
 	
 	
-	private Route turnInToRoute(Document myDoc2) {
+	private Route turnInToRoute(Document myDoc2) throws JDOMException {
 		//Documentation: https://developers.google.com/kml/documentation/kmlreference
 		//TODO download just the route and then the entire map
 		//(two different options on Google Maps) to make sure it works for both
@@ -107,11 +109,26 @@ public class JdomkmlInterface {
 	}
 
 
-	private GeoCoord parseString(String childText) {
+	private GeoCoord parseString(String childText) throws JDOMException {
 		System.out.println("coordinate: " + childText);
+		childText = childText.replaceAll("\\s", ""); //to get rid of any tabs or spaces. 
+		String[] coordinatePieces = childText.split("[,\\s]+");
+		if(coordinatePieces.length<3){ //i.e not a valid coordinate. (even altitude 0 would be ok)
+			throw new JDOMException("Not three parts to this coordinate. "
+					+ "May have had whitespace or newlines between lat, long, and elevation");
+		}
+		GeoCoord toReturn;
+		try{
+		toReturn = new GeoCoord(Double.parseDouble(coordinatePieces[0]),
+								Double.parseDouble(coordinatePieces[1]),
+								Double.parseDouble(coordinatePieces[2]));
+		}
+		catch(IllegalArgumentException e){ //if we can't parse into a Double
+			throw new JDOMException("Error converting from String to coordinate."
+					+ " Invalid Character?");
+		}
 		
-		
-		return null;
+		return toReturn;
 	}
 
 
