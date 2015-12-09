@@ -55,14 +55,16 @@ public class JdomkmlInterface {
 		Element rootElement = myDoc2.getRootElement();
 		Route toReturn = null;
 		Element documentNode;
+		Namespace theNameSpace = rootElement.getNamespace();
 		if(rootElement.getName() == "Document"){
 			documentNode = rootElement;
 		}else{
-			documentNode = rootElement.getChild("Document");
+			documentNode = rootElement.getChild("Document", theNameSpace);
 		}
 		
-		String nameOfDocument = documentNode.getChildText("name");
-		List<Element> placemarks = documentNode.getChildren("Placemark");
+		
+		String nameOfDocument = documentNode.getChildText("name",theNameSpace);
+		List<Element> placemarks = documentNode.getChildren("Placemark",theNameSpace);
 		ArrayList<GeoCoord> track = new ArrayList<GeoCoord>();
 		ArrayList<PointOfInterest> pois = new ArrayList<PointOfInterest>();
 		/*
@@ -76,16 +78,20 @@ public class JdomkmlInterface {
 <gx:Track>
 		 */
 		for(Element placeMarkToCheck : placemarks){
-			if(placeMarkToCheck.getChild("Point") != null){
-				String name = placeMarkToCheck.getChildText("Name");
-				GeoCoord location = parseString(placeMarkToCheck.getChild("Point").getChildText("Coordinates"));
+		//Note: element names are case-sensitive. 
+			if(placeMarkToCheck.getChild("Point",theNameSpace) != null){
+				String name = placeMarkToCheck.getChildText("name",theNameSpace);
+				System.out.println("name: " + name);
+				GeoCoord location = parseString(placeMarkToCheck.getChild("Point",theNameSpace).getChildText("coordinates",theNameSpace));
 				String description = "";
 				//TODO add in support for description (it's a 'cdata' tag, so I'm not sure)
 				pois.add(new PointOfInterest(location, name, description));
 			}
-			if(placeMarkToCheck.getChild("LineString") != null){
-				ArrayList<GeoCoord> theTrack = parseTrack(placeMarkToCheck.getChild("LineString").getChildText("Coordinates"));
+			if(placeMarkToCheck.getChild("LineString",theNameSpace) != null){
+				ArrayList<GeoCoord> theTrack = parseTrack(placeMarkToCheck.getChild("LineString",theNameSpace).getChildText("coordinates",theNameSpace));
+				if(theTrack != null){
 				track.addAll(theTrack);
+				}
 			}
 			//TODO add in support for the others. 
 		}
@@ -102,7 +108,9 @@ public class JdomkmlInterface {
 
 
 	private GeoCoord parseString(String childText) {
-		System.out.println(childText);
+		System.out.println("coordinate: " + childText);
+		
+		
 		return null;
 	}
 
