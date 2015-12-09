@@ -22,6 +22,8 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
+import org.jdom2.JDOMException;
+
 import com.ubcsolar.car.CarController;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LogType;
@@ -52,8 +54,9 @@ public class GlobalController {
 	 * constructor. 
 	 * @param mainWindow - the root window for the UI
 	 * (Note: could change that order of execution to do a GlobalController first, then the GUIMain
+	 * @throws IOException 
 	 */
-	public GlobalController(boolean doBuildUI){
+	public GlobalController(boolean doBuildUI) throws IOException{
 		iconImage = new ImageIcon("res/windowIcon.png");
 		
 		triggerNotifyMap = new HashMap<Class<? extends Notification>, List<Listener>>();		

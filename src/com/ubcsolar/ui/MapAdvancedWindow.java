@@ -43,6 +43,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JButton;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jdom2.JDOMException;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -158,6 +159,10 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 						dialog.setVisible(true);
 						e.printStackTrace();
 						
+					} catch (JDOMException e) {
+						JDialog dialog = new ErrorMessage("JDOM parser Exception: The file was formatted badly. Bad character?");
+						dialog.setVisible(true);
+						e.printStackTrace();
 					}
 					mySession.getMapController().getAllPoints();
 				 
@@ -275,7 +280,6 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 					
 					for(int i = 1; i<listOfPoints.size(); i++){
 						tripDistance +=  listOfPoints.get(i-1).calculateDistance(listOfPoints.get(i), unitMeasuredBy);
-						System.out.println(listOfPoints.get(i-1).calculateDistance(listOfPoints.get(i), unitMeasuredBy));
 						data[0][i] = tripDistance;
 						
 						//TODO make this change from feet to anything
