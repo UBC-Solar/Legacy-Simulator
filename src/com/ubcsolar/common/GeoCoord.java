@@ -118,7 +118,7 @@ public static double haversine(
 }
 
 /**
- * returns a String sumaraizing the Point.
+ * returns a String summarizing the Point.
  * Form: "name lat,long,elevation"
  */
 public String toString(){
