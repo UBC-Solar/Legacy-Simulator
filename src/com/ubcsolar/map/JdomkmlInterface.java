@@ -99,7 +99,7 @@ public class JdomkmlInterface {
 			//TODO add in support for the others. 
 		}
 		
-		return new Route(nameOfDocument, new ArrayList<GeoCoord>(), new ArrayList<PointOfInterest>());
+		return new Route(nameOfDocument, track, pois);
 		
 	}
 
@@ -129,8 +129,6 @@ public class JdomkmlInterface {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("before: " + coordinates.size());
-		System.out.println("after: " + toReturn.size());
 		return toReturn;
 	}
 
@@ -158,7 +156,15 @@ public class JdomkmlInterface {
 
 
 	public Route getRoute(){
-		return null;
+		if(this.chachedRoute != null){
+			return this.chachedRoute;
+		}
+		try {
+			return turnInToRoute(this.myDoc);
+		} catch (JDOMException e) {
+			
+			return null;
+		}
 	}
 	
 	

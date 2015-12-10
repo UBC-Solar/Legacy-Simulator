@@ -18,6 +18,7 @@ import org.xml.sax.SAXException;
 
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.ModuleController;
+import com.ubcsolar.common.Route;
 import com.ubcsolar.notification.RouteDataAsRequestedNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
@@ -26,6 +27,7 @@ public class MapController extends ModuleController{
 
 	
 	private DataHolder currentRoute; //the dataHolder
+	JdomkmlInterface myJDOMMap;
 
 	public MapController(GlobalController toAdd) throws IOException{
 		super(toAdd);
@@ -50,17 +52,18 @@ public class MapController extends ModuleController{
 	 * @throws JDOMException 
 	 */
 	public void load(String filename) throws IOException, SAXException, ParserConfigurationException, JDOMException{
-		System.out.println("Loading " + filename);
-		currentRoute = new DataHolder(filename, this);	
+		//System.out.println("Loading " + filename);
+		//currentRoute = new DataHolder(filename, this);	
 		sendNotification(new NewMapLoadedNotification(filename));
-		JdomkmlInterface myJDOMMap = new JdomkmlInterface("res\\ShortHopeToMerritt.kml");
+		myJDOMMap = new JdomkmlInterface(filename);
 		//Decided against automatically sending all data points. 
 		//If the UI element wants them, it can specifiy it. 
 		//getAllPoints();
 	}
 	
 	public void getAllPoints(){
-		sendNotification(new RouteDataAsRequestedNotification(currentRoute.getAllPoints()));
+		sendNotification(new RouteDataAsRequestedNotification(myJDOMMap.getRoute().getTrailMarkers()));
+		//sendNotification(new RouteDataAsRequestedNotification(currentRoute.getAllPoints()));
 		
 	}
 	
