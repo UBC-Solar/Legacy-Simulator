@@ -11,7 +11,6 @@ import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
-import com.ubcsolar.notification.RouteDataAsRequestedNotification;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -90,15 +89,13 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		
 		//A new map has been loaded into the program
 		if(n.getClass() == NewMapLoadedNotification.class){ //when a new map is loaded, propogate the new name. 
-			labelUpdate(((NewMapLoadedNotification) n).getMapLoadedName()); 
-			JOptionPane.showMessageDialog(this, "New map: " + (((NewMapLoadedNotification) n).getMapLoadedName()));
+			NewMapLoadedNotification n2 = (NewMapLoadedNotification) n; 
+			labelUpdate(n2.getMapLoadedName());
+			updateMap(n2.getRoute().getTrailMarkers(), -1, DistanceUnit.KILOMETERS);
+		//	JOptionPane.showMessageDialog(this, "New map: " + (((NewMapLoadedNotification) n).getMapLoadedName()));
+			
 		}
-		//the data that this class likely requested has been processed and loaded
-		//possibly somewhere else requested data, but we can update this graph anyway
-		else if (n.getClass() == RouteDataAsRequestedNotification.class){
-			RouteDataAsRequestedNotification n2 = (RouteDataAsRequestedNotification) n;
-			updateMap(n2.getListOfPoints(), n2.getNumOfDistanceRequested(), n2.getUnitMeasuredBy());
-		}
+
 	}
 
 	/**
@@ -107,8 +104,6 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	@Override
 	public void register(){
 		mySession.register(this, NewMapLoadedNotification.class); //need this for the map label and tool bar.
-		mySession.register(this, RouteDataAsRequestedNotification.class); //for when route data is processed and sent out. Likely requested
-																		//by this class
 		//add any notifications you need to listen for here. 
 	}
 	

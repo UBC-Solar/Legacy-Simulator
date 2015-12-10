@@ -19,19 +19,15 @@ import org.xml.sax.SAXException;
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.Route;
-import com.ubcsolar.notification.RouteDataAsRequestedNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 
 public class MapController extends ModuleController{
 
-	
-	private DataHolder currentRoute; //the dataHolder
 	JdomkmlInterface myJDOMMap;
 
 	public MapController(GlobalController toAdd) throws IOException{
-		super(toAdd);
-		
+		super(toAdd);	
 	}
 	
 	
@@ -52,35 +48,33 @@ public class MapController extends ModuleController{
 	 * @throws JDOMException 
 	 */
 	public void load(String filename) throws IOException, SAXException, ParserConfigurationException, JDOMException{
-		//System.out.println("Loading " + filename);
-		//currentRoute = new DataHolder(filename, this);	
-		sendNotification(new NewMapLoadedNotification(filename));
+		
 		myJDOMMap = new JdomkmlInterface(filename);
+		sendNotification(new NewMapLoadedNotification(filename, myJDOMMap.getRoute()));
 		//Decided against automatically sending all data points. 
 		//If the UI element wants them, it can specifiy it. 
 		//getAllPoints();
 	}
 	
-	public void getAllPoints(){
-		sendNotification(new RouteDataAsRequestedNotification(myJDOMMap.getRoute().getTrailMarkers()));
-		//sendNotification(new RouteDataAsRequestedNotification(currentRoute.getAllPoints()));
-		
+	public Route getAllPoints(){
+		if(this.myJDOMMap == null){
+			return null;
+		}
+		return this.myJDOMMap.getRoute();
 	}
 	
-	
-
 	/**
 	 * gets the name of the currently loaded map. Shouldn't really be needed, 
 	 * as notifications will be sent out. 
 	 * @return filename - the full network path name of the file.
 	 */
 	public String getLoadedMapName(){ 
-		if(currentRoute == null){
+		if(myJDOMMap == null){
 			return null;
 		}
 		//TODO: change it from network path to just file name
 		else{
-			return currentRoute.getFileName();
+			return myJDOMMap.getLoadedFileName();
 		}
 		
 	}

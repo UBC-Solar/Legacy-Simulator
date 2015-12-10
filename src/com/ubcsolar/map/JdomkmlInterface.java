@@ -33,7 +33,7 @@ public class JdomkmlInterface {
 	public void dropCurrentAndLoad(String filename) throws IOException, JDOMException{
 		//disconnect? 
 		//TODO check for and drop extra stuff if it's an absolute file path. 
-		this.loadedFileName = filename;
+		loadedFileName = filename;
 		try {
 	         File inputFile = new File(filename);
 
@@ -182,6 +182,11 @@ public class JdomkmlInterface {
 		FileWriter fileToPrintTo = new FileWriter(new File(filename));
 		fileToPrintTo.write(new XMLOutputter().outputString(this.myDoc));
 		fileToPrintTo.close();
+	}
+
+
+	public String getLoadedFileName() {
+		return loadedFileName;
 	}
 	
 	
