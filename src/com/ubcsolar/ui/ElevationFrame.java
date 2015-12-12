@@ -5,6 +5,8 @@ import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
+
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -37,7 +39,8 @@ public class ElevationFrame extends JFrame {
 	protected final File DEFAULT_OPEN_DIRECTORY = new File("res\\");
 	
 	
-	public ElevationFrame() {
+	public ElevationFrame(ImageIcon windowIcon) {
+		setIconImage(windowIcon.getImage());
 		//TODO add icon
 		Dimension miniMax = new Dimension(180, 225);
 		this.setMinimumSize(miniMax);
