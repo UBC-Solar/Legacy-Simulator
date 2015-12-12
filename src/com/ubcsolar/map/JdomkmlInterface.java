@@ -60,6 +60,9 @@ public class JdomkmlInterface {
 		Route toReturn = null;
 		Element documentNode;
 		Namespace theNameSpace = rootElement.getNamespace();
+		if(!rootElement.getName().equalsIgnoreCase("kml")){
+			throw new JDOMException("not a KML file");
+		}
 		if(rootElement.getName() == "Document"){
 			documentNode = rootElement;
 		}else{

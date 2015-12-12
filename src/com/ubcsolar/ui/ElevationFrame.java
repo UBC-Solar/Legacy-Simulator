@@ -170,12 +170,15 @@ class GoButtonClickHandler extends MouseAdapter{
 			} catch (IOException e) {
 				parent.handleError("IO Exception, check filename");
 				e.printStackTrace();
+				return;
 			} catch (JDOMException e) {
 				parent.handleError("parsing error, bad KML file");
 				e.printStackTrace();
+				return;
 			} catch (Exception e){
 				parent.handleError("" + e.getClass() + " " + e.getMessage());
 				e.printStackTrace();
+				return;
 			}
 			
 			try{
@@ -183,6 +186,7 @@ class GoButtonClickHandler extends MouseAdapter{
 			}
 			catch(ClassCastException e){
 				parent.handleError("Value from spinner not an integer");
+				return;
 			}
 			
 			try{
@@ -191,6 +195,7 @@ class GoButtonClickHandler extends MouseAdapter{
 			catch(IOException e){
 				parent.handleError("failed to save, check filename/permissions");
 				e.printStackTrace();
+				return;
 			}
 			
 			parent.completeAndClose();
