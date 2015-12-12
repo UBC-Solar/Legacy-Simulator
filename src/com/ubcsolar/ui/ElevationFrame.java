@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.jdom2.JDOMException;
 
@@ -28,6 +29,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class ElevationFrame extends JFrame {
 	protected JTextField textField;
@@ -41,9 +44,8 @@ public class ElevationFrame extends JFrame {
 	
 	public ElevationFrame(ImageIcon windowIcon) {
 		setIconImage(windowIcon.getImage());
-		//TODO add icon
-		Dimension miniMax = new Dimension(180, 225);
-		this.setMinimumSize(miniMax);
+		this.setTitle("Elevation Utility");
+		this.setBounds(500, 250, 180, 225);
 		this.setResizable(false);
 		JPanel panel = new JPanel();
 		getContentPane().add(panel, BorderLayout.CENTER);
@@ -211,6 +213,9 @@ class BrowseButtonHandler extends MouseAdapter{
 		if(parent.DEFAULT_OPEN_DIRECTORY.exists()){
 			fc.setCurrentDirectory(parent.DEFAULT_OPEN_DIRECTORY);
 		}
+		fc.addChoosableFileFilter(new FileNameExtensionFilter("Google Map files", "KML", "kml"));
+		fc.setAcceptAllFileFilterUsed(false); //makes the 'kml' one default. 
+		fc.setAcceptAllFileFilterUsed(true);
 		 int returnVal = fc.showOpenDialog(parent);
 		 if (returnVal == JFileChooser.APPROVE_OPTION) {
 	            parent.textField.setText(fc.getSelectedFile().getPath());
