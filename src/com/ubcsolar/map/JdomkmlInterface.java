@@ -66,7 +66,7 @@ public class JdomkmlInterface {
 			documentNode = rootElement.getChild("Document", theNameSpace);
 		}
 		
-		
+		//TODO add in a check to make sure this is a KML document. (test: open a different XML)
 		String nameOfDocument = documentNode.getChildText("name",theNameSpace);
 		List<Element> placemarks = documentNode.getChildren("Placemark",theNameSpace);
 		ArrayList<GeoCoord> track = new ArrayList<GeoCoord>();
@@ -175,7 +175,7 @@ public class JdomkmlInterface {
 	 * Also note that we only have a fixed number of calls per 24 hour period.
 	 */
 	public void getElevationsFromGoogle(int resolution){
-		
+		System.out.println("PRETENDING TO GET ELEVATIONS FROM GOOGLE");
 	}
 	
 	public void printToFile(String filename) throws IOException{
@@ -189,6 +189,25 @@ public class JdomkmlInterface {
 		return loadedFileName;
 	}
 	
+	public void saveToFile(String absoluteFileName) throws IOException{
+		this.saveToFile(new File(absoluteFileName));
+	}
+	
+	public void saveToFile(File fileWithAbsoluteFilename) throws IOException{
+		FileWriter printer = null;
+		try{
+			printer = new FileWriter(fileWithAbsoluteFilename);
+			printer.write(new XMLOutputter().outputString(this.myDoc));
+		}
+		catch(IOException e){
+			throw e;
+		}
+		finally{
+			if(printer != null){
+				printer.close();
+			}
+		}
+	}
 	
 	
 	

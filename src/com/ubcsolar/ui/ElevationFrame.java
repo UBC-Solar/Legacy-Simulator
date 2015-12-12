@@ -6,18 +6,39 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+
 import java.awt.GridBagConstraints;
 import javax.swing.JTextField;
 import java.awt.Insets;
 import javax.swing.JSpinner;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 import javax.swing.SpinnerNumberModel;
 
+import org.jdom2.JDOMException;
+
+import com.ubcsolar.map.JdomkmlInterface;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
+
 public class ElevationFrame extends JFrame {
-	private JTextField textField;
+	protected JTextField textField;
+	protected JSpinner spinner;
+	protected JdomkmlInterface theKMLInterface;
+	private final String DEFAULT_FILE_NAME = "";
+	private final int DEFAULT_SPINNER_VALUE = 300;
+	private final JdomkmlInterface DEFAULT_KML_INTERFACE = null;
+	protected final File DEFAULT_OPEN_DIRECTORY = new File("res\\");
+	
+	
 	public ElevationFrame() {
-		
+		//TODO add icon
 		Dimension miniMax = new Dimension(180, 225);
 		this.setMinimumSize(miniMax);
 		this.setResizable(false);
@@ -31,6 +52,7 @@ public class ElevationFrame extends JFrame {
 		panel.setLayout(gbl_panel);
 		
 		JButton btnNewButton = new JButton("Browse");
+		btnNewButton.addMouseListener(new BrowseButtonHandler(this));
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
 		gbc_btnNewButton.insets = new Insets(0, 0, 5, 5);
 		gbc_btnNewButton.gridx = 0;
@@ -53,7 +75,7 @@ public class ElevationFrame extends JFrame {
 		gbc_lblCoordsPerUrl.gridy = 1;
 		panel.add(lblCoordsPerUrl, gbc_lblCoordsPerUrl);
 		
-		JSpinner spinner = new JSpinner();
+		spinner = new JSpinner();
 		spinner.setModel(new SpinnerNumberModel(300, 1, 500, 1));
 		GridBagConstraints gbc_spinner = new GridBagConstraints();
 		gbc_spinner.insets = new Insets(0, 0, 5, 0);
@@ -61,7 +83,10 @@ public class ElevationFrame extends JFrame {
 		gbc_spinner.gridy = 1;
 		panel.add(spinner, gbc_spinner);
 		
-		JButton btnGo = new JButton("Go!");
+		JButton btnGo = new JButton("Save & Go!");
+		btnGo.addMouseListener(new GoButtonClickHandler(this));
+		
+		
 		GridBagConstraints gbc_btnGo = new GridBagConstraints();
 		gbc_btnGo.insets = new Insets(0, 0, 5, 5);
 		gbc_btnGo.gridx = 0;
@@ -78,6 +103,121 @@ public class ElevationFrame extends JFrame {
 		gbc_txtpnGooglesApi.gridx = 0;
 		gbc_txtpnGooglesApi.gridy = 3;
 		panel.add(txtpnGooglesApi, gbc_txtpnGooglesApi);
+		setAllToDefault();
+	}
+	
+	protected void handleError(String message){
+		displayMessage(message);
+		setAllToDefault();
+	}
+	
+	private void displayMessage(String errorMessage){
+		JOptionPane.showMessageDialog(this, errorMessage);
+	}
+	private void setAllToDefault(){
+		textField.setText(DEFAULT_FILE_NAME);;
+		spinner.setValue(DEFAULT_SPINNER_VALUE);
+		theKMLInterface = DEFAULT_KML_INTERFACE;
 	}
 
+	public void completeAndClose() {
+		displayMessage("Complete!");
+		System.exit(0);	
+	}
+}
+
+class GoButtonClickHandler extends MouseAdapter{
+	private final ElevationFrame parent;
+	public GoButtonClickHandler(ElevationFrame parent){
+		this.parent = parent;
+	}
+	
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
+		JFileChooser fc = new JFileChooser();
+		File toSaveTo;
+		if(parent.DEFAULT_OPEN_DIRECTORY.exists()){
+			fc.setCurrentDirectory(parent.DEFAULT_OPEN_DIRECTORY);
+		}
+		 int returnVal = fc.showSaveDialog(parent);
+		 if (returnVal == JFileChooser.APPROVE_OPTION) {  
+			 toSaveTo = fc.getSelectedFile();
+			 if(toSaveTo.exists()){
+				 parent.handleError("File already exists, cannot overwrite");
+				 return;
+			 }
+			 
+	        }
+		 else {
+	           //cancelled by user, do nothing
+	       	return;
+	      }
+		
+		
+			File testFile = new File(parent.textField.getText());
+			if(!testFile.exists()){
+				parent.handleError("Input file invalid");
+				return;
+			}
+		
+			try {
+				parent.theKMLInterface = new JdomkmlInterface(parent.textField.getText());
+			} catch (IOException e) {
+				parent.handleError("IO Exception, check filename");
+				e.printStackTrace();
+			} catch (JDOMException e) {
+				parent.handleError("parsing error, bad KML file");
+				e.printStackTrace();
+			} catch (Exception e){
+				parent.handleError("" + e.getClass() + " " + e.getMessage());
+				e.printStackTrace();
+			}
+			
+			try{
+				parent.theKMLInterface.getElevationsFromGoogle((int)parent.spinner.getValue());
+			}
+			catch(ClassCastException e){
+				parent.handleError("Value from spinner not an integer");
+			}
+			
+			try{
+				parent.theKMLInterface.saveToFile(toSaveTo);
+			}
+			catch(IOException e){
+				parent.handleError("failed to save, check filename/permissions");
+				e.printStackTrace();
+			}
+			
+			parent.completeAndClose();
+			
+	}
+	
+	
+}
+
+
+class BrowseButtonHandler extends MouseAdapter{
+	private final ElevationFrame parent;
+	public BrowseButtonHandler(ElevationFrame parent){
+		this.parent = parent;
+	}
+	
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
+		JFileChooser fc = new JFileChooser();
+		if(parent.DEFAULT_OPEN_DIRECTORY.exists()){
+			fc.setCurrentDirectory(parent.DEFAULT_OPEN_DIRECTORY);
+		}
+		 int returnVal = fc.showOpenDialog(parent);
+		 if (returnVal == JFileChooser.APPROVE_OPTION) {
+	            parent.textField.setText(fc.getSelectedFile().getPath());
+	            
+	        } else {
+	            //cancelled by user, do nothing
+	        	return;
+	        }
+		
+	}
+	
+	
 }
