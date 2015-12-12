@@ -1,5 +1,4 @@
 /**
- * This class forms the main window, and launches all additional needed windows. 
  * This is the main "dashboard" for a user on the road. 
  */
 
