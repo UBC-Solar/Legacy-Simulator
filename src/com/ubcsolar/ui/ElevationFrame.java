@@ -17,9 +17,10 @@ import javax.swing.SpinnerNumberModel;
 public class ElevationFrame extends JFrame {
 	private JTextField textField;
 	public ElevationFrame() {
-		Dimension miniMax = new Dimension(200, 225);
+		
+		Dimension miniMax = new Dimension(180, 225);
 		this.setMinimumSize(miniMax);
-		this.setMaximumSize(miniMax);
+		this.setResizable(false);
 		JPanel panel = new JPanel();
 		getContentPane().add(panel, BorderLayout.CENTER);
 		GridBagLayout gbl_panel = new GridBagLayout();
