@@ -37,7 +37,7 @@ public class ElevationFrame extends JFrame {
 	protected JSpinner spinner;
 	protected JdomkmlInterface theKMLInterface;
 	private final String DEFAULT_FILE_NAME = "";
-	private final int DEFAULT_SPINNER_VALUE = 300;
+	private final int DEFAULT_SPINNER_VALUE = 85;
 	private final JdomkmlInterface DEFAULT_KML_INTERFACE = null;
 	protected final File DEFAULT_OPEN_DIRECTORY = new File("res\\");
 	
@@ -81,7 +81,7 @@ public class ElevationFrame extends JFrame {
 		panel.add(lblCoordsPerUrl, gbc_lblCoordsPerUrl);
 		
 		spinner = new JSpinner();
-		spinner.setModel(new SpinnerNumberModel(300, 1, 500, 1));
+		spinner.setModel(new SpinnerNumberModel(85, 1, 85, 5));
 		GridBagConstraints gbc_spinner = new GridBagConstraints();
 		gbc_spinner.insets = new Insets(0, 0, 5, 0);
 		gbc_spinner.gridx = 1;
@@ -99,7 +99,7 @@ public class ElevationFrame extends JFrame {
 		panel.add(btnGo, gbc_btnGo);
 		
 		JTextPane txtpnGooglesApi = new JTextPane();
-		txtpnGooglesApi.setText("* Google's API allows only 10k calls per day. More coordinates per call = less calls, but also less accuracy. Max 500");
+		txtpnGooglesApi.setText("* Google's API allows only 10k calls per day. More coordinates per call = less calls, but also less accuracy. Max 2k characters per URL, so limited to 85 points per call");
 		GridBagConstraints gbc_txtpnGooglesApi = new GridBagConstraints();
 		gbc_txtpnGooglesApi.anchor = GridBagConstraints.NORTH;
 		gbc_txtpnGooglesApi.gridwidth = 2;
