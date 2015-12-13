@@ -200,9 +200,15 @@ public class JdomkmlInterface {
 	
 	
 	private String turnToString(ArrayList<GeoCoord> toPrintOut) {
+		//KML standard is Lon, Lat. Don't ask why...
 		String toReturn = "";
 		for(GeoCoord g : toPrintOut){
-			toReturn += g.toString() + " ";
+			toReturn += g.getLon();
+			toReturn += ",";
+			toReturn += g.getLat();
+			toReturn += ",";
+			toReturn += g.getElevation();
+			toReturn += " ";
 		}
 		return toReturn;
 	}
@@ -221,29 +227,56 @@ public class JdomkmlInterface {
 			System.out.println("start: " + start);
 			System.out.println("end: " + end);
 			System.out.println("Size: " + parsedTrack.size());
-			String urlToSend = makeURL(parsedTrack.subList(start, end));
+			List toConvert = parsedTrack.subList(start, end);
+			String urlToSend = makeURL(toConvert);
 			System.out.println(urlToSend);
 			String response = sendURL(urlToSend);
-			//TODO decide what to do with Google's apparently backwards lat, lons. When I save
-			//an updated version, do I keep their order?
-			//updated.addAll(parseResponse(response));
-			System.out.println(response);
+			updated.addAll(parseResponse(response, toConvert.size()));
 			
 			//TODO remove this. kluge to let it run
-			updated.addAll(parsedTrack.subList(start, end));
+			//updated.addAll(parsedTrack.subList(start, end));
 			
 			start = end;
 			end += maxCoordPerURL;
 		}
 		
-		return parsedTrack;
+		return updated;
 	}
 	
 
-	private Collection<? extends GeoCoord> parseResponse(String response) {
-		ArrayList<GeoCoord> updatedPoints = new ArrayList<GeoCoord>();
+	private Collection<? extends GeoCoord> parseResponse(String JSONresponse, int numOfValues) {
+		/*
+		 *
+	{
+   "results" : [
+      {
+         "elevation" : 1107.862182617188,
+         "location" : {
+            "lat" : 51.0762327,
+            "lng" : -114.1319691
+         },
+         "resolution" : 9.543951988220215
+      }
+   ],
+   "status" : "OK"
+}
+
+		 */
+		//If we know, might as well set to the proper size right away (instead of re-copying as it grows)
+		ArrayList<GeoCoord> updatedPoints = new ArrayList<GeoCoord>(numOfValues);
 		
-		return null;
+		JSONObject test = new JSONObject(JSONresponse);
+		JSONArray results = test.getJSONArray("results");
+		//coordinateList = new ArrayList<Coordinate>();
+		for(int i=0; i<results.length(); i++){
+			JSONObject temp = results.getJSONObject(i);
+			double elevation = temp.getDouble("elevation");
+			double lat = temp.getJSONObject("location").getDouble("lat");
+			double lon = temp.getJSONObject("location").getDouble("lng");
+			updatedPoints.add(new GeoCoord(lat,lon,elevation));
+		}
+		
+		return updatedPoints;
 	}
 
 

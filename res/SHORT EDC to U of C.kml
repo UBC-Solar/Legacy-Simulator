@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<kml xmlns='http://www.opengis.net/kml/2.2'>
+	<Document>
+		<name>EDC to University of Calgary</name>
+		<description><![CDATA[]]></description>
+		<Folder>
+			<name>Directions from 2345 East Mall, Vancouver, BC to 2500 University Dr NW</name>
+			<Placemark>
+				<name>Directions from 2345 East Mall, Vancouver, BC to 2500 University Dr NW</name>
+				<styleUrl>#line-1267FF-5-nodesc</styleUrl>
+				<ExtendedData>
+				</ExtendedData>
+				<LineString>
+					<tessellate>1</tessellate>
+					<coordinates>-123.24805000000002,49.26219,0.0 -123.24766999999999,49.26232,0.0 -123.24743000000001,49.26203,0.0 -123.24732999999999,49.26189,0.0 -123.24720000000002,49.26173,0.0 -123.24695,49.26136,0.0 -123.24663999999999,49.26094,0.0 -123.24661,49.26091,0.0 -123.24642000000001,49.26068,0.0 -123.24640000000001,49.260650000000005,0.0 -123.24627999999998,49.26052000000001,0.0 -123.24624000000001,49.26049,0.0 -123.24600000000001,49.2601,0.0 -123.24593,49.26002,0.0 -123.24554000000002,49.25949,0.0 -123.24547,49.25942,0.0 -123.24459,49.25832,0.0 -123.24310000000001,49.25655,0.0 -123.24299,49.25643,0.0 -114.13198,51.07604,0.0 -114.13195,51.07605,0.0 -114.13192,51.07607,0.0 -114.1319,51.07609,0.0 -114.13189,51.07612,0.0 -114.13189,51.07614,0.0 -114.13191,51.07616,0.0 -114.13192,51.07618,0.0 -114.13197000000001,51.07623,0.0</coordinates>
+				</LineString>
+			</Placemark>
+			<Placemark>
+				<name>2345 East Mall, Vancouver, BC</name>
+				<styleUrl>#icon-503-DB4436-nodesc</styleUrl>
+				<ExtendedData>
+				</ExtendedData>
+				<Point>
+					<coordinates>-123.24804950000001,49.2621886,0.0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>2500 University Dr NW</name>
+				<styleUrl>#icon-503-DB4436-nodesc</styleUrl>
+				<ExtendedData>
+				</ExtendedData>
+				<Point>
+					<coordinates>-114.1319691,51.0762327,0.0</coordinates>
+				</Point>
+			</Placemark>
+		</Folder>
+		<Style id='icon-503-DB4436-nodesc-normal'>
+			<IconStyle>
+				<color>ff3644DB</color>
+				<scale>1.1</scale>
+				<Icon>
+					<href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+				</Icon>
+				<hotSpot x='16' y='31' xunits='pixels' yunits='insetPixels'>
+				</hotSpot>
+			</IconStyle>
+			<LabelStyle>
+				<scale>0.0</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<Style id='icon-503-DB4436-nodesc-highlight'>
+			<IconStyle>
+				<color>ff3644DB</color>
+				<scale>1.1</scale>
+				<Icon>
+					<href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+				</Icon>
+				<hotSpot x='16' y='31' xunits='pixels' yunits='insetPixels'>
+				</hotSpot>
+			</IconStyle>
+			<LabelStyle>
+				<scale>1.1</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<StyleMap id='icon-503-DB4436-nodesc'>
+			<Pair>
+				<key>normal</key>
+				<styleUrl>#icon-503-DB4436-nodesc-normal</styleUrl>
+			</Pair>
+			<Pair>
+				<key>highlight</key>
+				<styleUrl>#icon-503-DB4436-nodesc-highlight</styleUrl>
+			</Pair>
+		</StyleMap>
+		<Style id='line-1267FF-5-nodesc-normal'>
+			<LineStyle>
+				<color>ffFF6712</color>
+				<width>5</width>
+			</LineStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<Style id='line-1267FF-5-nodesc-highlight'>
+			<LineStyle>
+				<color>ffFF6712</color>
+				<width>8.0</width>
+			</LineStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<StyleMap id='line-1267FF-5-nodesc'>
+			<Pair>
+				<key>normal</key>
+				<styleUrl>#line-1267FF-5-nodesc-normal</styleUrl>
+			</Pair>
+			<Pair>
+				<key>highlight</key>
+				<styleUrl>#line-1267FF-5-nodesc-highlight</styleUrl>
+			</Pair>
+		</StyleMap>
+	</Document>
+</kml>
