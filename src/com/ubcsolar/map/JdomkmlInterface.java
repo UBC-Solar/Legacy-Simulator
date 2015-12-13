@@ -1,18 +1,12 @@
 package com.ubcsolar.map;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
-
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
-
 import org.jdom2.*;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.LocatorImpl;
 
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.LogType;
@@ -59,13 +53,17 @@ public class JdomkmlInterface {
 		this.cachedRoute = turnInToRoute(this.myDoc);
 	}
 	
-	
+	/**
+	 * Parses the KML document and creates (and caches) the Route. 
+	 * @param myDoc2
+	 * @return
+	 * @throws JDOMException
+	 */
 	private Route turnInToRoute(Document myDoc2) throws JDOMException {
 		//Documentation: https://developers.google.com/kml/documentation/kmlreference
-		//TODO download just the route and then the entire map
+		//TODO test after downloading just the route and then test with downloading the entire map
 		//(two different options on Google Maps) to make sure it works for both
 		Element rootElement = myDoc2.getRootElement();
-		Route toReturn = null;
 		Element documentNode;
 		Namespace theNameSpace = rootElement.getNamespace();
 		if(!rootElement.getName().equalsIgnoreCase("kml")){
@@ -85,7 +83,7 @@ public class JdomkmlInterface {
 		//Note: element names are case-sensitive. 
 			if(placeMarkToCheck.getChild("Point",theNameSpace) != null){
 				String name = placeMarkToCheck.getChildText("name",theNameSpace);
-				GeoCoord location = parseString(placeMarkToCheck.getChild("Point",theNameSpace).getChildText("coordinates",theNameSpace));
+				GeoCoord location = parseSingleFromString(placeMarkToCheck.getChild("Point",theNameSpace).getChildText("coordinates",theNameSpace));
 				String description = "";
 				//TODO add in support for description (it's a 'cdata' tag, so I'm not sure)
 				pois.add(new PointOfInterest(location, name, description));
@@ -96,7 +94,7 @@ public class JdomkmlInterface {
 				track.addAll(theTrack);
 				}
 			}
-			//TODO add in support for the others. 
+			//TODO add in support for the others. Check KML guide for all possible ones. 
 		}
 		
 		return new Route(nameOfDocument, track, pois);
@@ -122,7 +120,7 @@ public class JdomkmlInterface {
 		ArrayList<GeoCoord> toReturn = new ArrayList<GeoCoord>(coordinates.size());
 		for(String s : coordinates){
 			try {
-				toReturn.add(parseString(s));
+				toReturn.add(parseSingleFromString(s));
 			} catch (JDOMException e) {
 				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Rejected a coordinate while importing the KML; parsing error");
 				e.printStackTrace();
@@ -131,8 +129,13 @@ public class JdomkmlInterface {
 		return toReturn;
 	}
 
-
-	private GeoCoord parseString(String childText) throws JDOMException {
+	/**
+	 * Parses a single GeoCoord from a String. 
+	 * @param childText
+	 * @return
+	 * @throws JDOMException - if it's not formatted right (i.e less than 3 parts).
+	 */
+	private GeoCoord parseSingleFromString(String childText) throws JDOMException {
 		childText = childText.replaceAll("\\s", ""); //to get rid of any tabs or spaces. 
 		String[] coordinatePieces = childText.split("[,\\s]+");
 		if(coordinatePieces.length<3){ //i.e not a valid coordinate. (even altitude 0 would be ok)
@@ -145,9 +148,8 @@ public class JdomkmlInterface {
 		}
 		GeoCoord toReturn;
 		try{
-			//TODO add a check to put Lon and Lat in right place. Google's KMLs seem to be backwards??
 		toReturn = new GeoCoord(Double.parseDouble(coordinatePieces[1]),
-								Double.parseDouble(coordinatePieces[0]), //Google's KML seems to be Lon, Lat??
+								Double.parseDouble(coordinatePieces[0]), //KML standard is lon, lat. Weird. 
 								Double.parseDouble(coordinatePieces[2]));
 		}
 		catch(IllegalArgumentException e){ //if we can't parse into a Double
@@ -186,6 +188,13 @@ public class JdomkmlInterface {
 		return cachedRoute;
 	}
 	
+	/**
+	 * Recursively searches for and updates every coordinate note in the document under the Root Element. 
+	 * Depth-first-search.
+	 * @param rootElement
+	 * @param maxCoordPerURL
+	 * @throws IOException
+	 */
 	private void updateAllCoordinateNodes(Element rootElement, int maxCoordPerURL) throws IOException{
 		if(rootElement.getName().equalsIgnoreCase("coordinates")){
 			rootElement.setText(turnToString(parseAndUpdate(rootElement.getText(), maxCoordPerURL)));	
@@ -198,7 +207,11 @@ public class JdomkmlInterface {
 		
 	}
 	
-	
+	/**
+	 * Turns a list of GeoCoords into a String in KML Format, separated by a space. 
+	 * @param toPrintOut
+	 * @return
+	 */
 	private String turnToString(ArrayList<GeoCoord> toPrintOut) {
 		//KML standard is Lon, Lat. Don't ask why...
 		String toReturn = "";
@@ -227,11 +240,12 @@ public class JdomkmlInterface {
 			System.out.println("start: " + start);
 			System.out.println("end: " + end);
 			System.out.println("Size: " + parsedTrack.size());
-			List toConvert = parsedTrack.subList(start, end);
-			String urlToSend = makeURL(toConvert);
+			List<GeoCoord> toConvert = parsedTrack.subList(start, end);
+			String urlToSend = makeGoogleURL(toConvert);
 			System.out.println(urlToSend);
 			String response = sendURL(urlToSend);
-			updated.addAll(parseResponse(response, toConvert.size()));
+			System.out.println(response);
+			updated.addAll(parseJSONResponse(response));
 						
 			start = end;
 			end += maxCoordPerURL;
@@ -241,7 +255,15 @@ public class JdomkmlInterface {
 	}
 	
 
-	private Collection<? extends GeoCoord> parseResponse(String JSONresponse, int numOfValues) {
+	
+	/**
+	 * Parses the response from Google Elevations Api and makes
+	 * a list of coordinates. 
+	 * @param JSONresponse
+	 * @return
+	 */
+	private Collection<? extends GeoCoord> parseJSONResponse(String JSONresponse) {
+		//TODO add check for API 'out of quota' response. 
 		/*
 		 *
 	{
@@ -259,11 +281,9 @@ public class JdomkmlInterface {
 }
 
 		 */
-		//If we know, might as well set to the proper size right away (instead of re-copying as it grows)
-		ArrayList<GeoCoord> updatedPoints = new ArrayList<GeoCoord>(numOfValues);
-		
 		JSONObject test = new JSONObject(JSONresponse);
 		JSONArray results = test.getJSONArray("results");
+		ArrayList<GeoCoord> updatedPoints = new ArrayList<GeoCoord>(results.length());
 		//coordinateList = new ArrayList<Coordinate>();
 		for(int i=0; i<results.length(); i++){
 			JSONObject temp = results.getJSONObject(i);
@@ -277,26 +297,34 @@ public class JdomkmlInterface {
 	}
 
 
+	/**
+	 * Connects to a URL, records response, then closes connection. (Good for REST APIs)
+	 * @param urlToSend
+	 * @return
+	 * @throws IOException - if there was an error connecting, probably an Internet issue
+	 */
 	private String sendURL(String urlToSend) throws IOException {
 		URL url = new URL(urlToSend); 
 		InputStream inputStream = url.openStream(); 
 		BufferedReader inputReader = new BufferedReader(new InputStreamReader(inputStream)); 
-		StringBuffer webPageData = new StringBuffer(); 
-		//http://maps.googleapis.com/maps/api/elevation/json?locations=39.7391536,-104.9847034|36.455556,-116.866667&sensor=true_or_false&key=API_KEY
-		
+		StringBuffer webPageData = new StringBuffer(); 		
 		String inputLine = null; 
 		while ((inputLine = inputReader.readLine()) != null) { 
 			webPageData.append(inputLine); 
 			webPageData.append("\n"); 
 		} 
-		inputReader.close(); 
-		System.out.println(webPageData.toString());
+		inputReader.close();
 		return webPageData.toString();
 	}
 
 
-	private String makeURL(List<GeoCoord> coordsToConvert) throws IllegalArgumentException{
-		ArrayList<GeoCoord> updated = new ArrayList<GeoCoord>(coordsToConvert.size());
+	/**
+	 * Generates the URL for Google's Elevations API. 
+	 * @param coordsToConvert
+	 * @return - the URL, ready to go. 
+	 * @throws IllegalArgumentException - if the number of coordinates given exceed 1900 characters (max URL Length)
+	 */
+	private String makeGoogleURL(List<GeoCoord> coordsToConvert) throws IllegalArgumentException{
 		String urlToSend = "https://maps.googleapis.com/maps/api/elevation/json?locations=";
 		int maxInOneShot = 512;//max number of coords as per Google documentation. 
 		for(int i = 0; i<(coordsToConvert.size()-1) && i<(maxInOneShot -1); i++){
@@ -305,7 +333,7 @@ public class JdomkmlInterface {
 		//to avoid adding the bar at the end. 
 		urlToSend += "" + coordsToConvert.get(coordsToConvert.size()-1).getLat() + "," + coordsToConvert.get(coordsToConvert.size()-1).getLon();
 		urlToSend += "&sensor=false&key=" + API_KEY;		
-		if(urlToSend.length() > 1900){ //max is 2,000 characters, but lets do 1900 to be safe.
+		if(urlToSend.length() > 1900){ //max URL length is 2,000 characters, but let's do 1900 to be safe.
 			throw new IllegalArgumentException("URL too long, too many coords given");
 		}
 		return urlToSend;
@@ -313,24 +341,24 @@ public class JdomkmlInterface {
 		
 	}
 
-
-	public void printToFile(String filename) throws IOException{
-		//TODO: It look like Google's KML prints the coordinates backwards. When I save... do I want
-		//to keep them in that order? 
-		FileWriter fileToPrintTo = new FileWriter(new File(filename));
-		fileToPrintTo.write(new XMLOutputter().outputString(this.myDoc));
-		fileToPrintTo.close();
-	}
-
-
 	public String getLoadedFileName() {
 		return loadedFileName;
 	}
 	
+	/**
+	 * Write the entire KML document to file 
+	 * @param fileWithAbsoluteFilename
+	 * @throws IOException
+	 */	
 	public void saveToFile(String absoluteFileName) throws IOException{
 		this.saveToFile(new File(absoluteFileName));
 	}
 	
+	/**
+	 * Write the entire KML document to file 
+	 * @param fileWithAbsoluteFilename
+	 * @throws IOException
+	 */
 	public void saveToFile(File fileWithAbsoluteFilename) throws IOException{
 		FileWriter printer = null;
 		try{
