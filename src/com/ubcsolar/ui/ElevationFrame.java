@@ -127,7 +127,8 @@ public class ElevationFrame extends JFrame {
 
 	public void completeAndClose() {
 		displayMessage("Complete!");
-		System.exit(0);	
+		this.dispose();
+		this.setVisible(false);	
 	}
 }
 

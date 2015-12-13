@@ -123,6 +123,7 @@ public class JdomkmlInterface {
 				toReturn.add(parseSingleFromString(s));
 			} catch (JDOMException e) {
 				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Rejected a coordinate while importing the KML; parsing error");
+				System.out.println("rejected a coordinate");
 				e.printStackTrace();
 			}
 		}
@@ -233,7 +234,7 @@ public class JdomkmlInterface {
 		
 		int start = 0;
 		int end = maxCoordPerURL;
-		while((updated.size() < parsedTrack.size()) && (parsedTrack.size() - start)>1){
+		while((updated.size() < parsedTrack.size()) && (parsedTrack.size() - start)>=1){
 			if(end >= parsedTrack.size()){
 				end = parsedTrack.size();
 			}
@@ -244,13 +245,12 @@ public class JdomkmlInterface {
 			String urlToSend = makeGoogleURL(toConvert);
 			System.out.println(urlToSend);
 			String response = sendURL(urlToSend);
-			System.out.println(response);
+			//System.out.println(response);
 			updated.addAll(parseJSONResponse(response));
 						
 			start = end;
 			end += maxCoordPerURL;
 		}
-		
 		return updated;
 	}
 	
