@@ -220,7 +220,7 @@ public class JdomkmlInterface {
 		
 		int start = 0;
 		int end = maxCoordPerURL;
-		while(updated.size() < parsedTrack.size()){
+		while((updated.size() < parsedTrack.size()) && (parsedTrack.size() - start)>1){
 			if(end >= parsedTrack.size()){
 				end = parsedTrack.size();
 			}
@@ -232,10 +232,7 @@ public class JdomkmlInterface {
 			System.out.println(urlToSend);
 			String response = sendURL(urlToSend);
 			updated.addAll(parseResponse(response, toConvert.size()));
-			
-			//TODO remove this. kluge to let it run
-			//updated.addAll(parsedTrack.subList(start, end));
-			
+						
 			start = end;
 			end += maxCoordPerURL;
 		}
