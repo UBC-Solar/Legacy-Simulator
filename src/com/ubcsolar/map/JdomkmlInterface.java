@@ -21,12 +21,12 @@ public class JdomkmlInterface {
 	private Route cachedRoute;
 	private final String API_KEY = "AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek";
 	//private final String API_KEY = "AIz4mek"; //bad key, can use to test Google errors. 
-	
+
 	public JdomkmlInterface(String filename) throws IOException, JDOMException {
 		dropCurrentAndLoad(filename);
 	}
-	
-	
+
+
 	/**
 	 * Note that this won't save any changes that have been made. 
 	 * @param filename
@@ -37,22 +37,22 @@ public class JdomkmlInterface {
 		//disconnect?  
 		loadedFileName = filename;
 		try {
-	         File inputFile = new File(filename);
+			File inputFile = new File(filename);
 
-	         SAXBuilder saxBuilder = new SAXBuilder();
+			SAXBuilder saxBuilder = new SAXBuilder();
 
-	         myDoc = saxBuilder.build(inputFile);
-	         
+			myDoc = saxBuilder.build(inputFile);
+
 		}
 		catch(IOException e){
 			throw e;
 		} catch (JDOMException e) {
 			throw e;
 		}
-		
+
 		this.cachedRoute = turnInToRoute(this.myDoc);
 	}
-	
+
 	/**
 	 * Parses the KML document and creates (and caches) the Route. 
 	 * @param myDoc2
@@ -71,51 +71,58 @@ public class JdomkmlInterface {
 			documentNode = rootElement;
 		}else{
 			documentNode = rootElement.getChild("Document", theNameSpace);
-		}
-		
+		}	
 		String nameOfDocument = documentNode.getChildText("name",theNameSpace);
-		List<Element> placemarks = documentNode.getChildren("Placemark",theNameSpace);
 		ArrayList<GeoCoord> track = new ArrayList<GeoCoord>();
 		ArrayList<PointOfInterest> pois = new ArrayList<PointOfInterest>();
+		List<Element> thingsToCheckForPlacemarks = documentNode.getChildren("Folder", theNameSpace);
+		if(thingsToCheckForPlacemarks.size() == 0){
+			//No folders, therefore the placemarks are located right on the document node. 
+			thingsToCheckForPlacemarks = new ArrayList<Element>();
+			thingsToCheckForPlacemarks.add(documentNode);
+		}
+		
+		for(Element toCheck : thingsToCheckForPlacemarks){
+		List<Element> placemarks = toCheck.getChildren("Placemark",theNameSpace);
 		for(Element placeMarkToCheck : placemarks){
-		//Note: element names are case-sensitive. 
+			//Note: element names are case-sensitive. 
 			if(placeMarkToCheck.getChild("Point",theNameSpace) != null){
 				String name = placeMarkToCheck.getChildText("name",theNameSpace);
 				GeoCoord location = parseSingleFromString(placeMarkToCheck.getChild("Point",theNameSpace).getChildText("coordinates",theNameSpace));
 				String description = placeMarkToCheck.getChildText("description", theNameSpace);
-				//System.out.println(name + ": " + description);
-				//TODO add in support for description (it's a 'cdata' tag, so I'm not sure)
-				
+				if(description == null){
+					description = "";
+				}
 				pois.add(new PointOfInterest(location, name, description));
 			}
 			if(placeMarkToCheck.getChild("LineString",theNameSpace) != null){
 				ArrayList<GeoCoord> theTrack = parseTrack(placeMarkToCheck.getChild("LineString",theNameSpace).getChildText("coordinates",theNameSpace));
 				if(theTrack != null){
-				track.addAll(theTrack);
+					track.addAll(theTrack);
 				}
 			}
 			//NOTE, KML has other geometry types, but ones that aren't likely to be used in this program. 
 		}
-		
+		}
 		return new Route(nameOfDocument, track, pois);
-		
+
 	}
 
 
 	private ArrayList<GeoCoord> parseTrack(String childText) {
-		
+
 		String[] roughCoordinates = childText.split("\\s");
-		
+
 		//Factor of half is a pretty good estimate/place to start. Minimize number of array
 		//re-allocations.
 		ArrayList<String> coordinates = new ArrayList<String>(roughCoordinates.length/2);
-		
+
 		for(String s : roughCoordinates){
 			if(s.length()>5){ //(two commas, 3 numbers)
 				coordinates.add(s);
 			}
 		}
-		
+
 		//it'll be the same size, might as well set that size before we start. 
 		ArrayList<GeoCoord> toReturn = new ArrayList<GeoCoord>(coordinates.size());
 		for(String s : coordinates){
@@ -140,24 +147,24 @@ public class JdomkmlInterface {
 		childText = childText.replaceAll("\\s", ""); //to get rid of any tabs or spaces. 
 		String[] coordinatePieces = childText.split("[,\\s]+");
 		if(coordinatePieces.length<3){ //i.e not a valid coordinate. (even altitude 0 would be ok)
-		for(String s : coordinatePieces){
-			System.out.println(s);
-		}
+			for(String s : coordinatePieces){
+				System.out.println(s);
+			}
 			throw new JDOMException("Not three parts to this coordinate. "
 					+ "May have had whitespace or newlines between lat, long, and elevation");
-			
+
 		}
 		GeoCoord toReturn;
 		try{
-		toReturn = new GeoCoord(Double.parseDouble(coordinatePieces[1]),
-								Double.parseDouble(coordinatePieces[0]), //KML standard is lon, lat. Weird. 
-								Double.parseDouble(coordinatePieces[2]));
+			toReturn = new GeoCoord(Double.parseDouble(coordinatePieces[1]),
+					Double.parseDouble(coordinatePieces[0]), //KML standard is lon, lat. Weird. 
+					Double.parseDouble(coordinatePieces[2]));
 		}
 		catch(IllegalArgumentException e){ //if we can't parse into a Double
 			throw new JDOMException("Error converting from String to coordinate."
 					+ " Invalid Character?");
 		}
-		
+
 		return toReturn;
 	}
 
@@ -169,12 +176,12 @@ public class JdomkmlInterface {
 		try {
 			return turnInToRoute(this.myDoc);
 		} catch (JDOMException e) {
-			
+
 			return null;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Uses Google's Elevations API to get elevations for each coordinate
 	 * @param resolution - how many Coordinates to send each URL request.
@@ -188,7 +195,7 @@ public class JdomkmlInterface {
 		this.cachedRoute = this.turnInToRoute(myDoc);
 		return cachedRoute;
 	}
-	
+
 	/**
 	 * Recursively searches for and updates every coordinate note in the document under the Root Element. 
 	 * Depth-first-search.
@@ -205,9 +212,9 @@ public class JdomkmlInterface {
 				updateAllCoordinateNodes(e, maxCoordPerURL);
 			}
 		}
-		
+
 	}
-	
+
 	/**
 	 * Turns a list of GeoCoords into a String in KML Format, separated by a space. 
 	 * @param toPrintOut
@@ -231,31 +238,33 @@ public class JdomkmlInterface {
 	private ArrayList<GeoCoord> parseAndUpdate(String text, int maxCoordPerURL) throws IOException {
 		ArrayList<GeoCoord> parsedTrack = this.parseTrack((text));
 		ArrayList<GeoCoord> updated = new ArrayList<GeoCoord>(parsedTrack.size());
-		
+
 		int start = 0;
 		int end = maxCoordPerURL;
 		while((updated.size() < parsedTrack.size()) && (parsedTrack.size() - start)>=1){
 			if(end >= parsedTrack.size()){
 				end = parsedTrack.size();
 			}
+			/*
 			System.out.println("start: " + start);
 			System.out.println("end: " + end);
 			System.out.println("Size: " + parsedTrack.size());
+			 */
 			List<GeoCoord> toConvert = parsedTrack.subList(start, end);
 			String urlToSend = makeGoogleURL(toConvert);
-			System.out.println(urlToSend);
+			//System.out.println(urlToSend);
 			String response = sendURL(urlToSend);
 			//System.out.println(response);
 			updated.addAll(parseJSONResponse(response));
-						
+
 			start = end;
 			end += maxCoordPerURL;
 		}
 		return updated;
 	}
-	
 
-	
+
+
 	/**
 	 * Parses the response from Google Elevations Api and makes
 	 * a list of coordinates. 
@@ -264,7 +273,7 @@ public class JdomkmlInterface {
 	 * @throws GoogleAPIException 
 	 */
 	private Collection<? extends GeoCoord> parseJSONResponse(String JSONresponse) throws GoogleAPIException {
-		
+
 		/*
 		 *
 	{
@@ -287,7 +296,7 @@ public class JdomkmlInterface {
 		if(!status.equalsIgnoreCase("OK")){
 			throw new GoogleAPIException("Tried to access elevations, got error: " + status, status);
 		}
-		
+
 		JSONArray results = test.getJSONArray("results");
 		ArrayList<GeoCoord> updatedPoints = new ArrayList<GeoCoord>(results.length());
 		//coordinateList = new ArrayList<Coordinate>();
@@ -298,7 +307,7 @@ public class JdomkmlInterface {
 			double lon = temp.getJSONObject("location").getDouble("lng");
 			updatedPoints.add(new GeoCoord(lat,lon,elevation));
 		}
-		
+
 		return updatedPoints;
 	}
 
@@ -334,7 +343,7 @@ public class JdomkmlInterface {
 		String urlToSend = "https://maps.googleapis.com/maps/api/elevation/json?locations=";
 		int maxInOneShot = 512;//max number of coords as per Google documentation. 
 		for(int i = 0; i<(coordsToConvert.size()-1) && i<(maxInOneShot -1); i++){
-				urlToSend += "" + coordsToConvert.get(i).getLat() + "," + coordsToConvert.get(i).getLon() + "|";
+			urlToSend += "" + coordsToConvert.get(i).getLat() + "," + coordsToConvert.get(i).getLon() + "|";
 		}
 		//to avoid adding the bar at the end. 
 		urlToSend += "" + coordsToConvert.get(coordsToConvert.size()-1).getLat() + "," + coordsToConvert.get(coordsToConvert.size()-1).getLon();
@@ -343,14 +352,14 @@ public class JdomkmlInterface {
 			throw new IllegalArgumentException("URL too long, too many coords given");
 		}
 		return urlToSend;
-		
-		
+
+
 	}
 
 	public String getLoadedFileName() {
 		return loadedFileName;
 	}
-	
+
 	/**
 	 * Write the entire KML document to file 
 	 * @param fileWithAbsoluteFilename
@@ -359,7 +368,7 @@ public class JdomkmlInterface {
 	public void saveToFile(String absoluteFileName) throws IOException{
 		this.saveToFile(new File(absoluteFileName));
 	}
-	
+
 	/**
 	 * Write the entire KML document to file 
 	 * @param fileWithAbsoluteFilename
@@ -380,7 +389,7 @@ public class JdomkmlInterface {
 			}
 		}
 	}
-	
-	
-	
+
+
+
 }
