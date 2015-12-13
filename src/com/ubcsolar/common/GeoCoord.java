@@ -122,7 +122,7 @@ public static double haversine(
  * Form: "name lat,long,elevation"
  */
 public String toString(){
-	return this.lat + "," + this.lon + "," + this.elevation + "(m)";
+	return this.lat + "," + this.lon + "," + this.elevation;
 }
 
 public double getLat(){

@@ -17,7 +17,7 @@ public class JdomkmlInterface {
 
 	private Document myDoc;
 	private String loadedFileName;
-	private Route chachedRoute;
+	private Route cachedRoute;
 	
 	public JdomkmlInterface(String filename) throws IOException, JDOMException {
 		dropCurrentAndLoad(filename);
@@ -48,7 +48,7 @@ public class JdomkmlInterface {
 			throw e;
 		}
 		
-		this.chachedRoute = turnInToRoute(this.myDoc);
+		this.cachedRoute = turnInToRoute(this.myDoc);
 	}
 	
 	
@@ -69,21 +69,10 @@ public class JdomkmlInterface {
 			documentNode = rootElement.getChild("Document", theNameSpace);
 		}
 		
-		//TODO add in a check to make sure this is a KML document. (test: open a different XML)
 		String nameOfDocument = documentNode.getChildText("name",theNameSpace);
 		List<Element> placemarks = documentNode.getChildren("Placemark",theNameSpace);
 		ArrayList<GeoCoord> track = new ArrayList<GeoCoord>();
 		ArrayList<PointOfInterest> pois = new ArrayList<PointOfInterest>();
-		/*
-		 * <Point>
-<LineString>
-<LinearRing>
-<Polygon>
-<MultiGeometry>
-<gx:MultiTrack>
-<Model>
-<gx:Track>
-		 */
 		for(Element placeMarkToCheck : placemarks){
 		//Note: element names are case-sensitive. 
 			if(placeMarkToCheck.getChild("Point",theNameSpace) != null){
@@ -110,7 +99,6 @@ public class JdomkmlInterface {
 	private ArrayList<GeoCoord> parseTrack(String childText) {
 		
 		String[] roughCoordinates = childText.split("\\s");
-		System.out.println(roughCoordinates.length);
 		
 		//Factor of half is a pretty good estimate/place to start. Minimize number of array
 		//re-allocations.
@@ -159,8 +147,8 @@ public class JdomkmlInterface {
 
 
 	public Route getRoute(){
-		if(this.chachedRoute != null){
-			return this.chachedRoute;
+		if(this.cachedRoute != null){
+			return this.cachedRoute;
 		}
 		try {
 			return turnInToRoute(this.myDoc);
@@ -176,11 +164,51 @@ public class JdomkmlInterface {
 	 * @param resolution - how many Coordinates to send each URL request.
 	 * Note that more coordinates reduces accuracy as per their API documentation
 	 * Also note that we only have a fixed number of calls per 24 hour period.
+	 * @throws JDOMException 
 	 */
-	public void getElevationsFromGoogle(int resolution){
-		System.out.println("PRETENDING TO GET ELEVATIONS FROM GOOGLE");
+	public Route getElevationsFromGoogle(int resolution) throws JDOMException{
+		updateAllCoordinateNodes(this.myDoc.getRootElement(), resolution);
+		this.cachedRoute = this.turnInToRoute(myDoc);
+		return cachedRoute;
 	}
 	
+	private void updateAllCoordinateNodes(Element rootElement, int maxCoordPerURL){
+		System.out.println(rootElement.getName());
+		if(rootElement.getName().equalsIgnoreCase("coordinates")){
+			rootElement.setText(turnToString(parseAndUpdate(rootElement.getText(), maxCoordPerURL)));	
+		}
+		else{
+			for(Element e : rootElement.getChildren()){
+				updateAllCoordinateNodes(e, maxCoordPerURL);
+			}
+		}
+		
+	}
+	
+	
+	private String turnToString(ArrayList<GeoCoord> toPrintOut) {
+		String toReturn = "";
+		for(GeoCoord g : toPrintOut){
+			toReturn += g.toString() + "\n";
+		}
+		return toReturn;
+	}
+
+
+	private ArrayList<GeoCoord> parseAndUpdate(String text, int maxCoordPerURL) {
+		ArrayList<GeoCoord> updatedNodes = updateFromGoogle(this.parseTrack(text), maxCoordPerURL);
+		return updatedNodes;
+	}
+
+
+	private ArrayList<GeoCoord> updateFromGoogle(ArrayList<GeoCoord> parsedTrack, int maxCoordPerURL) {
+		ArrayList<GeoCoord> updated = new ArrayList<GeoCoord>(parsedTrack);
+		//Talk to Google's Elevation API here. 
+		
+		return updated;
+	}
+
+
 	public void printToFile(String filename) throws IOException{
 		FileWriter fileToPrintTo = new FileWriter(new File(filename));
 		fileToPrintTo.write(new XMLOutputter().outputString(this.myDoc));

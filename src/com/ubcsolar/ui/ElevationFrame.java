@@ -187,6 +187,10 @@ class GoButtonClickHandler extends MouseAdapter{
 			catch(ClassCastException e){
 				parent.handleError("Value from spinner not an integer");
 				return;
+			} catch (JDOMException e) {
+				parent.handleError("Parsing exception");
+				e.printStackTrace();
+				return;
 			}
 			
 			try{
