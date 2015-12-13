@@ -100,7 +100,7 @@ public class ElevationFrame extends JFrame {
 		panel.add(btnGo, gbc_btnGo);
 		
 		JTextPane txtpnGooglesApi = new JTextPane();
-		txtpnGooglesApi.setText("* Google's API allows only 10k calls per day. More coordinates per call = less calls, but also less accuracy. Max 2k characters per URL, so limited to 85 points per call");
+		txtpnGooglesApi.setText("* Google's API allows only 2.5k calls per day. More coordinates per call = less calls, but also less accuracy. Max 2k characters per URL, so limited to 85 points per call");
 		GridBagConstraints gbc_txtpnGooglesApi = new GridBagConstraints();
 		gbc_txtpnGooglesApi.anchor = GridBagConstraints.NORTH;
 		gbc_txtpnGooglesApi.gridwidth = 2;

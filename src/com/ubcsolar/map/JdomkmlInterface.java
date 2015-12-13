@@ -34,8 +34,7 @@ public class JdomkmlInterface {
 	 * @throws JDOMException 
 	 */
 	public void dropCurrentAndLoad(String filename) throws IOException, JDOMException{
-		//disconnect? 
-		//TODO check for and drop extra stuff if it's an absolute file path. 
+		//disconnect?  
 		loadedFileName = filename;
 		try {
 	         File inputFile = new File(filename);
@@ -62,8 +61,6 @@ public class JdomkmlInterface {
 	 */
 	private Route turnInToRoute(Document myDoc2) throws JDOMException {
 		//Documentation: https://developers.google.com/kml/documentation/kmlreference
-		//TODO test after downloading just the route and then test with downloading the entire map
-		//(two different options on Google Maps) to make sure it works for both
 		Element rootElement = myDoc2.getRootElement();
 		Element documentNode;
 		Namespace theNameSpace = rootElement.getNamespace();
@@ -85,8 +82,10 @@ public class JdomkmlInterface {
 			if(placeMarkToCheck.getChild("Point",theNameSpace) != null){
 				String name = placeMarkToCheck.getChildText("name",theNameSpace);
 				GeoCoord location = parseSingleFromString(placeMarkToCheck.getChild("Point",theNameSpace).getChildText("coordinates",theNameSpace));
-				String description = "";
+				String description = placeMarkToCheck.getChildText("description", theNameSpace);
+				//System.out.println(name + ": " + description);
 				//TODO add in support for description (it's a 'cdata' tag, so I'm not sure)
+				
 				pois.add(new PointOfInterest(location, name, description));
 			}
 			if(placeMarkToCheck.getChild("LineString",theNameSpace) != null){
@@ -95,7 +94,7 @@ public class JdomkmlInterface {
 				track.addAll(theTrack);
 				}
 			}
-			//TODO add in support for the others. Check KML guide for all possible ones. 
+			//NOTE, KML has other geometry types, but ones that aren't likely to be used in this program. 
 		}
 		
 		return new Route(nameOfDocument, track, pois);

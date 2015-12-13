@@ -6,3 +6,6 @@ http://docs.geotools.org/latest/userguide/tutorial/quickstart/eclipse.html
 
 Google Maps engine library (might be useful to replace OpenStreetMap)
 https://developers.google.com/api-client-library/java/apis/mapsengine/v1?hl=en
+
+http://www.nearby.org.uk/elevation-kml.php
+website with more solutions for elevation data, possibly without the 2.5k restrictions. 
