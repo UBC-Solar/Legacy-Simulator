@@ -1,9 +1,16 @@
 package com.ubcsolar.map;
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
+
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
+
 import org.jdom2.*;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.LocatorImpl;
 
@@ -18,6 +25,7 @@ public class JdomkmlInterface {
 	private Document myDoc;
 	private String loadedFileName;
 	private Route cachedRoute;
+	private final String API_KEY = "AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek";
 	
 	public JdomkmlInterface(String filename) throws IOException, JDOMException {
 		dropCurrentAndLoad(filename);
@@ -128,13 +136,18 @@ public class JdomkmlInterface {
 		childText = childText.replaceAll("\\s", ""); //to get rid of any tabs or spaces. 
 		String[] coordinatePieces = childText.split("[,\\s]+");
 		if(coordinatePieces.length<3){ //i.e not a valid coordinate. (even altitude 0 would be ok)
+		for(String s : coordinatePieces){
+			System.out.println(s);
+		}
 			throw new JDOMException("Not three parts to this coordinate. "
 					+ "May have had whitespace or newlines between lat, long, and elevation");
+			
 		}
 		GeoCoord toReturn;
 		try{
-		toReturn = new GeoCoord(Double.parseDouble(coordinatePieces[0]),
-								Double.parseDouble(coordinatePieces[1]),
+			//TODO add a check to put Lon and Lat in right place. Google's KMLs seem to be backwards??
+		toReturn = new GeoCoord(Double.parseDouble(coordinatePieces[1]),
+								Double.parseDouble(coordinatePieces[0]), //Google's KML seems to be Lon, Lat??
 								Double.parseDouble(coordinatePieces[2]));
 		}
 		catch(IllegalArgumentException e){ //if we can't parse into a Double
@@ -165,15 +178,15 @@ public class JdomkmlInterface {
 	 * Note that more coordinates reduces accuracy as per their API documentation
 	 * Also note that we only have a fixed number of calls per 24 hour period.
 	 * @throws JDOMException 
+	 * @throws IOException 
 	 */
-	public Route getElevationsFromGoogle(int resolution) throws JDOMException{
+	public Route getElevationsFromGoogle(int resolution) throws JDOMException, IOException{
 		updateAllCoordinateNodes(this.myDoc.getRootElement(), resolution);
 		this.cachedRoute = this.turnInToRoute(myDoc);
 		return cachedRoute;
 	}
 	
-	private void updateAllCoordinateNodes(Element rootElement, int maxCoordPerURL){
-		System.out.println(rootElement.getName());
+	private void updateAllCoordinateNodes(Element rootElement, int maxCoordPerURL) throws IOException{
 		if(rootElement.getName().equalsIgnoreCase("coordinates")){
 			rootElement.setText(turnToString(parseAndUpdate(rootElement.getText(), maxCoordPerURL)));	
 		}
@@ -189,27 +202,91 @@ public class JdomkmlInterface {
 	private String turnToString(ArrayList<GeoCoord> toPrintOut) {
 		String toReturn = "";
 		for(GeoCoord g : toPrintOut){
-			toReturn += g.toString() + "\n";
+			toReturn += g.toString() + " ";
 		}
 		return toReturn;
 	}
 
 
-	private ArrayList<GeoCoord> parseAndUpdate(String text, int maxCoordPerURL) {
-		ArrayList<GeoCoord> updatedNodes = updateFromGoogle(this.parseTrack(text), maxCoordPerURL);
-		return updatedNodes;
+	private ArrayList<GeoCoord> parseAndUpdate(String text, int maxCoordPerURL) throws IOException {
+		ArrayList<GeoCoord> parsedTrack = this.parseTrack((text));
+		ArrayList<GeoCoord> updated = new ArrayList<GeoCoord>(parsedTrack.size());
+		
+		int start = 0;
+		int end = maxCoordPerURL;
+		while(updated.size() < parsedTrack.size()){
+			if(end >= parsedTrack.size()){
+				end = parsedTrack.size();
+			}
+			System.out.println("start: " + start);
+			System.out.println("end: " + end);
+			System.out.println("Size: " + parsedTrack.size());
+			String urlToSend = makeURL(parsedTrack.subList(start, end));
+			System.out.println(urlToSend);
+			String response = sendURL(urlToSend);
+			//TODO decide what to do with Google's apparently backwards lat, lons. When I save
+			//an updated version, do I keep their order?
+			//updated.addAll(parseResponse(response));
+			System.out.println(response);
+			
+			//TODO remove this. kluge to let it run
+			updated.addAll(parsedTrack.subList(start, end));
+			
+			start = end;
+			end += maxCoordPerURL;
+		}
+		
+		return parsedTrack;
+	}
+	
+
+	private Collection<? extends GeoCoord> parseResponse(String response) {
+		ArrayList<GeoCoord> updatedPoints = new ArrayList<GeoCoord>();
+		
+		return null;
 	}
 
 
-	private ArrayList<GeoCoord> updateFromGoogle(ArrayList<GeoCoord> parsedTrack, int maxCoordPerURL) {
-		ArrayList<GeoCoord> updated = new ArrayList<GeoCoord>(parsedTrack);
-		//Talk to Google's Elevation API here. 
+	private String sendURL(String urlToSend) throws IOException {
+		URL url = new URL(urlToSend); 
+		InputStream inputStream = url.openStream(); 
+		BufferedReader inputReader = new BufferedReader(new InputStreamReader(inputStream)); 
+		StringBuffer webPageData = new StringBuffer(); 
+		//http://maps.googleapis.com/maps/api/elevation/json?locations=39.7391536,-104.9847034|36.455556,-116.866667&sensor=true_or_false&key=API_KEY
 		
-		return updated;
+		String inputLine = null; 
+		while ((inputLine = inputReader.readLine()) != null) { 
+			webPageData.append(inputLine); 
+			webPageData.append("\n"); 
+		} 
+		inputReader.close(); 
+		System.out.println(webPageData.toString());
+		return webPageData.toString();
+	}
+
+
+	private String makeURL(List<GeoCoord> coordsToConvert) throws IllegalArgumentException{
+		ArrayList<GeoCoord> updated = new ArrayList<GeoCoord>(coordsToConvert.size());
+		String urlToSend = "https://maps.googleapis.com/maps/api/elevation/json?locations=";
+		int maxInOneShot = 512;//max number of coords as per Google documentation. 
+		for(int i = 0; i<(coordsToConvert.size()-1) && i<(maxInOneShot -1); i++){
+				urlToSend += "" + coordsToConvert.get(i).getLat() + "," + coordsToConvert.get(i).getLon() + "|";
+		}
+		//to avoid adding the bar at the end. 
+		urlToSend += "" + coordsToConvert.get(coordsToConvert.size()-1).getLat() + "," + coordsToConvert.get(coordsToConvert.size()-1).getLon();
+		urlToSend += "&sensor=false&key=" + API_KEY;		
+		if(urlToSend.length() > 1900){ //max is 2,000 characters, but lets do 1900 to be safe.
+			throw new IllegalArgumentException("URL too long, too many coords given");
+		}
+		return urlToSend;
+		
+		
 	}
 
 
 	public void printToFile(String filename) throws IOException{
+		//TODO: It look like Google's KML prints the coordinates backwards. When I save... do I want
+		//to keep them in that order? 
 		FileWriter fileToPrintTo = new FileWriter(new File(filename));
 		fileToPrintTo.write(new XMLOutputter().outputString(this.myDoc));
 		fileToPrintTo.close();

@@ -191,6 +191,14 @@ class GoButtonClickHandler extends MouseAdapter{
 				parent.handleError("Parsing exception");
 				e.printStackTrace();
 				return;
+			} catch (IOException e) {
+				parent.handleError("IO Exception, check internet");
+				e.printStackTrace();
+				return;
+			} catch(IllegalArgumentException e){
+				parent.handleError("too many URLs in one try");
+				e.printStackTrace();
+				return;
 			}
 			
 			try{
