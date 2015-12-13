@@ -1,8 +1,6 @@
 package com.ubcsolar.Main;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 import com.ubcsolar.ui.ElevationFrame;
 
 public class ElevationScript {

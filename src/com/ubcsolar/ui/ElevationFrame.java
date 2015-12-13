@@ -3,12 +3,10 @@ package com.ubcsolar.ui;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridBagLayout;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 
 import java.awt.GridBagConstraints;
@@ -29,10 +27,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 public class ElevationFrame extends JFrame {
+	/**
+	 * Added to get Eclipse to stop whining.
+	 */
+	private static final long serialVersionUID = 1L;
 	protected JTextField textField;
 	protected JSpinner spinner;
 	protected JdomkmlInterface theKMLInterface;
