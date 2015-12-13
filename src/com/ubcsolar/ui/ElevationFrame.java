@@ -21,6 +21,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.jdom2.JDOMException;
 
+import com.ubcsolar.map.GoogleAPIException;
 import com.ubcsolar.map.JdomkmlInterface;
 
 import java.awt.event.MouseAdapter;
@@ -184,6 +185,9 @@ class GoButtonClickHandler extends MouseAdapter{
 			
 			try{
 				parent.theKMLInterface.getElevationsFromGoogle((int)parent.spinner.getValue());
+			}catch(GoogleAPIException e){
+				parent.handleError("Google API error, status: " + e.getResponseCode());
+				return;
 			}
 			catch(ClassCastException e){
 				parent.handleError("Value from spinner not an integer");

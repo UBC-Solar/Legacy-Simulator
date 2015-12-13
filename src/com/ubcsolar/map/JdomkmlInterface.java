@@ -20,6 +20,7 @@ public class JdomkmlInterface {
 	private String loadedFileName;
 	private Route cachedRoute;
 	private final String API_KEY = "AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek";
+	//private final String API_KEY = "AIz4mek"; //bad key, can use to test Google errors. 
 	
 	public JdomkmlInterface(String filename) throws IOException, JDOMException {
 		dropCurrentAndLoad(filename);
@@ -261,9 +262,10 @@ public class JdomkmlInterface {
 	 * a list of coordinates. 
 	 * @param JSONresponse
 	 * @return
+	 * @throws GoogleAPIException 
 	 */
-	private Collection<? extends GeoCoord> parseJSONResponse(String JSONresponse) {
-		//TODO add check for API 'out of quota' response. 
+	private Collection<? extends GeoCoord> parseJSONResponse(String JSONresponse) throws GoogleAPIException {
+		
 		/*
 		 *
 	{
@@ -282,6 +284,11 @@ public class JdomkmlInterface {
 
 		 */
 		JSONObject test = new JSONObject(JSONresponse);
+		String status = test.getString("status");
+		if(!status.equalsIgnoreCase("OK")){
+			throw new GoogleAPIException("Tried to access elevations, got error: " + status, status);
+		}
+		
 		JSONArray results = test.getJSONArray("results");
 		ArrayList<GeoCoord> updatedPoints = new ArrayList<GeoCoord>(results.length());
 		//coordinateList = new ArrayList<Coordinate>();
