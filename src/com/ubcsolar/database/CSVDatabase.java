@@ -23,7 +23,6 @@ import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.TelemDataPacket;
 
 public class CSVDatabase extends Database {
-	private final String folderpath = "Output\\"; //default save directory
 	private Queue<String> writingQueue; //will read from here and then write. 
 	private FileWriter myFileWriter; //used to write. 
 	private int entryCounter; //used to generate primary keys. 
@@ -63,7 +62,7 @@ public class CSVDatabase extends Database {
 		if(filename.length() == 0){
 			throw new IOException("Blank filename is Invalid filename");
 		}
-		File testForExistence = new File(folderpath+filename + ".csv");
+		File testForExistence = new File(filename + ".csv");
 		if(testForExistence.exists()){
 			throw new IOException("file already exists");
 		}
@@ -84,11 +83,20 @@ public class CSVDatabase extends Database {
 	
 	/**
 	 * Build a standard CSV database with the system time as the filename.
+	 * Attempts to save to folder 'Output', or default file level if that doesn't work. 
 	 * @throws IOException
 	 */
 	public CSVDatabase() throws IOException {
-		setup(""+System.nanoTime()); //pretty much guaranteed to be a unique filename. (unless you're making them faster than 1 per ns
-									//but that is unlikely. 
+		File testForExistence = new File("Output");
+		if(testForExistence.exists() && testForExistence.isDirectory()){
+			setup("Output\\"+System.nanoTime()); //pretty much guaranteed to be a unique filename. (unless you're making them faster than 1 per ns
+			//but that is unlikely. 
+		}
+		else{
+			//if there is no 'output' folder
+			setup("" + System.nanoTime());
+		}
+
 	}
 	
 	/**
@@ -100,7 +108,7 @@ public class CSVDatabase extends Database {
 		entryCounter = 0; 
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
 				"CSV Database created with name " + filename + ".csv");
-		myFileWriter = new FileWriter(folderpath+ filename + ".csv");
+		myFileWriter = new FileWriter(filename + ".csv");
 		writingQueue = new PriorityQueue<String>();
 		this.isDBConnected = true;
 		setUpTables();

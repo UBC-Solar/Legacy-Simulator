@@ -67,6 +67,9 @@ public class GlobalController {
 		//TODO Confirm the notification system is working and remove these
 		listOfListeners = new ArrayList<Listener>();
 		listOfTriggers = new ArrayList<Class<? extends Notification>>();
+		
+		//TODO many of these are interrelated: the main window asks for the Database Controller. 
+		//If it's 'null' (as in, didn't build properly), the program crashes. It shouldn't. 
 		myMapController = new MapController(this);
 		myCarController = new CarController(this);
 		mySimController = new SimController(this);

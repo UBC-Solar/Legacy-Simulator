@@ -9,6 +9,7 @@ import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewDataUnitNotification;
 import com.ubcsolar.notification.Notification;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -35,6 +36,8 @@ public class DatabaseController extends ModuleController {
 	//when I actually implement a database (could be a SQL query). 
 	Database myDatabase;
 	String databaseName;
+	private final String DEFAULT_FOLDER_LOCATION = "Output"; //default place to create the database file. (CSVDatabase tries to save to 'output' by default).
+	
 	public DatabaseController(GlobalController myGlobalController)throws IOException {
 		super(myGlobalController);
 		buildNewDatabase();
@@ -49,8 +52,12 @@ public class DatabaseController extends ModuleController {
 		if(myDatabase != null && myDatabase.isConnected()){
 			myDatabase.saveAndDisconnect();
 		}
+		File testForExistence = new File(DEFAULT_FOLDER_LOCATION);
+		if(!testForExistence.exists() || !testForExistence.isDirectory()){
+			testForExistence.mkdir();
+		}
 		myDatabase = new CSVDatabase();
-		databaseName = ".csv";
+		databaseName = ".csv"; //Just want to identify the type of DB (i.e csv vs SQL, etc.) It will already have the time created. 
 		this.mySession.sendNotification(new DatabaseCreatedOrConnectedNotification(databaseName));
 	}
 	
