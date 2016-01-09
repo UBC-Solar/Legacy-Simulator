@@ -137,7 +137,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 				
 					try {
 						//TODO hardcoded, will need to update
-						mySession.getMapController().load("res/HopeToMerrittElevated.kml");
+						mySession.getMapController().load("res/TEST123.txt");
 						
 					} catch (IOException e) {
 						JDialog dialog = new ErrorMessage("IO Exception: File could not be loaded (bad filename?)");

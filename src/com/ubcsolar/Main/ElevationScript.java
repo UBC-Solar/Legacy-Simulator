@@ -1,3 +1,8 @@
+/**
+ * This Main class runs a limited program to import and add elevations to a KML file's coordinates
+ * without starting up the entire program. As of this writing, this functionality is not contained within
+ * the main program as it should be a case of 'convert once' and then use forever. 
+ */
 package com.ubcsolar.Main;
 
 import javax.swing.ImageIcon;
