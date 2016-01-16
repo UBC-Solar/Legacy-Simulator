@@ -27,6 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -39,6 +40,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JButton;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -69,6 +71,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	private XYDataset ds;
 	private JFreeChart elevationChart;
 	private ChartPanel cp;
+	private final String DEFAULT_FILE_LOCATION = "Res\\";
 
 	/**
 	 * update the map name label
@@ -134,7 +137,28 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		JMenuItem mntmNewMenuItem = new JMenuItem("ASC2014 Route Map");
 		mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+/*
+				JFileChooser fc = new JFileChooser();
+				File defaultDirectory = new File(DEFAULT_FILE_LOCATION);
+				File toSaveTo;
+				if(defaultDirectory.exists() && defaultDirectory.isDirectory()){
+					fc.setCurrentDirectory(defaultDirectory);
+				}
+				 int returnVal = fc.showSaveDialog(parent);
+				 if (returnVal == JFileChooser.APPROVE_OPTION) {  
+					 toSaveTo = fc.getSelectedFile();
+					 if(toSaveTo.exists()){
+						 parent.handleError("File already exists, cannot overwrite");
+						 return;
+					 }
+					 
+			        }
+				 else {
+			           //cancelled by user, do nothing
+			       	return;
+			      }
+				 */
+				 
 					try {
 						//TODO hardcoded, will need to update
 						mySession.getMapController().load("res/TEST123.txt");

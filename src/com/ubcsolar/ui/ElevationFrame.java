@@ -40,7 +40,7 @@ public class ElevationFrame extends JFrame {
 	private final String DEFAULT_FILE_NAME = "";
 	private final int DEFAULT_SPINNER_VALUE = 85;
 	private final JdomkmlInterface DEFAULT_KML_INTERFACE = null;
-	protected final File DEFAULT_OPEN_DIRECTORY = new File("res\\");
+	protected final File DEFAULT_OPEN_DIRECTORY = new File("res");
 	
 	
 	public ElevationFrame(ImageIcon windowIcon) {
@@ -143,7 +143,7 @@ class GoButtonClickHandler extends MouseAdapter{
 	public void mouseClicked(MouseEvent arg0) {
 		JFileChooser fc = new JFileChooser();
 		File toSaveTo;
-		if(parent.DEFAULT_OPEN_DIRECTORY.exists()){
+		if(parent.DEFAULT_OPEN_DIRECTORY.exists() && parent.DEFAULT_OPEN_DIRECTORY.isDirectory()){
 			fc.setCurrentDirectory(parent.DEFAULT_OPEN_DIRECTORY);
 		}
 		 int returnVal = fc.showSaveDialog(parent);
