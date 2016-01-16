@@ -168,7 +168,7 @@ class GoButtonClickHandler extends MouseAdapter{
 			}
 		
 			try {
-				parent.theKMLInterface = new JdomkmlInterface(parent.textField.getText());
+				parent.theKMLInterface = new JdomkmlInterface(new File(parent.textField.getText()));
 			} catch (IOException e) {
 				parent.handleError("IO Exception, check filename");
 				e.printStackTrace();

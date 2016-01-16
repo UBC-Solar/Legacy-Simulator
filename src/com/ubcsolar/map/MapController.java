@@ -9,6 +9,7 @@
 //TODO: check threading. Is the controller threading the sub classes?
 package com.ubcsolar.map;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -47,10 +48,10 @@ public class MapController extends ModuleController{
 	 * @throws SAXException 
 	 * @throws JDOMException 
 	 */
-	public void load(String filename) throws IOException, SAXException, ParserConfigurationException, JDOMException{
+	public void load(File fileToLoad) throws IOException, SAXException, ParserConfigurationException, JDOMException{
 		
-		myJDOMMap = new JdomkmlInterface(filename);
-		sendNotification(new NewMapLoadedNotification(filename, myJDOMMap.getRoute()));
+		myJDOMMap = new JdomkmlInterface(fileToLoad);
+		sendNotification(new NewMapLoadedNotification(myJDOMMap.getLoadedFileName(), myJDOMMap.getRoute()));
 		//Decided against automatically sending all data points. 
 		//If the UI element wants them, it can specifiy it. 
 		//getAllPoints();

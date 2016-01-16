@@ -22,26 +22,24 @@ public class JdomkmlInterface {
 	private final String API_KEY = "AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek";
 	//private final String API_KEY = "AIz4mek"; //bad key, can use to test Google errors. 
 
-	public JdomkmlInterface(String filename) throws IOException, JDOMException {
-		dropCurrentAndLoad(filename);
+	public JdomkmlInterface(File fileToLoad) throws IOException, JDOMException{
+		dropCurrentAndLoad(fileToLoad);
 	}
 
 
 	/**
 	 * Note that this won't save any changes that have been made. 
-	 * @param filename
+	 * @param fileToLoad
 	 * @throws IOException 
 	 * @throws JDOMException 
 	 */
-	public void dropCurrentAndLoad(String filename) throws IOException, JDOMException{
+	public void dropCurrentAndLoad(File fileToLoad) throws IOException, JDOMException{
 		//disconnect?  
-		loadedFileName = filename;
+		loadedFileName = fileToLoad.getName();
 		try {
-			File inputFile = new File(filename);
-
 			SAXBuilder saxBuilder = new SAXBuilder();
 
-			myDoc = saxBuilder.build(inputFile);
+			myDoc = saxBuilder.build(fileToLoad);
 
 		}
 		catch(IOException e){

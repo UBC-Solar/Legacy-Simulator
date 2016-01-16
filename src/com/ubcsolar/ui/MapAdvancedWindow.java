@@ -189,7 +189,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	private void loadMap(File fileToLoad){
 
 		try {
-			mySession.getMapController().load(fileToLoad.getAbsolutePath());
+			mySession.getMapController().load(fileToLoad);
 			
 		} catch (IOException e) {
 			JDialog dialog = new ErrorMessage("IO Exception: File could not be loaded (bad filename?)");
