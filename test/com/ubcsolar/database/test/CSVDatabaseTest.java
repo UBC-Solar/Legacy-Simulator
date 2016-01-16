@@ -75,7 +75,7 @@ public class CSVDatabaseTest {
 	 */
 	@Test
 	public void constructorWithStringShouldMakeName() throws IOException{
-		CSVDatabase test = new CSVDatabase("hello");
+		CSVDatabase test = new CSVDatabase("Output\\hello");
 		File theFile = new File("Output\\hello.csv");
 		assertTrue(theFile.exists());
 	}
