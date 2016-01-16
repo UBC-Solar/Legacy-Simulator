@@ -13,11 +13,13 @@ import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -72,7 +74,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	private JFreeChart elevationChart;
 	private ChartPanel cp;
 	private final String DEFAULT_FILE_LOCATION = "Res\\";
-
+	private final MapAdvancedWindow parentInstance = this;
 	/**
 	 * update the map name label
 	 * @param labelupdate - what to make the label display
@@ -134,59 +136,28 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		JMenu mnLoadMap = new JMenu("Load Map");
 		menuBar.add(mnLoadMap);
 		
-		JMenuItem mntmNewMenuItem = new JMenuItem("ASC2014 Route Map");
+		JMenuItem mntmNewMenuItem = new JMenuItem("Select File");
 		mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-/*
-				JFileChooser fc = new JFileChooser();
 				File defaultDirectory = new File(DEFAULT_FILE_LOCATION);
-				File toSaveTo;
+				JFileChooser fc = new JFileChooser();
 				if(defaultDirectory.exists() && defaultDirectory.isDirectory()){
 					fc.setCurrentDirectory(defaultDirectory);
 				}
-				 int returnVal = fc.showSaveDialog(parent);
-				 if (returnVal == JFileChooser.APPROVE_OPTION) {  
-					 toSaveTo = fc.getSelectedFile();
-					 if(toSaveTo.exists()){
-						 parent.handleError("File already exists, cannot overwrite");
-						 return;
-					 }
-					 
-			        }
-				 else {
-			           //cancelled by user, do nothing
-			       	return;
-			      }
-				 */
-				 
-					try {
-						//TODO hardcoded, will need to update
-						mySession.getMapController().load("res/TEST123.txt");
-						
-					} catch (IOException e) {
-						JDialog dialog = new ErrorMessage("IO Exception: File could not be loaded (bad filename?)");
-						dialog.setVisible(true);
-						e.printStackTrace();
-						
-					} catch (SAXException e) {
-						JDialog dialog = new ErrorMessage("SAX parser Exception: The file was formatted badly. Bad character?");
-						dialog.setVisible(true);
-						e.printStackTrace();
-						
-					} catch (ParserConfigurationException e) {
-						JDialog dialog = new ErrorMessage("Something with the parser configuration: Check stack trace.");
-						dialog.setVisible(true);
-						e.printStackTrace();
-						
-					} catch (JDOMException e) {
-						JDialog dialog = new ErrorMessage("JDOM parser Exception: The file was formatted badly. Bad character?");
-						dialog.setVisible(true);
-						e.printStackTrace();
-					}
-					mySession.getMapController().getAllPoints();
-				 
 				
-			
+				fc.addChoosableFileFilter(new FileNameExtensionFilter("Google Map files", "KML", "kml"));
+				fc.setAcceptAllFileFilterUsed(false); //makes the 'kml' one default. 
+				fc.setAcceptAllFileFilterUsed(true);
+				
+				 int returnVal = fc.showOpenDialog(parentInstance);
+				 
+				 if (returnVal == JFileChooser.APPROVE_OPTION) {
+					 parentInstance.loadMap(fc.getSelectedFile());
+			            
+			        } else {
+			            //cancelled by user, do nothing
+			        	return;
+			        }
 			}
 		});
 		mnLoadMap.add(mntmNewMenuItem);
@@ -215,7 +186,35 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		
 		}
 	
+	private void loadMap(File fileToLoad){
+
+		try {
+			mySession.getMapController().load(fileToLoad.getAbsolutePath());
+			
+		} catch (IOException e) {
+			JDialog dialog = new ErrorMessage("IO Exception: File could not be loaded (bad filename?)");
+			dialog.setVisible(true);
+			e.printStackTrace();
+			
+		} catch (SAXException e) {
+			JDialog dialog = new ErrorMessage("SAX parser Exception: The file was formatted badly. Bad character?");
+			dialog.setVisible(true);
+			e.printStackTrace();
+			
+		} catch (ParserConfigurationException e) {
+			JDialog dialog = new ErrorMessage("Something with the parser configuration: Check stack trace.");
+			dialog.setVisible(true);
+			e.printStackTrace();
+			
+		} catch (JDOMException e) {
+			JDialog dialog = new ErrorMessage("JDOM parser Exception: The file was formatted badly. Bad character?");
+			dialog.setVisible(true);
+			e.printStackTrace();
+		}
+		mySession.getMapController().getAllPoints();
+	 
 	
+	}
 	
 	/**
 	 * set the title and icon for this window. 

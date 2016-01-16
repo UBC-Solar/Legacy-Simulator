@@ -42,7 +42,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 	 */ 
 	public XbeeSerialDataReceiver(CarController toAdd, DataProcessor theProcessor) throws SerialPortException{
 		super(toAdd, theProcessor);
-		
+		myDataProcessor = theProcessor;
 		try{
 			String[] portNames = SerialPortList.getPortNames();
 			String portName = "NO SERIAL PORT";

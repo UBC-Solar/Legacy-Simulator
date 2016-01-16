@@ -232,7 +232,7 @@ class BrowseButtonHandler extends MouseAdapter{
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
 		JFileChooser fc = new JFileChooser();
-		if(parent.DEFAULT_OPEN_DIRECTORY.exists()){
+		if(parent.DEFAULT_OPEN_DIRECTORY.exists() && parent.DEFAULT_OPEN_DIRECTORY.isDirectory()){
 			fc.setCurrentDirectory(parent.DEFAULT_OPEN_DIRECTORY);
 		}
 		fc.addChoosableFileFilter(new FileNameExtensionFilter("Google Map files", "KML", "kml"));
