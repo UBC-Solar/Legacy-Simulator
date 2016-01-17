@@ -119,37 +119,18 @@ public class GUImain implements Listener{
 			handleException((ExceptionNotification) n);
 		}
 		if(n.getClass() == NewMapLoadedNotification.class){
-			System.out.println("GOT NEW MAP NOTIFICATION");
 			drawNewMap((NewMapLoadedNotification) n);
 		}
 		
 	}
 	
 	private void drawNewMap(NewMapLoadedNotification n) {
-		/*mainPanel.setVisible(false);
-		List<Coordinate> mainRouteToDraw = new ArrayList<Coordinate>(n.getRoute().getTrailMarkers().size());
-		for(GeoCoord temp : n.getRoute().getTrailMarkers()){
-			mainPanel.addMapMarker(new MapMarkerDot(temp.getLat(), temp.getLon()));
-			//mainRouteToDraw.add(new Coordinate(temp.getLat(), temp.getLon()));
-		}
-		MapPolygonImpl toAdd = new MapPolygonImpl(n.getRoute().getTitle(), mainRouteToDraw);
-		//JMapViewer newMapViewerTest = new JMapViewer();
-		//mainFrame.remove(mainPanel);
-		mainPanel.addMapPolygon(toAdd);
-		//this.mainPanel = newMapViewerTest;
-		System.out.println("Added");
-		*/
-		
-		mainPanel.setVisible(false);
-		GeoCoord temp = n.getRoute().getTrailMarkers().get(0);
-		mainPanel.addMapMarker(new MapMarkerDot(temp.getLat(), temp.getLon()));
-		temp = n.getRoute().getTrailMarkers().get(n.getRoute().getTrailMarkers().size() - 1);
-		mainPanel.addMapMarker(new MapMarkerDot(temp.getLat(), temp.getLon()));
-		temp = n.getRoute().getTrailMarkers().get(100);
-		mainPanel.addMapMarker(new MapMarkerDot(temp.getLat(), temp.getLon()));
-		System.out.println("Added here");
-		mainPanel.setVisible(true);
-		mainPanel.repaint();
+		Coordinate vancouver = new Coordinate(49.282,-123.12);
+		Coordinate merritt = new Coordinate(50.1119,-120.78);
+		Coordinate thirdPoint = new Coordinate(49.282, -120.78);
+		mainPanel.addMapMarker(new MapMarkerDot(vancouver)); //Vancouver
+		mainPanel.addMapMarker(new MapMarkerDot(merritt)); //merritt
+		mainPanel.addMapMarker(new MapMarkerDot(thirdPoint)); //third point to make a triangle
 		
 	}
 
