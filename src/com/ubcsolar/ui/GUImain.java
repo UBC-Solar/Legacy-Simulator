@@ -7,6 +7,9 @@ package com.ubcsolar.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Point;
+
+import org.openstreetmap.gui.jmapviewer.Coordinate;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -19,6 +22,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.LogType;
@@ -32,6 +36,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -44,6 +50,8 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
+import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
+import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
 
 public class GUImain implements Listener{
 
@@ -51,7 +59,7 @@ public class GUImain implements Listener{
 	private GlobalController mySession; //Global Controller for the program (interface between code and UI)
 	private JLabel loadedMapName; //a label for the loaded map
 	private JPanel carPanel; //Car status within the main window
-	private JPanel mainPanel; //Biggest panel in the main window; Shows amalgamated information
+	private JMapViewer mainPanel; //Biggest panel in the main window; Shows amalgamated information
 	private JPanel simPanel; //Sim status within the main window
 	private JPanel mapPanel; //map status within the main window
 	private JPanel weatherPanel; //weather status within the main window
@@ -96,6 +104,7 @@ public class GUImain implements Listener{
 			/*mySession.register(this, NewMapLoadedNotification.class);
 			mySession.register(this, CarUpdateNotification.class);*/	
 			mySession.register(this, ExceptionNotification.class);
+			mySession.register(this, NewMapLoadedNotification.class);
 	}
 	
 	/**
@@ -109,8 +118,41 @@ public class GUImain implements Listener{
 		if(n.getClass()== ExceptionNotification.class){
 			handleException((ExceptionNotification) n);
 		}
+		if(n.getClass() == NewMapLoadedNotification.class){
+			System.out.println("GOT NEW MAP NOTIFICATION");
+			drawNewMap((NewMapLoadedNotification) n);
+		}
+		
 	}
 	
+	private void drawNewMap(NewMapLoadedNotification n) {
+		/*mainPanel.setVisible(false);
+		List<Coordinate> mainRouteToDraw = new ArrayList<Coordinate>(n.getRoute().getTrailMarkers().size());
+		for(GeoCoord temp : n.getRoute().getTrailMarkers()){
+			mainPanel.addMapMarker(new MapMarkerDot(temp.getLat(), temp.getLon()));
+			//mainRouteToDraw.add(new Coordinate(temp.getLat(), temp.getLon()));
+		}
+		MapPolygonImpl toAdd = new MapPolygonImpl(n.getRoute().getTitle(), mainRouteToDraw);
+		//JMapViewer newMapViewerTest = new JMapViewer();
+		//mainFrame.remove(mainPanel);
+		mainPanel.addMapPolygon(toAdd);
+		//this.mainPanel = newMapViewerTest;
+		System.out.println("Added");
+		*/
+		
+		mainPanel.setVisible(false);
+		GeoCoord temp = n.getRoute().getTrailMarkers().get(0);
+		mainPanel.addMapMarker(new MapMarkerDot(temp.getLat(), temp.getLon()));
+		temp = n.getRoute().getTrailMarkers().get(n.getRoute().getTrailMarkers().size() - 1);
+		mainPanel.addMapMarker(new MapMarkerDot(temp.getLat(), temp.getLon()));
+		temp = n.getRoute().getTrailMarkers().get(100);
+		mainPanel.addMapMarker(new MapMarkerDot(temp.getLat(), temp.getLon()));
+		System.out.println("Added here");
+		mainPanel.setVisible(true);
+		mainPanel.repaint();
+		
+	}
+
 	public void handleException(ExceptionNotification e){
 		JOptionPane.showMessageDialog(mainFrame, e.getMessage());
 	}
@@ -260,6 +302,8 @@ public class GUImain implements Listener{
 		mainFrame.getContentPane().add(carPanel, "1, 5, fill, fill");
 
 		mainPanel = new JMapViewer();
+		mainPanel.setCenter(new Point(350,700));
+		mainPanel.setZoom(5);
 		mainPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		mainFrame.getContentPane().add(mainPanel, "3, 3, 1, 7, fill, fill");
 		
