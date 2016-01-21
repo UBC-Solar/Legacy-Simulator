@@ -26,6 +26,7 @@ import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.LogType;
+import com.ubcsolar.common.Route;
 import com.ubcsolar.notification.CarUpdateNotification;
 import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
@@ -52,6 +53,7 @@ import javax.swing.Action;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
 import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
+import org.openstreetmap.gui.jmapviewer.interfaces.MapPolygon;
 
 public class GUImain implements Listener{
 
@@ -124,13 +126,27 @@ public class GUImain implements Listener{
 		
 	}
 	
-	private void drawNewMap(NewMapLoadedNotification n) {
-		Coordinate vancouver = new Coordinate(49.282,-123.12);
+	private void drawNewMap(NewMapLoadedNotification notification) {
+		/*Coordinate vancouver = new Coordinate(49.282,-123.12);
 		Coordinate merritt = new Coordinate(50.1119,-120.78);
 		Coordinate thirdPoint = new Coordinate(49.282, -120.78);
 		mainPanel.addMapMarker(new MapMarkerDot(vancouver)); //Vancouver
 		mainPanel.addMapMarker(new MapMarkerDot(merritt)); //merritt
 		mainPanel.addMapMarker(new MapMarkerDot(thirdPoint)); //third point to make a triangle
+		List<Coordinate> toAdd = new ArrayList<Coordinate>(3);
+		toAdd.add(vancouver);
+		toAdd.add(merritt);
+		toAdd.add(thirdPoint);
+		mainPanel.addMapPolygon(new MapPolygonImpl(toAdd));
+		System.out.println(n.getRoute().getTrailMarkers().get(0));
+		*/
+		Route temp = notification.getRoute();
+		List<Coordinate> toAdd = new ArrayList<Coordinate>(temp.getTrailMarkers().size());
+		for(GeoCoord geo : temp.getTrailMarkers()){
+			toAdd.add(new Coordinate(geo.getLat(), geo.getLon()));
+		}
+		
+		mainPanel.addMapPolygon(new MapPolygonImpl(toAdd));
 		
 	}
 
