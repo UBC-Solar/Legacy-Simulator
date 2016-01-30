@@ -140,7 +140,7 @@ public class GUImain implements Listener{
 		mainPanel.addMapPolygon(new MapPolygonImpl(toAdd));
 		System.out.println(n.getRoute().getTrailMarkers().get(0));
 		*/
-		Route temp = notification.getRoute();
+		/*Route temp = notification.getRoute();
 		List<Coordinate> listForPolygon = new ArrayList<Coordinate>(temp.getTrailMarkers().size());
 		for(GeoCoord geo : temp.getTrailMarkers()){
 			listForPolygon.add(new Coordinate(geo.getLat(), geo.getLon()));
@@ -153,7 +153,8 @@ public class GUImain implements Listener{
 		}
 		
 		mainPanel.addMapPolygon(new MapPolygonImpl(listForPolygon));
-		
+		*/
+		mainPanel.changeDrawnRoute(notification.getRoute());
 	}
 
 	public void handleException(ExceptionNotification e){
