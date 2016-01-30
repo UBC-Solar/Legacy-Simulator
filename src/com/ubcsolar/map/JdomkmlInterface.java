@@ -19,7 +19,9 @@ public class JdomkmlInterface {
 	private Document myDoc;
 	private String loadedFileName;
 	private Route cachedRoute;
-	private final String API_KEY = "AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek";
+	
+	private final String API_KEY = "AIzaSyDYE2CgPSZGLTJWMSaNSg4woYrZjJ_qwXk";
+//	private final String API_KEY = "AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek";
 	//private final String API_KEY = "AIz4mek"; //bad key, can use to test Google errors. 
 
 	public JdomkmlInterface(File fileToLoad) throws IOException, JDOMException{
@@ -318,6 +320,8 @@ public class JdomkmlInterface {
 	 */
 	private String sendURL(String urlToSend) throws IOException {
 		URL url = new URL(urlToSend); 
+		System.out.println(urlToSend);
+		
 		InputStream inputStream = url.openStream(); 
 		BufferedReader inputReader = new BufferedReader(new InputStreamReader(inputStream)); 
 		StringBuffer webPageData = new StringBuffer(); 		
@@ -327,6 +331,11 @@ public class JdomkmlInterface {
 			webPageData.append("\n"); 
 		} 
 		inputReader.close();
+		try {
+		    Thread.sleep(100);                 //100 milliseconds is one second.
+		} catch(InterruptedException ex) {
+		    Thread.currentThread().interrupt();
+		}
 		return webPageData.toString();
 	}
 
