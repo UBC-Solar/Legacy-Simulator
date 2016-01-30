@@ -61,7 +61,7 @@ public class GUImain implements Listener{
 	private GlobalController mySession; //Global Controller for the program (interface between code and UI)
 	private JLabel loadedMapName; //a label for the loaded map
 	private JPanel carPanel; //Car status within the main window
-	private JMapViewer mainPanel; //Biggest panel in the main window; Shows amalgamated information
+	private CustomDisplayMap mainPanel; //Biggest panel in the main window; Shows amalgamated information
 	private JPanel simPanel; //Sim status within the main window
 	private JPanel mapPanel; //map status within the main window
 	private JPanel weatherPanel; //weather status within the main window
@@ -141,12 +141,18 @@ public class GUImain implements Listener{
 		System.out.println(n.getRoute().getTrailMarkers().get(0));
 		*/
 		Route temp = notification.getRoute();
-		List<Coordinate> toAdd = new ArrayList<Coordinate>(temp.getTrailMarkers().size());
+		List<Coordinate> listForPolygon = new ArrayList<Coordinate>(temp.getTrailMarkers().size());
 		for(GeoCoord geo : temp.getTrailMarkers()){
-			toAdd.add(new Coordinate(geo.getLat(), geo.getLon()));
+			listForPolygon.add(new Coordinate(geo.getLat(), geo.getLon()));
 		}
 		
-		mainPanel.addMapPolygon(new MapPolygonImpl(toAdd));
+		//adding this in to make it a single line, otherwise it draws a line from end to start. 
+		for(int i = temp.getTrailMarkers().size()-1; i>=0; i--){
+			GeoCoord toAdd = temp.getTrailMarkers().get(i);
+			listForPolygon.add(new Coordinate(toAdd.getLat(), toAdd.getLon()));
+		}
+		
+		mainPanel.addMapPolygon(new MapPolygonImpl(listForPolygon));
 		
 	}
 
@@ -298,7 +304,7 @@ public class GUImain implements Listener{
 		carPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		mainFrame.getContentPane().add(carPanel, "1, 5, fill, fill");
 
-		mainPanel = new JMapViewer();
+		mainPanel = new CustomDisplayMap();
 		mainPanel.setCenter(new Point(350,700));
 		mainPanel.setZoom(5);
 		mainPanel.setBorder(BorderFactory.createLineBorder(Color.black));
