@@ -283,8 +283,8 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		//ds = makeDataSet(listOfPoints, DistanceUnit.KILOMETERS);
 		//elevationChart.
 		
-		double minHeight = 0.0; //blank chart
-		double maxHeight = 200.0; //a blank chart
+		double minHeight = -20.0; //blank chart (centers '0')
+		double maxHeight = 20.0; //a blank chart
 		
 		//TODO ignores last 2 cuz I haven't figured out how to sort them yet. 
 				double tripDistance = 0.0; //whatever units I select below. 
@@ -292,9 +292,14 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 				if(listOfPoints.size() > 1){
 					data[0][0] = tripDistance; //first distance is zero.
 					data[1][0] = listOfPoints.get(0).getElevation();
-					minHeight = listOfPoints.get(0).getElevation();
-					maxHeight = listOfPoints.get(0).getElevation();
-					
+					double firstPointHeight = listOfPoints.get(0).getElevation();
+					if(firstPointHeight - minHeight < 0){
+						minHeight = firstPointHeight; //new low, IFF it's less than the empty one. 
+														//don't want window resizing if it's zero. 										
+					}
+					if(firstPointHeight - maxHeight > 0){
+						maxHeight = firstPointHeight; //same for max. No resizing if it's within the min range. 
+					}
 					
 					for(int i = 1; i<listOfPoints.size(); i++){
 						tripDistance +=  listOfPoints.get(i-1).calculateDistance(listOfPoints.get(i), unitMeasuredBy);
