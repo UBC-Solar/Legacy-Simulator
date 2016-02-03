@@ -15,7 +15,7 @@ public class Route extends DataUnit{
 	public Route(String title, List<GeoCoord> trailMarkers, List<PointOfInterest> pointsOfIntrest) {
 		this.trailMarkers = new ArrayList<GeoCoord>(trailMarkers);
 		this.title = title;
-		this.pointsOfIntrest = new ArrayList<PointOfInterest>();
+		this.pointsOfIntrest = new ArrayList<PointOfInterest>(pointsOfIntrest);
 		timeCreated = System.currentTimeMillis();
 	}
 

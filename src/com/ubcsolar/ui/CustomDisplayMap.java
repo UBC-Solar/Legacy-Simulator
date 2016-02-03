@@ -49,8 +49,6 @@ public class CustomDisplayMap extends JMapViewer {
 		}
 		
 		this.addMapPolygon(new MapPolygonImpl(listForPolygon));
-		System.out.println("AHAHAHAHA");
-		System.out.println(newRouteToLoad.getPointsOfIntrest().size());
 		//for(int i = 0; i<newRouteToLoad.getPointsOfIntrest().size(); i++){
 		for(PointOfInterest temp : newRouteToLoad.getPointsOfIntrest()){
 			GeoCoord newSpot = temp.getLocation();
