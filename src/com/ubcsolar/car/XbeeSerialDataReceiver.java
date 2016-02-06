@@ -61,44 +61,6 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 	}
 	
 	/**
-	 * This method turns the JsonString that we received into a TelemDataPacket for 
-	 * transfer to the DataProcessor
-	 * @param jsonString - the string received from the xbee serial port. 
-	 */
-	public void loadJSONData(String jsonString){
-		JSONObject jsonData;
-		
-		// test data
-		//jsonData = "{\"speed\":100,\"totalVoltage\":44.4,\"stateOfCharge\":101,\"temperatures\":{\"bms\":40,\"motor\":50,\"pack0\":35,\"pack1\":36,\"pack2\":37,\"pack3\":38},\"cellVoltages\":{\"pack0\":[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2],\"pack1\":[1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2],\"pack2\":[2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3.0,3.1,3.2],\"pack3\":[3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4.0,4.1,4.2]}}\n";
-		try{
-			jsonData = new JSONObject(jsonString);
-		}catch(JSONException e){
-			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Received a Corrupt Packet");
-			return; //malformed (corrupted) data is ignored.
-		}
-		int speed = (int) jsonData.get("speed");
-		int totalVoltage = (int) jsonData.get("totalVoltage");
-		JSONObject temperatures = ((JSONObject) jsonData.get("temperatures"));
-		HashMap<String,Integer> mapForTemperatures = new HashMap<String,Integer>();
-		for(String key : JSONObject.getNames(temperatures))
-			mapForTemperatures.put(key, (int) temperatures.get(key));
-		JSONObject cellVoltages = ((JSONObject) jsonData.get("cellVoltages"));
-		HashMap<Integer,ArrayList<Float>> mapForCellVoltages = new HashMap<Integer,ArrayList<Float>>();
-		for(String key : JSONObject.getNames(cellVoltages)){
-			int packID = key.toCharArray()[key.length()-1] - '0';
-			mapForCellVoltages.put(packID, new ArrayList<Float>());
-			JSONArray array = (JSONArray) cellVoltages.get(key);
-			for(int i=0; i<array.length(); i++)
-				mapForCellVoltages.get(packID).add((float) array.getDouble(i));
-		}
-		/*(int newSpeed, int newTotalVoltage,int newStateOfCharge,
-			Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages){*/
-		TelemDataPacket newData = new TelemDataPacket(speed, totalVoltage, mapForTemperatures, mapForCellVoltages);
-		this.lastLoadedDataPacket = newData;
-		this.myDataProcessor.store(newData);
-	}
-	
-	/**
 	 * This method turns the binary data that we received into a TelemDataPacket for 
 	 * transfer to the DataProcessor
 	 * @param inData - the bytes up to the sync character received from the xbee serial port. 
