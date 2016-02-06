@@ -1,24 +1,23 @@
 package com.ubcsolar.map;
 
-import jssc.SerialPort;
-import jssc.SerialPortEvent;
-import jssc.SerialPortEventListener;
-import jssc.SerialPortException;
-import jssc.SerialPortList;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.TooManyListenersException;
 
-import com.ubcsolar.car.CarController;
-import com.ubcsolar.car.DataProcessor;
-import com.ubcsolar.car.XbeeSerialDataReceiver;
+import gnu.io.*;
+
 import com.ubcsolar.common.CarLocation;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.sim.Log;
 
-public class GPSFromPhoneReceiver implements Runnable,SerialPortEventListener{
+public class GPSFromPhoneReceiver implements Runnable{
 	private final MapController parent;
 	private final String carName;
 	private final String source; 
 	
-	private SerialPort serialPort;
+	private NRSerialPort serialPort;
 	
 	/**
 	 * 
@@ -26,22 +25,18 @@ public class GPSFromPhoneReceiver implements Runnable,SerialPortEventListener{
 	 * @param carName - the name of the car that this even represents (in case we ever do multiple cars at once)
 	 * @param source - where did it come from? GPS, Phone, manual entry via the UI?
 	 */
-	public GPSFromPhoneReceiver(MapController parent, String carName, String source) throws SerialPortException{
+	public GPSFromPhoneReceiver(MapController parent, String carName, String source){
 		this.parent = parent;
 		this.carName = carName;
 		this.source = source;
 		
 		try{
-			String[] portNames = SerialPortList.getPortNames();
-			String portName = "NO SERIAL PORT";
-			if(portNames.length > 0)
-				portName = portNames[0]; //it always gets the first serial port available. 
+			Set<String> portNames = NRSerialPort.getAvailableSerialPorts();
+			String portName = portNames.iterator().next(); //it always gets the first serial port available. 
 			System.out.println(portName);
-			serialPort = new SerialPort(portName);
-			serialPort.openPort();
-			serialPort.setParams(9600, 8, 1, 0); //where did these numbers come from?
-			serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
-		} catch(ArrayIndexOutOfBoundsException e) {
+			serialPort = new NRSerialPort(portName, 9600);
+			serialPort.connect();
+		} catch(NoSuchElementException e) {
 			System.out.println("No serial ports");
 			Log.write("ERROR: No Serial Ports");
 			e.printStackTrace();
@@ -61,39 +56,28 @@ public class GPSFromPhoneReceiver implements Runnable,SerialPortEventListener{
 
 
 	@Override
-	public void serialEvent(SerialPortEvent event) {
-		// we set event mask to SerialPort.MASK_RXCHAR so we don't check event type
-		try {
-			int bytesAvailable = event.getEventValue();
-			while (bytesAvailable-->0) {
-				System.out.print((char)serialPort.readBytes(1)[0]);
-			}
-		} catch (SerialPortException e) {System.out.println(e);}
-	}
-
-
-	@Override
 	public void run() {
-		try {
-			serialPort.addEventListener(this);
-		} catch (SerialPortException e) {
-			System.out.println(e);
-		} catch (NullPointerException e) {
-			e.printStackTrace();
+		InputStream is = serialPort.getInputStream();
+		while(true){
+			try {
+				if(is.available() > 0){
+					System.out.print((char)is.read());
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 		
-	public void stop()throws SerialPortException{
-		
-			serialPort.removeEventListener();
-			serialPort.closePort();
-		
+	public void stop(){
+		serialPort.disconnect();
 	}
 	
 	/**
 	 * For testing the serial code on its own 
 	 */
-	public static void main(String[] args) throws SerialPortException{
+	public static void main(String[] args){
 		GPSFromPhoneReceiver gpsrx = new GPSFromPhoneReceiver(null, null, null);
 		gpsrx.run();
 		return;
