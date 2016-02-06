@@ -18,8 +18,10 @@ import org.jdom2.JDOMException;
 import org.xml.sax.SAXException;
 
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.common.CarLocation;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.Route;
+import com.ubcsolar.notification.NewCarLocationNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 
@@ -87,6 +89,10 @@ public class MapController extends ModuleController{
 	public void notify(Notification n) { 
 		//don't imagine Map needs to know any notifications. 
 		
+	}
+	
+	public void recordNewCarLocation(CarLocation carLocationReported){
+		sendNotification(new NewCarLocationNotification(carLocationReported));
 	}
 
 }
