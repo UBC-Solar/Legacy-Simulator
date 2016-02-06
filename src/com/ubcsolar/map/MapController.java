@@ -58,7 +58,7 @@ public class MapController extends ModuleController{
 		//Decided against automatically sending all data points. 
 		//If the UI element wants them, it can specifiy it. 
 		//getAllPoints(); -83.77817,39.89031
-		this.recordNewCarLocation(new CarLocation(new GeoCoord(39.89031, -83.77817,317.757354), "Raven", "Phone"));
+		this.recordNewCarLocation(new CarLocation(new GeoCoord(41.89031, -81.77817,317.757354), "Raven", "Phone"));
 	}
 	
 	public Route getAllPoints(){

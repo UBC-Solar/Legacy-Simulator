@@ -4,13 +4,17 @@
 
 package com.ubcsolar.ui;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
+import org.openstreetmap.gui.jmapviewer.MapObjectImpl;
 import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
+import org.openstreetmap.gui.jmapviewer.Style;
+import org.openstreetmap.gui.jmapviewer.interfaces.MapMarker;
 
 import com.ubcsolar.common.CarLocation;
 import com.ubcsolar.common.GeoCoord;
@@ -24,7 +28,7 @@ public class CustomDisplayMap extends JMapViewer {
 	 */
 	private static final long serialVersionUID = 1L;
 
-
+	private MapMarker carCurrentLocation;
 
 	public CustomDisplayMap() {
 		super();
@@ -37,7 +41,11 @@ public class CustomDisplayMap extends JMapViewer {
 	}
 	
 	public void addNewCarLocationToMap(CarLocation newLocation){
-		System.out.println(newLocation.getCarName() + " at " + newLocation.getLocation());
+		this.removeMapMarker(carCurrentLocation);
+		Style testStyle = new Style(Color.BLACK, Color.RED, null, MapObjectImpl.getDefaultFont());
+		MapMarkerDot newLocationDot = new MapMarkerDot(null,"THE CAR", new Coordinate(newLocation.getLocation().getLat(), newLocation.getLocation().getLon()), testStyle);
+		this.addMapMarker(newLocationDot);
+		this.carCurrentLocation = newLocationDot; //so we can remove it next time. 
 	}
 	
 	public void addNewRouteToMap(Route newRouteToLoad){
