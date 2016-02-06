@@ -10,6 +10,10 @@ public class NewCarLocationNotification extends Notification {
 		this.theLocationOfCar = locationOfCar;
 		
 	}
+	
+	public CarLocation getCarLocation(){
+		return theLocationOfCar;
+	}
 
 	@Override
 	public String getMessage() {

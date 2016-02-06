@@ -12,6 +12,7 @@ import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
 import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
 
+import com.ubcsolar.common.CarLocation;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.PointOfInterest;
 import com.ubcsolar.common.Route;
@@ -33,6 +34,10 @@ public class CustomDisplayMap extends JMapViewer {
 		this.removeAllMapPolygons();
 		this.removeAllMapMarkers();
 		this.addNewRouteToMap(newRouteToLoad);
+	}
+	
+	public void addNewCarLocationToMap(CarLocation newLocation){
+		System.out.println(newLocation.getCarName() + " at " + newLocation.getLocation());
 	}
 	
 	public void addNewRouteToMap(Route newRouteToLoad){

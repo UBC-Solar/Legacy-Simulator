@@ -19,6 +19,7 @@ import org.xml.sax.SAXException;
 
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.CarLocation;
+import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.Route;
 import com.ubcsolar.notification.NewCarLocationNotification;
@@ -56,7 +57,8 @@ public class MapController extends ModuleController{
 		sendNotification(new NewMapLoadedNotification(myJDOMMap.getLoadedFileName(), myJDOMMap.getRoute()));
 		//Decided against automatically sending all data points. 
 		//If the UI element wants them, it can specifiy it. 
-		//getAllPoints();
+		//getAllPoints(); -83.77817,39.89031
+		this.recordNewCarLocation(new CarLocation(new GeoCoord(39.89031, -83.77817,317.757354), "Raven", "Phone"));
 	}
 	
 	public Route getAllPoints(){
