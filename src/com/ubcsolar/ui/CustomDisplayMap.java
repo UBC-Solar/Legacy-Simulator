@@ -65,8 +65,8 @@ public class CustomDisplayMap extends JMapViewer {
 		//for(int i = 0; i<newRouteToLoad.getPointsOfIntrest().size(); i++){
 		for(PointOfInterest temp : newRouteToLoad.getPointsOfIntrest()){
 			GeoCoord newSpot = temp.getLocation();
-			this.addMapMarker(new MapMarkerDot(temp.getName(), new Coordinate(newSpot.getLat(), newSpot.getLon())));
-			
+			String name = temp.getName().split(",")[0]; //don't need the whole "city, state, country, continent, earth" name
+			this.addMapMarker(new MapMarkerDot(name, new Coordinate(newSpot.getLat(), newSpot.getLon())));
 			System.out.println(temp.getName() + ": " + newSpot);
 		}
 		
