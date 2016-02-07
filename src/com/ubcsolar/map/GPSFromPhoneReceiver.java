@@ -6,18 +6,22 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TooManyListenersException;
 
+import net.sf.marineapi.nmea.event.SentenceEvent;
+import net.sf.marineapi.nmea.event.SentenceListener;
+import net.sf.marineapi.nmea.io.SentenceReader;
 import gnu.io.*;
 
 import com.ubcsolar.common.CarLocation;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.sim.Log;
 
-public class GPSFromPhoneReceiver implements Runnable{
+public class GPSFromPhoneReceiver implements Runnable, SentenceListener{
 	private final MapController parent;
 	private final String carName;
 	private final String source; 
 	
 	private NRSerialPort serialPort;
+	private SentenceReader NMEASentenceReader;
 	
 	/**
 	 * 
@@ -58,20 +62,47 @@ public class GPSFromPhoneReceiver implements Runnable{
 	@Override
 	public void run() {
 		InputStream is = serialPort.getInputStream();
-		while(true){
-			try {
-				if(is.available() > 0){
-					System.out.print((char)is.read());
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		NMEASentenceReader = new SentenceReader(is);
+		NMEASentenceReader.addSentenceListener(this);
+		NMEASentenceReader.start();
 	}
 		
 	public void stop(){
+		NMEASentenceReader.stop();
+		NMEASentenceReader.removeSentenceListener(this);
 		serialPort.disconnect();
+	}
+
+
+	public void readingPaused() {
+		System.out.println("-- Paused --");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.sf.marineapi.nmea.event.SentenceListener#readingStarted()
+	 */
+	public void readingStarted() {
+		System.out.println("-- Started --");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.sf.marineapi.nmea.event.SentenceListener#readingStopped()
+	 */
+	public void readingStopped() {
+		System.out.println("-- Stopped --");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * net.sf.marineapi.nmea.event.SentenceListener#sentenceRead(net.sf.marineapi
+	 * .nmea.event.SentenceEvent)
+	 */
+	public void sentenceRead(SentenceEvent event) {
+		// here we receive each sentence read from the port
+		System.out.println(event.getSentence());
 	}
 	
 	/**
