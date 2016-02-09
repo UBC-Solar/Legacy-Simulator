@@ -95,7 +95,7 @@ public class MapController extends ModuleController{
 	}
 	
 	public void connectToCellPhone(){
-		gpsBlueToothConnection = new GPSFromPhoneReceiver(null, null, null);
+		gpsBlueToothConnection = new GPSFromPhoneReceiver(this, "Raven", "PhoneGPS");
 		gpsBlueToothConnection.run();
 	}
 	
