@@ -40,7 +40,7 @@ public class GPSFromPhoneReceiver implements Runnable, SentenceListener{
 			Set<String> portNames = NRSerialPort.getAvailableSerialPorts();
 			String portName = portNames.iterator().next(); //it always gets the first serial port available. 
 			System.out.println(portName);
-			serialPort = new NRSerialPort(portName, 9600);
+			serialPort = new NRSerialPort("COM7", 9600);
 			serialPort.connect();
 		} catch(NoSuchElementException e) {
 			System.out.println("No serial ports");

@@ -162,8 +162,8 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		});
 		mnLoadMap.add(mntmNewMenuItem);
 		
-		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Other Map");
-		mntmNewMenuItem.addActionListener(new ActionListener() {
+		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Connect Cell Phone");
+		mntmNewMenuItem_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				connectToCellPhone();
 			}
