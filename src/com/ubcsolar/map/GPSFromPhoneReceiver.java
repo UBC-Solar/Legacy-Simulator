@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.TooManyListenersException;
 
 import net.sf.marineapi.nmea.event.SentenceEvent;
 import net.sf.marineapi.nmea.event.SentenceListener;
 import net.sf.marineapi.nmea.io.SentenceReader;
 import net.sf.marineapi.nmea.sentence.GGASentence;
 import net.sf.marineapi.nmea.sentence.SentenceId;
+import net.sf.marineapi.nmea.util.Position;
 import gnu.io.*;
 
 import com.ubcsolar.common.CarLocation;
@@ -104,9 +104,16 @@ public class GPSFromPhoneReceiver implements Runnable, SentenceListener{
 	 */
 	public void sentenceRead(SentenceEvent event) {
 		// here we receive each sentence read from the port
-		System.out.println(event.getSentence());
+		//System.out.println(event.getSentence());
 		GGASentence gga = (GGASentence) event.getSentence();
-		System.out.println(gga.getPosition());
+		Position pos = gga.getPosition();
+		
+		GeoCoord coordinates = new GeoCoord(pos.getLatitude(), pos.getLongitude(), pos.getAltitude());
+		if(parent != null){
+			parent.recordNewCarLocation(new CarLocation(coordinates, this.carName, this.source, System.currentTimeMillis()));
+		}else{
+			System.out.println(coordinates);
+		}
 	}
 	
 	/**
