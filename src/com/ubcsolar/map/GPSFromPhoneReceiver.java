@@ -9,6 +9,8 @@ import java.util.TooManyListenersException;
 import net.sf.marineapi.nmea.event.SentenceEvent;
 import net.sf.marineapi.nmea.event.SentenceListener;
 import net.sf.marineapi.nmea.io.SentenceReader;
+import net.sf.marineapi.nmea.sentence.GGASentence;
+import net.sf.marineapi.nmea.sentence.SentenceId;
 import gnu.io.*;
 
 import com.ubcsolar.common.CarLocation;
@@ -63,7 +65,7 @@ public class GPSFromPhoneReceiver implements Runnable, SentenceListener{
 	public void run() {
 		InputStream is = serialPort.getInputStream();
 		NMEASentenceReader = new SentenceReader(is);
-		NMEASentenceReader.addSentenceListener(this);
+		NMEASentenceReader.addSentenceListener(this, SentenceId.GGA);
 		NMEASentenceReader.start();
 	}
 		
@@ -103,6 +105,8 @@ public class GPSFromPhoneReceiver implements Runnable, SentenceListener{
 	public void sentenceRead(SentenceEvent event) {
 		// here we receive each sentence read from the port
 		System.out.println(event.getSentence());
+		GGASentence gga = (GGASentence) event.getSentence();
+		System.out.println(gga.getPosition());
 	}
 	
 	/**
