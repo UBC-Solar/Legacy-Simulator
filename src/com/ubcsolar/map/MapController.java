@@ -29,6 +29,7 @@ import com.ubcsolar.notification.Notification;
 public class MapController extends ModuleController{
 
 	JdomkmlInterface myJDOMMap;
+	GPSFromPhoneReceiver gpsBlueToothConnection;
 
 	public MapController(GlobalController toAdd) throws IOException{
 		super(toAdd);	
@@ -91,6 +92,11 @@ public class MapController extends ModuleController{
 	public void notify(Notification n) { 
 		//don't imagine Map needs to know any notifications. 
 		
+	}
+	
+	public void connectToCellPhone(){
+		gpsBlueToothConnection = new GPSFromPhoneReceiver(null, null, null);
+		gpsBlueToothConnection.run();
 	}
 	
 	public void recordNewCarLocation(CarLocation carLocationReported){

@@ -163,6 +163,12 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		mnLoadMap.add(mntmNewMenuItem);
 		
 		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Other Map");
+		mntmNewMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				connectToCellPhone();
+			}
+		});
+		
 		mnLoadMap.add(mntmNewMenuItem_1);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -214,6 +220,10 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		mySession.getMapController().getAllPoints();
 	 
 	
+	}
+	
+	private void connectToCellPhone(){
+		mySession.getMapController().connectToCellPhone();
 	}
 	
 	/**
