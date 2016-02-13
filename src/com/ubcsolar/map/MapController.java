@@ -22,6 +22,7 @@ import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.Route;
+import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
@@ -95,8 +96,14 @@ public class MapController extends ModuleController{
 	}
 	
 	public void connectToCellPhone(){
+		try{
 		gpsBlueToothConnection = new GPSFromPhoneReceiver(this, "Raven", "PhoneGPS");
 		gpsBlueToothConnection.run();
+		}
+		catch(NullPointerException e){
+			this.mySession.sendNotification(new ExceptionNotification(e, "NULL Error starting GPS BT connection. Check that it's not already running"));
+			e.printStackTrace();
+		}
 	}
 	
 	public void recordNewCarLocation(LocationReport carLocationReported){

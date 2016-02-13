@@ -62,7 +62,7 @@ public class GPSFromPhoneReceiver implements Runnable, SentenceListener{
 
 
 	@Override
-	public void run() {
+	public void run() throws NullPointerException{
 		InputStream is = serialPort.getInputStream();
 		NMEASentenceReader = new SentenceReader(is);
 		NMEASentenceReader.addSentenceListener(this, SentenceId.GGA);
