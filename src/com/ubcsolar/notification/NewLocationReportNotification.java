@@ -1,11 +1,12 @@
 package com.ubcsolar.notification;
 
+import com.ubcsolar.common.DataUnit;
 import com.ubcsolar.common.LocationReport;
 
-public class NewCarLocationNotification extends Notification {
+public class NewLocationReportNotification extends NewDataUnitNotification {
 	private final LocationReport theLocationOfCar;
 	
-	public NewCarLocationNotification(LocationReport locationOfCar) {
+	public NewLocationReportNotification(LocationReport locationOfCar) {
 		super();
 		this.theLocationOfCar = locationOfCar;
 		
@@ -19,6 +20,11 @@ public class NewCarLocationNotification extends Notification {
 	public String getMessage() {
 		String message = this.theLocationOfCar.getLocation() + " at " + this.theLocationOfCar.getTimeCreated() + " (" + this.theLocationOfCar.getCarName() + ").";
 		return message;
+	}
+
+	@Override
+	public DataUnit getDataUnit() {
+		return theLocationOfCar;
 	}
 
 }

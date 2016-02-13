@@ -6,6 +6,7 @@ import com.ubcsolar.notification.CarUpdateNotification;
 import com.ubcsolar.notification.DatabaseCreatedOrConnectedNotification;
 import com.ubcsolar.notification.DatabaseDisconnectedOrClosed;
 import com.ubcsolar.notification.ExceptionNotification;
+import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewDataUnitNotification;
 import com.ubcsolar.notification.Notification;
 
@@ -109,6 +110,7 @@ public class DatabaseController extends ModuleController {
 	public void register() {
 		this.mySession.register(this, NewDataUnitNotification.class);
 		this.mySession.register(this, CarUpdateNotification.class);
+		this.mySession.register(this, NewLocationReportNotification.class);
 
 	}
 	

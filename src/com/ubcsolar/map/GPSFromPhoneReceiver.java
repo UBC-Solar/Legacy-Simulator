@@ -104,7 +104,6 @@ public class GPSFromPhoneReceiver implements Runnable, SentenceListener{
 	 */
 	public void sentenceRead(SentenceEvent event) {
 		// here we receive each sentence read from the port
-		System.out.println(event.getSentence());
 		GGASentence gga = (GGASentence) event.getSentence();
 		Position pos = gga.getPosition();
 		

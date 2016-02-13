@@ -22,7 +22,7 @@ import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.Route;
-import com.ubcsolar.notification.NewCarLocationNotification;
+import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 
@@ -100,7 +100,7 @@ public class MapController extends ModuleController{
 	}
 	
 	public void recordNewCarLocation(LocationReport carLocationReported){
-		sendNotification(new NewCarLocationNotification(carLocationReported));
+		sendNotification(new NewLocationReportNotification(carLocationReported));
 	}
 
 }
