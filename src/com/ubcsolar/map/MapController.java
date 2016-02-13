@@ -59,8 +59,7 @@ public class MapController extends ModuleController{
 		sendNotification(new NewMapLoadedNotification(myJDOMMap.getLoadedFileName(), myJDOMMap.getRoute()));
 		//Decided against automatically sending all data points. 
 		//If the UI element wants them, it can specifiy it. 
-		//getAllPoints(); -83.77817,39.89031
-		this.recordNewCarLocation(new LocationReport(new GeoCoord(41.89031, -81.77817,317.757354), "Raven", "Phone"));
+		//getAllPoints();
 	}
 	
 	public Route getAllPoints(){
