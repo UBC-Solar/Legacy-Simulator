@@ -18,7 +18,7 @@ public class NewLocationReportNotification extends NewDataUnitNotification {
 
 	@Override
 	public String getMessage() {
-		String message = this.theLocationOfCar.getLocation() + " at " + this.theLocationOfCar.getTimeCreated() + " (" + this.theLocationOfCar.getCarName() + ").";
+		String message = this.theLocationOfCar.getCarName() + " location reported at: " + this.theLocationOfCar.getLocation();
 		return message;
 	}
 
