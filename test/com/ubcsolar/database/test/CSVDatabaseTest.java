@@ -27,6 +27,7 @@ public class CSVDatabaseTest {
 	//of null. Will have to update the tests when that happens. 
 	CSVDatabase toTest;
 	CSVDatabase toTestTwo;
+	String defaultColumnTitles = "hi, test";
 	//======================SETTING UP THE TESTS=========================
 	
 
@@ -75,7 +76,7 @@ public class CSVDatabaseTest {
 	 */
 	@Test
 	public void constructorWithStringShouldMakeName() throws IOException{
-		CSVDatabase test = new CSVDatabase("Output\\hello");
+		CSVDatabase test = new CSVDatabase("Output\\hello", defaultColumnTitles);
 		File theFile = new File("Output\\hello.csv");
 		assertTrue(theFile.exists());
 	}
@@ -94,12 +95,12 @@ public class CSVDatabaseTest {
 		CSVDatabase smallToTest = null;
 		String name = ""+System.currentTimeMillis();
 		try {
-			smallToTest = new CSVDatabase(name);
+			smallToTest = new CSVDatabase(name, defaultColumnTitles);
 		} catch (IOException e) {fail("Should not have gotten exception here");}
 		
 		smallToTest.saveAndDisconnect();
 		
-		CSVDatabase two = new CSVDatabase(name); //should throw exception here; trying to create one with same name. 
+		CSVDatabase two = new CSVDatabase(name, defaultColumnTitles); //should throw exception here; trying to create one with same name. 
 		
 	}
 	/*
@@ -115,10 +116,10 @@ public class CSVDatabaseTest {
 		CSVDatabase smallToTest = null;
 		String name = ""+System.currentTimeMillis();
 		try {
-			smallToTest = new CSVDatabase(name);
+			smallToTest = new CSVDatabase(name, defaultColumnTitles);
 		} catch (IOException e) {fail("Should not have gotten exception here");}
 		
-		CSVDatabase two = new CSVDatabase(name); //should throw exception here; trying to create one with same name. 
+		CSVDatabase two = new CSVDatabase(name, defaultColumnTitles); //should throw exception here; trying to create one with same name. 
 		
 	}
 	/*
@@ -130,7 +131,7 @@ public class CSVDatabaseTest {
 		try{
 			tearDown();
 		}catch(IOException e){fail("Should not have gotten exception here");}
-		this.toTest = new CSVDatabase("");
+		this.toTest = new CSVDatabase("", defaultColumnTitles);
 	}
 	
 	/*
@@ -145,7 +146,7 @@ public class CSVDatabaseTest {
 			tearDown();
 		}catch(IOException e){fail("Should not have gotten exception here");}
 		File testFile = new File("null.csv");
-		try{this.toTest = new CSVDatabase(null);}
+		try{this.toTest = new CSVDatabase(null, defaultColumnTitles);}
 		catch(IOException e){
 			throw e;
 		}
@@ -163,7 +164,7 @@ public class CSVDatabaseTest {
 			tearDown();
 		}catch(IOException e){fail("Should not have gotten exception here");}
 		try {
-			this.toTest = new CSVDatabase("test.csv");
+			this.toTest = new CSVDatabase("test.csv", defaultColumnTitles);
 		} catch(IOException e){fail("Should not have gotten exception here");}
 		
 		File temp = new File("test.csv.csv");
@@ -180,7 +181,7 @@ public class CSVDatabaseTest {
 		try{
 			tearDown();
 		}catch(IOException e){fail("Should not have gotten exception here");}
-		this.toTest = new CSVDatabase("something*.csv");
+		this.toTest = new CSVDatabase("something*.csv", defaultColumnTitles);
 	}
 		
 	//================isConnected() tests ============================

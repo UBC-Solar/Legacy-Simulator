@@ -31,10 +31,17 @@ public class DatabaseController extends ModuleController {
  * I'll leave the more abstract ones commented out until we decide to implement them. 
  */
 	
+	private final String carPacketColumnNames = "entry,RealTime,ExcelTime,Speed,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,"
+			+ "Pck0Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
+			+ "Pck1Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
+			+ "Pck2Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
+			+ "Pck3Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg";
+	
 	//Added a queue to do asynchronous writes to the permanent storage. 
 	//NOTE: Currently string, but will probably change this
 	//when I actually implement a database (could be a SQL query). 
-	Database myDatabase;
+	Database myCarPacketDatabase;
+	Database myLocationUpdateDatabase;
 	String databaseName;
 	private final String DEFAULT_FOLDER_LOCATION = "Output"; //default place to create the database file. (CSVDatabase tries to save to 'output' by default).
 	
@@ -49,27 +56,28 @@ public class DatabaseController extends ModuleController {
    * @throws IOException
    */
 	public void buildNewDatabase() throws IOException{
-		if(myDatabase != null && myDatabase.isConnected()){
-			myDatabase.saveAndDisconnect();
+		if(myCarPacketDatabase != null && myCarPacketDatabase.isConnected()){
+			myCarPacketDatabase.saveAndDisconnect();
 		}
 		File testForExistence = new File(DEFAULT_FOLDER_LOCATION);
 		if(!testForExistence.exists() || !testForExistence.isDirectory()){
 			testForExistence.mkdir();
 		}
-		myDatabase = new CSVDatabase();
+		String time = "" + System.currentTimeMillis();
+		myCarPacketDatabase = new CSVDatabase("CarPacketSystem" + time, carPacketColumnNames);
 		databaseName = ".csv"; //Just want to identify the type of DB (i.e csv vs SQL, etc.) It will already have the time created. 
 		this.mySession.sendNotification(new DatabaseCreatedOrConnectedNotification(databaseName));
 	}
 	
 	public boolean isDBConnected(){
-		if(myDatabase == null){
+		if(myCarPacketDatabase == null){
 			return false;
 		}
-		else return myDatabase.isConnected();
+		else return myCarPacketDatabase.isConnected();
 	}
 	
 	public String getDatabaseName(){
-		if(myDatabase == null || !myDatabase.isConnected()){
+		if(myCarPacketDatabase == null || !myCarPacketDatabase.isConnected()){
 			return null;
 		}
 		else return databaseName;
@@ -85,7 +93,7 @@ public class DatabaseController extends ModuleController {
 	 * @throws IOException - if it can't disconnect the database. 
 	 */
 	public void saveAndDisconnect() throws IOException{
-		this.myDatabase.saveAndDisconnect();
+		this.myCarPacketDatabase.saveAndDisconnect();
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Database saved and disconnected");
 		this.mySession.sendNotification(new DatabaseDisconnectedOrClosed(this.databaseName));
 		this.databaseName = null;
@@ -130,12 +138,12 @@ public class DatabaseController extends ModuleController {
 
 	public void store(DataUnit toStore) throws IOException{
 		if(toStore.getClass() == TelemDataPacket.class){
-			this.myDatabase.store(toStore);
+			this.myCarPacketDatabase.store(toStore);
 		}
 	}
 	
 	public void store(TelemDataPacket toStore) throws IOException{
-		this.myDatabase.store(toStore);
+		this.myCarPacketDatabase.store(toStore);
 	}
 	/* save until we implement LatLongs. 
 	public void store(LatLong toStore) throws IOException{

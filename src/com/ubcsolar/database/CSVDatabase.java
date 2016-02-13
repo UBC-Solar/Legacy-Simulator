@@ -35,11 +35,7 @@ public class CSVDatabase extends Database {
 	
 	//This String provides the structure for the csv. 
 	//NOTE: If you change this, change the buildCSVEntryRow method to match.
-	private final String columnTitles = "entry,RealTime,ExcelTime,Speed,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,"
-							+ "Pck0Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
-							+ "Pck1Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
-							+ "Pck2Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
-							+ "Pck3Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg";
+	private final String columnTitles;
 	
 	//Using this as a kluge until I implement actually reading from the CSV instead of just writing to it. 
 	Map<Double,TelemDataPacket> recallStuff = new HashMap<Double, TelemDataPacket>();
@@ -51,14 +47,13 @@ public class CSVDatabase extends Database {
 	 * @param filename - filename for the .csv
 	 * @throws IOException - if it can't create the file for some reason. 
 	 */
-	public CSVDatabase(String filename) throws IOException {
+	public CSVDatabase(String filename, String columnTitles) throws IOException {
 		//might as well set it to be "null". Can make a "null.csv". By setting the value
 		//we don't get null pointer exceptions. 
 		if(filename == null){
 			filename = "null";
 		}
-		
-		
+		this.columnTitles = columnTitles;		
 		if(filename.length() == 0){
 			throw new IOException("Blank filename is Invalid filename");
 		}
@@ -88,6 +83,7 @@ public class CSVDatabase extends Database {
 	 */
 	public CSVDatabase() throws IOException {
 		File testForExistence = new File("Output");
+		columnTitles = "";//By default, won't have anything.
 		if(testForExistence.exists() && testForExistence.isDirectory()){
 			setup("Output\\"+System.nanoTime()); //pretty much guaranteed to be a unique filename. (unless you're making them faster than 1 per ns
 			//but that is unlikely. 
