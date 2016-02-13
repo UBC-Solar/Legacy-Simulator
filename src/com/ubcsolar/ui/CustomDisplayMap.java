@@ -16,7 +16,7 @@ import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
 import org.openstreetmap.gui.jmapviewer.Style;
 import org.openstreetmap.gui.jmapviewer.interfaces.MapMarker;
 
-import com.ubcsolar.common.CarLocation;
+import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.PointOfInterest;
 import com.ubcsolar.common.Route;
@@ -40,7 +40,7 @@ public class CustomDisplayMap extends JMapViewer {
 		this.addNewRouteToMap(newRouteToLoad);
 	}
 	
-	public void addNewCarLocationToMap(CarLocation newLocation){
+	public void addNewCarLocationToMap(LocationReport newLocation){
 		this.removeMapMarker(carCurrentLocation);
 		Style testStyle = new Style(Color.BLACK, Color.RED, null, MapObjectImpl.getDefaultFont());
 		MapMarkerDot newLocationDot = new MapMarkerDot(null,"THE CAR", new Coordinate(newLocation.getLocation().getLat(), newLocation.getLocation().getLon()), testStyle);

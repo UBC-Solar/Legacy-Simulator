@@ -18,7 +18,7 @@ import org.jdom2.JDOMException;
 import org.xml.sax.SAXException;
 
 import com.ubcsolar.Main.GlobalController;
-import com.ubcsolar.common.CarLocation;
+import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.Route;
@@ -59,7 +59,7 @@ public class MapController extends ModuleController{
 		//Decided against automatically sending all data points. 
 		//If the UI element wants them, it can specifiy it. 
 		//getAllPoints(); -83.77817,39.89031
-		this.recordNewCarLocation(new CarLocation(new GeoCoord(41.89031, -81.77817,317.757354), "Raven", "Phone"));
+		this.recordNewCarLocation(new LocationReport(new GeoCoord(41.89031, -81.77817,317.757354), "Raven", "Phone"));
 	}
 	
 	public Route getAllPoints(){
@@ -99,7 +99,7 @@ public class MapController extends ModuleController{
 		gpsBlueToothConnection.run();
 	}
 	
-	public void recordNewCarLocation(CarLocation carLocationReported){
+	public void recordNewCarLocation(LocationReport carLocationReported){
 		sendNotification(new NewCarLocationNotification(carLocationReported));
 	}
 

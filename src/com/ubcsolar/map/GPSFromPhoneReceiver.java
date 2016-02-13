@@ -13,7 +13,7 @@ import net.sf.marineapi.nmea.sentence.SentenceId;
 import net.sf.marineapi.nmea.util.Position;
 import gnu.io.*;
 
-import com.ubcsolar.common.CarLocation;
+import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.sim.Log;
 
@@ -57,7 +57,7 @@ public class GPSFromPhoneReceiver implements Runnable, SentenceListener{
 		double lon = -83.684;
 		double elevation = 327.203;
 		GeoCoord location = new GeoCoord(lat,lon,elevation);
-		parent.recordNewCarLocation(new CarLocation(location, this.carName, this.source, System.currentTimeMillis()));
+		parent.recordNewCarLocation(new LocationReport(location, this.carName, this.source, System.currentTimeMillis()));
 	}
 
 
@@ -110,7 +110,7 @@ public class GPSFromPhoneReceiver implements Runnable, SentenceListener{
 		
 		GeoCoord coordinates = new GeoCoord(pos.getLatitude(), pos.getLongitude(), pos.getAltitude());
 		if(parent != null){
-			parent.recordNewCarLocation(new CarLocation(coordinates, this.carName, this.source, System.currentTimeMillis()));
+			parent.recordNewCarLocation(new LocationReport(coordinates, this.carName, this.source, System.currentTimeMillis()));
 		}else{
 			System.out.println(coordinates);
 		}

@@ -1,17 +1,17 @@
 package com.ubcsolar.notification;
 
-import com.ubcsolar.common.CarLocation;
+import com.ubcsolar.common.LocationReport;
 
 public class NewCarLocationNotification extends Notification {
-	private final CarLocation theLocationOfCar;
+	private final LocationReport theLocationOfCar;
 	
-	public NewCarLocationNotification(CarLocation locationOfCar) {
+	public NewCarLocationNotification(LocationReport locationOfCar) {
 		super();
 		this.theLocationOfCar = locationOfCar;
 		
 	}
 	
-	public CarLocation getCarLocation(){
+	public LocationReport getCarLocation(){
 		return theLocationOfCar;
 	}
 

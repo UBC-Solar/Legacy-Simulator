@@ -36,6 +36,7 @@ public class DatabaseController extends ModuleController {
 			+ "Pck1Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
 			+ "Pck2Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
 			+ "Pck3Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg";
+	private final String locationUpdateColumnNames = "test1, test2, test3, etc";
 	
 	//Added a queue to do asynchronous writes to the permanent storage. 
 	//NOTE: Currently string, but will probably change this
@@ -64,7 +65,8 @@ public class DatabaseController extends ModuleController {
 			testForExistence.mkdir();
 		}
 		String time = "" + System.currentTimeMillis();
-		myCarPacketDatabase = new CSVDatabase("CarPacketSystem" + time, carPacketColumnNames);
+		myCarPacketDatabase = new CSVDatabase("Output\\" + time + "-CarPacketSystem", carPacketColumnNames);
+		myCarPacketDatabase = new CSVDatabase("Output\\" + time + "-locationUpdates", locationUpdateColumnNames);
 		databaseName = ".csv"; //Just want to identify the type of DB (i.e csv vs SQL, etc.) It will already have the time created. 
 		this.mySession.sendNotification(new DatabaseCreatedOrConnectedNotification(databaseName));
 	}
@@ -138,6 +140,9 @@ public class DatabaseController extends ModuleController {
 
 	public void store(DataUnit toStore) throws IOException{
 		if(toStore.getClass() == TelemDataPacket.class){
+			this.myCarPacketDatabase.store(toStore);
+		}
+		if(toStore.getClass() == LocationReport.class){
 			this.myCarPacketDatabase.store(toStore);
 		}
 	}

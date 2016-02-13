@@ -2,7 +2,7 @@ package com.ubcsolar.common;
 
 import java.util.Map;
 
-public class CarLocation extends DataUnit {
+public class LocationReport extends DataUnit {
 
 	private final double timeCreated;
 	private final GeoCoord location;
@@ -16,7 +16,7 @@ public class CarLocation extends DataUnit {
 	 * @param source - where they came from (phone? Manually entered? Telemetry data?)
 	 * @param timeCreated - time of report
 	 */
-	public CarLocation(GeoCoord location, String carName, String source, double timeCreated) {
+	public LocationReport(GeoCoord location, String carName, String source, double timeCreated) {
 		this.timeCreated = timeCreated;
 		this.location = location;
 		this.carName = carName;
@@ -31,7 +31,7 @@ public class CarLocation extends DataUnit {
 	 * @param source - where they came from (phone? Manually entered? Telemetry data?)
 	 * @param timeCreated - time of report
 	 */
-	public CarLocation(GeoCoord location, String carName, String source) {
+	public LocationReport(GeoCoord location, String carName, String source) {
 		this(location, carName, source, System.currentTimeMillis());
 	}
 	

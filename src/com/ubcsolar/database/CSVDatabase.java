@@ -18,6 +18,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import com.ubcsolar.common.DataUnit;
+import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.TelemDataPacket;
@@ -213,10 +214,10 @@ public class CSVDatabase extends Database {
 		flushAndSave();
 	}
 	
-	/* Commented out until LatLongs introduced
-	private void store(LatLong toStore){
-		
-	}*/
+	
+	private void store(LocationReport toStore){
+		System.out.println("Got a location report");
+	}
 	
 	/* Commented out until LatLongs introduced
 	 private void store(metar toStore){
@@ -383,6 +384,9 @@ public class CSVDatabase extends Database {
 	public void store(DataUnit toStore) throws IOException {
 		if(toStore instanceof TelemDataPacket){
 			store((TelemDataPacket) toStore);
+		}
+		if(toStore instanceof LocationReport){
+			store((LocationReport) toStore);
 		}
 	}
 
