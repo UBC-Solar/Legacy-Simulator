@@ -18,6 +18,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import com.ubcsolar.common.DataUnit;
+import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SolarLog;
@@ -215,10 +216,7 @@ public class CSVDatabase extends Database {
 	}
 	
 	
-	private void store(LocationReport toStore){
-		System.out.println("Got a location report");
-	}
-	
+
 	/* Commented out until LatLongs introduced
 	 private void store(metar toStore){
 	 }
@@ -286,6 +284,30 @@ public class CSVDatabase extends Database {
 				
 	}
 	
+	private void store(LocationReport toStore) throws IOException{
+		//private final String locationUpdateColumnNames = "Time" + "Car" + "Source" + "latitude" + "longitude" + "elevation";
+		System.out.println("Got a location report");
+		String rowToPrint = buildCSVEntryRow(toStore);
+		this.writingQueue.add(rowToPrint);
+		this.flushAndSave();
+	}
+	
+	
+	private String buildCSVEntryRow(LocationReport toStore) {
+		GeoCoord locToAdd = toStore.getLocation();
+		String toPrint = "";
+		toPrint += this.entryCounter + ",";
+		this.entryCounter++;
+		toPrint += actualDateFormat.format(toStore.getTimeCreated()) + ",";
+		toPrint += excelDateFormat.format(toStore.getTimeCreated()) + ",";
+		toPrint += toStore.getCarName() + ",";
+		toPrint += toStore.getSource() + ",";
+		toPrint += locToAdd.getLat() + ",";
+		toPrint += locToAdd.getLon() + ",";
+		toPrint += locToAdd.getElevation() + ",";
+		return toPrint;
+	}
+
 	/*
 	 * Sets up the row to be printed to the .csv. It's relatively static though,
 	 * so if the coloumn title change or number of entries change then this will have 

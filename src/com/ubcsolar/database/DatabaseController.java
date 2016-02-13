@@ -37,8 +37,7 @@ public class DatabaseController extends ModuleController {
 			+ "Pck1Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
 			+ "Pck2Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
 			+ "Pck3Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg";
-	private final String locationUpdateColumnNames = "test1, test2, test3, etc";
-	
+	private final String locationUpdateColumnNames = "entry, RealTime, ExcelTime, Car, Source, latitude, longitude, elevation";
 	//Added a queue to do asynchronous writes to the permanent storage. 
 	//NOTE: Currently string, but will probably change this
 	//when I actually implement a database (could be a SQL query). 
