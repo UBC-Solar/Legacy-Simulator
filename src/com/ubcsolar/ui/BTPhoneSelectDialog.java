@@ -20,6 +20,7 @@ import java.awt.event.MouseEvent;
 
 public class BTPhoneSelectDialog extends JFrame {
 	private GlobalController mySession;
+	private JComboBox comPortComboBox;
 	
 	public BTPhoneSelectDialog(GlobalController mySession) throws HeadlessException {
 		this.mySession = mySession;
@@ -48,15 +49,15 @@ public class BTPhoneSelectDialog extends JFrame {
 		gbc_lblComPort.gridy = 0;
 		getContentPane().add(lblComPort, gbc_lblComPort);
 		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "COM10"}));
-		comboBox.setSelectedIndex(6);
-		GridBagConstraints gbc_comboBox = new GridBagConstraints();
-		gbc_comboBox.insets = new Insets(0, 0, 5, 5);
-		gbc_comboBox.fill = GridBagConstraints.HORIZONTAL;
-		gbc_comboBox.gridx = 2;
-		gbc_comboBox.gridy = 0;
-		getContentPane().add(comboBox, gbc_comboBox);
+		comPortComboBox = new JComboBox();
+		comPortComboBox.setModel(new DefaultComboBoxModel(new String[] {"COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "COM10"}));
+		comPortComboBox.setSelectedIndex(6);
+		GridBagConstraints gbc_comPortComboBox = new GridBagConstraints();
+		gbc_comPortComboBox.insets = new Insets(0, 0, 5, 5);
+		gbc_comPortComboBox.fill = GridBagConstraints.HORIZONTAL;
+		gbc_comPortComboBox.gridx = 2;
+		gbc_comPortComboBox.gridy = 0;
+		getContentPane().add(comPortComboBox, gbc_comPortComboBox);
 		
 		JButton btnOk = new JButton("OK");
 		btnOk.addMouseListener(new MouseAdapter() {
@@ -100,7 +101,8 @@ public class BTPhoneSelectDialog extends JFrame {
 		this.dispose();
 	}
 	private void connectToCellPhone(){
-		mySession.getMapController().connectToCellPhone();
+		String comPort = this.comPortComboBox.getSelectedItem() + "";
+		mySession.getMapController().connectToCellPhone(comPort);
 	}
 	
 }

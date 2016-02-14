@@ -31,7 +31,7 @@ public class GPSFromPhoneReceiver implements Runnable, SentenceListener{
 	 * @param carName - the name of the car that this even represents (in case we ever do multiple cars at once)
 	 * @param source - where did it come from? GPS, Phone, manual entry via the UI?
 	 */
-	public GPSFromPhoneReceiver(MapController parent, String carName, String source){
+	public GPSFromPhoneReceiver(String comPort, MapController parent, String carName, String source){
 		this.parent = parent;
 		this.carName = carName;
 		this.source = source;
@@ -39,8 +39,8 @@ public class GPSFromPhoneReceiver implements Runnable, SentenceListener{
 		try{
 			Set<String> portNames = NRSerialPort.getAvailableSerialPorts();
 			String portName = portNames.iterator().next(); //it always gets the first serial port available. 
-			System.out.println(portName);
-			serialPort = new NRSerialPort("COM7", 9600);
+			System.out.println(comPort);
+			serialPort = new NRSerialPort(comPort, 9600);
 			serialPort.connect();
 		} catch(NoSuchElementException e) {
 			System.out.println("No serial ports");
@@ -119,7 +119,7 @@ public class GPSFromPhoneReceiver implements Runnable, SentenceListener{
 	 * For testing the serial code on its own 
 	 */
 	public static void main(String[] args){
-		GPSFromPhoneReceiver gpsrx = new GPSFromPhoneReceiver(null, null, null);
+		GPSFromPhoneReceiver gpsrx = new GPSFromPhoneReceiver("COM7",null, null, null);
 		gpsrx.run();
 		return;
 	}

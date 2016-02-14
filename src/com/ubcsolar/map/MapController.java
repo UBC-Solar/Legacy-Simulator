@@ -94,9 +94,9 @@ public class MapController extends ModuleController{
 		
 	}
 	
-	public void connectToCellPhone(){
+	public void connectToCellPhone(String comPort){
 		try{
-		gpsBlueToothConnection = new GPSFromPhoneReceiver(this, "Raven", "PhoneGPS");
+		gpsBlueToothConnection = new GPSFromPhoneReceiver(comPort, this, "Raven", "PhoneGPS");
 		gpsBlueToothConnection.run();
 		}
 		catch(NullPointerException e){
