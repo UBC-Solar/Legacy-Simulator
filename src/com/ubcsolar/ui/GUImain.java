@@ -270,6 +270,18 @@ public class GUImain implements Listener{
 		});
 		mnModules.add(mntmStrategy);
 		
+		JMenu mnDebug = new JMenu("Debug");
+		menuBar.add(mnDebug);
+		
+		JMenuItem mntmAddLocationReport = new JMenuItem("Add Location Report");
+		mnDebug.add(mntmAddLocationReport);
+		
+		JMenuItem mntmAddCarTelempacket = new JMenuItem("Add Car TelemPacket");
+		mnDebug.add(mntmAddCarTelempacket);
+		
+		JMenuItem mntmAddWeatherReport = new JMenuItem("Add Weather Report");
+		mnDebug.add(mntmAddWeatherReport);
+		
 		//THIS SECTION ADDS IN THE LABELS
 		this.loadedMapName = new JLabel("None");
 		//TODO set up the rest of the labels to initialize properly
