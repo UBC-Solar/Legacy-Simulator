@@ -165,7 +165,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Connect Cell Phone");
 		mntmNewMenuItem_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				connectToCellPhone();
+				new BTPhoneSelectDialog(mySession).setVisible(true);
 			}
 		});
 		
@@ -220,10 +220,6 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		mySession.getMapController().getAllPoints();
 	 
 	
-	}
-	
-	private void connectToCellPhone(){
-		mySession.getMapController().connectToCellPhone();
 	}
 	
 	/**
