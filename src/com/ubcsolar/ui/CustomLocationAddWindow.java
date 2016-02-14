@@ -8,10 +8,14 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.common.GeoCoord;
+import com.ubcsolar.common.LocationReport;
 
 import java.awt.GridLayout;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.GridBagConstraints;
 import java.awt.Component;
 import javax.swing.Box;
@@ -21,16 +25,23 @@ import javax.swing.SwingConstants;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.JButton;
+import javax.swing.JDialog;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 public class CustomLocationAddWindow extends JFrame {
-	private JTextField txtRaven;
-	private JTextField txtPhonegps;
+	private JTextField txtCarName;
+	private JTextField txtSource;
 	private JTextField txtLatitude;
 	private JTextField txtLongitude;
-	private JTextField textField;
+	private JTextField timeField;
 	private GlobalController mySession;
+	private DateFormat standardTimeFormat = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+	private JSpinner spinElevation;
 
 	public CustomLocationAddWindow(GlobalController mySession) throws HeadlessException {
 		setResizable(false);
@@ -52,16 +63,16 @@ public class CustomLocationAddWindow extends JFrame {
 		gbc_lblCarName.gridy = 0;
 		getContentPane().add(lblCarName, gbc_lblCarName);
 		
-		txtRaven = new JTextField();
-		txtRaven.setHorizontalAlignment(SwingConstants.CENTER);
-		txtRaven.setText("Raven");
-		GridBagConstraints gbc_txtRaven = new GridBagConstraints();
-		gbc_txtRaven.insets = new Insets(0, 0, 5, 5);
-		gbc_txtRaven.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtRaven.gridx = 2;
-		gbc_txtRaven.gridy = 0;
-		getContentPane().add(txtRaven, gbc_txtRaven);
-		txtRaven.setColumns(10);
+		txtCarName = new JTextField();
+		txtCarName.setHorizontalAlignment(SwingConstants.CENTER);
+		txtCarName.setText("Raven");
+		GridBagConstraints gbc_txtCarName = new GridBagConstraints();
+		gbc_txtCarName.insets = new Insets(0, 0, 5, 5);
+		gbc_txtCarName.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtCarName.gridx = 2;
+		gbc_txtCarName.gridy = 0;
+		getContentPane().add(txtCarName, gbc_txtCarName);
+		txtCarName.setColumns(10);
 		
 		JLabel lblSource = new JLabel("Source:");
 		GridBagConstraints gbc_lblSource = new GridBagConstraints();
@@ -71,16 +82,16 @@ public class CustomLocationAddWindow extends JFrame {
 		gbc_lblSource.gridy = 1;
 		getContentPane().add(lblSource, gbc_lblSource);
 		
-		txtPhonegps = new JTextField();
-		txtPhonegps.setText("PhoneGPS");
-		txtPhonegps.setHorizontalAlignment(SwingConstants.CENTER);
-		txtPhonegps.setColumns(10);
-		GridBagConstraints gbc_txtPhonegps = new GridBagConstraints();
-		gbc_txtPhonegps.insets = new Insets(0, 0, 5, 5);
-		gbc_txtPhonegps.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtPhonegps.gridx = 2;
-		gbc_txtPhonegps.gridy = 1;
-		getContentPane().add(txtPhonegps, gbc_txtPhonegps);
+		txtSource = new JTextField();
+		txtSource.setText("PhoneGPS");
+		txtSource.setHorizontalAlignment(SwingConstants.CENTER);
+		txtSource.setColumns(10);
+		GridBagConstraints gbc_txtSource = new GridBagConstraints();
+		gbc_txtSource.insets = new Insets(0, 0, 5, 5);
+		gbc_txtSource.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtSource.gridx = 2;
+		gbc_txtSource.gridy = 1;
+		getContentPane().add(txtSource, gbc_txtSource);
 		
 		JLabel lblLatitude = new JLabel("Latitude:");
 		GridBagConstraints gbc_lblLatitude = new GridBagConstraints();
@@ -91,7 +102,7 @@ public class CustomLocationAddWindow extends JFrame {
 		getContentPane().add(lblLatitude, gbc_lblLatitude);
 		
 		txtLatitude = new JTextField();
-		txtLatitude.setText("Latitude");
+		txtLatitude.setText("49.2496600");
 		txtLatitude.setHorizontalAlignment(SwingConstants.CENTER);
 		txtLatitude.setColumns(10);
 		GridBagConstraints gbc_txtLatitude = new GridBagConstraints();
@@ -110,7 +121,7 @@ public class CustomLocationAddWindow extends JFrame {
 		getContentPane().add(lblLongitude, gbc_lblLongitude);
 		
 		txtLongitude = new JTextField();
-		txtLongitude.setText("Longitude");
+		txtLongitude.setText("-123.1193400");
 		txtLongitude.setHorizontalAlignment(SwingConstants.CENTER);
 		txtLongitude.setColumns(10);
 		GridBagConstraints gbc_txtLongitude = new GridBagConstraints();
@@ -128,14 +139,14 @@ public class CustomLocationAddWindow extends JFrame {
 		gbc_lblElevationm.gridy = 4;
 		getContentPane().add(lblElevationm, gbc_lblElevationm);
 		
-		JSpinner spinner = new JSpinner();
-		spinner.setModel(new SpinnerNumberModel(new Integer(100), null, null, new Integer(1)));
-		GridBagConstraints gbc_spinner = new GridBagConstraints();
-		gbc_spinner.anchor = GridBagConstraints.WEST;
-		gbc_spinner.insets = new Insets(0, 0, 5, 5);
-		gbc_spinner.gridx = 2;
-		gbc_spinner.gridy = 4;
-		getContentPane().add(spinner, gbc_spinner);
+		spinElevation = new JSpinner();
+		spinElevation.setModel(new SpinnerNumberModel(new Integer(100), null, null, new Integer(1)));
+		GridBagConstraints gbc_spinElevation = new GridBagConstraints();
+		gbc_spinElevation.anchor = GridBagConstraints.WEST;
+		gbc_spinElevation.insets = new Insets(0, 0, 5, 5);
+		gbc_spinElevation.gridx = 2;
+		gbc_spinElevation.gridy = 4;
+		getContentPane().add(spinElevation, gbc_spinElevation);
 		
 		JLabel lblTime = new JLabel("Time:");
 		GridBagConstraints gbc_lblTime = new GridBagConstraints();
@@ -145,23 +156,22 @@ public class CustomLocationAddWindow extends JFrame {
 		gbc_lblTime.gridy = 5;
 		getContentPane().add(lblTime, gbc_lblTime);
 		
-		textField = new JTextField();
-		textField.setText("14:22:10");
-		textField.setHorizontalAlignment(SwingConstants.CENTER);
-		textField.setColumns(10);
-		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.insets = new Insets(0, 0, 5, 5);
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.gridx = 2;
-		gbc_textField.gridy = 5;
-		getContentPane().add(textField, gbc_textField);
+		timeField = new JTextField();
+		timeField.setText(this.standardTimeFormat.format(System.currentTimeMillis()));
+		timeField.setHorizontalAlignment(SwingConstants.CENTER);
+		timeField.setColumns(10);
+		GridBagConstraints gbc_timeField = new GridBagConstraints();
+		gbc_timeField.insets = new Insets(0, 0, 5, 5);
+		gbc_timeField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_timeField.gridx = 2;
+		gbc_timeField.gridy = 5;
+		getContentPane().add(timeField, gbc_timeField);
 		
 		JButton btnOk = new JButton("OK");
 		btnOk.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				
-				System.out.println("AHAHAHAHAH OK clicked");
+				handleOkClick();
 			}
 		});
 		GridBagConstraints gbc_btnOk = new GridBagConstraints();
@@ -175,7 +185,7 @@ public class CustomLocationAddWindow extends JFrame {
 		btnCancel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				System.out.println("cancel clicked");
+				closeWindow();
 			}
 		});
 		GridBagConstraints gbc_btnCancel = new GridBagConstraints();
@@ -184,7 +194,52 @@ public class CustomLocationAddWindow extends JFrame {
 		gbc_btnCancel.gridy = 6;
 		getContentPane().add(btnCancel, gbc_btnCancel);
 	}
-
+	
+	private void handleError(String message){
+		JOptionPane.showMessageDialog(this, message);
+	}
+	
+	private void handleOkClick(){
+		double latitude;
+		try{
+		latitude = Double.parseDouble(this.txtLatitude.getText());
+		}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Latitude formatted incorrectly");
+			return;
+		}
+		double longitude;
+		try{
+			longitude = Double.parseDouble(this.txtLongitude.getText());
+			}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Longitude formatted incorrectly");
+			return;
+		}
+		double elevation;
+		try{
+			elevation = Double.parseDouble(this.spinElevation.getValue() + "");
+		}catch(java.lang.NumberFormatException e){
+			this.handleError("Elevation formatted incorrectly");
+			return;
+		}
+		GeoCoord temp = new GeoCoord(latitude, longitude, elevation);
+		double time;
+		try {
+			time = this.standardTimeFormat.parse(this.timeField.getText()).getTime();
+		} catch (ParseException e) {
+			this.handleError("time formatted incorrectly");
+			return;
+		}
+		LocationReport toSend = new LocationReport(temp, this.txtCarName.getText(), this.txtSource.getText(), time);
+		mySession.getMapController().recordNewCarLocation(toSend);
+		
+		this.closeWindow();
+	}
+	
+	private void closeWindow(){
+		this.dispose();
+	}
 	private void setTitleAndLogo() {
 		this.setIconImage(mySession.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
 		this.setTitle("Custom Location Report");
