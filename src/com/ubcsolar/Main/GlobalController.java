@@ -36,10 +36,6 @@ import com.ubcsolar.ui.GUImain;
 import com.ubcsolar.weather.WeatherController;
 
 public class GlobalController {
-	@Deprecated //replaced by the Map. It worked though, so could re-enable if bugs show up. 
-	private List<Listener> listOfListeners; //listeners, waiting for a trigger listed in triggers/. 
-	@Deprecated //replaced by Map
-	private List<Class<? extends Notification>> listOfTriggers; //list of Notifcations that Listeners are waiting for. 
 								//listener in pos. 1 is waiting for the trigger in pos. 1, etc. 
 	private GUImain mainWindow; //the root panel for the UI
 	private MapController myMapController; //the Map controller
@@ -64,9 +60,6 @@ public class GlobalController {
 		//is listening for the trigger in position 3 of the triggers list. 
 		//there are much more elegant and efficient ways of doing that. 
 		
-		//TODO Confirm the notification system is working and remove these
-		listOfListeners = new ArrayList<Listener>();
-		listOfTriggers = new ArrayList<Class<? extends Notification>>();
 		
 		//TODO many of these are interrelated: the main window asks for the Database Controller. 
 		//If it's 'null' (as in, didn't build properly), the program crashes. It shouldn't. 
@@ -149,17 +142,6 @@ public class GlobalController {
 		System.out.println("Map Size: " + triggerNotifyMap.size());
 	}
 	
-	/*trying to upgrade the registration system to be able to use
-	 * a Map for performance reasons. This is the old way and I know it works.   
-	 */
-	@SuppressWarnings("unused")
-	@Deprecated 
-	private void oldRegister(Listener l, Class<? extends Notification> n) {
-		listOfListeners.add(l);
-		listOfTriggers.add(n);
-		System.out.println("Total number registered: " + listOfListeners.size());
-	}
-
 	/**
 	 * sends the notification to all classes that have registered to receive it. 
 	 * @param n - the notification being sent. 
@@ -198,21 +180,6 @@ public class GlobalController {
 
 	}
 	
-	
-	/* Trying to implement the notification system
-	 * using a Map for performance reasons. This is the old way which I know works. 
-	 */
-	@SuppressWarnings("unused")
-	@Deprecated
-	private void oldSendNotification(Notification n) {
-		for(int i=0; i<listOfTriggers.size(); i++){
-			if(listOfTriggers.get(i).isInstance(n)){
-				listOfListeners.get(i).notify(n);
-			}
-		}
-		
-	}
-
 	//THESE METHODS ALLOW US TO GET THE EXISTING CONTROLLERS FROM ANY OTHER CLASS. 
 	//It ensures we only ever have one instantiated at a time. 
 	//Could probably turn them into Singleton methods, but this allows us to control them a bit. 
