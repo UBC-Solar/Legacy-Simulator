@@ -96,6 +96,7 @@ public class DatabaseController extends ModuleController {
 	 */
 	public void saveAndDisconnect() throws IOException{
 		this.myCarPacketDatabase.saveAndDisconnect();
+		this.myLocationUpdateDatabase.saveAndDisconnect();
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Database saved and disconnected");
 		this.mySession.sendNotification(new DatabaseDisconnectedOrClosed(this.databaseName));
 		this.databaseName = null;
