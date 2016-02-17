@@ -4,3 +4,4 @@ bin/
 
 # OSX
 .DS_Store
+/Output/
