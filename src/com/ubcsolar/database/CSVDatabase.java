@@ -433,12 +433,16 @@ public class CSVDatabase extends Database {
 	public void writeRoute(Route route) throws IOException {
 	int entryNum = 0;
 	GeoCoord lastPoint = null;
+	double runningTotalDistance = 0;
 	for(GeoCoord g : route.getTrailMarkers()){
 		if(lastPoint == null){
 			this.writingQueue.add(""+entryNum+","+g.getLat()+","+ g.getLon()+","+g.getElevation());
 			lastPoint = g;
 		}else{
-			this.writingQueue.add(""+entryNum+","+g.getLat()+","+ g.getLon()+","+g.getElevation()+","+lastPoint.calculateDistance(g, DistanceUnit.KILOMETERS));
+			double tempDistance = lastPoint.calculateDistance(g, DistanceUnit.KILOMETERS);
+			runningTotalDistance += tempDistance;
+			this.writingQueue.add(""+entryNum+","+g.getLat()+","+ g.getLon()+","+g.getElevation()+","+tempDistance+","+runningTotalDistance);
+			lastPoint = g;
 		}
 		
 		this.flushAndSave();
