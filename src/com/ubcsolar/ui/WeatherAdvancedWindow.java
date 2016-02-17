@@ -57,7 +57,7 @@ public class WeatherAdvancedWindow extends JFrame {
 		JMenuItem mntmloadMetars = new JMenuItem("Load Default METAR");
 		mntmloadMetars.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				mySession.getMyWeatherController().loadMetars("res/test_METAR_xml");
+			//	mySession.getMyWeatherController().loadMetars("res/test_METAR_xml"); //Do nothing; not loading METARS yet. 
 				
 			}
 		});

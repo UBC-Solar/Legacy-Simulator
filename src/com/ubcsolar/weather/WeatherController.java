@@ -7,20 +7,11 @@ import com.ubcsolar.notification.Notification;
 
 public class WeatherController extends ModuleController {
 
+	
 	public WeatherController(GlobalController toAdd) {
 		super(toAdd);
 	}
 
-	
-	public void loadMetars(String filename){
-		ReadMETAR.ReadMETAR(filename, this);
-		System.out.println("Order to load metars received");
-	}
-	
-	public void loadTafs(String filename){
-		//ReadTAFS.ReadTAFS(filename, this);
-	}
-	
 	
 	
 	
