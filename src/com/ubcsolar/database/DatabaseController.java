@@ -7,6 +7,7 @@ import com.ubcsolar.notification.DatabaseCreatedOrConnectedNotification;
 import com.ubcsolar.notification.DatabaseDisconnectedOrClosed;
 import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewLocationReportNotification;
+import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.NewDataUnitNotification;
 import com.ubcsolar.notification.Notification;
 
@@ -38,6 +39,7 @@ public class DatabaseController extends ModuleController {
 			+ "Pck2Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
 			+ "Pck3Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg";
 	private final String locationUpdateColumnNames = "entry, RealTime, ExcelTime, Car, Source, latitude, longitude, elevation";
+	private final String printingRouteColumnNames = "pointNum, latitude, longitude, elevation, distanceFromPrevious";
 	//Added a queue to do asynchronous writes to the permanent storage. 
 	//NOTE: Currently string, but will probably change this
 	//when I actually implement a database (could be a SQL query). 
@@ -111,6 +113,7 @@ public class DatabaseController extends ModuleController {
 		this.mySession.register(this, NewDataUnitNotification.class);
 		this.mySession.register(this, CarUpdateNotification.class);
 		this.mySession.register(this, NewLocationReportNotification.class);
+		this.mySession.register(this, NewMapLoadedNotification.class);
 
 	}
 	
@@ -135,6 +138,18 @@ public class DatabaseController extends ModuleController {
 		} catch (IOException e) {
 			this.mySession.sendNotification(new ExceptionNotification(e, "Error storing lastest data unit"));
 			e.printStackTrace();
+		}
+		
+		if(n.getClass() == NewMapLoadedNotification.class){
+			n = (NewMapLoadedNotification) n;
+			try {
+				Database route = new CSVDatabase("Output\\" + "new_route - " + System.currentTimeMillis(), printingRouteColumnNames);
+				route.writeRoute(((NewMapLoadedNotification) n).getRoute());
+				route.flushAndSave();
+			} catch (IOException e) {
+				this.mySession.sendNotification(new ExceptionNotification(e, "failed at saving route"));
+				e.printStackTrace();
+			}
 		}
 
 	}

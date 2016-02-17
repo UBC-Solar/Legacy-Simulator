@@ -18,9 +18,11 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import com.ubcsolar.common.DataUnit;
+import com.ubcsolar.common.DistanceUnit;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.LogType;
+import com.ubcsolar.common.Route;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.TelemDataPacket;
 
@@ -427,4 +429,22 @@ public class CSVDatabase extends Database {
 		return this.getTelemDataPacket(doubleKey);
 	}
 
+	@Override
+	public void writeRoute(Route route) throws IOException {
+	int entryNum = 0;
+	GeoCoord lastPoint = null;
+	for(GeoCoord g : route.getTrailMarkers()){
+		if(lastPoint == null){
+			this.writingQueue.add(""+entryNum+","+g.getLat()+","+ g.getLon()+","+g.getElevation());
+			lastPoint = g;
+		}else{
+			this.writingQueue.add(""+entryNum+","+g.getLat()+","+ g.getLon()+","+g.getElevation()+","+lastPoint.calculateDistance(g, DistanceUnit.KILOMETERS));
+		}
+		
+		this.flushAndSave();
+		entryNum++;
+		
+	}
+
+	}
 }

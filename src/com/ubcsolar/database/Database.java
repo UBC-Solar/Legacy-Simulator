@@ -49,5 +49,7 @@ public abstract class Database {
 	abstract public DataUnit get(String key);
 */
 	abstract public TelemDataPacket getTelemDataPacket(String key);
+
+	abstract public void writeRoute(Route route) throws IOException;
 	
 }
