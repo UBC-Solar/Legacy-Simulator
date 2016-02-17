@@ -4,8 +4,8 @@ import com.github.dvdme.ForecastIOLib.FIOCurrently;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 
 public class FIOImplement {
-	
-	public String API_KEY = "49358bec9be8ea1393625a7334124152"; // API-KEY do not edit.
+	private final String API_KEY = "e4f99878991a762e85efbffc7db8d657"; //Strategy@ubcsolar.com's
+	//public String API_KEY = "49358bec9be8ea1393625a7334124152"; // old but valid API-KEY.
 	public String Latitude ="38.7252993";// Enter Latitude here
 	public String Longitude ="-9.1500364";// Enter Longitude here	
 	private ForecastIO fio;

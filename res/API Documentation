@@ -1,4 +1,4 @@
-Documentation on APIs used. 
+Documentation on web APIs and some of the libraries used. 
 
 MAP
 1) using the MyMaps web interface, you can create/save a map, and then export to xml (see steps below)
@@ -10,3 +10,16 @@ MAP
 	Program key: AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek
 	registered under: Strategy@ubcsolar.com
 	
+3) To display the map, we're using the JMapViewer library that works with Open Street Map. 
+Documentation: https://josm.openstreetmap.de/doc/overview-summary.html
+	
+WEATHER
+1) Forecast.io seems to do everything we need (gathers info from NASA and NOAA DB's in the back end)
+(https://developer.forecast.io/)
+Program key: e4f99878991a762e85efbffc7db8d657
+Registered under: Strategy@ubcsolar.com
+
+2) U.S aviation weather (https://aviationweather.gov/adds/dataserver/tafs/TafsExamples.php)
+Has all of the automated weather reports and forecasts (METARS and TAFs) from airports around the 'states.
+There's a lot of them
+Program Key/registered under: Don't seem to need one. 
