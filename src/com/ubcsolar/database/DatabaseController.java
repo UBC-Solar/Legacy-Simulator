@@ -66,7 +66,7 @@ public class DatabaseController extends ModuleController {
 		}
 		String time = "" + System.currentTimeMillis();
 		myCarPacketDatabase = new CSVDatabase("Output\\" + time + "-CarPacketSystem", carPacketColumnNames);
-		myCarPacketDatabase = new CSVDatabase("Output\\" + time + "-locationUpdates", locationUpdateColumnNames);
+		myLocationUpdateDatabase = new CSVDatabase("Output\\" + time + "-locationUpdates", locationUpdateColumnNames);
 		databaseName = ".csv"; //Just want to identify the type of DB (i.e csv vs SQL, etc.) It will already have the time created. 
 		this.mySession.sendNotification(new DatabaseCreatedOrConnectedNotification(databaseName));
 	}
@@ -144,7 +144,7 @@ public class DatabaseController extends ModuleController {
 			this.myCarPacketDatabase.store(toStore);
 		}
 		if(toStore.getClass() == LocationReport.class){
-			this.myCarPacketDatabase.store(toStore);
+			this.myLocationUpdateDatabase.store(toStore);
 		}
 	}
 	
