@@ -30,7 +30,7 @@ public class CSVDatabase extends Database {
 	private Queue<String> writingQueue; //will read from here and then write. 
 	private FileWriter myFileWriter; //used to write. 
 	private int entryCounter; //used to generate primary keys. 
-	private DateFormat actualDateFormat = new SimpleDateFormat("HH:mm:ss:SSS"); //time format. ss = seconds, SSS = ms
+	private DateFormat actualDateFormat = new SimpleDateFormat("HH:mm:ss.SSS"); //time format. ss = seconds, SSS = ms
 	//couldn't manage to format milliseconds in a way that Excel can handle as time
 	//so just generated a second column to be able to graph it properly. 
 	private DateFormat excelDateFormat = new SimpleDateFormat("HH:mm:ss"); //time format. ss = seconds, SSS = ms
