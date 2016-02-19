@@ -364,6 +364,7 @@ public class GUImain implements Listener{
 		
 		
 		setTitleAndLogo();
+		mainFrame.repaint(); //sometimes the map window button doesn't pop up, hoping this fixes the glitch
 	}
 	
 	/**

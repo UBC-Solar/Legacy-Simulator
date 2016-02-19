@@ -79,6 +79,7 @@ public class GlobalController {
 		
 		if(doBuildUI){
 			mainWindow = new GUImain(this); //See note below about starting this as a Runnable.
+			
 		}
 		
 		//TODO start Window in it's own thread. Here's the original boilerplate code 
