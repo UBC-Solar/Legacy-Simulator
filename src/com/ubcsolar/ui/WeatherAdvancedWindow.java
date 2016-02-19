@@ -15,6 +15,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class WeatherAdvancedWindow extends JFrame {
 
@@ -51,21 +53,26 @@ public class WeatherAdvancedWindow extends JFrame {
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		
-		JMenuItem mntmFile = new JMenuItem("file");
-		menuBar.add(mntmFile);
+		JMenu mnForecasts = new JMenu("Forecasts");
+		menuBar.add(mnForecasts);
 		
-		JMenuItem mntmloadMetars = new JMenuItem("Load Default METAR");
-		mntmloadMetars.addActionListener(new ActionListener() {
+		JMenuItem mntmLoadForecastsFor = new JMenuItem("Load Forecasts for Route (48 hours)");
+		mntmLoadForecastsFor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-			//	mySession.getMyWeatherController().loadMetars("res/test_METAR_xml"); //Do nothing; not loading METARS yet. 
-				
+				mySession.getMyWeatherController().loadForecastsForRoute(100);
 			}
 		});
-		mntmFile.add(mntmloadMetars);
 		
+		mnForecasts.add(mntmLoadForecastsFor);
 		
-		JMenuItem mntmForecasts = new JMenuItem("Forecasts");
-		menuBar.add(mntmForecasts);
+		JMenuItem mntmLoadForecastsFor_1 = new JMenuItem("Load Forecasts for current location");
+		mntmLoadForecastsFor_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Was asked currentLocation forecast");
+			}
+		});
+		
+		mnForecasts.add(mntmLoadForecastsFor_1);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -79,5 +86,4 @@ public class WeatherAdvancedWindow extends JFrame {
 			this.setIconImage(mySession.iconImage.getImage());
 			this.setTitle("Weather");
 		}
-
 }
