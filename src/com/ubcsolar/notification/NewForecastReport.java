@@ -19,5 +19,9 @@ public class NewForecastReport extends NewDataUnitNotification {
 	public DataUnit getDataUnit() {
 		return theReport;
 	}
+	
+	public ForecastReport getTheReport(){
+		return theReport;
+	}
 
 }

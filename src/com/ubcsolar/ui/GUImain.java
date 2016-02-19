@@ -28,6 +28,7 @@ import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.Route;
 import com.ubcsolar.notification.CarUpdateNotification;
 import com.ubcsolar.notification.ExceptionNotification;
+import com.ubcsolar.notification.NewForecastReport;
 import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
@@ -108,6 +109,7 @@ public class GUImain implements Listener{
 			mySession.register(this, ExceptionNotification.class);
 			mySession.register(this, NewMapLoadedNotification.class);
 			mySession.register(this, NewLocationReportNotification.class);
+			mySession.register(this, NewForecastReport.class);
 	}
 	
 	/**
@@ -128,6 +130,10 @@ public class GUImain implements Listener{
 		if(n.getClass() == NewLocationReportNotification.class){
 			NewLocationReportNotification temp = (NewLocationReportNotification) n;
 			mainPanel.addNewCarLocationToMap(temp.getCarLocation());
+		}
+		if(n.getClass() == NewForecastReport.class){
+			NewForecastReport temp = (NewForecastReport) n;
+			mainPanel.addForecastsToMap(temp.getTheReport());
 		}
 		
 	}

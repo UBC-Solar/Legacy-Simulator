@@ -17,6 +17,8 @@ import org.openstreetmap.gui.jmapviewer.Style;
 import org.openstreetmap.gui.jmapviewer.interfaces.MapMarker;
 
 import com.ubcsolar.common.LocationReport;
+import com.github.dvdme.ForecastIOLib.ForecastIO;
+import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.PointOfInterest;
 import com.ubcsolar.common.Route;
@@ -73,5 +75,18 @@ public class CustomDisplayMap extends JMapViewer {
 		
 	}
 	
+	public void addForecastsToMap(ForecastReport theReport){
+		Style forecastStyle = new Style(Color.BLACK, Color.GREEN, null, MapObjectImpl.getDefaultFont());
+		for(int i= 0; i<theReport.getForecasts().size(); i++){
+			ForecastIO fc = theReport.getForecasts().get(i);
+			Coordinate location = new Coordinate(fc.getLatitude(), fc.getLongitude());
+			String name = "" + i;
+			MapMarkerDot newLocationDot = new MapMarkerDot(null,name,location, forecastStyle);
+			this.addMapMarker(newLocationDot);
+		}
+		
+		
+		
+	}
 
 }
