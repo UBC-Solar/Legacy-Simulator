@@ -3,12 +3,15 @@ package com.ubcsolar.weather;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.DistanceUnit;
+import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.Route;
 import com.ubcsolar.notification.ExceptionNotification;
+import com.ubcsolar.notification.NewForecastReport;
 import com.ubcsolar.notification.Notification;
 
 public class WeatherController extends ModuleController {
@@ -32,9 +35,9 @@ public class WeatherController extends ModuleController {
 		List<GeoCoord> toGet = this.calculatePointsForForecast(numOfKMBetweenForecasts, currentlyLoadedRoute.getTrailMarkers());
 		
 		ForecastFactory forecastGetter = new ForecastFactory();
-		System.out.println("GOT: " + forecastGetter.getForecasts(toGet).size() + " FORECASTS");
-		
-		
+		List<ForecastIO> retrievedForecasts = forecastGetter.getForecasts(toGet);
+		ForecastReport theReport = new ForecastReport(retrievedForecasts, this.mySession.getMapController().getLoadedMapName());
+		this.mySession.sendNotification(new NewForecastReport(theReport));
 	}
 	
 	
