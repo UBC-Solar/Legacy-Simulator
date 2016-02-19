@@ -1,6 +1,11 @@
 package com.ubcsolar.weather;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.common.DistanceUnit;
+import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.Route;
 import com.ubcsolar.notification.ExceptionNotification;
@@ -24,11 +29,35 @@ public class WeatherController extends ModuleController {
 			mySession.sendNotification(new ExceptionNotification(new NullPointerException(), "Tried to get forecast but route was null"));
 			return;
 		}
+		List<GeoCoord> toGet = this.calculatePointsForForecast(numOfKMBetweenForecasts, currentlyLoadedRoute.getTrailMarkers());
+		
+		ForecastFactory forecastGetter = new ForecastFactory();
+		System.out.println("GOT: " + forecastGetter.getForecasts(toGet).size() + " FORECASTS");
+		
 		
 	}
 	
 	
 	
+	/*
+	 * Starting at the first point, creates a list of points that are at least numOfKMBetween km apart
+	 * as the crow flies (i.e if the route does a spiral of diamater 1km, and you asked for 2km, you will only get
+	 * the start point. No reason to get two forecasts if the two points are less than that apart)/
+	 */
+	private List<GeoCoord> calculatePointsForForecast(int numOfKMBetween, List<GeoCoord> trailMarkers) {
+		GeoCoord start = trailMarkers.get(0);
+		ArrayList<GeoCoord> toReturn = new ArrayList<GeoCoord>(trailMarkers.size()/numOfKMBetween);
+		toReturn.add(start);
+		for(GeoCoord g : trailMarkers){
+			if(start.calculateDistance(g, DistanceUnit.KILOMETERS) > numOfKMBetween){
+				toReturn.add(g);
+				start = g;
+			}
+		}
+		System.out.println("Controller - Selected " + toReturn.size() + " points from " + trailMarkers.size());
+		return toReturn;
+	}
+
 	/**
 	 * will receive all notifications it has registered for here.
 	 * The 'shoulder tap'
