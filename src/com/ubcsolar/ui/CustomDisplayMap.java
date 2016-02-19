@@ -67,7 +67,6 @@ public class CustomDisplayMap extends JMapViewer {
 			GeoCoord newSpot = temp.getLocation();
 			String name = temp.getName().split(",")[0]; //don't need the whole "city, state, country, continent, earth" name
 			this.addMapMarker(new MapMarkerDot(name, new Coordinate(newSpot.getLat(), newSpot.getLon())));
-			System.out.println(temp.getName() + ": " + newSpot);
 		}
 		
 		this.repaint();
