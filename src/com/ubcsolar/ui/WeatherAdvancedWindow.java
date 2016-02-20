@@ -59,7 +59,7 @@ public class WeatherAdvancedWindow extends JFrame {
 		JMenuItem mntmLoadForecastsFor = new JMenuItem("Load Forecasts for Route (48 hours)");
 		mntmLoadForecastsFor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				mySession.getMyWeatherController().loadForecastsForRoute(100);
+				mySession.getMyWeatherController().downloadNewForecastsForRoute(100);
 			}
 		});
 		
