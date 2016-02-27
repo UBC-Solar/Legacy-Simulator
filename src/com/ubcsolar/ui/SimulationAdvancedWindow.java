@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.common.GeoCoord;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -20,6 +21,8 @@ import javax.swing.JButton;
 
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 import java.awt.event.ActionEvent;
 
 public class SimulationAdvancedWindow extends JFrame {
@@ -73,8 +76,11 @@ public class SimulationAdvancedWindow extends JFrame {
 		JButton btnNewSimulation = new JButton("New Simulation");
 		btnNewSimulation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JDialog dialog = new NewSimulation();
+				//Use this if we ever have to gather arguments from the user. 
+				/*JDialog dialog = new NewSimulation();
 				dialog.setVisible(true);
+				*/
+				mySession.getMySimController().runSimulation(new HashMap<GeoCoord,Double>());
 			}
 		});
 		GridBagConstraints gbc_btnNewSimulation = new GridBagConstraints();

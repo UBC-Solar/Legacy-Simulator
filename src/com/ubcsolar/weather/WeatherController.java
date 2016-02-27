@@ -64,10 +64,12 @@ public class WeatherController extends ModuleController {
 		
 		for(GeoCoord g : currentlyLoadedRoute.getTrailMarkers()){
 			int indexOfStart = this.getIndexOfStartForecast(lastDownloadedReport.getForecasts(), g);
-			if(indexOfStart == lastDownloadedReport.getForecasts().size()){
+			if(indexOfStart == lastDownloadedReport.getForecasts().size()-1){
 				theForecastList.add(this.interprolateForecast(currentForecasts.get(indexOfStart), null, g));
 			}
+			else{
 			theForecastList.add(this.interprolateForecast(currentForecasts.get(indexOfStart), currentForecasts.get(indexOfStart+1),g));
+			}
 		}
 		
 		ForecastReport toReturn = new ForecastReport(theForecastList, "SIMULATED " + this.mySession.getMapController().getLoadedMapName());
@@ -123,7 +125,7 @@ public class WeatherController extends ModuleController {
 		
 		
 		
-		return -1;
+		return lowestIndex;
 	}
 	
 	
