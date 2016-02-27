@@ -11,8 +11,14 @@ import javax.swing.border.EmptyBorder;
 
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.GeoCoord;
+import com.ubcsolar.common.LogType;
+import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.exception.NoForecastReportException;
+import com.ubcsolar.exception.NoLoadedRouteException;
+import com.ubcsolar.exception.NoLocationReportedException;
 
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JMenu;
 
 import java.awt.GridBagLayout;
@@ -46,6 +52,9 @@ public class SimulationAdvancedWindow extends JFrame {
 		});
 	}*/
 
+	private void handleError(String message){
+		JOptionPane.showMessageDialog(this, message);
+	}
 	/**
 	 * Create the frame.
 	 * @param mySession 
@@ -76,13 +85,22 @@ public class SimulationAdvancedWindow extends JFrame {
 		JButton btnNewSimulation = new JButton("New Simulation");
 		btnNewSimulation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//Use this if we ever have to gather arguments from the user. 
-				/*JDialog dialog = new NewSimulation();
-				dialog.setVisible(true);
-				*/
-				mySession.getMySimController().runSimulation(new HashMap<GeoCoord,Double>());
+				try {
+					mySession.getMySimController().runSimulation(new HashMap<GeoCoord,Double>());
+				} catch (NoForecastReportException e1) {
+					handleError("No Forcecast Loaded yet");
+					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to No Forecast loaded");
+				} catch (NoLoadedRouteException e1) {
+					handleError("No Route Loaded yet");
+					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to run a sim with no route loaded");
+				} catch (NoLocationReportedException e1) {
+					handleError("No Location Reported yet");
+					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to run a sim with no location reported yet");
+				}
 			}
 		});
+		
+		
 		GridBagConstraints gbc_btnNewSimulation = new GridBagConstraints();
 		gbc_btnNewSimulation.gridx = 0;
 		gbc_btnNewSimulation.gridy = 0;

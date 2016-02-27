@@ -12,7 +12,7 @@ import com.ubcsolar.common.TelemDataPacket;
 
 public class SimEngine {
 
-	public SimEngine(String infoStuff) {
+	public SimEngine() {
 		
 	}
 
