@@ -31,6 +31,7 @@ public class MapController extends ModuleController{
 
 	JdomkmlInterface myJDOMMap;
 	GPSFromPhoneReceiver gpsBlueToothConnection;
+	LocationReport lastReported;
 
 	public MapController(GlobalController toAdd) throws IOException{
 		super(toAdd);	
@@ -86,6 +87,13 @@ public class MapController extends ModuleController{
 	}
 
 	/**
+	 * 
+	 * @return the last received LocationReport, or null if never has gotten one. 
+	 */
+	public LocationReport getLastReportedLocation(){
+		return this.lastReported;
+	}
+	/**
 	 * Receives any notifications it registered for here. 
 	 */
 	@Override
@@ -106,6 +114,7 @@ public class MapController extends ModuleController{
 	}
 	
 	public void recordNewCarLocation(LocationReport carLocationReported){
+		this.lastReported = carLocationReported;
 		sendNotification(new NewLocationReportNotification(carLocationReported));
 	}
 
