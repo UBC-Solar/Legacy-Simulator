@@ -5,6 +5,7 @@
  */
 
 package com.ubcsolar.sim;
+import java.util.List;
 import java.util.Map;
 
 import com.ubcsolar.Main.GlobalController;
@@ -12,6 +13,10 @@ import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.ModuleController;
+import com.ubcsolar.common.Route;
+import com.ubcsolar.common.SimulationReport;
+import com.ubcsolar.common.TelemDataPacket;
+import com.ubcsolar.exception.NoCarStatusException;
 import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.exception.NoLocationReportedException;
@@ -24,16 +29,25 @@ public class SimController extends ModuleController {
 		super(toAdd);
 	}
 	
-	public void runSimulation(Map<GeoCoord, Double> requestedSpeeds) throws NoForecastReportException, NoLoadedRouteException, NoLocationReportedException{
-		ForecastReport simmedForecastReport;
-		
-		simmedForecastReport = this.mySession.getMyWeatherController().getSimmedForecastForEveryPointfForLoadedRoute();
+	public void runSimulation(Map<GeoCoord, Double> requestedSpeeds) throws NoForecastReportException, NoLoadedRouteException, NoLocationReportedException, NoCarStatusException{
+		//Compile all the information we need. 		
+		ForecastReport simmedForecastReport = this.mySession.getMyWeatherController().getSimmedForecastForEveryPointfForLoadedRoute();
 		LocationReport lastReported = this.mySession.getMapController().getLastReportedLocation();
 		if(lastReported == null){
 			throw new NoLocationReportedException();
 		}
+		Route routeToTraverse = this.mySession.getMapController().getAllPoints();
 		
-		//SimEngine test = new SimEngine();
+		if (routeToTraverse == null){
+			throw new NoLoadedRouteException();
+		}
+		TelemDataPacket lastCarReported = this.mySession.getMyCarController().getLastTelemDataPacket();
+		if(lastCarReported == null){
+			throw new NoCarStatusException();
+		}
+		
+		//run the sim! 
+		List<SimFrame> simFrames = new SimEngine().runSimulation(routeToTraverse, lastReported, simmedForecastReport, lastCarReported, requestedSpeeds);
 		
 		
 	}

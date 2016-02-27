@@ -13,6 +13,7 @@ import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.exception.NoCarStatusException;
 import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.exception.NoLocationReportedException;
@@ -96,6 +97,9 @@ public class SimulationAdvancedWindow extends JFrame {
 				} catch (NoLocationReportedException e1) {
 					handleError("No Location Reported yet");
 					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to run a sim with no location reported yet");
+				} catch (NoCarStatusException e1) {
+					handleError("No Car Status Reported yet");
+					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to run a sim with no car status reported yet");
 				}
 			}
 		});
