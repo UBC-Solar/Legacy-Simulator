@@ -21,6 +21,7 @@ import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.exception.NoLocationReportedException;
 import com.ubcsolar.notification.ExceptionNotification;
+import com.ubcsolar.notification.NewSimulationReportNotification;
 import com.ubcsolar.notification.Notification;
 
 public class SimController extends ModuleController {
@@ -49,7 +50,8 @@ public class SimController extends ModuleController {
 		//run the sim! 
 		List<SimFrame> simFrames = new SimEngine().runSimulation(routeToTraverse, lastReported, simmedForecastReport, lastCarReported, requestedSpeeds);
 		
-		
+		SimulationReport toSend = new SimulationReport(simFrames, "some info");
+		this.mySession.sendNotification(new NewSimulationReportNotification(toSend));
 	}
 	
 	/**
