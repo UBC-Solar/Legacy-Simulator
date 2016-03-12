@@ -338,7 +338,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 				ChartFactory.createXYLineChart(
 						"Height Map",
 						"Travel Distance (" + unitMeasuredBy + ")",
-						"elevation (feet)", //TODO make this dynamic 
+						"elevation (meters)", //TODO make this dynamic 
 						ds,
 						PlotOrientation.VERTICAL, true, true, false);
 		
