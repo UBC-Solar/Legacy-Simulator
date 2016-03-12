@@ -17,6 +17,7 @@ public class Main {
 	public static void main(String[] args) throws IOException{
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Application started");
 		theProgram = new GlobalController(true);
+		//will first commit test
 	}
 
 }
