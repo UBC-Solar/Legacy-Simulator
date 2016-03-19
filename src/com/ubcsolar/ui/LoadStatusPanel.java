@@ -61,7 +61,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		
 		//lblWeather = new JLabel(mySession.getMyWeatherController().getLoadedWeatherName());
 		//TODO add these in as we develop the model
-		lblMetar = new JLabel("Metar: none");
+		lblMetar = new JLabel("Forecast: none");
 		add(lblMetar);
 		
 		horizontalGlue_1 = Box.createHorizontalGlue();

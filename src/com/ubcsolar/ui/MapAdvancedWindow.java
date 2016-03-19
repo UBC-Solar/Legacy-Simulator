@@ -181,10 +181,6 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		lblMapName = new JLabel("Map Loaded: None");
 		statusPanel.add(lblMapName);
 		
-		btnRefreshMapName = new JButton("Refresh Map Name");
-		statusPanel.add(btnRefreshMapName);
-		//TODO add in handler to refresh name
-		
 		
 		
 		//add in the chart
