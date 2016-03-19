@@ -15,6 +15,7 @@ import com.ubcsolar.database.DatabaseController;
 import com.ubcsolar.notification.DatabaseCreatedOrConnectedNotification;
 import com.ubcsolar.notification.DatabaseDisconnectedOrClosed;
 import com.ubcsolar.notification.NewCarLoadedNotification;
+import com.ubcsolar.notification.NewForecastReport;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.NewMetarReportLoadedNotification;
 import com.ubcsolar.notification.NewTafReportLoadedNotification;
@@ -31,7 +32,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	private GlobalController mySession;
 	//private GUImain parent;
 	private JLabel lblMap; //Displays the name of the loaded map
-	private JLabel lblMetar; //dispalyed the name of the loaded metar report
+	private JLabel lblForecast; //dispalyed the name of the loaded metar report
 	private JLabel lblSim; //displays the name of the last-run sim
 	private JLabel lblCar; //displays the name of the loaded car (simulated or real?)
 	private JLabel lblTaf; //displays the name of the loaded Taf report
@@ -61,8 +62,8 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		
 		//lblWeather = new JLabel(mySession.getMyWeatherController().getLoadedWeatherName());
 		//TODO add these in as we develop the model
-		lblMetar = new JLabel("Forecast: none");
-		add(lblMetar);
+		lblForecast = new JLabel("Forecast: none");
+		add(lblForecast);
 		
 		horizontalGlue_1 = Box.createHorizontalGlue();
 		add(horizontalGlue_1);
@@ -142,8 +143,8 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		else if(n.getClass() == NewCarLoadedNotification.class){
 			updateCarLabel(((NewCarLoadedNotification) n).getNameOfCar()); //to update the car label
 		}
-		else if(n.getClass() == NewMetarReportLoadedNotification.class){
-			updateMetarLabel("" + n.getTimeCreated());
+		else if(n.getClass() == NewForecastReport.class){
+			updateForcastlbl("" + n.getTimeCreated());
 		}
 		else if(n.getClass() == NewMetarReportLoadedNotification.class){
 			updateTafLabel("" + n.getTimeCreated());
@@ -167,8 +168,8 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	}
 	
 	
-	private void updateMetarLabel(String string) {
-		this.lblMetar.setText("Metar: " + string);
+	private void updateForcastlbl(String string) {
+		this.lblForecast.setText("Forecast: " + string);
 		
 	}
 
@@ -183,6 +184,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		mySession.register(this,  NewMapLoadedNotification.class);
 		mySession.register(this, NewCarLoadedNotification.class);
 		mySession.register(this, NewMetarReportLoadedNotification.class);
+		mySession.register(this, NewForecastReport.class);
 		mySession.register(this, NewTafReportLoadedNotification.class);
 		mySession.register(this, DatabaseCreatedOrConnectedNotification.class);
 		mySession.register(this, DatabaseDisconnectedOrClosed.class);
