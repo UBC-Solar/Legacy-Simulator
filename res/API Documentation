@@ -10,6 +10,10 @@ MAP
 	Program key: AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek
 	registered under: Strategy@ubcsolar.com
 	
+	Also:
+	Hooman's Key: AIzaSyDYE2CgPSZGLTJWMSaNSg4woYrZjJ_qwXk 
+	
+	
 3) To display the map, we're using the JMapViewer library that works with Open Street Map. 
 Documentation: https://josm.openstreetmap.de/doc/overview-summary.html
 	

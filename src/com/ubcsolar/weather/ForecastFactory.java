@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.common.GeoCoord;
+
+import com.ubcsolar.Main.API_Keys;
 /*
  * Made this it's own class in case there are config settings we need to play with when we create the 
  * internet connection/use the ForcecastIO library. 
@@ -12,7 +14,7 @@ import com.ubcsolar.common.GeoCoord;
  * Also so that we can set it to run in it's own thread. 
  */
 public class ForecastFactory {
-	private final String API_KEY = "e4f99878991a762e85efbffc7db8d657";
+	private final String API_KEY = API_Keys.WEATHER_KEY;
 
 	public ArrayList<ForecastIO> getForecasts(List<GeoCoord> spots){
 		ArrayList<ForecastIO> toReturn = new ArrayList<ForecastIO>(spots.size());

@@ -2,9 +2,10 @@ package com.ubcsolar.weather;
 
 import com.github.dvdme.ForecastIOLib.FIOCurrently;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
+import com.ubcsolar.Main.API_Keys;
 
 public class FIOImplement {
-	private final String API_KEY = "e4f99878991a762e85efbffc7db8d657"; //Strategy@ubcsolar.com's
+	private final String API_KEY = API_Keys.WEATHER_KEY; //Strategy@ubcsolar.com's
 	//public String API_KEY = "49358bec9be8ea1393625a7334124152"; // old but valid API-KEY.
 	public String Latitude ="38.7252993";// Enter Latitude here
 	public String Longitude ="-9.1500364";// Enter Longitude here	
