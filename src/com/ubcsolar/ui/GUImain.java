@@ -289,6 +289,12 @@ public class GUImain implements Listener{
 		mnDebug.add(mntmAddLocationReport);
 		
 		JMenuItem mntmAddCarTelempacket = new JMenuItem("Add Car TelemPacket");
+		mntmAddCarTelempacket.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFrame frame = new CarTelemPacketWindow(mySession);
+				frame.setVisible(true);
+			}
+		});
 		mnDebug.add(mntmAddCarTelempacket);
 		
 		JMenuItem mntmAddWeatherReport = new JMenuItem("Add Weather Report");
