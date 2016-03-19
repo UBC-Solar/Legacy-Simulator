@@ -82,7 +82,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	 * @param labelupdate - what to make the label display
 	 */
 	public void labelUpdate(String labelupdate) {
-		lblMapName.setText(labelupdate);
+		lblMapName.setText("Map Loaded: " + labelupdate);
 	}
 	
 	
