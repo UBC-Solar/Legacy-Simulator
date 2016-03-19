@@ -75,6 +75,8 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	private ChartPanel cp;
 	private final String DEFAULT_FILE_LOCATION = "Res\\";
 	private final MapAdvancedWindow parentInstance = this;
+	private final String X_AXIS_LABEL = "Travel Distance (km)";
+	private final String Y_AXIS_LABEL = "Elevation (m)";
 	/**
 	 * update the map name label
 	 * @param labelupdate - what to make the label display
@@ -234,8 +236,8 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		this.elevationChart = 
 				ChartFactory.createXYLineChart(
 						"Height Chart",
-						"Distance",
-						"Height", 
+						X_AXIS_LABEL,
+						Y_AXIS_LABEL, 
 						ds,
 						PlotOrientation.VERTICAL, true, true, false);
 		
@@ -333,8 +335,8 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		this.elevationChart = 
 				ChartFactory.createXYLineChart(
 						"Height Map",
-						"Travel Distance (" + unitMeasuredBy + ")",
-						"elevation (meters)", //TODO make this dynamic 
+						X_AXIS_LABEL,
+						Y_AXIS_LABEL, //TODO make this dynamic 
 						ds,
 						PlotOrientation.VERTICAL, true, true, false);
 		
