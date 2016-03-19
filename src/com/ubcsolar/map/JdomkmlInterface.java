@@ -13,15 +13,15 @@ import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.PointOfInterest;
 import com.ubcsolar.common.Route;
 import com.ubcsolar.common.SolarLog;
-
+import com.ubcsolar.Main.API_Keys;
 public class JdomkmlInterface {
 
 	private Document myDoc;
 	private String loadedFileName;
 	private Route cachedRoute;
 	
-	private final String API_KEY = "AIzaSyDYE2CgPSZGLTJWMSaNSg4woYrZjJ_qwXk";
-//	private final String API_KEY = "AIzaSyCMCYQ_X_BgCcGD43euexoiIJED__44mek";
+	private final String API_KEY = API_Keys.GOOGLE_MAPS_KEY;
+
 	//private final String API_KEY = "AIz4mek"; //bad key, can use to test Google errors. 
 
 	public JdomkmlInterface(File fileToLoad) throws IOException, JDOMException{
