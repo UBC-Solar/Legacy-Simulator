@@ -14,6 +14,7 @@ import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.Route;
+import com.ubcsolar.common.SimFrame;
 import com.ubcsolar.common.SimulationReport;
 import com.ubcsolar.common.TelemDataPacket;
 import com.ubcsolar.exception.NoCarStatusException;

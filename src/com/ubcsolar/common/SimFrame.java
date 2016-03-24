@@ -1,4 +1,4 @@
-package com.ubcsolar.sim;
+package com.ubcsolar.common;
 
 import java.util.Map;
 
@@ -6,9 +6,6 @@ import com.github.dvdme.ForecastIOLib.FIOCurrently;
 import com.github.dvdme.ForecastIOLib.FIODataBlock;
 import com.github.dvdme.ForecastIOLib.FIODataPoint;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
-import com.ubcsolar.common.DataUnit;
-import com.ubcsolar.common.LocationReport;
-import com.ubcsolar.common.TelemDataPacket;
 
 public class SimFrame extends DataUnit {
 	private final long timeCreated; //the time this frame was created, not the time it represents. 

@@ -3,8 +3,6 @@ package com.ubcsolar.common;
 import java.util.List;
 import java.util.Map;
 
-import com.ubcsolar.sim.SimFrame;
-
 public class SimulationReport extends DataUnit {
 	private final List<SimFrame> simData;
 	public SimulationReport(List<SimFrame> simData, String info) {

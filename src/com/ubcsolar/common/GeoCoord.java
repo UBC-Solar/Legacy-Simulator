@@ -89,6 +89,9 @@ public double calculateDistance(GeoCoord ending, DistanceUnit unit){
 	else if(unit == DistanceUnit.MILES){
 		return kmDistance * 0.621371;
 	}
+	else if(unit == DistanceUnit.METERS){
+		return kmDistance * 1000;
+	}
 
 	return -1.0;
 }

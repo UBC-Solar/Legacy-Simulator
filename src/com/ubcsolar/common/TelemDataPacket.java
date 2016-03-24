@@ -90,7 +90,7 @@ public Map<String, Object> getAllValues() {
 		return this.timeCreated;
 	}
 	
-	public float getTotalVoltage(){
+	public int getTotalVoltage(){
 		return totalVoltage;
 	}
 		
