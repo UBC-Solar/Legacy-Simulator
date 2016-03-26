@@ -10,6 +10,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import com.jgoodies.forms.factories.FormFactory;
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.database.DatabaseController;
 import com.ubcsolar.notification.DatabaseCreatedOrConnectedNotification;
@@ -144,7 +145,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 			updateCarLabel(((NewCarLoadedNotification) n).getNameOfCar()); //to update the car label
 		}
 		else if(n.getClass() == NewForecastReport.class){
-			updateForcastlbl("" + n.getTimeCreated());
+			updateForcastlbl("" + GlobalValues.hourMinSec.format(n.getTimeCreated()));
 		}
 		else if(n.getClass() == NewMetarReportLoadedNotification.class){
 			updateTafLabel("" + n.getTimeCreated());
