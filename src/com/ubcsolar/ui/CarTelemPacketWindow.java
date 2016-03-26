@@ -51,25 +51,45 @@ public class CarTelemPacketWindow extends JFrame {
 	private JTextField txtMotor;
 	private JTextField txtPack1;
 	private JTextField txtPack3;
+	private JTextField txtCharge;
 
 	public CarTelemPacketWindow(GlobalController mySession) throws HeadlessException {
 		setResizable(false);
 		this.mySession = mySession;
 		setTitleAndLogo();
-		this.setBounds(500, 250, 400, 328);
+		this.setBounds(500, 250, 400, 355);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 83, 0, 70, 0};
-		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		gridBagLayout.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		getContentPane().setLayout(gridBagLayout);
+		
+		JLabel lblStateOfCharge = new JLabel("State Of Charge:");
+		GridBagConstraints gbc_lblStateOfCharge = new GridBagConstraints();
+		gbc_lblStateOfCharge.anchor = GridBagConstraints.EAST;
+		gbc_lblStateOfCharge.insets = new Insets(0, 0, 5, 5);
+		gbc_lblStateOfCharge.gridx = 1;
+		gbc_lblStateOfCharge.gridy = 1;
+		getContentPane().add(lblStateOfCharge, gbc_lblStateOfCharge);
+		
+		txtCharge = new JTextField();
+		txtCharge.setHorizontalAlignment(SwingConstants.CENTER);
+		txtCharge.setText("1");
+		GridBagConstraints gbc_textField_4 = new GridBagConstraints();
+		gbc_textField_4.insets = new Insets(0, 0, 5, 5);
+		gbc_textField_4.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField_4.gridx = 2;
+		gbc_textField_4.gridy = 1;
+		getContentPane().add(txtCharge, gbc_textField_4);
+		txtCharge.setColumns(10);
 		
 		JLabel lblSpeed = new JLabel("Speed:");
 		GridBagConstraints gbc_lblSpeed = new GridBagConstraints();
 		gbc_lblSpeed.anchor = GridBagConstraints.EAST;
 		gbc_lblSpeed.insets = new Insets(0, 0, 5, 5);
 		gbc_lblSpeed.gridx = 1;
-		gbc_lblSpeed.gridy = 1;
+		gbc_lblSpeed.gridy = 2;
 		getContentPane().add(lblSpeed, gbc_lblSpeed);
 		
 		txtSpeed = new JTextField();
@@ -79,7 +99,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_txtCarName.insets = new Insets(0, 0, 5, 5);
 		gbc_txtCarName.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtCarName.gridx = 2;
-		gbc_txtCarName.gridy = 1;
+		gbc_txtCarName.gridy = 2;
 		getContentPane().add(txtSpeed, gbc_txtCarName);
 		txtSpeed.setColumns(10);
 		
@@ -88,7 +108,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_lblnewTotalVoltage.anchor = GridBagConstraints.EAST;
 		gbc_lblnewTotalVoltage.insets = new Insets(0, 0, 5, 5);
 		gbc_lblnewTotalVoltage.gridx = 1;
-		gbc_lblnewTotalVoltage.gridy = 2;
+		gbc_lblnewTotalVoltage.gridy = 3;
 		getContentPane().add(lblnewTotalVoltage, gbc_lblnewTotalVoltage);
 		
 		JButton btnOk = new JButton("OK");
@@ -107,7 +127,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_txtLongitude.insets = new Insets(0, 0, 5, 5);
 		gbc_txtLongitude.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtLongitude.gridx = 2;
-		gbc_txtLongitude.gridy = 2;
+		gbc_txtLongitude.gridy = 3;
 		getContentPane().add(txttotalcellvolt, gbc_txtLongitude);
 		
 		JLabel lblTemperatures = new JLabel("Temperatures");
@@ -115,7 +135,7 @@ public class CarTelemPacketWindow extends JFrame {
 		GridBagConstraints gbc_lblTemperatures = new GridBagConstraints();
 		gbc_lblTemperatures.insets = new Insets(0, 0, 5, 5);
 		gbc_lblTemperatures.gridx = 2;
-		gbc_lblTemperatures.gridy = 3;
+		gbc_lblTemperatures.gridy = 4;
 		getContentPane().add(lblTemperatures, gbc_lblTemperatures);
 		
 		JLabel lblBms = new JLabel("BMS:");
@@ -123,7 +143,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_lblBms.insets = new Insets(0, 0, 5, 5);
 		gbc_lblBms.anchor = GridBagConstraints.EAST;
 		gbc_lblBms.gridx = 1;
-		gbc_lblBms.gridy = 4;
+		gbc_lblBms.gridy = 5;
 		getContentPane().add(lblBms, gbc_lblBms);
 		
 		txtBms = new JTextField();
@@ -134,7 +154,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_txtBms.insets = new Insets(0, 0, 5, 5);
 		gbc_txtBms.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtBms.gridx = 2;
-		gbc_txtBms.gridy = 4;
+		gbc_txtBms.gridy = 5;
 		getContentPane().add(txtBms, gbc_txtBms);
 		
 		JLabel lblMotor = new JLabel("Motor:");
@@ -142,7 +162,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_lblMotor.insets = new Insets(0, 0, 5, 5);
 		gbc_lblMotor.anchor = GridBagConstraints.EAST;
 		gbc_lblMotor.gridx = 1;
-		gbc_lblMotor.gridy = 5;
+		gbc_lblMotor.gridy = 6;
 		getContentPane().add(lblMotor, gbc_lblMotor);
 		
 		txtMotor = new JTextField();
@@ -152,7 +172,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_textField_1.insets = new Insets(0, 0, 5, 5);
 		gbc_textField_1.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField_1.gridx = 2;
-		gbc_textField_1.gridy = 5;
+		gbc_textField_1.gridy = 6;
 		getContentPane().add(txtMotor, gbc_textField_1);
 		txtMotor.setColumns(10);
 		
@@ -161,7 +181,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_lblPack0.anchor = GridBagConstraints.EAST;
 		gbc_lblPack0.insets = new Insets(0, 0, 5, 5);
 		gbc_lblPack0.gridx = 1;
-		gbc_lblPack0.gridy = 6;
+		gbc_lblPack0.gridy = 7;
 		getContentPane().add(lblPack0, gbc_lblPack0);
 		
 		txtPack0 = new JTextField();
@@ -172,7 +192,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_txtLatitude.insets = new Insets(0, 0, 5, 5);
 		gbc_txtLatitude.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtLatitude.gridx = 2;
-		gbc_txtLatitude.gridy = 6;
+		gbc_txtLatitude.gridy = 7;
 		getContentPane().add(txtPack0, gbc_txtLatitude);
 		
 		JLabel lblPack1 = new JLabel("Pack 1:");
@@ -180,7 +200,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_lblPack1.insets = new Insets(0, 0, 5, 5);
 		gbc_lblPack1.anchor = GridBagConstraints.EAST;
 		gbc_lblPack1.gridx = 1;
-		gbc_lblPack1.gridy = 7;
+		gbc_lblPack1.gridy = 8;
 		getContentPane().add(lblPack1, gbc_lblPack1);
 		
 		txtPack1 = new JTextField();
@@ -190,7 +210,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_textField_2.insets = new Insets(0, 0, 5, 5);
 		gbc_textField_2.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField_2.gridx = 2;
-		gbc_textField_2.gridy = 7;
+		gbc_textField_2.gridy = 8;
 		getContentPane().add(txtPack1, gbc_textField_2);
 		txtPack1.setColumns(10);
 		
@@ -199,18 +219,18 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_lblPack2.insets = new Insets(0, 0, 5, 5);
 		gbc_lblPack2.anchor = GridBagConstraints.EAST;
 		gbc_lblPack2.gridx = 1;
-		gbc_lblPack2.gridy = 8;
+		gbc_lblPack2.gridy = 9;
 		getContentPane().add(lblPack2, gbc_lblPack2);
 		
 		txtPack2 = new JTextField();
 		txtPack2.setText("2");
 		txtPack2.setHorizontalAlignment(SwingConstants.CENTER);
-		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.insets = new Insets(0, 0, 5, 5);
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.gridx = 2;
-		gbc_textField.gridy = 8;
-		getContentPane().add(txtPack2, gbc_textField);
+		GridBagConstraints gbc_textField_5 = new GridBagConstraints();
+		gbc_textField_5.insets = new Insets(0, 0, 5, 5);
+		gbc_textField_5.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField_5.gridx = 2;
+		gbc_textField_5.gridy = 9;
+		getContentPane().add(txtPack2, gbc_textField_5);
 		txtPack2.setColumns(10);
 		
 		JLabel lblPack3 = new JLabel("Pack 3:");
@@ -218,7 +238,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_lblPack3.insets = new Insets(0, 0, 5, 5);
 		gbc_lblPack3.anchor = GridBagConstraints.EAST;
 		gbc_lblPack3.gridx = 1;
-		gbc_lblPack3.gridy = 9;
+		gbc_lblPack3.gridy = 10;
 		getContentPane().add(lblPack3, gbc_lblPack3);
 		
 		txtPack3 = new JTextField();
@@ -228,7 +248,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_textField_3.insets = new Insets(0, 0, 5, 5);
 		gbc_textField_3.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField_3.gridx = 2;
-		gbc_textField_3.gridy = 9;
+		gbc_textField_3.gridy = 10;
 		getContentPane().add(txtPack3, gbc_textField_3);
 		txtPack3.setColumns(10);
 		
@@ -237,7 +257,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_lblTime.anchor = GridBagConstraints.EAST;
 		gbc_lblTime.insets = new Insets(0, 0, 5, 5);
 		gbc_lblTime.gridx = 1;
-		gbc_lblTime.gridy = 10;
+		gbc_lblTime.gridy = 11;
 		getContentPane().add(lblTime, gbc_lblTime);
 		
 		timeField = new JTextField();
@@ -248,13 +268,13 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_timeField.insets = new Insets(0, 0, 5, 5);
 		gbc_timeField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_timeField.gridx = 2;
-		gbc_timeField.gridy = 10;
+		gbc_timeField.gridy = 11;
 		getContentPane().add(timeField, gbc_timeField);
 		GridBagConstraints gbc_btnOk = new GridBagConstraints();
 		gbc_btnOk.anchor = GridBagConstraints.EAST;
 		gbc_btnOk.insets = new Insets(0, 0, 0, 5);
 		gbc_btnOk.gridx = 2;
-		gbc_btnOk.gridy = 11;
+		gbc_btnOk.gridy = 12;
 		getContentPane().add(btnOk, gbc_btnOk);
 		
 		JButton btnCancel = new JButton("Cancel");
@@ -267,7 +287,7 @@ public class CarTelemPacketWindow extends JFrame {
 		GridBagConstraints gbc_btnCancel = new GridBagConstraints();
 		gbc_btnCancel.anchor = GridBagConstraints.WEST;
 		gbc_btnCancel.gridx = 3;
-		gbc_btnCancel.gridy = 11;
+		gbc_btnCancel.gridy = 12;
 		getContentPane().add(btnCancel, gbc_btnCancel);
 	}
 	
@@ -295,7 +315,7 @@ public class CarTelemPacketWindow extends JFrame {
 		temperatures.put("pack3", Integer.parseInt(TempPack3));
 		double speedget = Double.parseDouble(longval);
 		int totalVoltage = Integer.parseInt(nextval);
-		int stateOfCharge= 1; // TODO
+		int stateOfCharge= Integer.parseInt(this.txtCharge.getText()); // TODO
 		
 		HashMap<Integer,ArrayList<Float>> cellvoltages = new HashMap<Integer,ArrayList<Float>>();
 		for(int i = 0; i<4; i++){ //Current number of cells coming in pack is 4. Will probably have to adjust that.
