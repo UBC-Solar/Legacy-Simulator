@@ -22,6 +22,7 @@ public class BasicSimulatedDataReceiver extends AbstractDataReceiver {
 	
 	private double temps[] = new double[6];
 	private double speed, totalV;
+	private int stateOfCharge;
 	
 	
 	public BasicSimulatedDataReceiver(DataProcessor myProcessor, CarController toAdd){
@@ -31,6 +32,7 @@ public class BasicSimulatedDataReceiver extends AbstractDataReceiver {
 			temps[i] = 25.0;
 		speed = 0;
 		totalV = 44;
+		stateOfCharge= 80;   
 	}
 	
 	private void receiveNewPacket(TelemDataPacket newPacket){
@@ -131,6 +133,7 @@ private class generateNewThings extends TimerTask{
 		totalV = totalV > 50 ? 50 : totalV < 40 ? 40 : totalV;
 		for(int i=0; i<6; i++)
 			temps[i] += rng.nextFloat() - 0.5;
+		//stateOfCharge= TO DO
 		
 		HashMap<String,Integer> temperatures = new HashMap<String,Integer>();
 		temperatures.put("bms", (int) temps[0]);
@@ -143,7 +146,7 @@ private class generateNewThings extends TimerTask{
 		for(int i = 0; i<4; i++){ //Current number of cells coming in pack is 4. Will probably have to adjust that.
 			cellVoltages.put(i, generatePackVoltages(totalV));
 		}
-		TelemDataPacket tempPacket = new TelemDataPacket((int)speed, (int)totalV, temperatures, cellVoltages);
+		TelemDataPacket tempPacket = new TelemDataPacket(speed, (int)totalV, temperatures, cellVoltages, stateOfCharge);
 		iterations++;
 		return tempPacket;
 	}

@@ -22,9 +22,9 @@ public class NullTelemDataPacket extends TelemDataPacket {
 	
 
 
-	public NullTelemDataPacket(int newSpeed, int newTotalVoltage, HashMap<String, Integer> newTemperatures,
-			HashMap<Integer, ArrayList<Float>> newCellVoltages) {
-		super(newSpeed, newTotalVoltage,newTemperatures, newCellVoltages);
+	public NullTelemDataPacket(double newSpeed, int newTotalVoltage, HashMap<String, Integer> newTemperatures,
+			HashMap<Integer, ArrayList<Float>> newCellVoltages, int newstateOfCharge) {
+		super(newSpeed, newTotalVoltage,newTemperatures, newCellVoltages, newstateOfCharge);
 	
 		if(newTemperatures.size() == 0){
 			this.myTemperatures = null;
@@ -39,9 +39,9 @@ public class NullTelemDataPacket extends TelemDataPacket {
 		}
 	}
 	
-	public NullTelemDataPacket(int newSpeed, int newTotalVoltage, HashMap<String, Integer> newTemperatures,
-			HashMap<Integer, ArrayList<Float>> newCellVoltages, double timeInMillis) {
-		super(newSpeed, newTotalVoltage,newTemperatures, newCellVoltages, timeInMillis);
+	public NullTelemDataPacket(double newSpeed, int newTotalVoltage, HashMap<String, Integer> newTemperatures,
+			HashMap<Integer, ArrayList<Float>> newCellVoltages,int newStateOfCharge, double timeInMillis) {
+		super(newSpeed, newTotalVoltage,newTemperatures, newCellVoltages, newStateOfCharge, timeInMillis);
 	
 		if(newTemperatures.size() == 0){
 			this.myTemperatures = null;

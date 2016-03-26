@@ -721,8 +721,9 @@ public class CSVDatabaseTest {
 	//public TelemDataPacket(int newSpeed, int newTotalVoltage,
 	//HashMap<String,Integer> newTemperatures, HashMap<Integer,ArrayList<Float>> newCellVoltages){
 	private TelemDataPacket generateStandardTelemDataPacket(){
-		int speed = 5;
+		double speed = 5;
 		int totalVoltage = 6;
+		int stateOfCharge=70;
 		HashMap<String, Integer> temperatures = new HashMap<String, Integer>();		
 		temperatures.put("bms", (35));
 		temperatures.put("motor", (40));
@@ -735,13 +736,14 @@ public class CSVDatabaseTest {
 			cellVoltages.put(i, generatePackVoltages());
 		}
 		
-		return new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages);
+		return new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages,stateOfCharge);
 		
 	}
 	
 	private TelemDataPacket generateStandardTelemDataPacket(double timeInMillis){
-		int speed = 5;
+		double speed = 5;
 		int totalVoltage = 6;
+		int stateOfCharge=70;   
 		HashMap<String, Integer> temperatures = new HashMap<String, Integer>();		
 		temperatures.put("bms", (35));
 		temperatures.put("motor", (40));
@@ -754,7 +756,7 @@ public class CSVDatabaseTest {
 			cellVoltages.put(i, generatePackVoltages());
 		}
 		
-		return new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages, timeInMillis);
+		return new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages, stateOfCharge,timeInMillis );
 		
 	}
 	
@@ -769,33 +771,37 @@ public class CSVDatabaseTest {
 	}
 	
 	private TelemDataPacket generateTerribleTelemDataPacket(){
-		int speed = -1;
+		double speed = -1;
 		int totalVoltage = -2;
+		int stateOfCharge= -1000;
 		//NullTelemDataPacket will store the empty maps as 'null's
-		return new NullTelemDataPacket(speed, totalVoltage, new HashMap<String, Integer>(), new HashMap<Integer, ArrayList<Float>>());
+		return new NullTelemDataPacket(speed, totalVoltage, new HashMap<String, Integer>(), new HashMap<Integer, ArrayList<Float>>(), stateOfCharge);
 	}
 	
 	private TelemDataPacket generateTerribleTelemDataPacket(double timeCreatedInMillis){
 		int speed = -1;
 		int totalVoltage = -2;
+		int stateOfCharge= -500;
 		//NullTelemDataPacket will store the empty maps as 'null's
-		return new NullTelemDataPacket(speed, totalVoltage, new HashMap<String, Integer>(), new HashMap<Integer, ArrayList<Float>>(), timeCreatedInMillis);
+		return new NullTelemDataPacket(speed, totalVoltage, new HashMap<String, Integer>(), new HashMap<Integer, ArrayList<Float>>(), stateOfCharge, timeCreatedInMillis);
 	}
 	
 	private TelemDataPacket generateEmptyMapsTelemDataPacket(){
-		int speed = -3;
+		double speed = -3;
 		int totalVoltage = -2;
+		int stateOfCharge= -20; // TODO
 		HashMap<String, Integer> temperatures = new HashMap<String, Integer>();	
 		HashMap<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
-		return new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages);
+		return new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages, stateOfCharge);
 	}
 	
 	private TelemDataPacket generateEmptyMapsTelemDataPacket(double timeInMillis){
 		int speed = -3;
 		int totalVoltage = -2;
+		int stateOfCharge = -300;
 		HashMap<String, Integer> temperatures = new HashMap<String, Integer>();	
 		HashMap<Integer,ArrayList<Float>> cellVoltages = new HashMap<Integer,ArrayList<Float>>();
-		return new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages, timeInMillis);
+		return new TelemDataPacket(speed, totalVoltage, temperatures, cellVoltages, stateOfCharge, timeInMillis);
 	}
 	
 	

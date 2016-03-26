@@ -88,7 +88,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 			return;
 		}
 		i = 0;
-		int speed = (int) inData[i++];
+		double speed = (double) inData[i++];
 		int totalVoltage = (int) inData[i++];
 		int stateOfCharge  = (int) inData[i++];
 		HashMap<String,Integer> mapForTemperatures = new HashMap<String,Integer>();
@@ -105,7 +105,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 			}
 		}
 		
-		TelemDataPacket newData = new TelemDataPacket(speed, totalVoltage, mapForTemperatures, mapForCellVoltages);
+		TelemDataPacket newData = new TelemDataPacket(speed, totalVoltage, mapForTemperatures, mapForCellVoltages, stateOfCharge);
 		this.lastLoadedDataPacket = newData;
 		this.myDataProcessor.store(newData);
 	}

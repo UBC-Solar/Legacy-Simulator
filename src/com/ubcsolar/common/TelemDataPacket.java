@@ -13,6 +13,7 @@ public Map<String, Object> getAllValues() {
 	allValues.put("total voltage", this.getTotalVoltage());
 	allValues.put("temperatures", this.getTemperatures());
 	allValues.put("cell voltages", this.getCellVoltages());
+	allValues.put("state of charge", this.getStateOfCharge());
 	
 	return allValues;
 }
@@ -21,12 +22,13 @@ public Map<String, Object> getAllValues() {
 	private final int totalVoltage; //used to guesstimate state of charge
 	private final HashMap<String,Integer> temperatures;
 	private final HashMap<Integer,ArrayList<Float>> cellVoltages;
+	private final int stateOfCharge;
 	
 	/**
 	 * This constructor used if packet was received at an earlier time and needs to be specified.
 	 * I.e pulled out of a database. 
 	 */
-	public TelemDataPacket(double newSpeed, int newTotalVoltage, Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages, double timeCreated){
+	public TelemDataPacket(double newSpeed, int newTotalVoltage, Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages, int newStateOfCharge, double timeCreated){
 		if(newTemperatures == null || newCellVoltages == null){
 			throw new NullPointerException("Can't created a DataUnit with a null value");
 		}
@@ -37,6 +39,7 @@ public Map<String, Object> getAllValues() {
 		this.temperatures = new HashMap<String,Integer>(newTemperatures);
 		this.cellVoltages = new HashMap<Integer, ArrayList<Float>>();//(newCellVoltages);
 		this.copyOverCellVoltages(cellVoltages,newCellVoltages);
+		this.stateOfCharge= newStateOfCharge;
 	}
 	
 	/*
@@ -65,8 +68,9 @@ public Map<String, Object> getAllValues() {
 	 * @param newTotalVoltage total voltage of the car
 	 * @param newTemperatures map of temperatures of the car
 	 * @param newCellVoltages a map of cell voltages.
+	 * @param newStateOfCharge state of charge of the car
 	 */
-	public TelemDataPacket(double newSpeed, int newTotalVoltage, Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages){
+	public TelemDataPacket(double newSpeed, int newTotalVoltage, Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages, int newStateOfCharge){
 		if(newTemperatures == null || newCellVoltages == null){
 			throw new NullPointerException("Can't created a DataUnit with a null value");
 		}
@@ -77,6 +81,7 @@ public Map<String, Object> getAllValues() {
 		this.temperatures = new HashMap<String,Integer>(newTemperatures);
 		this.cellVoltages = new HashMap<Integer, ArrayList<Float>>();//(newCellVoltages);
 		this.copyOverCellVoltages(cellVoltages,newCellVoltages);
+		this.stateOfCharge= newStateOfCharge;
 	}
 	public double getSpeed(){
 		return speed;
@@ -106,6 +111,9 @@ public Map<String, Object> getAllValues() {
 			copyCellVoltages.put(key, new ArrayList<Float>(cellVoltages.get(key)));
 		}
 		return copyCellVoltages;
+	}
+	public int getStateOfCharge(){
+		return stateOfCharge;
 	}
 	
 	@Override

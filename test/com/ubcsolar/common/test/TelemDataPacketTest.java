@@ -22,10 +22,11 @@ import com.ubcsolar.common.TelemDataPacket;
 public class TelemDataPacketTest {
 
 //============ Class/test values =====================
-	private int defaultSpeed;
+	private double defaultSpeed;
 	private int defaultTotalVoltage;
 	private HashMap<String, Integer> defaultTemperatures; 
 	private HashMap<Integer,ArrayList<Float>> defaultCellVoltages;
+	private int defaultStateOfCharge;
 	
 //============ Setup/takedown methods =================
 	/**
@@ -43,6 +44,7 @@ public class TelemDataPacketTest {
 		defaultTemperatures.put("pack2", (43));
 		defaultTemperatures.put("pack3", (44));
 		defaultCellVoltages = new HashMap<Integer,ArrayList<Float>>();
+		//defaultStateOfCharge =   TODO
 		for(int i = 0; i<4; i++){ //Current number of cells coming in pack is 4. Will probably have to adjust that.
 			defaultCellVoltages.put(i, generatePackVoltages());
 		}
@@ -90,7 +92,7 @@ public class TelemDataPacketTest {
 	 */
 	@Test(expected = NullPointerException.class)
 	public void nullConstructorShouldThrowNullPointerExcptns(){
-			TelemDataPacket test = new TelemDataPacket(-1,-1,null,null);
+			TelemDataPacket test = new TelemDataPacket(-1,-1,null,null, -1); // TODO (for the last argument (stateOfCharge)
 	}
 	
 	/*
@@ -115,7 +117,7 @@ public class TelemDataPacketTest {
 		
 		try{
 			TelemDataPacket test = 
-					new TelemDataPacket(defaultSpeed,defaultTotalVoltage,tempWithNulls, cellVoltagesWithNulls);
+					new TelemDataPacket(defaultSpeed,defaultTotalVoltage,tempWithNulls, cellVoltagesWithNulls, defaultStateOfCharge);
 		}
 		catch(Exception e){
 			fail("Threw exception: " + e.getClass());
@@ -152,7 +154,11 @@ public class TelemDataPacketTest {
 		TelemDataPacket test = this.makeDefaultTelemDataPacket();
 		assertEquals("cellVoltages", test.getCellVoltages(), this.defaultCellVoltages);
 	}
-
+	@Test
+	public void getStateOfChargeShouldGetStateOfCharge() {
+		TelemDataPacket test = this.makeDefaultTelemDataPacket();
+		assertEquals("stateOfCharge", test.getStateOfCharge(), this.defaultStateOfCharge);
+	}
 // ================= toString test ==================
 	@Test
 	public void toStringShouldNotBeNullAndShouldBeLong(){
@@ -257,7 +263,7 @@ public class TelemDataPacketTest {
 			newTempMap.put(key, defaultTemperatures.get(key));
 		}
 		
-		TelemDataPacket toTestTwo = new TelemDataPacket(defaultSpeed, defaultTotalVoltage,newTempMap,defaultCellVoltages,toTestOne.getTimeCreated());
+		TelemDataPacket toTestTwo = new TelemDataPacket(defaultSpeed, defaultTotalVoltage,newTempMap,defaultCellVoltages, defaultStateOfCharge, toTestOne.getTimeCreated());
 		
 		assertTrue(toTestOne.equals(toTestTwo));	
 	}
@@ -311,7 +317,7 @@ public class TelemDataPacketTest {
 			newCellVMap.put(key, defaultCellVoltages.get(key));
 		}
 		
-		TelemDataPacket toTestTwo = new TelemDataPacket(defaultSpeed, defaultTotalVoltage,defaultTemperatures,newCellVMap,toTestOne.getTimeCreated());
+		TelemDataPacket toTestTwo = new TelemDataPacket(defaultSpeed, defaultTotalVoltage,defaultTemperatures,newCellVMap, defaultStateOfCharge, toTestOne.getTimeCreated());
 		
 		assertTrue(toTestOne.equals(toTestTwo));	
 	}
@@ -361,11 +367,11 @@ public class TelemDataPacketTest {
 	
 	//because I need to make a bunch of these and this is easier
 	private TelemDataPacket makeTelemPacketWithTime(double milliSecondTime){
-		return new TelemDataPacket(defaultSpeed, defaultTotalVoltage,defaultTemperatures,defaultCellVoltages,milliSecondTime);
+		return new TelemDataPacket(defaultSpeed, defaultTotalVoltage,defaultTemperatures,defaultCellVoltages,defaultStateOfCharge,milliSecondTime);
 	}
 	//because I need to make a bunch of these and this is easier
 	private TelemDataPacket makeDefaultTelemDataPacket(){
-		return new TelemDataPacket(defaultSpeed, defaultTotalVoltage,defaultTemperatures,defaultCellVoltages);
+		return new TelemDataPacket(defaultSpeed, defaultTotalVoltage,defaultTemperatures,defaultCellVoltages,defaultStateOfCharge);
 	}
 	
 	//Generates a default pack voltage array, because it's too hard to type manually. 

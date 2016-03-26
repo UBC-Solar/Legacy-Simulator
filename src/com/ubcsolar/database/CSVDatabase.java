@@ -384,7 +384,8 @@ public class CSVDatabase extends Database {
 				}
 			}
 		}
-		return new TelemDataPacket(speed, (int) totalVoltage, temperatures, cellVoltages, creationTime);
+		int stateOfCharge= toStore.getStateOfCharge();
+		return new TelemDataPacket(speed, (int) totalVoltage, temperatures, cellVoltages,stateOfCharge, creationTime);
 		
 		
 	}
