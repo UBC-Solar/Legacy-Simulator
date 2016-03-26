@@ -133,7 +133,7 @@ private class generateNewThings extends TimerTask{
 		totalV = totalV > 50 ? 50 : totalV < 40 ? 40 : totalV;
 		for(int i=0; i<6; i++)
 			temps[i] += rng.nextFloat() - 0.5;
-		//stateOfCharge= TO DO
+		stateOfCharge= rng.nextInt(100);
 		
 		HashMap<String,Integer> temperatures = new HashMap<String,Integer>();
 		temperatures.put("bms", (int) temps[0]);

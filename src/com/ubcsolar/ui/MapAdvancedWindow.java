@@ -277,20 +277,10 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	 */
 	private void updateMap(ArrayList<GeoCoord> listOfPoints,
 			int numOfDistanceRequested, DistanceUnit unitMeasuredBy) {
-		contentPane.remove(this.cp);
-		//if there are no points, make an empty graph?
-		/*if(listOfPoints.size() <1){ //if there are no points, abort. 
-			return;
-		}*/
-		
-		//TODO make the unit dynamic.
-		//ds = makeDataSet(listOfPoints, DistanceUnit.KILOMETERS);
-		//elevationChart.
-		
+
 		double minHeight = -20.0; //blank chart (centers '0')
 		double maxHeight = 20.0; //a blank chart
 		
-		//TODO ignores last 2 cuz I haven't figured out how to sort them yet. 
 				double tripDistance = 0.0; //whatever units I select below. 
 				double[][] data = new double[2][listOfPoints.size()];
 				if(listOfPoints.size() > 1){
@@ -347,16 +337,10 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		
 		
 		
-		cp = new ChartPanel(elevationChart);
-	
-		
-		
-		
-		contentPane.add(cp);
+		cp.setChart(elevationChart);
 		cp.repaint();
 		cp.revalidate();
 		contentPane.revalidate();
-		
 		contentPane.repaint();
 		
 		//initialize ds, elevationChart, and cp
