@@ -369,8 +369,8 @@ public class CarPanel extends JPanel implements Listener {
 	lblPackv_3.setText(voltageLabels.get(2)); //the third
 	lblPackv_4.setText(voltageLabels.get(3)); //and fourth. Can add more as needed 
 
-	//easy to update the speed. 
-	lblSpeed.setText(""+recentPacket.getSpeed()); //the label showing speed (update this one!)
+	//easy to update the speed.
+	lblSpeed.setText(""+new DecimalFormat("###.##").format(recentPacket.getSpeed())); //the label showing speed to two decimal places (update this one!)
 	SoC.setText(""+recentPacket.getStateOfCharge()); //the label showing the state of charge
 	
 	SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");
