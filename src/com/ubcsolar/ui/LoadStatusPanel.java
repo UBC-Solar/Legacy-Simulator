@@ -181,7 +181,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 			this.updateDatabaseLabel(((DatabaseDisconnectedOrClosed) n).getName(), true, n.getTimeCreated());
 		}
 		else if(n.getClass() == CarUpdateNotification.class){
-			this.updateTelemLabel("rcv'd @" + GlobalValues.hourMinSec.format(n.getTimeCreated()));
+			this.updateTelemLabel("rcv'd @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
 		}
 		else if(n.getClass() == NewLocationReportNotification.class){
 			this.updateLocationLabel("rcv'd @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
