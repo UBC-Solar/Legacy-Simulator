@@ -55,9 +55,10 @@ public class SimController extends ModuleController {
 		List<SimFrame> simFrames = new SimEngine().runSimulation(routeToTraverse, lastReported, simmedForecastReport, lastCarReported, requestedSpeeds);
 		
 		double endTimeNanos = System.nanoTime();
+		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim completed in " + ((endTimeNanos -startTimeNanos)/1000000) + "ms");
 		SimulationReport toSend = new SimulationReport(simFrames, "some info");
 		this.mySession.sendNotification(new NewSimulationReportNotification(toSend));
-		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim completed in " + ((endTimeNanos -startTimeNanos)/1000));
+	
 	}
 	
 	/**
