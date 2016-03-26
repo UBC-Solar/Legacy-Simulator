@@ -55,6 +55,10 @@ public class CarPanel extends JPanel implements Listener {
 	private JLabel lblCarLoadedName; // the name of the currently loaded car. 
 	private ArrayList<Integer> voltageLabelKeys; //the keys for the voltage labels
 	private ArrayList<String> temperatureLabelKeys; //the keys for the temperature labels
+	private JLabel label;
+	private JLabel label_1;
+	private JLabel lblSoC; //title for state of charge
+	private JLabel SoC; //state of charge value
 	
 	
 	/**
@@ -251,6 +255,23 @@ public class CarPanel extends JPanel implements Listener {
 		lblKmh.setAlignmentX(Component.CENTER_ALIGNMENT);
 		speedDisplayPanel.add(lblKmh);
 		
+		label_1 = new JLabel("_________");
+		label_1.setAlignmentX(0.5f);
+		speedDisplayPanel.add(label_1);
+		
+		lblSoC = new JLabel("SoC");
+		lblSoC.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblSoC.setAlignmentX(Component.CENTER_ALIGNMENT);
+		speedDisplayPanel.add(lblSoC);
+		
+		SoC = new JLabel("");
+		SoC.setFont(new Font("Tahoma", Font.BOLD, 18));
+		SoC.setAlignmentX(Component.CENTER_ALIGNMENT);
+		speedDisplayPanel.add(SoC);
+		
+		label = new JLabel("");
+		speedDisplayPanel.add(label);
+		
 		if(mySession != null) { //NullPointerException protection. And now they'll show up in a 
 								//WYSIWYG editor. 
 		
@@ -348,9 +369,10 @@ public class CarPanel extends JPanel implements Listener {
 	lblPackv_3.setText(voltageLabels.get(2)); //the third
 	lblPackv_4.setText(voltageLabels.get(3)); //and fourth. Can add more as needed 
 
-	//easy to update the speed. 
-	lblSpeed.setText(""+recentPacket.getSpeed());; //the label showing speed (update this one!)
-
+	//easy to update the speed.
+	lblSpeed.setText(""+new DecimalFormat("###.##").format(recentPacket.getSpeed())); //the label showing speed to two decimal places (update this one!)
+	SoC.setText(""+recentPacket.getStateOfCharge()); //the label showing the state of charge
+	
 	SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");
 	Date now = new Date((long) (recentPacket.getTimeCreated()));
     String strDate = sdfDate.format(now);
@@ -457,6 +479,7 @@ public class CarPanel extends JPanel implements Listener {
 		lblSpeed.setText("NONE");; //the label showing speed (update this one!)
 		lblLastDataReceived.setText("Last Received: NONE"); //Time of last data received
 		lblCarLoadedName.setText("No Car Connected");; // the name of the currently loaded car. 
+		SoC.setText("N/A"); //the default text for state of charge
 	}
 	
 	
