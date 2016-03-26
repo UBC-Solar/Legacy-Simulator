@@ -365,7 +365,7 @@ public class CSVDatabase extends Database {
 	 */
 	private TelemDataPacket sanitizeInput(TelemDataPacket toStore) {
 		double creationTime = toStore.getTimeCreated();
-		int speed = toStore.getSpeed();
+		double speed = toStore.getSpeed();
 		float totalVoltage = toStore.getTotalVoltage();
 		HashMap<String,Integer> temperatures = toStore.getTemperatures();
 		if(temperatures == null){

@@ -71,7 +71,7 @@ public class SimEngine {
 	private SimFrame generateNextFrame(SimFrame lastFrame, GeoCoord nextPoint, ForecastIO nextWeather, Double requestedSpeed) {
 		TelemDataPacket lastCarStatus = lastFrame.getCarStatus();
 		GeoCoord lastPosition = lastFrame.getGPSReport().getLocation();
-		int lastSpeed = lastCarStatus.getSpeed();
+		double lastSpeed = lastCarStatus.getSpeed();
 		long lastTimeStamp = lastFrame.getRepresentedTime();
 		
 		

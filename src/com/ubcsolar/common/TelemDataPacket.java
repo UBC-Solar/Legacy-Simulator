@@ -17,7 +17,7 @@ public Map<String, Object> getAllValues() {
 	return allValues;
 }
 	private final double timeCreated;
-	private final int speed;
+	private final double speed;
 	private final int totalVoltage; //used to guesstimate state of charge
 	private final HashMap<String,Integer> temperatures;
 	private final HashMap<Integer,ArrayList<Float>> cellVoltages;
@@ -26,7 +26,7 @@ public Map<String, Object> getAllValues() {
 	 * This constructor used if packet was received at an earlier time and needs to be specified.
 	 * I.e pulled out of a database. 
 	 */
-	public TelemDataPacket(int newSpeed, int newTotalVoltage, Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages, double timeCreated){
+	public TelemDataPacket(double newSpeed, int newTotalVoltage, Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages, double timeCreated){
 		if(newTemperatures == null || newCellVoltages == null){
 			throw new NullPointerException("Can't created a DataUnit with a null value");
 		}
@@ -66,7 +66,7 @@ public Map<String, Object> getAllValues() {
 	 * @param newTemperatures map of temperatures of the car
 	 * @param newCellVoltages a map of cell voltages.
 	 */
-	public TelemDataPacket(int newSpeed, int newTotalVoltage, Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages){
+	public TelemDataPacket(double newSpeed, int newTotalVoltage, Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages){
 		if(newTemperatures == null || newCellVoltages == null){
 			throw new NullPointerException("Can't created a DataUnit with a null value");
 		}
@@ -78,7 +78,7 @@ public Map<String, Object> getAllValues() {
 		this.cellVoltages = new HashMap<Integer, ArrayList<Float>>();//(newCellVoltages);
 		this.copyOverCellVoltages(cellVoltages,newCellVoltages);
 	}
-	public int getSpeed(){
+	public double getSpeed(){
 		return speed;
 	}
 	
@@ -111,7 +111,7 @@ public Map<String, Object> getAllValues() {
 	@Override
 	public String toString(){
 		return this.timeCreated + "\n"
-				+ Integer.toString(this.speed) + "\n"
+				+ Double.toString(this.speed) + "\n"
 				+ Float.toString(this.totalVoltage) + "\n"
 				+ this.temperatures.toString() + "\n"
 				+ this.cellVoltages.toString() + "\n";
@@ -146,7 +146,7 @@ public Map<String, Object> getAllValues() {
 			return false; //timeCreated not the same. 
 		}
 		
-		if(toCompare.speed != this.speed){
+		if( Math.abs(toCompare.speed - this.speed)>0.000000000000001){ 
 			return false; 
 		}
 		
