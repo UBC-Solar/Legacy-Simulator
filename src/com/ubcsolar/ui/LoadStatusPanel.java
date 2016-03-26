@@ -13,10 +13,12 @@ import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.database.DatabaseController;
+import com.ubcsolar.notification.CarUpdateNotification;
 import com.ubcsolar.notification.DatabaseCreatedOrConnectedNotification;
 import com.ubcsolar.notification.DatabaseDisconnectedOrClosed;
 import com.ubcsolar.notification.NewCarLoadedNotification;
 import com.ubcsolar.notification.NewForecastReport;
+import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.NewMetarReportLoadedNotification;
 import com.ubcsolar.notification.NewTafReportLoadedNotification;
@@ -38,12 +40,20 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	private JLabel lblCar; //displays the name of the loaded car (simulated or real?)
 	private JLabel lblTaf; //displays the name of the loaded Taf report
 	private JLabel lblDatabase; //displays the status of the Database. 
+	private JLabel lblLocationReport;
+	private JLabel lblTelemdata;
 	private Component horizontalGlue; //These glues add space between and grow the labels properly.
 	private Component horizontalGlue_1;
 	private Component horizontalGlue_2;
 	private Component horizontalGlue_3;
 	private Component horizontalGlue_4;
 	private DateFormat labelTimeFormat = new SimpleDateFormat("HH:mm:ss"); //the format for the times on the labels.
+	private final String TAFTITLE = "Taf: ";
+	private final String FORECASTTITLE = "Forecast: ";
+	private final String MAPLOADED = "Map: ";
+	private final String CARLOADED = "Car: ";
+	private final String LOCATIONREPORT = "Location Report: ";
+	private final String TELEMDATA = "TelemData: ";
 	
 	/**
 	 * constructor
@@ -55,7 +65,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		mySession = session;
 		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-		lblMap = new JLabel("Map loaded: None");
+		lblMap = new JLabel(MAPLOADED);
 		add(lblMap);
 		
 		horizontalGlue = Box.createHorizontalGlue();
@@ -63,14 +73,14 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		
 		//lblWeather = new JLabel(mySession.getMyWeatherController().getLoadedWeatherName());
 		//TODO add these in as we develop the model
-		lblForecast = new JLabel("Forecast: none");
+		lblForecast = new JLabel(FORECASTTITLE);
 		add(lblForecast);
 		
 		horizontalGlue_1 = Box.createHorizontalGlue();
 		add(horizontalGlue_1);
 		
-		lblTaf = new JLabel("TAF: none");
-		add(lblTaf);
+		/*lblTaf = new JLabel(TAFTITLE);
+		add(lblTaf);*/
 		
 		horizontalGlue_2 = Box.createHorizontalGlue();
 		add(horizontalGlue_2);
@@ -81,7 +91,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		horizontalGlue_3 = Box.createHorizontalGlue();
 		add(horizontalGlue_3);
 		
-		lblCar = new JLabel("Car Loaded: None");
+		lblCar = new JLabel(CARLOADED);
 		add(lblCar);
 		
 		horizontalGlue_4 = Box.createHorizontalGlue();
@@ -89,6 +99,13 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		
 		lblDatabase = new JLabel("Database: unknown");
 		add(lblDatabase);
+		
+		lblTelemdata = new JLabel(TELEMDATA);
+		add(lblTelemdata);
+		
+		lblLocationReport = new JLabel(LOCATIONREPORT);
+		add(lblLocationReport);
+
 		if(mySession != null){
 			initializeValues();
 			register();
@@ -96,8 +113,12 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	}
 	
 	private void initializeValues(){
-		lblCar.setText("Car: " + mySession.getMyCarController().getLoadedCarName());
-		lblMap.setText("Map loaded: " + mySession.getMapController().getLoadedMapName());
+		updateForcastlbl("none");
+		//updateTafLabel("none");
+		this.updateLocationLabel("none");
+		this.updateTelemLabel("none");
+		updateMapLabel(mySession.getMapController().getLoadedMapName());
+		updateCarLabel(mySession.getMyCarController().getLoadedCarName());
 		if(mySession.getMyDataBaseController() != null){
 		if((mySession.getMyDataBaseController()).getDatabaseName() != null){
 		this.updateDatabaseLabel(mySession.getMyDataBaseController().getDatabaseName(), false, System.currentTimeMillis());
@@ -113,7 +134,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	 * @param mapName - the name of map to display
 	 */
 	private void updateMapLabel(String mapName){
-		lblMap.setText("Map: " + mapName);
+		lblMap.setText(MAPLOADED + mapName);
 	}
 	
 	/**
@@ -121,7 +142,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	 * @param carName - the name of the car to display
 	 */
 	private void updateCarLabel(String carName){
-		lblCar.setText("Car: " + carName);
+		lblCar.setText(CARLOADED + carName);
 	}
 	
 	private void updateDatabaseLabel(String databaseName, boolean isClosed, double time){
@@ -145,16 +166,22 @@ public class LoadStatusPanel extends JPanel implements Listener {
 			updateCarLabel(((NewCarLoadedNotification) n).getNameOfCar()); //to update the car label
 		}
 		else if(n.getClass() == NewForecastReport.class){
-			updateForcastlbl("" + GlobalValues.hourMinSec.format(n.getTimeCreated()));
+			updateForcastlbl("Last downloaded " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
 		}
-		else if(n.getClass() == NewMetarReportLoadedNotification.class){
-			updateTafLabel("" + n.getTimeCreated());
-		}
+		/*else if(n.getClass() == NewMetarReportLoadedNotification.class){
+			updateTafLabel("" + GlobalValues.hourMinSec.format(n.getTimeCreated()));
+		}*/
 		else if(n.getClass() == DatabaseCreatedOrConnectedNotification.class){
 			this.updateDatabaseLabel(((DatabaseCreatedOrConnectedNotification) n).getName(), false, n.getTimeCreated());
 		}
 		else if(n.getClass() == DatabaseDisconnectedOrClosed.class){
 			this.updateDatabaseLabel(((DatabaseDisconnectedOrClosed) n).getName(), true, n.getTimeCreated());
+		}
+		else if(n.getClass() == CarUpdateNotification.class){
+			this.updateTelemLabel("Last rcv'd " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
+		}
+		else if(n.getClass() == NewLocationReportNotification.class){
+			this.updateLocationLabel("Last rcv'd " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
 		}
 		
 		/*//TODO implement these
@@ -170,15 +197,22 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	
 	
 	private void updateForcastlbl(String string) {
-		this.lblForecast.setText("Forecast: " + string);
+		this.lblForecast.setText(FORECASTTITLE + string);
 		
 	}
 
-	private void updateTafLabel(String string) {
-		this.lblTaf.setText("Taf: " + string);
+/*	private void updateTafLabel(String string) {
+		this.lblTaf.setText(TAFTITLE + string);
 		
 	}
-
+	*/
+	private void updateLocationLabel(String string){
+		lblLocationReport.setText(LOCATIONREPORT + string);
+	}
+	
+	private void updateTelemLabel(String string){
+		lblTelemdata.setText(TELEMDATA + string);
+	}
 	@Override
 	public void register() {
 		if(mySession != null){
@@ -189,6 +223,8 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		mySession.register(this, NewTafReportLoadedNotification.class);
 		mySession.register(this, DatabaseCreatedOrConnectedNotification.class);
 		mySession.register(this, DatabaseDisconnectedOrClosed.class);
+		mySession.register(this,  CarUpdateNotification.class);
+		mySession.register(this, NewLocationReportNotification.class);
 		}
 		//mySession.register(this, SimDonwRunningNotificaiton.class); //TODO implement when I get there. 
 		//mySession.register(this,  NewWeatherLoadedNotification.class); //TODO implement when this gets created
