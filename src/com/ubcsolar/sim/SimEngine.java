@@ -1,14 +1,19 @@
 package com.ubcsolar.sim;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import org.jfree.data.Values;
 
 import com.github.dvdme.ForecastIOLib.FIOCurrently;
 import com.github.dvdme.ForecastIOLib.FIODataBlock;
 import com.github.dvdme.ForecastIOLib.FIODataPoint;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.DistanceUnit;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
@@ -105,8 +110,19 @@ public class SimEngine {
 		System.out.println("New SimFrame created!");
 		System.out.println("Location: " + nextLocationReport.getLocation());
 		System.out.println("raw time: " + nextSimFrameTime);
-		SimpleDateFormat test = new SimpleDateFormat("HH:mm:ss");
-		System.out.println("simulated time: " + test.format(nextSimFrameTime));
+		System.out.println("simulated full: " + GlobalValues.forecastIODateParser.format(nextSimFrameTime));
+		System.out.println("simulated hrmin: " + GlobalValues.hourMinSec.format(nextSimFrameTime));
+		System.out.println("simulated dayMnthYr: " + GlobalValues.dayMonthYr.format(nextSimFrameTime));
+		System.out.println("FC raw time: " + toReturn.getForecast().time());
+		try {
+			Date fcParseTime = GlobalValues.forecastIODateParser.parse(toReturn.getForecast().time());
+			System.out.println("FC parsed time in dbl: " + fcParseTime.getTime());
+			System.out.println("FC parsed time in String: " +  GlobalValues.forecastIODateParser.format(fcParseTime));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 		return toReturn; 
 	}
@@ -176,7 +192,9 @@ public class SimEngine {
     */
 	private FIODataPoint chooseReport(ForecastIO weather, double timeFrame) {
 		//TODO actually make this choose something. 
-		return new FIODataBlock(weather.getHourly()).datapoint(0);
+		FIODataPoint toReturn  = new FIODataBlock(weather.getHourly()).datapoint(0);
+		toReturn.setTimezone("PST");
+		return toReturn;
 	}
 
 
