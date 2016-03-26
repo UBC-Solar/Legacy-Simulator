@@ -189,11 +189,13 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			//[0] is distance, [1] is speed
 			data[0][0] = 0;
 			data[1][0] = simReport.getSimFrames().get(0).getCarStatus().getSpeed();
+			double runningTotalDistance = 0;
 			for(int i = 1; i<simReport.getSimFrames().size(); i++){
 				SimFrame temp = simReport.getSimFrames().get(i);
 				GeoCoord lastPosition = simReport.getSimFrames().get(i-1).getGPSReport().getLocation();
 				GeoCoord thisPosition = temp.getGPSReport().getLocation();
-				data[0][i] = lastPosition.calculateDistance(thisPosition, DistanceUnit.KILOMETERS);
+				runningTotalDistance += lastPosition.calculateDistance(thisPosition, DistanceUnit.KILOMETERS);
+				data[0][i] = runningTotalDistance;
 				data[1][i] = temp.getCarStatus().getSpeed();
 			}
 			
