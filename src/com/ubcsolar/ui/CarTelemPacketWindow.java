@@ -295,7 +295,7 @@ public class CarTelemPacketWindow extends JFrame {
 		temperatures.put("pack3", Integer.parseInt(TempPack3));
 		double speedget = Double.parseDouble(longval);
 		int totalVoltage = Integer.parseInt(nextval);
-
+		int stateOfCharge= 1; // TODO
 		
 		HashMap<Integer,ArrayList<Float>> cellvoltages = new HashMap<Integer,ArrayList<Float>>();
 		for(int i = 0; i<4; i++){ //Current number of cells coming in pack is 4. Will probably have to adjust that.
@@ -310,7 +310,7 @@ public class CarTelemPacketWindow extends JFrame {
 			return;
 		}
 		
-		TelemDataPacket newPacket = new TelemDataPacket(speedget, totalVoltage, temperatures, cellvoltages, time);
+		TelemDataPacket newPacket = new TelemDataPacket(speedget, totalVoltage, temperatures, cellvoltages,stateOfCharge, time);
 		TelemDataPacket testpacket = generateNewTelemDataPack();
 		mySession.getMyCarController().adviseOfNewCarReport(newPacket);
 		
@@ -327,12 +327,13 @@ public class CarTelemPacketWindow extends JFrame {
 //-------------------------------------------------------------------------------------------------------------	
 	private TelemDataPacket generateNewTelemDataPack(){
 		Random rng = new Random();
-		int speed = 5;
+		double speed = 5;
 		if(speed < 0)
 			speed = 0;
 		int totalV = 5;
 		totalV = totalV > 50 ? 50 : totalV < 40 ? 40 : totalV;
-
+		int stateOfCharge= 80;
+		
 		HashMap<String,Integer> temperatures = new HashMap<String,Integer>();
 		temperatures.put("bms", 1);
 		temperatures.put("motor", 2);
@@ -344,7 +345,7 @@ public class CarTelemPacketWindow extends JFrame {
 		for(int i = 0; i<4; i++){ //Current number of cells coming in pack is 4. Will probably have to adjust that.
 			cellVoltages.put(i, generatePackVoltages(totalV));
 		}
-		TelemDataPacket tempPacket = new TelemDataPacket((int)speed, (int)totalV, temperatures, cellVoltages);
+		TelemDataPacket tempPacket = new TelemDataPacket(speed, (int)totalV, temperatures, cellVoltages, stateOfCharge);
 
 		return tempPacket;
 	}
