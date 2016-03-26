@@ -20,6 +20,10 @@ public class NewSimulationReportNotification extends NewDataUnitNotification {
 	public DataUnit getDataUnit() {
 		return theReport;
 	}
+	
+	public SimulationReport getSimReport(){
+		return this.theReport;
+	}
 
 	@Override
 	public String getMessage() {

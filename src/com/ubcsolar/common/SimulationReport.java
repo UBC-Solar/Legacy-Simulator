@@ -8,7 +8,11 @@ public class SimulationReport extends DataUnit {
 	public SimulationReport(List<SimFrame> simData, String info) {
 		this.simData = simData;
 	}
-
+	
+	public List<SimFrame> getSimFrames(){
+		return simData;
+	}
+	
 	@Override
 	public double getTimeCreated() {
 		// TODO Auto-generated method stub
