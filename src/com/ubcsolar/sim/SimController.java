@@ -12,10 +12,12 @@ import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.LocationReport;
+import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.Route;
 import com.ubcsolar.common.SimFrame;
 import com.ubcsolar.common.SimulationReport;
+import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.TelemDataPacket;
 import com.ubcsolar.exception.NoCarStatusException;
 import com.ubcsolar.exception.NoForecastReportException;
@@ -48,11 +50,14 @@ public class SimController extends ModuleController {
 			throw new NoCarStatusException();
 		}
 		
+		double startTimeNanos = System.nanoTime();
 		//run the sim! 
 		List<SimFrame> simFrames = new SimEngine().runSimulation(routeToTraverse, lastReported, simmedForecastReport, lastCarReported, requestedSpeeds);
 		
+		double endTimeNanos = System.nanoTime();
 		SimulationReport toSend = new SimulationReport(simFrames, "some info");
 		this.mySession.sendNotification(new NewSimulationReportNotification(toSend));
+		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim completed in " + ((endTimeNanos -startTimeNanos)/1000));
 	}
 	
 	/**

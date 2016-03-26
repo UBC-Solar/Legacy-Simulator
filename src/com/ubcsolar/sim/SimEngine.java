@@ -94,9 +94,7 @@ public class SimEngine {
 		
 		
 		double tempTime = (distanceCovered/(speedToDrive * 1000))*60*1000*60; //double check units. km/h and m??
-		long timeSinceLastFrame = (long) tempTime;
-		System.out.println("ms to cover " + distanceCovered + " meters: " + timeSinceLastFrame);
-		
+		long timeSinceLastFrame = (long) tempTime;		
 		long nextSimFrameTime = lastTimeStamp + timeSinceLastFrame;
 		FIODataPoint forecastForPoint = chooseReport(nextWeather, nextSimFrameTime);
 		double squareMetersOfPanel = 10; //total random guess. TODO: get actual measurement. 
@@ -104,22 +102,12 @@ public class SimEngine {
 		
 		TelemDataPacket newCarStatus;
 		newCarStatus = calculateNewCarStatus(lastCarStatus, distanceCovered, elevationChange, forecastForPoint, speedToDrive, sunPowerInWatts);
-		System.out.println("Driving at: " + newCarStatus.getSpeed() + " km/h");
 		LocationReport nextLocationReport = generateLocationReport(lastFrame.getGPSReport(), nextPoint);
 		
 		SimFrame toReturn = new SimFrame(forecastForPoint, newCarStatus, nextLocationReport, nextSimFrameTime);
-		System.out.println("-------------------------------");
-		System.out.println("New SimFrame created!");
-		System.out.println("Location: " + nextLocationReport.getLocation());
-		System.out.println("raw time: " + nextSimFrameTime);
-		System.out.println("simulated full: " + GlobalValues.forecastIODateParser.format(nextSimFrameTime));
-		System.out.println("simulated hrmin: " + GlobalValues.hourMinSec.format(nextSimFrameTime));
-		System.out.println("simulated dayMnthYr: " + GlobalValues.dayMonthYr.format(nextSimFrameTime));
-		System.out.println("FC raw time: " + toReturn.getForecast().time());
+
 		try {
 			Date fcParseTime = GlobalValues.forecastIODateParser.parse(toReturn.getForecast().time());
-			System.out.println("FC parsed time in dbl: " + fcParseTime.getTime());
-			System.out.println("FC parsed time in String: " +  GlobalValues.forecastIODateParser.format(fcParseTime));
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -156,7 +144,7 @@ public class SimEngine {
 				lastCarStatus.getTemperatures(), 
 				lastCarStatus.getCellVoltages(), lastCarStatus.getStateOfCharge(), 
 				(distanceCovered/(speedToDrive*1000)*60*60*1000));
-		System.out.println(speedToDrive);
+		
 		return toReturn;
 	}
 
