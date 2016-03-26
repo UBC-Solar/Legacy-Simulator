@@ -183,7 +183,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		
 		
 		private void updateChart(SimulationReport simReport) {
-			this.contentPane.remove(this.chartFrame);
 			DefaultXYDataset dds = new DefaultXYDataset();
 			double[][] data = new double[2][simReport.getSimFrames().size()];
 			//[0] is distance, [1] is speed
@@ -209,12 +208,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 							dds,
 							PlotOrientation.VERTICAL, true, true, false);
 			
-			this.chartFrame= new ChartPanel(this.simResults);
-			GridBagConstraints gbc_panel = new GridBagConstraints();
-			gbc_panel.fill = GridBagConstraints.BOTH;
-			gbc_panel.gridx = 0;
-			gbc_panel.gridy = 1;
-			contentPane.add(chartFrame,gbc_panel); //this is terrible, should not be doing it here. 
+			this.chartFrame.setChart(this.simResults);
 			contentPane.repaint();
 			contentPane.validate();
 			chartFrame.repaint();
