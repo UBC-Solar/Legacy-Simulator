@@ -96,6 +96,7 @@ public class SimEngine {
 		double tempTime = (distanceCovered/(speedToDrive * 1000))*60*1000*60; //double check units. km/h and m??
 		long timeSinceLastFrame = (long) tempTime;
 		System.out.println("ms to cover " + distanceCovered + " meters: " + timeSinceLastFrame);
+		
 		long nextSimFrameTime = lastTimeStamp + timeSinceLastFrame;
 		FIODataPoint forecastForPoint = chooseReport(nextWeather, nextSimFrameTime);
 		double squareMetersOfPanel = 10; //total random guess. TODO: get actual measurement. 
@@ -103,6 +104,7 @@ public class SimEngine {
 		
 		TelemDataPacket newCarStatus;
 		newCarStatus = calculateNewCarStatus(lastCarStatus, distanceCovered, elevationChange, forecastForPoint, speedToDrive, sunPowerInWatts);
+		System.out.println("Driving at: " + newCarStatus.getSpeed() + " km/h");
 		LocationReport nextLocationReport = generateLocationReport(lastFrame.getGPSReport(), nextPoint);
 		
 		SimFrame toReturn = new SimFrame(forecastForPoint, newCarStatus, nextLocationReport, nextSimFrameTime);
