@@ -150,11 +150,12 @@ public class SimEngine {
 	private TelemDataPacket calculateNewCarStatus(TelemDataPacket lastCarStatus, double distanceCovered,
 			double elevationChange, FIODataPoint forecastForPoint, double speedToDrive, double sunPowerInWatts2) {
 		//TODO actually calculate the car...
-		TelemDataPacket toReturn = new TelemDataPacket((int)speedToDrive,
+		TelemDataPacket toReturn = new TelemDataPacket(speedToDrive,
 				lastCarStatus.getTotalVoltage(), 
 				lastCarStatus.getTemperatures(), 
 				lastCarStatus.getCellVoltages(), 
 				(distanceCovered/(speedToDrive*1000)*60*60*1000));
+		System.out.println(speedToDrive);
 		return toReturn;
 	}
 

@@ -17,13 +17,19 @@ import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
 
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.common.DistanceUnit;
 import com.ubcsolar.common.GeoCoord;
+import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LogType;
+import com.ubcsolar.common.SimFrame;
+import com.ubcsolar.common.SimulationReport;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.exception.NoCarStatusException;
 import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.exception.NoLocationReportedException;
+import com.ubcsolar.notification.NewSimulationReportNotification;
+import com.ubcsolar.notification.Notification;
 
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -40,13 +46,15 @@ import java.util.Map;
 import java.awt.event.ActionEvent;
 import java.awt.Insets;
 
-public class SimulationAdvancedWindow extends JFrame {
+public class SimulationAdvancedWindow extends JFrame implements Listener{
 
+	private static final String CHART_TITLE = "Sim Results";
 	private JPanel contentPane;
 	private GlobalController mySession;
 	private JFreeChart simResults;
 	private final String X_AXIS_LABEL = "Distance (km)";
 	private final String Y_AXIS_LABEL = "speed (km/h)";
+	private ChartPanel chartFrame;
 	
 	/**
 	 * Launch the application.
@@ -72,6 +80,7 @@ public class SimulationAdvancedWindow extends JFrame {
 	 * @param mySession 
 	 */
 	public SimulationAdvancedWindow(GlobalController mySession) {
+		
 		this.mySession = mySession;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 400);
@@ -123,27 +132,30 @@ public class SimulationAdvancedWindow extends JFrame {
 		contentPane.add(btnNewSimulation, gbc_btnNewSimulation);
 		
 		setDefaultChart();
-		ChartPanel displaySimPane = new ChartPanel(simResults);
+		this.chartFrame = new ChartPanel(simResults);
 		GridBagConstraints gbc_panel = new GridBagConstraints();
 		gbc_panel.fill = GridBagConstraints.BOTH;
 		gbc_panel.gridx = 0;
 		gbc_panel.gridy = 1;
-		contentPane.add(displaySimPane, gbc_panel);
+		contentPane.add(chartFrame, gbc_panel);
 		
 		setTitleAndLogo();
+		this.register();
 		}
 		
 		private void setDefaultChart() {
 			XYDataset ds = createBlankDataset();
 			this.simResults = 
 					ChartFactory.createXYLineChart(
-							"Height Chart",
+							CHART_TITLE,
 							X_AXIS_LABEL,
 							Y_AXIS_LABEL, 
 							ds,
 							PlotOrientation.VERTICAL, true, true, false);
 		
-	}
+		}
+		
+		
 		
 		/**
 		 * Makes an empty dataset for an empty chart. 
@@ -159,6 +171,59 @@ public class SimulationAdvancedWindow extends JFrame {
 		private void setTitleAndLogo(){
 			this.setIconImage(mySession.iconImage.getImage());
 			this.setTitle("Simulation");
+		}
+		@Override
+		public void notify(Notification n) {
+			if(n.getClass() == NewSimulationReportNotification.class){
+				NewSimulationReportNotification test = (NewSimulationReportNotification) n;
+				updateChart(test.getSimReport());
+			}
+			
+		}
+		
+		
+		private void updateChart(SimulationReport simReport) {
+			this.contentPane.remove(this.chartFrame);
+			DefaultXYDataset dds = new DefaultXYDataset();
+			double[][] data = new double[2][simReport.getSimFrames().size()];
+			//[0] is distance, [1] is speed
+			data[0][0] = 0;
+			data[1][0] = simReport.getSimFrames().get(0).getCarStatus().getSpeed();
+			for(int i = 1; i<simReport.getSimFrames().size(); i++){
+				SimFrame temp = simReport.getSimFrames().get(i);
+				GeoCoord lastPosition = simReport.getSimFrames().get(i-1).getGPSReport().getLocation();
+				GeoCoord thisPosition = temp.getGPSReport().getLocation();
+				data[0][i] = lastPosition.calculateDistance(thisPosition, DistanceUnit.KILOMETERS);
+				data[1][i] = temp.getCarStatus().getSpeed();
+			}
+			
+			dds.addSeries("Sim Results", data);
+			
+			this.simResults = 
+					ChartFactory.createXYLineChart(
+							CHART_TITLE,
+							X_AXIS_LABEL,
+							Y_AXIS_LABEL, 
+							dds,
+							PlotOrientation.VERTICAL, true, true, false);
+			
+			this.chartFrame= new ChartPanel(this.simResults);
+			GridBagConstraints gbc_panel = new GridBagConstraints();
+			gbc_panel.fill = GridBagConstraints.BOTH;
+			gbc_panel.gridx = 0;
+			gbc_panel.gridy = 1;
+			contentPane.add(chartFrame,gbc_panel); //this is terrible, should not be doing it here. 
+			contentPane.repaint();
+			contentPane.validate();
+			chartFrame.repaint();
+			chartFrame.validate();
+			this.repaint();
+			this.validate();
+			
+		}
+		@Override
+		public void register() {
+			mySession.register(this, NewSimulationReportNotification.class);
 		}
 
 }
