@@ -297,6 +297,7 @@ public class CarTelemPacketWindow extends JFrame {
 	
 	private void handleOkClick(){
 		
+		//Get all the text from the text fields
 		String longval = this.txtSpeed.getText();
 		String nextval = this.txttotalcellvolt.getText();
 		String TempBms = this.txtBms.getText();
@@ -307,15 +308,93 @@ public class CarTelemPacketWindow extends JFrame {
 		String TempPack3 = this.txtPack3.getText();
 		
 		HashMap<String, Integer> temperatures = new HashMap<String, Integer>();
-		temperatures.put("bms", Integer.parseInt(TempBms));
-		temperatures.put("motor", Integer.parseInt(TempMotor));
-		temperatures.put("pack0", Integer.parseInt(TempPack0));
-		temperatures.put("pack1", Integer.parseInt(TempPack1));
-		temperatures.put("pack2", Integer.parseInt(TempPack2));
-		temperatures.put("pack3", Integer.parseInt(TempPack3));
-		double speedget = Double.parseDouble(longval);
-		int totalVoltage = Integer.parseInt(nextval);
-		int stateOfCharge= Integer.parseInt(this.txtCharge.getText()); // TODO
+		int BMSTemp;
+		try{
+			BMSTemp= Integer.parseInt(TempBms);
+		}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("BMS temperature formatted incorrectly");
+			return;
+		}
+		
+		int MOTORTemp;
+		try{
+			MOTORTemp= Integer.parseInt(TempMotor);
+		}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Motor temperature formatted incorrectly");
+			return;
+		}
+		
+		int Temp0;
+		try{
+			Temp0= Integer.parseInt(TempPack0);
+		}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Pack 0 temperature formatted incorrectly");
+			return;
+		}
+		
+		int Temp1;
+		try{
+			Temp1= Integer.parseInt(TempPack1);
+		}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Pack 1 temperature formatted incorrectly");
+			return;
+		}
+		
+		int Temp2;
+		try{
+			Temp2= Integer.parseInt(TempPack2);
+		}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Pack 2 temperature formatted incorrectly");
+			return;
+		}
+		
+		int Temp3;
+		try{
+			Temp3= Integer.parseInt(TempPack3);
+		}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Pack 3 temperature formatted incorrectly");
+			return;
+		}
+		
+		temperatures.put("bms", BMSTemp);
+		temperatures.put("motor", MOTORTemp);
+		temperatures.put("pack0", Temp0);
+		temperatures.put("pack1", Temp1);
+		temperatures.put("pack2", Temp2);
+		temperatures.put("pack3", Temp3);
+		
+		double speedget;
+		try{
+			speedget= Double.parseDouble(longval);
+		}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Speed formatted incorrectly");
+			return;
+		}
+		
+		int totalVoltage;
+		try{
+			totalVoltage= Integer.parseInt(nextval);
+		}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Total voltage formatted incorrectly");
+			return;
+		}
+		
+		int stateOfCharge;
+		try{ 
+			stateOfCharge = Integer.parseInt(this.txtCharge.getText()); // TODO
+		}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("State of charge formatted incorrectly");
+			return;
+		}
 		
 		HashMap<Integer,ArrayList<Float>> cellvoltages = new HashMap<Integer,ArrayList<Float>>();
 		for(int i = 0; i<4; i++){ //Current number of cells coming in pack is 4. Will probably have to adjust that.
