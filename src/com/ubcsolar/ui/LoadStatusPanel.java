@@ -49,13 +49,13 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	private Component horizontalGlue_3;
 	private Component horizontalGlue_4;
 	private DateFormat labelTimeFormat = new SimpleDateFormat("HH:mm:ss"); //the format for the times on the labels.
-	private final String TAFTITLE = "Taf: ";
-	private final String FORECASTTITLE = "Forecast: ";
+	//private final String TAFTITLE = "Taf: ";
+	private final String FORECASTTITLE = "| Fc: ";
 	private final String MAPLOADED = "Map: ";
-	private final String CARLOADED = "Car: ";
-	private final String LOCATIONREPORT = "Location Report: ";
-	private final String TELEMDATA = "TelemData: ";
-	private final String SIMULATION = "Sim: ";
+	private final String CARLOADED = "| Car: ";
+	private final String LOCATIONREPORT = "| LocationReprt: ";
+	private final String TELEMDATA = "| TelemData: ";
+	private final String SIMULATION = "| Sim: ";
 	
 	/**
 	 * constructor
@@ -99,7 +99,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		horizontalGlue_4 = Box.createHorizontalGlue();
 		add(horizontalGlue_4);
 		
-		lblDatabase = new JLabel("Database: unknown");
+		lblDatabase = new JLabel("| Database: unknown");
 		add(lblDatabase);
 		
 		lblTelemdata = new JLabel(TELEMDATA);
@@ -155,7 +155,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		this.lblDatabase.setText("Database: DISCONECTED@" + labelTimeFormat.format(time)); 
 		}
 		else{
-			this.lblDatabase.setText("Database: " + databaseName + "@" + labelTimeFormat.format(time));
+			this.lblDatabase.setText("| Database: " + databaseName + "@" + labelTimeFormat.format(time));
 		}
 	}
 	
@@ -169,7 +169,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 			updateCarLabel(((NewCarLoadedNotification) n).getNameOfCar()); //to update the car label
 		}
 		else if(n.getClass() == NewForecastReport.class){
-			updateForcastlbl("Downloaded @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
+			updateForcastlbl("Dwnlded @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
 		}
 		/*else if(n.getClass() == NewMetarReportLoadedNotification.class){
 			updateTafLabel("" + GlobalValues.hourMinSec.format(n.getTimeCreated()));
