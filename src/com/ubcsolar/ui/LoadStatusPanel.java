@@ -21,6 +21,7 @@ import com.ubcsolar.notification.NewForecastReport;
 import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.NewMetarReportLoadedNotification;
+import com.ubcsolar.notification.NewSimulationReportNotification;
 import com.ubcsolar.notification.NewTafReportLoadedNotification;
 import com.ubcsolar.notification.Notification;
 
@@ -54,6 +55,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	private final String CARLOADED = "Car: ";
 	private final String LOCATIONREPORT = "Location Report: ";
 	private final String TELEMDATA = "TelemData: ";
+	private final String SIMULATION = "Sim: ";
 	
 	/**
 	 * constructor
@@ -85,7 +87,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		horizontalGlue_2 = Box.createHorizontalGlue();
 		add(horizontalGlue_2);
 		
-		lblSim = new JLabel("Sim: Has not run");
+		lblSim = new JLabel(SIMULATION);
 		add(lblSim);
 		
 		horizontalGlue_3 = Box.createHorizontalGlue();
@@ -117,6 +119,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		//updateTafLabel("none");
 		this.updateLocationLabel("none");
 		this.updateTelemLabel("none");
+		updateSimulation("no sim has run");
 		updateMapLabel(mySession.getMapController().getLoadedMapName());
 		updateCarLabel(mySession.getMyCarController().getLoadedCarName());
 		if(mySession.getMyDataBaseController() != null){
@@ -166,7 +169,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 			updateCarLabel(((NewCarLoadedNotification) n).getNameOfCar()); //to update the car label
 		}
 		else if(n.getClass() == NewForecastReport.class){
-			updateForcastlbl("Last downloaded " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
+			updateForcastlbl("Downloaded @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
 		}
 		/*else if(n.getClass() == NewMetarReportLoadedNotification.class){
 			updateTafLabel("" + GlobalValues.hourMinSec.format(n.getTimeCreated()));
@@ -178,12 +181,15 @@ public class LoadStatusPanel extends JPanel implements Listener {
 			this.updateDatabaseLabel(((DatabaseDisconnectedOrClosed) n).getName(), true, n.getTimeCreated());
 		}
 		else if(n.getClass() == CarUpdateNotification.class){
-			this.updateTelemLabel("Last rcv'd " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
+			this.updateTelemLabel("rcv'd @" + GlobalValues.hourMinSec.format(n.getTimeCreated()));
 		}
 		else if(n.getClass() == NewLocationReportNotification.class){
-			this.updateLocationLabel("Last rcv'd " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
+			this.updateLocationLabel("rcv'd @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
 		}
 		
+		else if(n.getClass() == NewSimulationReportNotification.class){
+			this.updateSimulation("Started @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
+		}
 		/*//TODO implement these
 		else if(n.getClass() == NewWeatherLoadedNotification.class){ //to update the weather label
 			updateWeatherLabel(n.getNameOfWeather());
@@ -213,6 +219,10 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	private void updateTelemLabel(String string){
 		lblTelemdata.setText(TELEMDATA + string);
 	}
+	
+	private void updateSimulation(String string){
+		lblSim.setText(SIMULATION + string);
+	}
 	@Override
 	public void register() {
 		if(mySession != null){
@@ -225,6 +235,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		mySession.register(this, DatabaseDisconnectedOrClosed.class);
 		mySession.register(this,  CarUpdateNotification.class);
 		mySession.register(this, NewLocationReportNotification.class);
+		mySession.register(this, NewSimulationReportNotification.class);
 		}
 		//mySession.register(this, SimDonwRunningNotificaiton.class); //TODO implement when I get there. 
 		//mySession.register(this,  NewWeatherLoadedNotification.class); //TODO implement when this gets created
