@@ -231,7 +231,17 @@ public class CustomLocationAddWindow extends JFrame {
 			this.handleError("time formatted incorrectly");
 			return;
 		}
-		LocationReport toSend = new LocationReport(temp, this.txtCarName.getText(), this.txtSource.getText(), time);
+		String carName = this.txtCarName.getText().replaceAll("\\s", "");
+		if(carName.equals("")){
+			this.handleError("invalid car name");
+			return;
+		}
+		String sourceName = this.txtSource.getText().replaceAll("\\s", "");
+		if(sourceName.equals("")){
+			this.handleError("invalid source name");
+			return;
+		}
+		LocationReport toSend = new LocationReport(temp, carName, sourceName, time);
 		mySession.getMapController().recordNewCarLocation(toSend);
 		
 		this.closeWindow();
