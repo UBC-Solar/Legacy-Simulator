@@ -231,13 +231,15 @@ public class CustomLocationAddWindow extends JFrame {
 			this.handleError("time formatted incorrectly");
 			return;
 		}
-		String carName = this.txtCarName.getText().replaceAll("\\s", "");
-		if(carName.equals("")){
+		String carName = this.txtCarName.getText();
+		String carNameNoSpaces = carName.replaceAll("\\s", "");
+		if(carNameNoSpaces.equals("")){
 			this.handleError("invalid car name");
 			return;
 		}
-		String sourceName = this.txtSource.getText().replaceAll("\\s", "");
-		if(sourceName.equals("")){
+		String sourceName = this.txtSource.getText();
+		String sourceNameNoSpaces = sourceName.replaceAll("\\s", "");
+		if(sourceNameNoSpaces.equals("")){
 			this.handleError("invalid source name");
 			return;
 		}
