@@ -78,12 +78,8 @@ public class SimEngine {
 		
 		double speedToDrive;
 		if(requestedSpeed == null){
-			if(lastCarStatus.getSpeed() > 1){
-				speedToDrive = lastCarStatus.getSpeed() + new Random().nextInt(10)-5; //'always drive the same speed' is simple, but dumb. 
-			}
-			else{
-				speedToDrive = calculateBestSpeed(); //stubMethod. Also this is a greedy algo. 
-			}
+			speedToDrive = calculateBestSpeed(lastCarStatus.getSpeed()); //stubMethod. Also this is a greedy algo.
+			//obviously need to add more arguments ^^
 		}
 		else{
 			speedToDrive = requestedSpeed;
@@ -152,13 +148,13 @@ public class SimEngine {
 
 	/**
 	 * May generate a value more than 100 or less than 0, but keeps it somewhere within that.
-	 * Max change is +/- 10% from last.  
+	 * Max change is +/- 2% from last.  
 	 * @param lastSoC
 	 * @return
 	 */
 	private int generateRandomSoC(int lastSoC) {
 		Random rng = new Random();
-		int change = rng.nextInt(20); //up or down max 10% in a frame.
+		int change = rng.nextInt(5); //up or down max 2% in a frame.
 		if(lastSoC<=0){
 			return lastSoC + change;
 		}
@@ -166,7 +162,7 @@ public class SimEngine {
 			return lastSoC-change;
 		}
 		else{
-			return lastSoC + change - 10; 
+			return lastSoC + change - 2; 
 		}
 	}
 
@@ -212,9 +208,28 @@ public class SimEngine {
 	}
 
 
-	private double calculateBestSpeed() {
-		return 22.0; // Chosen by fair dice roll, guaranteed to be random. https://xkcd.com/221/ 
-		//obviously need to put a real algo here... 
+	private double calculateBestSpeed(double lastCarSpeed) {
+		//return 22.0; // Chosen by fair dice roll, guaranteed to be random. https://xkcd.com/221/ 
+		
+		
+		
+		Random rng = new Random();
+		if(rng.nextInt(4)<=2){
+			return lastCarSpeed;
+		}
+		int deltaV = rng.nextInt(7);
+		double speedToReturn = lastCarSpeed;
+		if((lastCarSpeed-deltaV)<0){
+			speedToReturn = lastCarSpeed + deltaV; //don't want negative speed
+		}
+		else if(lastCarSpeed + deltaV>110){//max highway speed
+			speedToReturn = lastCarSpeed - deltaV;
+		}
+		else{
+			speedToReturn += (deltaV - 3); //to generate some negatives. 
+		}
+		
+		return speedToReturn;
 		//TODO put real algo here. 
 	}
 
