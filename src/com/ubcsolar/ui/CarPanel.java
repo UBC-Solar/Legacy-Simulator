@@ -169,7 +169,7 @@ public class CarPanel extends JPanel implements Listener {
 		containterPanelForUpdateLabels.add(temperatureDispPanel, gbc_temperatureDispPanel);
 		temperatureDispPanel.setLayout(new BoxLayout(temperatureDispPanel, BoxLayout.Y_AXIS));
 		
-		lblTempuratures = new JLabel("Temps");
+		lblTempuratures = new JLabel("Temps (\u00B0C)");
 		lblTempuratures.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblTempuratures.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTempuratures.setAlignmentX(Component.CENTER_ALIGNMENT);

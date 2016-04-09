@@ -65,7 +65,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		getContentPane().setLayout(gridBagLayout);
 		
-		JLabel lblStateOfCharge = new JLabel("State Of Charge:");
+		JLabel lblStateOfCharge = new JLabel("State Of Charge (%):");
 		GridBagConstraints gbc_lblStateOfCharge = new GridBagConstraints();
 		gbc_lblStateOfCharge.anchor = GridBagConstraints.EAST;
 		gbc_lblStateOfCharge.insets = new Insets(0, 0, 5, 5);
@@ -84,7 +84,7 @@ public class CarTelemPacketWindow extends JFrame {
 		getContentPane().add(txtCharge, gbc_textField_4);
 		txtCharge.setColumns(10);
 		
-		JLabel lblSpeed = new JLabel("Speed:");
+		JLabel lblSpeed = new JLabel("Speed (KM/H):");
 		GridBagConstraints gbc_lblSpeed = new GridBagConstraints();
 		gbc_lblSpeed.anchor = GridBagConstraints.EAST;
 		gbc_lblSpeed.insets = new Insets(0, 0, 5, 5);
@@ -103,7 +103,7 @@ public class CarTelemPacketWindow extends JFrame {
 		getContentPane().add(txtSpeed, gbc_txtCarName);
 		txtSpeed.setColumns(10);
 		
-		JLabel lblnewTotalVoltage = new JLabel("Total Voltage:");
+		JLabel lblnewTotalVoltage = new JLabel("Total Voltage (V):");
 		GridBagConstraints gbc_lblnewTotalVoltage = new GridBagConstraints();
 		gbc_lblnewTotalVoltage.anchor = GridBagConstraints.EAST;
 		gbc_lblnewTotalVoltage.insets = new Insets(0, 0, 5, 5);
@@ -130,7 +130,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_txtLongitude.gridy = 3;
 		getContentPane().add(txttotalcellvolt, gbc_txtLongitude);
 		
-		JLabel lblTemperatures = new JLabel("Temperatures");
+		JLabel lblTemperatures = new JLabel("Temperatures (\u00B0C)");
 		lblTemperatures.setFont(new Font("Tahoma", Font.ITALIC, 11));
 		GridBagConstraints gbc_lblTemperatures = new GridBagConstraints();
 		gbc_lblTemperatures.insets = new Insets(0, 0, 5, 5);
