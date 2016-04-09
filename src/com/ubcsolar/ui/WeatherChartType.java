@@ -5,5 +5,5 @@
 package com.ubcsolar.ui;
 
 public enum WeatherChartType {
-	TEMPERATURE, CLOUD_COVER, PRECIPITATION, HUMIDITY
+	TEMPERATURE, CLOUD_COVER, PRECIPITATION, WIND_SPEED
 }
