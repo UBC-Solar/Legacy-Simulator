@@ -223,7 +223,16 @@ public class CustomLocationAddWindow extends JFrame {
 			this.handleError("Elevation formatted incorrectly");
 			return;
 		}
-		GeoCoord temp = new GeoCoord(latitude, longitude, elevation);
+		
+		GeoCoord temp;
+		try{
+			temp = new GeoCoord(latitude, longitude, elevation);
+			
+			}
+		catch(java.lang.IllegalArgumentException a){
+			this.handleError(a.getMessage());
+			return;
+		}
 		double time;
 		try {
 			time = this.standardTimeFormat.parse(this.timeField.getText()).getTime();
