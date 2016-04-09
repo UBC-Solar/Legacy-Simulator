@@ -54,7 +54,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private JFreeChart simResults;
 	private final String X_AXIS_LABEL = "Distance (km)";
 	private final String Y_AXIS_LABEL = "speed (km/h)";
-	private ChartPanel chartFrame;
+	private JPanel buttonPanel;
+	private ChartPanel mainDisplay;
 	
 	/**
 	 * Launch the application.
@@ -96,53 +97,86 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		GridBagLayout gbl_contentPane = new GridBagLayout();
-		gbl_contentPane.columnWidths = new int[]{0, 0};
-		gbl_contentPane.rowHeights = new int[]{0, 0, 0};
-		gbl_contentPane.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
-		contentPane.setLayout(gbl_contentPane);
+		contentPane.setLayout(new BorderLayout(0, 0));
+		
+		buttonPanel = new JPanel();
+		contentPane.add(buttonPanel, BorderLayout.NORTH);
 		
 		JButton btnNewSimulation = new JButton("New Simulation");
 		btnNewSimulation.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					mySession.getMySimController().runSimulation(new HashMap<GeoCoord,Double>());
-				} catch (NoForecastReportException e1) {
-					handleError("No Forcecast Loaded yet");
-					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to No Forecast loaded");
-				} catch (NoLoadedRouteException e1) {
-					handleError("No Route Loaded yet");
-					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to run a sim with no route loaded");
-				} catch (NoLocationReportedException e1) {
-					handleError("No Location Reported yet");
-					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to run a sim with no location reported yet");
-				} catch (NoCarStatusException e1) {
-					handleError("No Car Status Reported yet");
-					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to run a sim with no car status reported yet");
-				}
+			public void actionPerformed(ActionEvent arg0) {
+				runSimultion();
 			}
 		});
+		buttonPanel.add(btnNewSimulation);
 		
-		
-		GridBagConstraints gbc_btnNewSimulation = new GridBagConstraints();
-		gbc_btnNewSimulation.insets = new Insets(0, 0, 5, 0);
-		gbc_btnNewSimulation.gridx = 0;
-		gbc_btnNewSimulation.gridy = 0;
-		contentPane.add(btnNewSimulation, gbc_btnNewSimulation);
+		JPanel chartHoldingPanel = new JPanel();
+		contentPane.add(chartHoldingPanel, BorderLayout.CENTER);
+		GridBagLayout gbl_chartHoldingPanel = new GridBagLayout();
+		gbl_chartHoldingPanel.columnWidths = new int[]{0, 0, 0};
+		gbl_chartHoldingPanel.rowHeights = new int[]{0, 0, 0};
+		gbl_chartHoldingPanel.columnWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
+		gbl_chartHoldingPanel.rowWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
+		chartHoldingPanel.setLayout(gbl_chartHoldingPanel);
 		
 		setDefaultChart();
-		this.chartFrame = new ChartPanel(simResults);
+		mainDisplay = new ChartPanel(simResults);
+		GridBagConstraints gbc_mainDisplay = new GridBagConstraints();
+		gbc_mainDisplay.weighty = 2.0;
+		gbc_mainDisplay.weightx = 2.0;
+		gbc_mainDisplay.insets = new Insets(0, 0, 5, 5);
+		gbc_mainDisplay.fill = GridBagConstraints.BOTH;
+		gbc_mainDisplay.gridx = 0;
+		gbc_mainDisplay.gridy = 0;
+		chartHoldingPanel.add(mainDisplay, gbc_mainDisplay);
+		
+		JPanel panel_1 = new JPanel();
+		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
+		gbc_panel_1.insets = new Insets(0, 0, 5, 0);
+		gbc_panel_1.fill = GridBagConstraints.BOTH;
+		gbc_panel_1.gridx = 1;
+		gbc_panel_1.gridy = 0;
+		chartHoldingPanel.add(panel_1, gbc_panel_1);
+		
+		JPanel panel_2 = new JPanel();
+		GridBagConstraints gbc_panel_2 = new GridBagConstraints();
+		gbc_panel_2.insets = new Insets(0, 0, 0, 5);
+		gbc_panel_2.fill = GridBagConstraints.BOTH;
+		gbc_panel_2.gridx = 0;
+		gbc_panel_2.gridy = 1;
+		chartHoldingPanel.add(panel_2, gbc_panel_2);
+		
+		JPanel panel = new JPanel();
 		GridBagConstraints gbc_panel = new GridBagConstraints();
 		gbc_panel.fill = GridBagConstraints.BOTH;
-		gbc_panel.gridx = 0;
+		gbc_panel.gridx = 1;
 		gbc_panel.gridy = 1;
-		contentPane.add(chartFrame, gbc_panel);
+		chartHoldingPanel.add(panel, gbc_panel);
+		
+		setDefaultChart();
 		
 		setTitleAndLogo();
 		this.register();
 		}
 		
+		protected void runSimultion() {
+		
+		try {
+			mySession.getMySimController().runSimulation(new HashMap<GeoCoord,Double>());
+		} catch (NoForecastReportException e) {
+			this.handleError("No Forcecasts Loaded");
+			return;
+		} catch (NoLoadedRouteException e) {
+			this.handleError("No Route Loaded");
+			return;
+		} catch (NoLocationReportedException e) {
+			this.handleError("No Location Reported Yet");
+			return;
+		} catch (NoCarStatusException e) {
+			this.handleError("No Car Status Reported Yet");
+			return;
+		}
+	}
 		private void setDefaultChart() {
 			XYDataset ds = createBlankDataset();
 			this.simResults = 
@@ -208,11 +242,11 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 							dds,
 							PlotOrientation.VERTICAL, true, true, false);
 			
-			this.chartFrame.setChart(this.simResults);
+			this.mainDisplay.setChart(this.simResults);
 			contentPane.repaint();
 			contentPane.validate();
-			chartFrame.repaint();
-			chartFrame.validate();
+			mainDisplay.repaint();
+			mainDisplay.validate();
 			this.repaint();
 			this.validate();
 			
