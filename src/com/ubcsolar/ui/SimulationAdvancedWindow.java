@@ -42,6 +42,7 @@ import javax.swing.JButton;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.awt.event.ActionEvent;
 import java.awt.Insets;
@@ -218,21 +219,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		
 		private void updateChart(SimulationReport simReport) {
 			DefaultXYDataset dds = new DefaultXYDataset();
-			double[][] data = new double[2][simReport.getSimFrames().size()];
-			//[0] is distance, [1] is speed
-			data[0][0] = 0;
-			data[1][0] = simReport.getSimFrames().get(0).getCarStatus().getSpeed();
-			double runningTotalDistance = 0;
-			for(int i = 1; i<simReport.getSimFrames().size(); i++){
-				SimFrame temp = simReport.getSimFrames().get(i);
-				GeoCoord lastPosition = simReport.getSimFrames().get(i-1).getGPSReport().getLocation();
-				GeoCoord thisPosition = temp.getGPSReport().getLocation();
-				runningTotalDistance += lastPosition.calculateDistance(thisPosition, DistanceUnit.KILOMETERS);
-				data[0][i] = runningTotalDistance;
-				data[1][i] = temp.getCarStatus().getSpeed();
-			}
+			double[][] speedSeries = generateSpeedSeries(simReport.getSimFrames());
+			dds.addSeries("Speed", speedSeries);
 			
-			dds.addSeries("Sim Results", data);
+			
 			
 			this.simResults = 
 					ChartFactory.createXYLineChart(
@@ -251,6 +241,25 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			this.validate();
 			
 		}
+		private double[][] generateSpeedSeries(List<SimFrame> simFrames) {
+			double[][] toReturn= new double[2][simFrames.size()];
+			//[0] is distance, [1] is speed
+			toReturn[0][0] = 0;
+			toReturn[1][0] = simFrames.get(0).getCarStatus().getSpeed();
+			double runningTotalDistance = 0;
+			for(int i = 1; i<simFrames.size(); i++){
+				SimFrame temp = simFrames.get(i);
+				GeoCoord lastPosition = simFrames.get(i-1).getGPSReport().getLocation();
+				GeoCoord thisPosition = temp.getGPSReport().getLocation();
+				runningTotalDistance += lastPosition.calculateDistance(thisPosition, DistanceUnit.KILOMETERS);
+				toReturn[0][i] = runningTotalDistance;
+				toReturn[1][i] = temp.getCarStatus().getSpeed();
+			}
+			
+			return toReturn;
+		}
+		
+		
 		@Override
 		public void register() {
 			mySession.register(this, NewSimulationReportNotification.class);
