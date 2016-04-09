@@ -58,6 +58,10 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private JFreeChart precipitationChartJFree;
 	private ChartPanel windSpeedChart;
 	private JFreeChart windSpeedChartJFree;
+	private JPanel windDirectionPanel;
+	private JPanel panel;
+	private JPanel panel_1;
+	private JPanel panel_2;
 
 	/**
 	 * Launch the application.
@@ -115,14 +119,15 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[]{0, 0, 0};
-		gbl_contentPane.rowHeights = new int[]{0, 0, 0};
+		gbl_contentPane.rowHeights = new int[]{0, 0, 0, 0, 0};
 		gbl_contentPane.columnWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
+		gbl_contentPane.rowWeights = new double[]{1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 				
 		buildTemperatureChart(createBlankDataset());
 		temperatureChart = new ChartPanel(temperatureChartJFree);
 		GridBagConstraints gbc_temperatureChart = new GridBagConstraints();
+		gbc_temperatureChart.weighty = 10.0;
 		gbc_temperatureChart.insets = new Insets(0, 0, 5, 5);
 		gbc_temperatureChart.fill = GridBagConstraints.BOTH;
 		gbc_temperatureChart.gridx = 0;
@@ -141,7 +146,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		buildPrecipitationChart(createBlankDataset());
 		precipitationChart = new ChartPanel(precipitationChartJFree);
 		GridBagConstraints gbc_precipitationChart = new GridBagConstraints();
-		gbc_precipitationChart.insets = new Insets(0, 0, 0, 5);
+		gbc_precipitationChart.weighty = 10.0;
+		gbc_precipitationChart.insets = new Insets(0, 0, 5, 5);
 		gbc_precipitationChart.fill = GridBagConstraints.BOTH;
 		gbc_precipitationChart.gridx = 0;
 		gbc_precipitationChart.gridy = 1;
@@ -150,10 +156,42 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		buildWindSpeedChart(createBlankDataset());
 		windSpeedChart = new ChartPanel(windSpeedChartJFree);
 		GridBagConstraints gbc_windSpeedChart = new GridBagConstraints();
+		gbc_windSpeedChart.insets = new Insets(0, 0, 5, 0);
 		gbc_windSpeedChart.fill = GridBagConstraints.BOTH;
 		gbc_windSpeedChart.gridx = 1;
 		gbc_windSpeedChart.gridy = 1;
 		contentPane.add(windSpeedChart, gbc_windSpeedChart);
+		
+		panel_1 = new JPanel();
+		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
+		gbc_panel_1.insets = new Insets(0, 0, 5, 5);
+		gbc_panel_1.fill = GridBagConstraints.BOTH;
+		gbc_panel_1.gridx = 0;
+		gbc_panel_1.gridy = 2;
+		contentPane.add(panel_1, gbc_panel_1);
+		
+		windDirectionPanel = new JPanel();
+		GridBagConstraints gbc_windDirectionPanel = new GridBagConstraints();
+		gbc_windDirectionPanel.insets = new Insets(0, 0, 5, 0);
+		gbc_windDirectionPanel.fill = GridBagConstraints.BOTH;
+		gbc_windDirectionPanel.gridx = 1;
+		gbc_windDirectionPanel.gridy = 2;
+		contentPane.add(windDirectionPanel, gbc_windDirectionPanel);
+		
+		panel_2 = new JPanel();
+		GridBagConstraints gbc_panel_2 = new GridBagConstraints();
+		gbc_panel_2.insets = new Insets(0, 0, 0, 5);
+		gbc_panel_2.fill = GridBagConstraints.BOTH;
+		gbc_panel_2.gridx = 0;
+		gbc_panel_2.gridy = 3;
+		contentPane.add(panel_2, gbc_panel_2);
+		
+		panel = new JPanel();
+		GridBagConstraints gbc_panel = new GridBagConstraints();
+		gbc_panel.fill = GridBagConstraints.BOTH;
+		gbc_panel.gridx = 1;
+		gbc_panel.gridy = 3;
+		contentPane.add(panel, gbc_panel);
 		
 		
 		setTitleAndLogo();
