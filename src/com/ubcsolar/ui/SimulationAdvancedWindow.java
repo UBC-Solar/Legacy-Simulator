@@ -221,8 +221,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			DefaultXYDataset dds = new DefaultXYDataset();
 			double[][] speedSeries = generateSpeedSeries(simReport.getSimFrames());
 			dds.addSeries("Speed", speedSeries);
-			
-			
+			double[][] stateOfChargeSeries = generateStateOfChargeSeries(simReport.getSimFrames());
+			dds.addSeries("StateOfCharge", stateOfChargeSeries);
 			
 			this.simResults = 
 					ChartFactory.createXYLineChart(
@@ -240,6 +240,24 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			this.repaint();
 			this.validate();
 			
+		}
+		private double[][] generateStateOfChargeSeries(List<SimFrame> simFrames) {
+			double[][] toReturn= new double[2][simFrames.size()];
+			//[0] is distance, [1] is speed
+			toReturn[0][0] = 0;
+			toReturn[1][0] = simFrames.get(0).getCarStatus().getStateOfCharge();
+			double runningTotalDistance = 0;
+			for(int i = 1; i<simFrames.size(); i++){
+				SimFrame temp = simFrames.get(i);
+				GeoCoord lastPosition = simFrames.get(i-1).getGPSReport().getLocation();
+				GeoCoord thisPosition = temp.getGPSReport().getLocation();
+				runningTotalDistance += lastPosition.calculateDistance(thisPosition, DistanceUnit.KILOMETERS);
+				toReturn[0][i] = runningTotalDistance;
+				toReturn[1][i] = temp.getCarStatus().getStateOfCharge();
+				System.out.println(temp.getCarStatus().getStateOfCharge());
+			}
+			
+			return toReturn;
 		}
 		private double[][] generateSpeedSeries(List<SimFrame> simFrames) {
 			double[][] toReturn= new double[2][simFrames.size()];
