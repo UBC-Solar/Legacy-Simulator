@@ -10,21 +10,45 @@ private final double elevation; //in meters
 private final double timeCreated;
 
 public GeoCoord(double lat, double lon, double elevationInMeters){
+	
+	if(isLatValid(lat)){     // use lat if it passes
 	this.lat = lat;
+	}
+	else{
+		throw new IllegalArgumentException("Illegal latitude");
+	}
+	if(isLongValid(lon)){
 	this.lon = lon;
+	}
+	else{
+		throw new IllegalArgumentException("Illegal longitude");
+	}
 	this.elevation = elevationInMeters;
 	this.timeCreated = System.currentTimeMillis();
 	
-	//checkvalues();
 }
-/*
-private void checkvalues() {
-	// TODO Auto-generated method stub
-	if (true){ //edit this "true" value for actual check value
-		throw new IllegalArgumentException("Invalid Coordinates.");
+
+
+//checks-------------------------------------------------------------------------
+private boolean isLatValid(double lat2) { //check to see if latitude is ok to use
+	if (lat2<-90 || lat2>90){
+	return false;
+	}
+	else{
+		return true;
 	}
 }
-*/
+private boolean isLongValid(double lon2) {
+	if(lon2<-180 || lon2>180){
+	return false;
+	}
+	else{
+		return true;
+	}
+}
+//-------------------------------------------------------------------------------
+
+
 public GeoCoord(double lat, double lon, double elevationInMeters, double timeCreated){
 	this.lat = lat;
 	this.lon = lon;
