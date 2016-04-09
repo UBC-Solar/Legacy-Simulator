@@ -19,7 +19,10 @@ public class ForecastFactory {
 	public ArrayList<ForecastIO> getForecasts(List<GeoCoord> spots){
 		ArrayList<ForecastIO> toReturn = new ArrayList<ForecastIO>(spots.size());
 		for(GeoCoord g : spots){
-			toReturn.add(new ForecastIO("" + g.getLat(), "" + g.getLon(), ForecastIO.UNITS_SI, ForecastIO.LANG_ENGLISH, API_KEY));
+			ForecastIO forecastIOhuhyu = new ForecastIO("" + g.getLat(), "" + g.getLon(), ForecastIO.UNITS_SI, ForecastIO.LANG_ENGLISH, API_KEY);
+			toReturn.add(forecastIOhuhyu);
+			System.out.println(forecastIOhuhyu.getUrl(""+g.getLat(), ""+g.getLon()));
+		
 		}
 		System.out.println("Factory - Spots in: " + spots.size() + " forecasts: " + toReturn.size());
 		return toReturn;
