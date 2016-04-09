@@ -55,6 +55,10 @@ import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
 import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
 import org.openstreetmap.gui.jmapviewer.interfaces.MapPolygon;
+import javax.swing.SwingConstants;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 
 public class GUImain implements Listener{
 
@@ -353,9 +357,50 @@ public class GUImain implements Listener{
 		simPanel = new JPanel();
 		mainFrame.getContentPane().add(simPanel, "1, 7, fill, fill");
 		simPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+		simPanel.setLayout(new BorderLayout(0, 0));
 		
-		JLabel lblSim = new JLabel("Sim");
-		simPanel.add(lblSim);
+		JPanel panel = new JPanel();
+		simPanel.add(panel, BorderLayout.NORTH);
+		GridBagLayout gbl_panel = new GridBagLayout();
+		gbl_panel.columnWidths = new int[]{0, 0, 0, 0, 0};
+		gbl_panel.rowHeights = new int[]{0, 0};
+		gbl_panel.columnWeights = new double[]{1.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
+		panel.setLayout(gbl_panel);
+		
+		JPanel panel_2 = new JPanel();
+		GridBagConstraints gbc_panel_2 = new GridBagConstraints();
+		gbc_panel_2.insets = new Insets(0, 0, 0, 5);
+		gbc_panel_2.fill = GridBagConstraints.BOTH;
+		gbc_panel_2.gridx = 0;
+		gbc_panel_2.gridy = 0;
+		panel.add(panel_2, gbc_panel_2);
+		
+		JLabel lblNewLabel = new JLabel("Sim");
+		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
+		gbc_lblNewLabel.insets = new Insets(0, 0, 0, 5);
+		gbc_lblNewLabel.gridx = 1;
+		gbc_lblNewLabel.gridy = 0;
+		panel.add(lblNewLabel, gbc_lblNewLabel);
+		
+		JButton btnAdvanced_1 = new JButton("Advanced");
+		btnAdvanced_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				launchSim();
+			}
+		});
+		GridBagConstraints gbc_btnAdvanced_1 = new GridBagConstraints();
+		gbc_btnAdvanced_1.insets = new Insets(0, 0, 0, 5);
+		gbc_btnAdvanced_1.gridx = 2;
+		gbc_btnAdvanced_1.gridy = 0;
+		panel.add(btnAdvanced_1, gbc_btnAdvanced_1);
+		
+		JPanel panel_1 = new JPanel();
+		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
+		gbc_panel_1.fill = GridBagConstraints.BOTH;
+		gbc_panel_1.gridx = 3;
+		gbc_panel_1.gridy = 0;
+		panel.add(panel_1, gbc_panel_1);
 		
 		mapPanel = new JPanel();
 		mainFrame.getContentPane().add(mapPanel, "1, 9, fill, fill");
