@@ -51,13 +51,13 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private ForecastReport currentForecastReport;
 	private GeoCoord startLocation;
 	private final String X_AXIS_LABEL = "Travel Distance (km)";
-	private final int NUM_REPORTS = 4;
+	private final int NUM_LINES = 4;
 	private ChartPanel cloudCoverChart;
 	private JFreeChart cloudCoverChartJFree;
 	private ChartPanel precipitationChart;
 	private JFreeChart precipitationChartJFree;
-	private ChartPanel humidityChart;
-	private JFreeChart humidityChartJFree;
+	private ChartPanel windSpeedChart;
+	private JFreeChart windSpeedChartJFree;
 
 	/**
 	 * Launch the application.
@@ -147,16 +147,15 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		gbc_precipitationChart.gridy = 1;
 		contentPane.add(precipitationChart, gbc_precipitationChart);
 		
-		buildHumidityChart(createBlankDataset());
-		humidityChart = new ChartPanel(humidityChartJFree);
-		GridBagConstraints gbc_humidityChart = new GridBagConstraints();
-		gbc_humidityChart.fill = GridBagConstraints.BOTH;
-		gbc_humidityChart.gridx = 1;
-		gbc_humidityChart.gridy = 1;
-		contentPane.add(humidityChart, gbc_humidityChart);
+		buildWindSpeedChart(createBlankDataset());
+		windSpeedChart = new ChartPanel(windSpeedChartJFree);
+		GridBagConstraints gbc_windSpeedChart = new GridBagConstraints();
+		gbc_windSpeedChart.fill = GridBagConstraints.BOTH;
+		gbc_windSpeedChart.gridx = 1;
+		gbc_windSpeedChart.gridy = 1;
+		contentPane.add(windSpeedChart, gbc_windSpeedChart);
 		
-		temperatureChart.repaint();
-		contentPane.repaint();
+		
 		setTitleAndLogo();
 		}
 		
@@ -207,8 +206,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			cloudCoverChart.setChart(cloudCoverChartJFree);
 			buildPrecipitationChart(createChartDataset(WeatherChartType.PRECIPITATION));
 			precipitationChart.setChart(precipitationChartJFree);
-			buildHumidityChart(createChartDataset(WeatherChartType.HUMIDITY));
-			humidityChart.setChart(humidityChartJFree);
+			buildWindSpeedChart(createChartDataset(WeatherChartType.WIND_SPEED));
+			windSpeedChart.setChart(windSpeedChartJFree);
 			
 			temperatureChart.repaint();
 			temperatureChart.revalidate();
@@ -216,8 +215,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			cloudCoverChart.revalidate();
 			precipitationChart.repaint();
 			precipitationChart.revalidate();
-			humidityChart.repaint();
-			humidityChart.revalidate();
+			windSpeedChart.repaint();
+			windSpeedChart.revalidate();
 			contentPane.revalidate();
 			contentPane.repaint();
 		}
@@ -269,15 +268,15 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			precipitationChartJFree = precipitationChart;
 		}
 		
-		private void buildHumidityChart(XYDataset ds){
-			JFreeChart humidityChart = 
+		private void buildWindSpeedChart(XYDataset ds){
+			JFreeChart headwindChart = 
 					ChartFactory.createXYLineChart(
-							"Humidity",
+							"Wind Speed",
 							X_AXIS_LABEL,
-							"Humidity Percentage", 
+							"Wind Speed (km/h)", 
 							ds,
 							PlotOrientation.VERTICAL, true, true, false);
-			humidityChartJFree = humidityChart;
+			windSpeedChartJFree = headwindChart;
 		}
 		
 		private XYDataset createChartDataset(WeatherChartType chartType){
@@ -286,37 +285,55 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			}else{
 				DefaultXYDataset dds = new DefaultXYDataset();
 				List<ForecastIO> forecasts = currentForecastReport.getForecasts();
-				List<GeoCoord> points = new ArrayList<GeoCoord>();
+				List<GeoCoord> forecastPoints = new ArrayList<GeoCoord>();
+				List<GeoCoord> trailMarkers = mySession.getMapController().getAllPoints().getTrailMarkers();
 				List<FIODataBlock> hourlyForecasts = new ArrayList<FIODataBlock>();
 				for(int i = 0; i < forecasts.size(); i++){
-					points.add(new GeoCoord(forecasts.get(i).getLatitude(), 
+					forecastPoints.add(new GeoCoord(forecasts.get(i).getLatitude(), 
 							forecasts.get(i).getLongitude(), 0.0));//uses 0 for elevation cause it doesn't matter for our uses
 					hourlyForecasts.add(new FIODataBlock(forecasts.get(i).getHourly()));
 				}
 				double[] distances = new double[forecasts.size()];
+				int distanceIndex = 1;
+				int trailMarkerIndex = 1;
 				double travelDistance = 0.0;
 				distances[0] = travelDistance;
-				for(int i = 1; i < distances.length; i++){
-					travelDistance += points.get(i-1).calculateDistance(points.get(i), 
+				while(distanceIndex < distances.length && trailMarkerIndex < trailMarkers.size()){
+					travelDistance += trailMarkers.get(trailMarkerIndex-1).calculateDistance(
+							trailMarkers.get(trailMarkerIndex), DistanceUnit.KILOMETERS);
+					GeoCoord currentMarker = new GeoCoord(trailMarkers.get(trailMarkerIndex).getLat(),
+							trailMarkers.get(trailMarkerIndex).getLon(), 0.0);
+					if(currentMarker.equals(forecastPoints.get(distanceIndex))){
+						forecastPoints.set(distanceIndex, trailMarkers.get(trailMarkerIndex));
+						//updates GeoCoord of forecasts to include elevation, will make comparing
+						//GeoCoords easier when calculating headwind
+						distances[distanceIndex] = travelDistance;
+						distanceIndex++;
+					}
+					trailMarkerIndex++;
+				}
+				/*for(int i = 1; i < distances.length; i++){
+					travelDistance += forecastPoints.get(i-1).calculateDistance(forecastPoints.get(i), 
 							DistanceUnit.KILOMETERS);
 					distances[i] = travelDistance;
-				}
+				}*/
 				
 				int numHours = 0;
 				
-				while((numHours < NUM_REPORTS) && ( numHours < hourlyForecasts.size()) ){
+				while((numHours < NUM_LINES) && ( numHours < hourlyForecasts.size()) ){
 					double[][] data = new double[2][distances.length];
-					for(int i = 0; i < distances.length; i++){
+					for(int i = 0; i < hourlyForecasts.size(); i++){
 						data[0][i] = distances[i];
-						FIODataPoint currentHourForecast = hourlyForecasts.get(numHours).datapoint(i);
+						FIODataPoint currentHourForecast = hourlyForecasts.get(i).datapoint(numHours);
 						if(chartType.equals(WeatherChartType.TEMPERATURE)){
 							data[1][i] = currentHourForecast.temperature();
+							System.out.println("Hour num: " + currentHourForecast.time());
 						}else if(chartType.equals(WeatherChartType.CLOUD_COVER)){
 							data[1][i] = currentHourForecast.cloudCover();
 						}else if(chartType.equals(WeatherChartType.PRECIPITATION)){
-							data[1][i] = currentHourForecast.precipProbability();
-						}else if(chartType.equals(WeatherChartType.HUMIDITY)){
-							data[1][i] = currentHourForecast.humidity();
+							data[1][i] = currentHourForecast.precipProbability()*100;
+						}else if(chartType.equals(WeatherChartType.WIND_SPEED)){
+							data[1][i] = currentHourForecast.windSpeed();
 						}
 					}
 					dds.addSeries("Hour " + numHours, data);

@@ -65,10 +65,10 @@ public class WeatherController extends ModuleController {
 		for(GeoCoord g : currentlyLoadedRoute.getTrailMarkers()){
 			int indexOfStart = this.getIndexOfStartForecast(lastDownloadedReport.getForecasts(), g);
 			if(indexOfStart == lastDownloadedReport.getForecasts().size()-1){
-				theForecastList.add(this.interprolateForecast(currentForecasts.get(indexOfStart), null, g));
+				theForecastList.add(this.interpolateForecast(currentForecasts.get(indexOfStart), null, g));
 			}
 			else{
-			theForecastList.add(this.interprolateForecast(currentForecasts.get(indexOfStart), currentForecasts.get(indexOfStart+1),g));
+			theForecastList.add(this.interpolateForecast(currentForecasts.get(indexOfStart), currentForecasts.get(indexOfStart+1),g));
 			}
 		}
 		
@@ -79,9 +79,9 @@ public class WeatherController extends ModuleController {
 	}
 	
 	/*
-	 * Supposed to interprolate between the start forecast and next forecast. Currently just returns the closest. 
+	 * Supposed to interpolate between the start forecast and next forecast. Currently just returns the closest. 
 	 */
-	private ForecastIO interprolateForecast(ForecastIO startForecast, ForecastIO endForecast, GeoCoord currentLoc) {
+	private ForecastIO interpolateForecast(ForecastIO startForecast, ForecastIO endForecast, GeoCoord currentLoc) {
 		if(endForecast == null){
 			return startForecast;
 		}
