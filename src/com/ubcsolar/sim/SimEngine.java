@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.jfree.data.Values;
 
@@ -78,7 +79,7 @@ public class SimEngine {
 		double speedToDrive;
 		if(requestedSpeed == null){
 			if(lastCarStatus.getSpeed() > 1){
-				speedToDrive = lastCarStatus.getSpeed(); //'always drive the same speed' is simple, but dumb. 
+				speedToDrive = lastCarStatus.getSpeed() + new Random().nextInt(10)-5; //'always drive the same speed' is simple, but dumb. 
 			}
 			else{
 				speedToDrive = calculateBestSpeed(); //stubMethod. Also this is a greedy algo. 
@@ -142,10 +143,31 @@ public class SimEngine {
 		TelemDataPacket toReturn = new TelemDataPacket(speedToDrive,
 				lastCarStatus.getTotalVoltage(), 
 				lastCarStatus.getTemperatures(), 
-				lastCarStatus.getCellVoltages(), lastCarStatus.getStateOfCharge(), 
+				lastCarStatus.getCellVoltages(), generateRandomSoC(lastCarStatus.getStateOfCharge()), 
 				(distanceCovered/(speedToDrive*1000)*60*60*1000));
 		
 		return toReturn;
+	}
+
+
+	/**
+	 * May generate a value more than 100 or less than 0, but keeps it somewhere within that.
+	 * Max change is +/- 10% from last.  
+	 * @param lastSoC
+	 * @return
+	 */
+	private int generateRandomSoC(int lastSoC) {
+		Random rng = new Random();
+		int change = rng.nextInt(20); //up or down max 10% in a frame.
+		if(lastSoC<=0){
+			return lastSoC + change;
+		}
+		if(lastSoC>=100){
+			return lastSoC-change;
+		}
+		else{
+			return lastSoC + change - 10; 
+		}
 	}
 
 
