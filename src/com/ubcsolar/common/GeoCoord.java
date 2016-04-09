@@ -14,8 +14,17 @@ public GeoCoord(double lat, double lon, double elevationInMeters){
 	this.lon = lon;
 	this.elevation = elevationInMeters;
 	this.timeCreated = System.currentTimeMillis();
+	
+	//checkvalues();
 }
-
+/*
+private void checkvalues() {
+	// TODO Auto-generated method stub
+	if (true){ //edit this "true" value for actual check value
+		throw new IllegalArgumentException("Invalid Coordinates.");
+	}
+}
+*/
 public GeoCoord(double lat, double lon, double elevationInMeters, double timeCreated){
 	this.lat = lat;
 	this.lon = lon;

@@ -371,8 +371,15 @@ public class CarPanel extends JPanel implements Listener {
 
 	//easy to update the speed.
 	lblSpeed.setText(""+new DecimalFormat("###.##").format(recentPacket.getSpeed())); //the label showing speed to two decimal places (update this one!)
-	SoC.setText(""+recentPacket.getStateOfCharge()); //the label showing the state of charge
-	
+
+	SoC.setText(""+recentPacket.getStateOfCharge()+"%"); //the label showing the state of charge
+		
+	if (recentPacket.getStateOfCharge()<=10){
+		SoC.setForeground(Color.red);
+	}
+	else{
+		SoC.setForeground(Color.black);
+	}
 	SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");
 	Date now = new Date((long) (recentPacket.getTimeCreated()));
     String strDate = sdfDate.format(now);
@@ -474,7 +481,7 @@ public class CarPanel extends JPanel implements Listener {
 		lblTempitem_5.setText(""); //5th item in temperature list.
 		lblPackv1.setText("NONE"); //first item in voltage pack list
 		lblPackv2.setText(""); //second item in voltage pack list
-		lblPackv_3.setText(""); //the third
+		lblPackv_3.setText(""); //the thirdf
 		lblPackv_4.setText(""); //and fourth. Can add more as needed 
 		lblSpeed.setText("NONE");; //the label showing speed (update this one!)
 		lblLastDataReceived.setText("Last Received: NONE"); //Time of last data received
