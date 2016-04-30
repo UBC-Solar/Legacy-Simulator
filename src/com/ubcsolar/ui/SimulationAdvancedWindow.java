@@ -255,11 +255,21 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	        plot.setDataset(2, stateOfChargeDataSet);
 	        plot.mapDatasetToRangeAxis(2,2);
 	        final StandardXYItemRenderer renderer3 = new StandardXYItemRenderer();
-	        renderer2.setSeriesPaint(0, Color.blue);
+	        renderer3.setSeriesPaint(0, Color.blue);
 	        //renderer2.setPlotShapes(true);
 	        plot.setRenderer(2, renderer3);
 			
-			
+	        DefaultXYDataset terrainHeight = new DefaultXYDataset();
+	        terrainHeight.addSeries("Elevation", generateElevationProfile(simReport.getSimFrames()));
+			final NumberAxis axis4 = new NumberAxis("height (m)");
+			axis3.setAutoRangeIncludesZero(false);
+	        plot.setRangeAxis(3, axis4);
+	        plot.setDataset(3, terrainHeight);
+	        plot.mapDatasetToRangeAxis(3,3);
+	        final StandardXYItemRenderer renderer4 = new StandardXYItemRenderer();
+	        renderer4.setSeriesPaint(0, Color.green);
+	        //renderer2.setPlotShapes(true);
+	        plot.setRenderer(3, renderer4);
 			
 			
 			
@@ -285,7 +295,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				runningTotalDistance += lastPosition.calculateDistance(thisPosition, DistanceUnit.KILOMETERS);
 				toReturn[xValues][i] = runningTotalDistance;
 				toReturn[yValues][i] = temp.getCarStatus().getStateOfCharge();
-				System.out.println(temp.getCarStatus().getStateOfCharge());
 			}
 			
 			return toReturn;
@@ -308,7 +317,23 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			return toReturn;
 		}
 		
-		
+		private double[][] generateElevationProfile(List<SimFrame> simFrames) {
+			double[][] toReturn= new double[2][simFrames.size()];
+			//[0] is distance, [1] is speed
+			toReturn[xValues][0] = 0;
+			toReturn[yValues][0] = simFrames.get(0).getGPSReport().getLocation().getElevation();
+			double runningTotalDistance = 0;
+			for(int i = 1; i<simFrames.size(); i++){
+				SimFrame temp = simFrames.get(i);
+				GeoCoord lastPosition = simFrames.get(i-1).getGPSReport().getLocation();
+				GeoCoord thisPosition = temp.getGPSReport().getLocation();
+				runningTotalDistance += lastPosition.calculateDistance(thisPosition, DistanceUnit.KILOMETERS);
+				toReturn[xValues][i] = runningTotalDistance;
+				toReturn[yValues][i] = temp.getGPSReport().getLocation().getElevation();
+			}
+			
+			return toReturn;
+		}
 		@Override
 		public void register() {
 			mySession.register(this, NewSimulationReportNotification.class);
