@@ -28,13 +28,10 @@ public class RunSimTest {
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException, JDOMException, NoForecastReportException, NoLoadedRouteException, NoLocationReportedException, NoCarStatusException{
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Application started");
 		theProgram = new GlobalController(true);
-		//will first commit test
-		theProgram.getMapController().load(new File("res\\UBC_to_Coquitlam.kml"));
-		theProgram.getMyWeatherController().downloadNewForecastsForRoute(50);
 		
-		//HashMap<String, > temperatures = new HashMap
-		TelemDataPacket fakeReport = generateNewTelemDataPack();
-		theProgram.getMyCarController().adviseOfNewCarReport(fakeReport);
+		theProgram.getMapController().load(new File("res\\UBC_to_Coquitlam.kml"));
+		theProgram.getMyWeatherController().downloadNewForecastsForRoute(100);
+		theProgram.getMyCarController().adviseOfNewCarReport(generateNewTelemDataPack());
 		LocationReport carLocationReported = new LocationReport(new GeoCoord(49.26068,-123.24576,97.41090393066406), "raven", "generated");
 		theProgram.getMapController().recordNewCarLocation(carLocationReported);
 		theProgram.getMySimController().runSimulation(new HashMap<GeoCoord, Double>());
