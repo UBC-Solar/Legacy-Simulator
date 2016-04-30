@@ -50,39 +50,33 @@ import java.util.List;
 import java.util.Map;
 import java.awt.event.ActionEvent;
 import java.awt.Insets;
+import javax.swing.JCheckBox;
+import java.awt.FlowLayout;
 
 public class SimulationAdvancedWindow extends JFrame implements Listener{
 
 	private static final String CHART_TITLE = "Sim Results";
-	private JPanel contentPane;
-	private GlobalController mySession;
-	private JFreeChart simResults;
+	private JPanel contentPane; //the root content holder
+	private GlobalController mySession; 
+	private JFreeChart simResults; //the main chart model.
 	private final String X_AXIS_LABEL = "Distance (km)";
 	private final String Y_AXIS_LABEL = "speed (km/h)";
 	private final int xValues = 0; //for the Double[][] dataset
 	private final int yValues = 1; //for the Double[][] dataset
-	private JPanel buttonPanel;
-	private ChartPanel mainDisplay;
+	private JPanel buttonPanel; 
+	private ChartPanel mainDisplay; //the panel displaying the model
+	private SimulationReport lastSimReport; //cache the last simReport
 	
-	/**
-	 * Launch the application.
-	 *//*//don't need a Main() here.
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Simulation frame = new Simulation();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}*/
+	private boolean showSpeed = true;
+	private boolean showStateOfCharge = true;
+	private boolean showCloud = true;
+	private boolean showElevation = true;
 
+	
 	private void handleError(String message){
 		JOptionPane.showMessageDialog(this, message);
 	}
+	
 	/**
 	 * Create the frame.
 	 * @param mySession 
@@ -115,7 +109,50 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				runSimultion();
 			}
 		});
+		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		buttonPanel.add(btnNewSimulation);
+		
+		JCheckBox chckbxSpeed = new JCheckBox("Speed");
+		chckbxSpeed.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showSpeed = chckbxSpeed.isSelected();
+				refreshChart();
+			}
+		});
+		chckbxSpeed.setSelected(true);
+		buttonPanel.add(chckbxSpeed);
+		
+		JCheckBox chckbxSoc = new JCheckBox("SoC");
+		chckbxSoc.setSelected(true);
+		chckbxSoc.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showStateOfCharge = chckbxSoc.isSelected();
+				refreshChart();
+			}
+		});
+		buttonPanel.add(chckbxSoc);
+		
+		
+		
+		JCheckBox chckbxCloud = new JCheckBox("Cloud");
+		chckbxCloud.setSelected(true);
+		chckbxCloud.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showCloud = chckbxCloud.isSelected();
+				refreshChart();
+			}
+		});
+		buttonPanel.add(chckbxCloud);
+		
+		JCheckBox chckbxElevation = new JCheckBox("Elevation");
+		chckbxElevation.setSelected(true);
+		chckbxElevation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showElevation = chckbxElevation.isSelected();
+				refreshChart();
+			}
+		});
+		buttonPanel.add(chckbxElevation);
 		
 		JPanel chartHoldingPanel = new JPanel();
 		contentPane.add(chartHoldingPanel, BorderLayout.CENTER);
@@ -166,6 +203,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		this.register();
 		}
 		
+		/**
+		 * Attempts to run a simulation with the loaded data. If there is needed data that
+		 * is not loaded, displays an error message to end user. 
+		 */
 		protected void runSimultion() {
 		
 		try {
@@ -184,6 +225,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			return;
 		}
 	}
+		
+		/**
+		 * Builds a default, empty chart. 
+		 */
 		private void setDefaultChart() {
 			XYDataset ds = createBlankDataset();
 			this.simResults = 
@@ -222,82 +267,100 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			
 		}
 		
+		private void refreshChart(){
+			updateChart(this.lastSimReport);
+		}
 		
+		/**
+		 * parses a simulation into the graph. 
+		 * @param simReport - to display
+		 */
 		private void updateChart(SimulationReport simReport) {
-			DefaultXYDataset dds = new DefaultXYDataset();
+			this.lastSimReport = simReport;
 			this.simResults = 
 					ChartFactory.createXYLineChart(
 							CHART_TITLE,
 							X_AXIS_LABEL,
 							Y_AXIS_LABEL, 
-							dds,
+							null, //we'll add in all the values below so we can map to custom axis
 							PlotOrientation.VERTICAL, true, true, false);
 			final XYPlot plot = simResults.getXYPlot();
 			
-			DefaultXYDataset speedDataset = new DefaultXYDataset();
-			speedDataset.addSeries("speed", generateSpeedSeries(simReport.getSimFrames()));
-			final NumberAxis axis2 = new NumberAxis("speed (km/h)");
-	        axis2.setAutoRangeIncludesZero(false);
-	        plot.setRangeAxis(1, axis2);
-	        plot.setDataset(1, speedDataset);
-	        plot.mapDatasetToRangeAxis(1, 1);
-	        final StandardXYItemRenderer renderer2 = new StandardXYItemRenderer();
-	        renderer2.setSeriesPaint(0, Color.black);
-	        //renderer2.setPlotShapes(true);
-	        plot.setRenderer(1, renderer2);
+			if(this.showSpeed){
+				DefaultXYDataset speedDataset = new DefaultXYDataset();
+				speedDataset.addSeries("Speed", generateSpeedSeries(simReport.getSimFrames()));
+				final NumberAxis axis2 = new NumberAxis("speed (km/h)");
+				axis2.setAutoRangeIncludesZero(false);
+				plot.setRangeAxis(1, axis2);
+				plot.setDataset(1, speedDataset);
+				plot.mapDatasetToRangeAxis(1, 1);
+				final StandardXYItemRenderer renderer2 = new StandardXYItemRenderer();
+				renderer2.setSeriesPaint(0, Color.black);
+				//renderer2.setPlotShapes(true);
+				plot.setRenderer(1, renderer2);
+			}
+			
+			if(this.showStateOfCharge){
+				DefaultXYDataset stateOfChargeDataSet = new DefaultXYDataset();
+				stateOfChargeDataSet.addSeries("State Of Charge", generateStateOfChargeSeries(simReport.getSimFrames()));
+				final NumberAxis axis3 = new NumberAxis("SoC (%)");
+				axis3.setAutoRangeIncludesZero(false);
+				plot.setRangeAxis(2, axis3);
+				plot.setDataset(2, stateOfChargeDataSet);
+				plot.mapDatasetToRangeAxis(2,2);
+				final StandardXYItemRenderer renderer3 = new StandardXYItemRenderer();
+				renderer3.setSeriesPaint(0, Color.blue);
+				//renderer2.setPlotShapes(true);
+				plot.setRenderer(2, renderer3);
+			}
+			
+			if(this.showElevation){
+				DefaultXYDataset terrainHeight = new DefaultXYDataset();
+				terrainHeight.addSeries("Elevation", generateElevationProfile(simReport.getSimFrames()));
+				final NumberAxis axis4 = new NumberAxis("height (m)");
+				axis4.setAutoRangeIncludesZero(false);
+				plot.setRangeAxis(3, axis4);
+				plot.setDataset(3, terrainHeight);
+				plot.mapDatasetToRangeAxis(3,3);
+				final StandardXYItemRenderer renderer4 = new StandardXYItemRenderer();
+				renderer4.setSeriesPaint(0, Color.green);
+				//renderer2.setPlotShapes(true);
+				plot.setRenderer(3, renderer4);
+			}
+			
+			if(this.showCloud){
+				DefaultXYDataset cloudiness = new DefaultXYDataset();
+				cloudiness.addSeries("Cloud", generateCloudinessSeries(simReport.getSimFrames()));
+				final NumberAxis axis5 = new NumberAxis("cloudiness (%)");
+				axis5.setAutoRangeIncludesZero(false);
+				plot.setRangeAxis(4, axis5);
+				plot.setDataset(4, cloudiness);
+				plot.mapDatasetToRangeAxis(4,4);
+				final StandardXYItemRenderer renderer5 = new StandardXYItemRenderer();
+				renderer5.setSeriesPaint(0, Color.RED);
+				//renderer2.setPlotShapes(true);
+				plot.setRenderer(4, renderer5);
+			}
 			
 			
-			DefaultXYDataset stateOfChargeDataSet = new DefaultXYDataset();
-			stateOfChargeDataSet.addSeries("stateOfCharge", generateStateOfChargeSeries(simReport.getSimFrames()));
-			final NumberAxis axis3 = new NumberAxis("SoC (%)");
-			axis3.setAutoRangeIncludesZero(false);
-	        plot.setRangeAxis(2, axis3);
-	        plot.setDataset(2, stateOfChargeDataSet);
-	        plot.mapDatasetToRangeAxis(2,2);
-	        final StandardXYItemRenderer renderer3 = new StandardXYItemRenderer();
-	        renderer3.setSeriesPaint(0, Color.blue);
-	        //renderer2.setPlotShapes(true);
-	        plot.setRenderer(2, renderer3);
-			
-	        DefaultXYDataset terrainHeight = new DefaultXYDataset();
-	        terrainHeight.addSeries("Elevation", generateElevationProfile(simReport.getSimFrames()));
-			final NumberAxis axis4 = new NumberAxis("height (m)");
-			axis4.setAutoRangeIncludesZero(false);
-	        plot.setRangeAxis(3, axis4);
-	        plot.setDataset(3, terrainHeight);
-	        plot.mapDatasetToRangeAxis(3,3);
-	        final StandardXYItemRenderer renderer4 = new StandardXYItemRenderer();
-	        renderer4.setSeriesPaint(0, Color.green);
-	        //renderer2.setPlotShapes(true);
-	        plot.setRenderer(3, renderer4);
-			
-	        DefaultXYDataset cloudiness = new DefaultXYDataset();
-	        cloudiness.addSeries("cloudiness", generateCloudinessSeries(simReport.getSimFrames()));
-			final NumberAxis axis5 = new NumberAxis("cloudiness (%)");
-			axis5.setAutoRangeIncludesZero(false);
-	        plot.setRangeAxis(4, axis5);
-	        plot.setDataset(4, cloudiness);
-	        plot.mapDatasetToRangeAxis(4,4);
-	        final StandardXYItemRenderer renderer5 = new StandardXYItemRenderer();
-	        renderer5.setSeriesPaint(0, Color.RED);
-	        //renderer2.setPlotShapes(true);
-	        plot.setRenderer(4, renderer5);
-	        
 			this.mainDisplay.setChart(this.simResults);
 			contentPane.repaint();
 			contentPane.validate();
 			mainDisplay.repaint();
 			mainDisplay.validate();
 			this.repaint();
-			this.validate();
-			
+			this.validate();	
 		}
+		
+		
 		private double[][] generateStateOfChargeSeries(List<SimFrame> simFrames) {
 			double[][] toReturn= new double[2][simFrames.size()];
 			//[0] is distance, [1] is speed
 			toReturn[xValues][0] = 0;
 			toReturn[yValues][0] = simFrames.get(0).getCarStatus().getStateOfCharge();
+			
 			double runningTotalDistance = 0;
+			
 			for(int i = 1; i<simFrames.size(); i++){
 				SimFrame temp = simFrames.get(i);
 				GeoCoord lastPosition = simFrames.get(i-1).getGPSReport().getLocation();
@@ -314,7 +377,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			//[0] is distance, [1] is speed
 			toReturn[xValues][0] = 0;
 			toReturn[yValues][0] = simFrames.get(0).getCarStatus().getSpeed();
+			
 			double runningTotalDistance = 0;
+			
 			for(int i = 1; i<simFrames.size(); i++){
 				SimFrame temp = simFrames.get(i);
 				GeoCoord lastPosition = simFrames.get(i-1).getGPSReport().getLocation();
@@ -332,7 +397,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			//[0] is distance, [1] is speed
 			toReturn[xValues][0] = 0;
 			toReturn[yValues][0] = simFrames.get(0).getGPSReport().getLocation().getElevation();
+			
 			double runningTotalDistance = 0;
+			
 			for(int i = 1; i<simFrames.size(); i++){
 				SimFrame temp = simFrames.get(i);
 				GeoCoord lastPosition = simFrames.get(i-1).getGPSReport().getLocation();
@@ -350,14 +417,17 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			//[0] is distance, [1] is speed
 			toReturn[xValues][0] = 0;
 			toReturn[yValues][0] = simFrames.get(0).getForecast().cloudCover();
+			
 			double runningTotalDistance = 0;
+			
 			for(int i = 1; i<simFrames.size(); i++){
 				SimFrame temp = simFrames.get(i);
 				GeoCoord lastPosition = simFrames.get(i-1).getGPSReport().getLocation();
 				GeoCoord thisPosition = temp.getGPSReport().getLocation();
 				runningTotalDistance += lastPosition.calculateDistance(thisPosition, DistanceUnit.KILOMETERS);
 				toReturn[xValues][i] = runningTotalDistance;
-				toReturn[yValues][i] = temp.getForecast().cloudCover();
+				Double value = temp.getForecast().cloudCover()*100; //convert to %.
+				toReturn[yValues][i] = value.intValue(); //to drop unneeded digits in scale
 			}
 			
 			return toReturn;
@@ -367,5 +437,4 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		public void register() {
 			mySession.register(this, NewSimulationReportNotification.class);
 		}
-
 }
