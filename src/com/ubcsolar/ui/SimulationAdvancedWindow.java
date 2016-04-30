@@ -262,7 +262,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	        DefaultXYDataset terrainHeight = new DefaultXYDataset();
 	        terrainHeight.addSeries("Elevation", generateElevationProfile(simReport.getSimFrames()));
 			final NumberAxis axis4 = new NumberAxis("height (m)");
-			axis3.setAutoRangeIncludesZero(false);
+			axis4.setAutoRangeIncludesZero(false);
 	        plot.setRangeAxis(3, axis4);
 	        plot.setDataset(3, terrainHeight);
 	        plot.mapDatasetToRangeAxis(3,3);
@@ -271,8 +271,18 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	        //renderer2.setPlotShapes(true);
 	        plot.setRenderer(3, renderer4);
 			
-			
-			
+	        DefaultXYDataset cloudiness = new DefaultXYDataset();
+	        cloudiness.addSeries("cloudiness", generateCloudinessSeries(simReport.getSimFrames()));
+			final NumberAxis axis5 = new NumberAxis("cloudiness (%)");
+			axis5.setAutoRangeIncludesZero(false);
+	        plot.setRangeAxis(4, axis5);
+	        plot.setDataset(4, cloudiness);
+	        plot.mapDatasetToRangeAxis(4,4);
+	        final StandardXYItemRenderer renderer5 = new StandardXYItemRenderer();
+	        renderer5.setSeriesPaint(0, Color.RED);
+	        //renderer2.setPlotShapes(true);
+	        plot.setRenderer(4, renderer5);
+	        
 			this.mainDisplay.setChart(this.simResults);
 			contentPane.repaint();
 			contentPane.validate();
@@ -334,6 +344,25 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			
 			return toReturn;
 		}
+		
+		private double[][] generateCloudinessSeries(List<SimFrame> simFrames) {
+			double[][] toReturn= new double[2][simFrames.size()];
+			//[0] is distance, [1] is speed
+			toReturn[xValues][0] = 0;
+			toReturn[yValues][0] = simFrames.get(0).getForecast().cloudCover();
+			double runningTotalDistance = 0;
+			for(int i = 1; i<simFrames.size(); i++){
+				SimFrame temp = simFrames.get(i);
+				GeoCoord lastPosition = simFrames.get(i-1).getGPSReport().getLocation();
+				GeoCoord thisPosition = temp.getGPSReport().getLocation();
+				runningTotalDistance += lastPosition.calculateDistance(thisPosition, DistanceUnit.KILOMETERS);
+				toReturn[xValues][i] = runningTotalDistance;
+				toReturn[yValues][i] = temp.getForecast().cloudCover();
+			}
+			
+			return toReturn;
+		}
+		
 		@Override
 		public void register() {
 			mySession.register(this, NewSimulationReportNotification.class);
