@@ -1,6 +1,7 @@
 package com.ubcsolar.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 
 import javax.swing.ImageIcon;
@@ -12,7 +13,10 @@ import javax.swing.border.EmptyBorder;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
 
@@ -221,11 +225,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		
 		private void updateChart(SimulationReport simReport) {
 			DefaultXYDataset dds = new DefaultXYDataset();
-			double[][] speedSeries = generateSpeedSeries(simReport.getSimFrames());
-			dds.addSeries("Speed", speedSeries);
-			double[][] stateOfChargeSeries = generateStateOfChargeSeries(simReport.getSimFrames());
-			dds.addSeries("StateOfCharge", stateOfChargeSeries);
-			
 			this.simResults = 
 					ChartFactory.createXYLineChart(
 							CHART_TITLE,
@@ -233,6 +232,36 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 							Y_AXIS_LABEL, 
 							dds,
 							PlotOrientation.VERTICAL, true, true, false);
+			final XYPlot plot = simResults.getXYPlot();
+			
+			DefaultXYDataset speedDataset = new DefaultXYDataset();
+			speedDataset.addSeries("speed", generateSpeedSeries(simReport.getSimFrames()));
+			final NumberAxis axis2 = new NumberAxis("speed (km/h)");
+	        axis2.setAutoRangeIncludesZero(false);
+	        plot.setRangeAxis(1, axis2);
+	        plot.setDataset(1, speedDataset);
+	        plot.mapDatasetToRangeAxis(1, 1);
+	        final StandardXYItemRenderer renderer2 = new StandardXYItemRenderer();
+	        renderer2.setSeriesPaint(0, Color.black);
+	        //renderer2.setPlotShapes(true);
+	        plot.setRenderer(1, renderer2);
+			
+			
+			DefaultXYDataset stateOfChargeDataSet = new DefaultXYDataset();
+			stateOfChargeDataSet.addSeries("stateOfCharge", generateStateOfChargeSeries(simReport.getSimFrames()));
+			final NumberAxis axis3 = new NumberAxis("SoC (%)");
+			axis3.setAutoRangeIncludesZero(false);
+	        plot.setRangeAxis(2, axis3);
+	        plot.setDataset(2, stateOfChargeDataSet);
+	        plot.mapDatasetToRangeAxis(2,2);
+	        final StandardXYItemRenderer renderer3 = new StandardXYItemRenderer();
+	        renderer2.setSeriesPaint(0, Color.blue);
+	        //renderer2.setPlotShapes(true);
+	        plot.setRenderer(2, renderer3);
+			
+			
+			
+			
 			
 			this.mainDisplay.setChart(this.simResults);
 			contentPane.repaint();
