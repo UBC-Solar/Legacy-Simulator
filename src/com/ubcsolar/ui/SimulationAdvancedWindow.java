@@ -55,6 +55,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private JFreeChart simResults;
 	private final String X_AXIS_LABEL = "Distance (km)";
 	private final String Y_AXIS_LABEL = "speed (km/h)";
+	private final int xValues = 0; //for the Double[][] dataset
+	private final int yValues = 1; //for the Double[][] dataset
 	private JPanel buttonPanel;
 	private ChartPanel mainDisplay;
 	
@@ -244,16 +246,16 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		private double[][] generateStateOfChargeSeries(List<SimFrame> simFrames) {
 			double[][] toReturn= new double[2][simFrames.size()];
 			//[0] is distance, [1] is speed
-			toReturn[0][0] = 0;
-			toReturn[1][0] = simFrames.get(0).getCarStatus().getStateOfCharge();
+			toReturn[xValues][0] = 0;
+			toReturn[yValues][0] = simFrames.get(0).getCarStatus().getStateOfCharge();
 			double runningTotalDistance = 0;
 			for(int i = 1; i<simFrames.size(); i++){
 				SimFrame temp = simFrames.get(i);
 				GeoCoord lastPosition = simFrames.get(i-1).getGPSReport().getLocation();
 				GeoCoord thisPosition = temp.getGPSReport().getLocation();
 				runningTotalDistance += lastPosition.calculateDistance(thisPosition, DistanceUnit.KILOMETERS);
-				toReturn[0][i] = runningTotalDistance;
-				toReturn[1][i] = temp.getCarStatus().getStateOfCharge();
+				toReturn[xValues][i] = runningTotalDistance;
+				toReturn[yValues][i] = temp.getCarStatus().getStateOfCharge();
 				System.out.println(temp.getCarStatus().getStateOfCharge());
 			}
 			
@@ -262,16 +264,16 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		private double[][] generateSpeedSeries(List<SimFrame> simFrames) {
 			double[][] toReturn= new double[2][simFrames.size()];
 			//[0] is distance, [1] is speed
-			toReturn[0][0] = 0;
-			toReturn[1][0] = simFrames.get(0).getCarStatus().getSpeed();
+			toReturn[xValues][0] = 0;
+			toReturn[yValues][0] = simFrames.get(0).getCarStatus().getSpeed();
 			double runningTotalDistance = 0;
 			for(int i = 1; i<simFrames.size(); i++){
 				SimFrame temp = simFrames.get(i);
 				GeoCoord lastPosition = simFrames.get(i-1).getGPSReport().getLocation();
 				GeoCoord thisPosition = temp.getGPSReport().getLocation();
 				runningTotalDistance += lastPosition.calculateDistance(thisPosition, DistanceUnit.KILOMETERS);
-				toReturn[0][i] = runningTotalDistance;
-				toReturn[1][i] = temp.getCarStatus().getSpeed();
+				toReturn[xValues][i] = runningTotalDistance;
+				toReturn[yValues][i] = temp.getCarStatus().getSpeed();
 			}
 			
 			return toReturn;
