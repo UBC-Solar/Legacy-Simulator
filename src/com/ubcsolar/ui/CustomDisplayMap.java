@@ -23,6 +23,9 @@ import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.PointOfInterest;
 import com.ubcsolar.common.Route;
 import com.ubcsolar.notification.NewMapLoadedNotification;
+import javax.swing.JCheckBox;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class CustomDisplayMap extends JMapViewer {
 	/**
@@ -34,6 +37,30 @@ public class CustomDisplayMap extends JMapViewer {
 
 	public CustomDisplayMap() {
 		super();
+		zoomOutButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
+		JCheckBox chckbxForecasts = new JCheckBox("Forecasts");
+		chckbxForecasts.setSelected(true);
+		chckbxForecasts.setBounds(26, 7, 106, 23);
+		add(chckbxForecasts);
+		
+		JCheckBox chckbxCities = new JCheckBox("Cities");
+		chckbxCities.setSelected(true);
+		chckbxCities.setBounds(134, 7, 73, 23);
+		add(chckbxCities);
+		
+		JCheckBox chckbxCarLocation = new JCheckBox("Car Location");
+		chckbxCarLocation.setSelected(true);
+		chckbxCarLocation.setBounds(209, 7, 120, 23);
+		add(chckbxCarLocation);
+		
+		JCheckBox chckbxRoute = new JCheckBox("Route");
+		chckbxRoute.setSelected(true);
+		chckbxRoute.setBounds(331, 7, 63, 23);
+		add(chckbxRoute);
 	}
 
 	public void changeDrawnRoute(Route newRouteToLoad){
@@ -88,5 +115,4 @@ public class CustomDisplayMap extends JMapViewer {
 		
 		
 	}
-
 }

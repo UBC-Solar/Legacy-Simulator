@@ -159,8 +159,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		GridBagLayout gbl_chartHoldingPanel = new GridBagLayout();
 		gbl_chartHoldingPanel.columnWidths = new int[]{0, 0, 0};
 		gbl_chartHoldingPanel.rowHeights = new int[]{0, 0, 0};
-		gbl_chartHoldingPanel.columnWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
-		gbl_chartHoldingPanel.rowWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
+		gbl_chartHoldingPanel.columnWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
+		gbl_chartHoldingPanel.rowWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
 		chartHoldingPanel.setLayout(gbl_chartHoldingPanel);
 		
 		setDefaultChart();
