@@ -31,7 +31,7 @@ public class RunSimTest {
 		theProgram = new GlobalController(true);
 		
 		theProgram.getMapController().load(new File("res\\UBC_to_Coquitlam.kml"));
-		theProgram.getMyWeatherController().downloadNewForecastsForRoute(100);
+		theProgram.getMyWeatherController().downloadNewForecastsForRoute(10);
 		theProgram.getMyCarController().adviseOfNewCarReport(RandomObjectGenerator.generateNewTelemDataPack());
 		LocationReport carLocationReported = new LocationReport(new GeoCoord(49.26068,-123.24576,97.41090393066406), "raven", "generated");
 		theProgram.getMapController().recordNewCarLocation(carLocationReported);
