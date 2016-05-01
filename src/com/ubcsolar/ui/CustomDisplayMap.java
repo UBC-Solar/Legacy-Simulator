@@ -54,7 +54,7 @@ public class CustomDisplayMap extends JMapViewer {
 		});
 		chckbxForecasts.setSelected(true);
 		showForecasts = chckbxForecasts.isSelected();
-		chckbxForecasts.setBounds(26, 7, 106, 23);
+		chckbxForecasts.setBounds(46, 7, 82, 23);
 		add(chckbxForecasts);
 		
 		JCheckBox chckbxCities = new JCheckBox("Cities");
@@ -137,7 +137,7 @@ public class CustomDisplayMap extends JMapViewer {
 			String name = temp.getName().split(",")[0]; //don't need the whole "city, state, country, continent, earth" name
 			routePOIs.add(new MapMarkerDot(name, new Coordinate(newSpot.getLat(), newSpot.getLon())));
 		}
-		this.refreshMap();
+		this.refreshMap(); //will paint it on if it's supposed to be there
 		this.repaint();
 		
 	}
