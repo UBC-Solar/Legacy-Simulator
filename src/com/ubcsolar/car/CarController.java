@@ -17,7 +17,7 @@ import com.ubcsolar.notification.*;
 import jssc.SerialPortException;
 
 public class CarController extends ModuleController {
-	
+	//test
 	private DatabaseController myDatabase; //references to the data warehouse. Want to store the car's broadcasts
 	private DataProcessor myDataProcessor; //where to send the car's broadcasts for processing. 
 	private AbstractDataReceiver myDataReceiver; //what will capture the car's raw broadcasts
