@@ -38,6 +38,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.awt.Font;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class CarTelemPacketWindow extends JFrame {
 	private JTextField txtSpeed;
@@ -112,6 +114,11 @@ public class CarTelemPacketWindow extends JFrame {
 		getContentPane().add(lblnewTotalVoltage, gbc_lblnewTotalVoltage);
 		
 		JButton btnOk = new JButton("OK");
+		btnOk.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				handleOkClick();
+			}
+		});
 		btnOk.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -278,18 +285,31 @@ public class CarTelemPacketWindow extends JFrame {
 		getContentPane().add(btnOk, gbc_btnOk);
 		
 		JButton btnCancel = new JButton("Cancel");
+		btnCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				closeWindow();
+			}
+		});
 		btnCancel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				closeWindow();
 			}
 		});
+		
 		GridBagConstraints gbc_btnCancel = new GridBagConstraints();
 		gbc_btnCancel.anchor = GridBagConstraints.WEST;
 		gbc_btnCancel.gridx = 3;
 		gbc_btnCancel.gridy = 12;
 		getContentPane().add(btnCancel, gbc_btnCancel);
+		
+		btnOk.requestFocus();
+		btnOk.requestFocusInWindow();
+		getRootPane().setDefaultButton(btnOk);
+		btnOk.requestFocus();
 	}
+	
+	//------------------------------------------------------
 	
 	private void handleError(String message){
 		JOptionPane.showMessageDialog(this, message);
@@ -415,6 +435,8 @@ public class CarTelemPacketWindow extends JFrame {
 		
 		this.closeWindow();
 	}
+	
+	
 	
 	private void closeWindow(){
 		this.dispose();

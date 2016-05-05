@@ -32,6 +32,8 @@ import java.awt.event.MouseEvent;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class CustomLocationAddWindow extends JFrame {
 	private JTextField txtCarName;
@@ -168,6 +170,11 @@ public class CustomLocationAddWindow extends JFrame {
 		getContentPane().add(timeField, gbc_timeField);
 		
 		JButton btnOk = new JButton("OK");
+		btnOk.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				handleOkClick();
+			}
+		});
 		btnOk.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -182,6 +189,11 @@ public class CustomLocationAddWindow extends JFrame {
 		getContentPane().add(btnOk, gbc_btnOk);
 		
 		JButton btnCancel = new JButton("Cancel");
+		btnCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				closeWindow();
+			}
+		});
 		btnCancel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -193,6 +205,10 @@ public class CustomLocationAddWindow extends JFrame {
 		gbc_btnCancel.gridx = 3;
 		gbc_btnCancel.gridy = 6;
 		getContentPane().add(btnCancel, gbc_btnCancel);
+		
+		btnOk.requestFocusInWindow();
+		getRootPane().setDefaultButton(btnOk);
+		btnOk.requestFocus();
 	}
 	
 	private void handleError(String message){
