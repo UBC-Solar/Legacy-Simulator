@@ -201,7 +201,8 @@ public class GUImain implements Listener{
 		this.buildAllWindows(); //builds all the windows in one shot
 		JMenuBar menuBar = new JMenuBar();
 		mainFrame.setJMenuBar(menuBar);
-
+		
+		//adding this to gracefully close the program when the 'x' is hit on the main frame. 
 		mainFrame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -209,7 +210,7 @@ public class GUImain implements Listener{
 		            "Are you sure to close this window?", "Really Closing?", 
 		            JOptionPane.YES_NO_OPTION,
 		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
-		            mySession.exit();
+		            mySession.exit(); //do the graceful exit code. 
 		        }
 		    }
 		});
