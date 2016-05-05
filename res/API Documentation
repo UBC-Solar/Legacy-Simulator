@@ -18,8 +18,9 @@ MAP
 Documentation: https://josm.openstreetmap.de/doc/overview-summary.html
 
 4) To make custom route on map when not possible on google map, use the website below
-make the route, export as KML file then import the file into "google my maps" then export it to KML file
-again to have the file in the required format. Then using ElevationScript.java add elevations to the file.
+make the route, export as KML file then import the file into "google my maps" then add lables using
+"Add marker" button. Then, export it as KML file again to have the file in the required format. 
+Finally using ElevationScript.java add elevations to the file.
 
 http://www.scribblemaps.com/
 
