@@ -18,7 +18,6 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import com.ubcsolar.common.DataUnit;
-import com.ubcsolar.common.DistanceUnit;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.LogType;
@@ -440,7 +439,7 @@ public class CSVDatabase extends Database {
 			this.writingQueue.add(""+entryNum+","+g.getLat()+","+ g.getLon()+","+g.getElevation());
 			lastPoint = g;
 		}else{
-			double tempDistance = lastPoint.calculateDistance(g, DistanceUnit.KILOMETERS);
+			double tempDistance = lastPoint.calculateDistance(g);
 			runningTotalDistance += tempDistance;
 			this.writingQueue.add(""+entryNum+","+g.getLat()+","+ g.getLon()+","+g.getElevation()+","+tempDistance+","+runningTotalDistance);
 			lastPoint = g;

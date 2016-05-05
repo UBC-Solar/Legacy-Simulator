@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
-import com.ubcsolar.common.DistanceUnit;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.ModuleController;
@@ -139,7 +138,7 @@ public class WeatherController extends ModuleController {
 		ArrayList<GeoCoord> toReturn = new ArrayList<GeoCoord>(trailMarkers.size()/numOfKMBetween);
 		toReturn.add(start);
 		for(GeoCoord g : trailMarkers){
-			if(start.calculateDistance(g, DistanceUnit.KILOMETERS) > numOfKMBetween){
+			if(start.calculateDistance(g) > numOfKMBetween){
 				toReturn.add(g);
 				start = g;
 			}

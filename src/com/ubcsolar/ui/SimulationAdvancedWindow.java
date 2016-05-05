@@ -21,7 +21,6 @@ import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
 
 import com.ubcsolar.Main.GlobalController;
-import com.ubcsolar.common.DistanceUnit;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LogType;
@@ -365,7 +364,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				SimFrame temp = simFrames.get(i);
 				GeoCoord lastPosition = simFrames.get(i-1).getGPSReport().getLocation();
 				GeoCoord thisPosition = temp.getGPSReport().getLocation();
-				runningTotalDistance += lastPosition.calculateDistance(thisPosition, DistanceUnit.KILOMETERS);
+				runningTotalDistance += lastPosition.calculateDistance(thisPosition);
 				toReturn[xValues][i] = runningTotalDistance;
 				toReturn[yValues][i] = temp.getCarStatus().getStateOfCharge();
 			}
@@ -384,7 +383,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				SimFrame temp = simFrames.get(i);
 				GeoCoord lastPosition = simFrames.get(i-1).getGPSReport().getLocation();
 				GeoCoord thisPosition = temp.getGPSReport().getLocation();
-				runningTotalDistance += lastPosition.calculateDistance(thisPosition, DistanceUnit.KILOMETERS);
+				runningTotalDistance += lastPosition.calculateDistance(thisPosition);
 				toReturn[xValues][i] = runningTotalDistance;
 				toReturn[yValues][i] = temp.getCarStatus().getSpeed();
 			}
@@ -404,7 +403,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				SimFrame temp = simFrames.get(i);
 				GeoCoord lastPosition = simFrames.get(i-1).getGPSReport().getLocation();
 				GeoCoord thisPosition = temp.getGPSReport().getLocation();
-				runningTotalDistance += lastPosition.calculateDistance(thisPosition, DistanceUnit.KILOMETERS);
+				runningTotalDistance += lastPosition.calculateDistance(thisPosition);
 				toReturn[xValues][i] = runningTotalDistance;
 				toReturn[yValues][i] = temp.getGPSReport().getLocation().getElevation();
 			}
@@ -424,7 +423,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				SimFrame temp = simFrames.get(i);
 				GeoCoord lastPosition = simFrames.get(i-1).getGPSReport().getLocation();
 				GeoCoord thisPosition = temp.getGPSReport().getLocation();
-				runningTotalDistance += lastPosition.calculateDistance(thisPosition, DistanceUnit.KILOMETERS);
+				runningTotalDistance += lastPosition.calculateDistance(thisPosition);
 				toReturn[xValues][i] = runningTotalDistance;
 				Double value = temp.getForecast().cloudCover()*100; //convert to %.
 				toReturn[yValues][i] = value.intValue(); //to drop unneeded digits in scale

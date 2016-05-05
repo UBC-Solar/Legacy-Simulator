@@ -106,27 +106,13 @@ public boolean equals(Object toCheck){
  * @param unit - the unit the distance should be reported in
  * @return the absolute distance between this point and another
  */
-public double calculateDistance(GeoCoord ending, DistanceUnit unit){
+public double calculateDistance(GeoCoord ending){
 	double kmDistance = Math.abs(
 							haversine(this.lat,
 									this.lon, 
 									ending.getLat(), 
 									ending.getLon()));
-	
-	if(unit == DistanceUnit.FEET){
-		return kmDistance * 3280.84;
-	}
-	else if(unit == DistanceUnit.KILOMETERS){
-		return kmDistance;
-	}
-	else if(unit == DistanceUnit.MILES){
-		return kmDistance * 0.621371;
-	}
-	else if(unit == DistanceUnit.METERS){
-		return kmDistance * 1000;
-	}
-
-	return -1.0;
+	return kmDistance;
 }
 
 /**
@@ -177,19 +163,6 @@ public double getElevation(){
 	return elevation;
 }
 
-public double getElevation(DistanceUnit unit){
-	switch(unit){
-		case METERS: return this.elevation;
-		case FEET: return this.convertToFeet(this.elevation);
-		case KILOMETERS: return this.elevation/1000;
-		case MILES: return this.elevation/1609.34;
-		default: return -1;
-	}
-}
-
-private double convertToFeet(double meters) {
-	return meters*3.28084;
-}
 
 @Override
 public double getTimeCreated() {

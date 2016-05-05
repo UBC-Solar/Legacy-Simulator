@@ -15,7 +15,6 @@ import com.github.dvdme.ForecastIOLib.FIODataBlock;
 import com.github.dvdme.ForecastIOLib.FIODataPoint;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalValues;
-import com.ubcsolar.common.DistanceUnit;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.LocationReport;
@@ -86,7 +85,8 @@ public class SimEngine {
 		}
 		
 		//not sure if calculateDistance() takes elevation into account....
-		double distanceCovered = lastPosition.calculateDistance(nextPoint, DistanceUnit.METERS); 
+		double distanceCovered = lastPosition.calculateDistance(nextPoint)*1000; 
+		
 		double elevationChange = nextPoint.getElevation() - lastPosition.getElevation();
 		
 		
