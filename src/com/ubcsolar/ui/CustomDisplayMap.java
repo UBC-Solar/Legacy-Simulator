@@ -151,12 +151,13 @@ public class CustomDisplayMap extends JMapViewer {
 			}
 		}
 		
-		forecasts = new ArrayList(theReport.getForecasts().size());
+		forecasts = new ArrayList<MapMarker>(theReport.getForecasts().size());
 		for(int i= 0; i<theReport.getForecasts().size(); i++){
 			ForecastIO fc = theReport.getForecasts().get(i);
 			Coordinate location = new Coordinate(fc.getLatitude(), fc.getLongitude());
 			String name = "" + i;
 			MapMarkerDot newLocationDot = new MapMarkerDot(null,name,location, forecastStyle);
+			
 			forecasts.add(newLocationDot);
 		}
 		this.refreshMap();
