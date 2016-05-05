@@ -195,13 +195,24 @@ public class GUImain implements Listener{
 		mainFrame = new JFrame(); //
 		//public void setBounds(int x, int y, int width, int height)
 		mainFrame.setBounds(150, 50, 1000, 600); //main window size on opening
-		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.setVisible(true);
 		//NOTE: Could consider not building all the windows at once in case of performance issues.
 		this.buildAllWindows(); //builds all the windows in one shot
 		JMenuBar menuBar = new JMenuBar();
 		mainFrame.setJMenuBar(menuBar);
-		
+
+		mainFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		        if (JOptionPane.showConfirmDialog(mainFrame, 
+		            "Are you sure to close this window?", "Really Closing?", 
+		            JOptionPane.YES_NO_OPTION,
+		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+		            mySession.exit();
+		        }
+		    }
+		});
 		
 		//THIS SECTION CREATES AND ADDS IN THE 'FILE' MENU
 		JMenu mnFile = new JMenu("File"); //Make a 'file' drop down list
