@@ -5,28 +5,20 @@ package com.ubcsolar.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Point;
 
-import org.openstreetmap.gui.jmapviewer.Coordinate;
-
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.SpringLayout;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import com.ubcsolar.Main.GlobalController;
-import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.LogType;
-import com.ubcsolar.common.Route;
-import com.ubcsolar.notification.CarUpdateNotification;
 import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewForecastReport;
 import com.ubcsolar.notification.NewLocationReportNotification;
@@ -35,12 +27,6 @@ import com.ubcsolar.notification.Notification;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
@@ -48,14 +34,6 @@ import com.jgoodies.forms.factories.FormFactory;
 
 import javax.swing.JPanel;
 import javax.swing.JButton;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-
-import org.openstreetmap.gui.jmapviewer.JMapViewer;
-import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
-import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
-import org.openstreetmap.gui.jmapviewer.interfaces.MapPolygon;
-import javax.swing.SwingConstants;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -64,7 +42,6 @@ public class GUImain implements Listener{
 
 	private JFrame mainFrame; //The main/root program window
 	private GlobalController mySession; //Global Controller for the program (interface between code and UI)
-	private JLabel loadedMapName; //a label for the loaded map
 	private JPanel carPanel; //Car status within the main window
 	private CustomDisplayMap mainPanel; //Biggest panel in the main window; Shows amalgamated information
 	private JPanel simPanel; //Sim status within the main window
@@ -189,9 +166,7 @@ public class GUImain implements Listener{
 	 * @param parent 
 	 */
 	private void initialize(GlobalController parent) {
-		mySession = parent; //adds parent
-		//TODO it's a little weird to be creating the controller from within the UI. Consider
-		//moving it up to the MAIN method. 
+		mySession = parent; //adds parent 
 		mainFrame = new JFrame(); //
 		//public void setBounds(int x, int y, int width, int height)
 		mainFrame.setBounds(150, 50, 1000, 600); //main window size on opening
@@ -314,14 +289,7 @@ public class GUImain implements Listener{
 		mnDebug.add(mntmAddCarTelempacket);
 		
 		JMenuItem mntmAddWeatherReport = new JMenuItem("Add Weather Report");
-		mnDebug.add(mntmAddWeatherReport);
-		
-		//THIS SECTION ADDS IN THE LABELS
-		this.loadedMapName = new JLabel("None");
-		//TODO set up the rest of the labels to initialize properly
-		//note: Pretty sure I've made them elsewhere in the code, 
-		//probably have to just consolidate them
-		
+		mnDebug.add(mntmAddWeatherReport);		
 		
 		//This sets up the layout for the main window
 		mainFrame.getContentPane().setLayout(new FormLayout(new ColumnSpec[] {
@@ -344,7 +312,6 @@ public class GUImain implements Listener{
 		loadStatusPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		//frame.getContentPane().add(LoadStatusPanel);
 		mainFrame.getContentPane().add(loadStatusPanel, "1, 1, 3, 1, fill, top");
-		//TODO: remove the fills. We don't want it to grow.
 		
 		weatherPanel = new WeatherPanel(this.mySession, this);
 		weatherPanel.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -365,7 +332,6 @@ public class GUImain implements Listener{
 		
 		JLabel lblMain = new JLabel("Main");
 		mainPanel.add(lblMain);
-		//TODO: turn these panels into their own classes, and set them up.
 		simPanel = new JPanel();
 		mainFrame.getContentPane().add(simPanel, "1, 7, fill, fill");
 		simPanel.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -437,7 +403,7 @@ public class GUImain implements Listener{
 	}
 	
 	/**
-	 * Sets the window title and logo. Currently Just what I came up with 
+	 * Sets the window title and logo. Currently just what I came up with 
 	 */
 	private void setTitleAndLogo(){
 		mainFrame.setIconImage(mySession.iconImage.getImage());
