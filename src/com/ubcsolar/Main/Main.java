@@ -2,12 +2,11 @@ package com.ubcsolar.Main;
 
 import java.io.IOException;
 
-import org.jdom2.JDOMException;
-
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SolarLog;
 
 public class Main {
+	@SuppressWarnings("unused")
 	private static GlobalController theProgram;
 
 	/**
@@ -17,7 +16,6 @@ public class Main {
 	public static void main(String[] args) throws IOException{
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Application started");
 		theProgram = new GlobalController(true);
-		//will first commit test
 	}
 
 }
