@@ -21,7 +21,6 @@ public class ForecastFactory {
 		for(GeoCoord g : spots){
 			ForecastIO forecastIOhuhyu = new ForecastIO("" + g.getLat(), "" + g.getLon(), ForecastIO.UNITS_SI, ForecastIO.LANG_ENGLISH, API_KEY);
 			toReturn.add(forecastIOhuhyu);
-			System.out.println(forecastIOhuhyu.getUrl(""+g.getLat(), ""+g.getLon()));
 		
 		}
 		System.out.println("Factory - Spots in: " + spots.size() + " forecasts: " + toReturn.size());
