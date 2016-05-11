@@ -68,6 +68,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private JLabel stormLabel;
 	private JLabel windDirectionLabel;
 	private GeoCoord currentLocation;
+	private JMenuItem mntmLoadFakeForecast;
 
 	/**
 	 * Launch the application.
@@ -120,6 +121,17 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		});
 		
 		mnForecasts.add(mntmLoadForecastsFor_1);
+		
+		mntmLoadFakeForecast = new JMenuItem("Load Fake Forecast");
+		mntmLoadFakeForecast.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				System.out.println("Asked to create a fake forecast");
+				JFrame frame = new FakeForecastAddWindow(mySession);
+				frame.setVisible(true);
+			}
+		});
+		mnForecasts.add(mntmLoadFakeForecast);
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
