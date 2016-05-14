@@ -19,12 +19,14 @@ import jssc.SerialPortList;
 import javax.swing.JButton;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Vector;
 
-public class BTPhoneSelectDialog extends JFrame {
+public class BTCarSelectDialog extends JFrame {
 	private GlobalController mySession;
 	private JComboBox comPortComboBox;
+	private final String defaultOption = "Default";
 	
-	public BTPhoneSelectDialog(GlobalController mySession) throws HeadlessException {
+	public BTCarSelectDialog(GlobalController mySession) throws HeadlessException {
 		this.mySession = mySession;
 		setResizable(false);
 		setTitleAndLogo();
@@ -52,7 +54,12 @@ public class BTPhoneSelectDialog extends JFrame {
 		getContentPane().add(lblComPort, gbc_lblComPort);
 		
 		comPortComboBox = new JComboBox();
-		comPortComboBox.setModel(new DefaultComboBoxModel(SerialPortList.getPortNames()));
+		Vector<String> toPutInComboBox = new Vector<String>();
+		toPutInComboBox.addElement(defaultOption);
+		for(String s : SerialPortList.getPortNames()){
+			toPutInComboBox.addElement(s);
+		}
+		comPortComboBox.setModel(new DefaultComboBoxModel(toPutInComboBox));
 		GridBagConstraints gbc_comPortComboBox = new GridBagConstraints();
 		gbc_comPortComboBox.insets = new Insets(0, 0, 5, 5);
 		gbc_comPortComboBox.fill = GridBagConstraints.HORIZONTAL;
@@ -64,7 +71,7 @@ public class BTPhoneSelectDialog extends JFrame {
 		btnOk.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				connectToCar();
+				connectToCellPhone();
 				closeWindow();
 			}
 		});
@@ -78,7 +85,6 @@ public class BTPhoneSelectDialog extends JFrame {
 		btnCancel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				disconnectCellPhone();
 				closeWindow();
 			}
 		});
@@ -102,13 +108,14 @@ public class BTPhoneSelectDialog extends JFrame {
 	private void closeWindow(){
 		this.dispose();
 	}
-	private void connectToCar(){
+	private void connectToCellPhone(){
 		String comPort = this.comPortComboBox.getSelectedItem() + "";
-		mySession.getMyCarController().establishNewConnection(comPort);// (comPort);
+		if(comPort.equals(defaultOption)){
+			mySession.getMyCarController().establishNewConnection();
+		}
+		else{
+			mySession.getMyCarController().establishNewConnection(comPort);
+		}
 	}
-	
-	private void disconnectCellPhone(){
-		mySession.getMapController().disconnectCellPhone();
-	}
-	
+		
 }
