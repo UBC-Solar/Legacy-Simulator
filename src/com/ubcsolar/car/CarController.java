@@ -62,7 +62,7 @@ public class CarController extends ModuleController {
 	public void establishNewConnection(String comPort) {
 		try{
 			stopListeningToCar(); //close any existing current connection
-			myDataReceiver = new XbeeSerialDataReceiver(this, myDataProcessor);
+			myDataReceiver = new XbeeSerialDataReceiver(this, myDataProcessor, comPort);
 			myDataReceiver.run();
 			sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
 		}
