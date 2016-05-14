@@ -77,6 +77,7 @@ public class BTPhoneSelectDialog extends JFrame {
 		btnCancel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				disconnectCellPhone();
 				closeWindow();
 			}
 		});
@@ -103,6 +104,10 @@ public class BTPhoneSelectDialog extends JFrame {
 	private void connectToCellPhone(){
 		String comPort = this.comPortComboBox.getSelectedItem() + "";
 		mySession.getMapController().connectToCellPhone(comPort);
+	}
+	
+	private void disconnectCellPhone(){
+		mySession.getMapController().disconnectCellPhone();
 	}
 	
 }
