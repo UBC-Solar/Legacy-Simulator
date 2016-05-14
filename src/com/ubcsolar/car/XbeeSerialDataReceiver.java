@@ -36,6 +36,21 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 	void setName() {
 		this.name = "Real Car";
 	}
+	
+	private void setSerialPort(String serialPortName) throws SerialPortException{
+		System.out.println(serialPortName);
+		serialPort = new SerialPort(serialPortName);
+		serialPort.openPort();
+		serialPort.setParams(115200, 8, 1, 0); //where did these numbers come from?
+		serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
+	}
+	
+	public XbeeSerialDataReceiver(CarController toAdd, DataProcessor theProcessor, String serialPortName) throws SerialPortException{
+		super(toAdd, theProcessor);
+		myDataProcessor = theProcessor;
+		setSerialPort(serialPortName);
+	}
+	
 	/**
 	 * default constructor.
 	 * @param toAdd - the CarController to notify when it gets a new result
@@ -43,21 +58,13 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 	public XbeeSerialDataReceiver(CarController toAdd, DataProcessor theProcessor) throws SerialPortException{
 		super(toAdd, theProcessor);
 		myDataProcessor = theProcessor;
-		try{
-			String[] portNames = SerialPortList.getPortNames();
-			String portName = "NO SERIAL PORT";
-			if(portNames.length > 0)
-				portName = portNames[0]; //it always gets the first serial port available. 
-			System.out.println(portName);
-			serialPort = new SerialPort(portName);
-			serialPort.openPort();
-			serialPort.setParams(115200, 8, 1, 0); //where did these numbers come from?
-			serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
-		} catch(ArrayIndexOutOfBoundsException e) {
-			System.out.println("No serial ports");
-			Log.write("ERROR: No Serial Ports");
-			e.printStackTrace();
-		}
+		
+		String[] portNames = SerialPortList.getPortNames();
+		String serialPortName = "NO SERIAL PORT";
+		if(portNames.length > 0)
+			serialPortName = portNames[0]; //it always gets the first serial port available. 
+
+		setSerialPort(serialPortName);
 	}
 	
 	/**
