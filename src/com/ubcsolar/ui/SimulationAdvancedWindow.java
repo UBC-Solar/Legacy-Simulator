@@ -51,6 +51,11 @@ import java.awt.event.ActionEvent;
 import java.awt.Insets;
 import javax.swing.JCheckBox;
 import java.awt.FlowLayout;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.SwingConstants;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.JTextField;
 
 public class SimulationAdvancedWindow extends JFrame implements Listener{
 
@@ -70,6 +75,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private boolean showStateOfCharge = true;
 	private boolean showCloud = true;
 	private boolean showElevation = true;
+	private JScrollPane speedSlidersPanel;
 
 	
 	private void handleError(String message){
@@ -165,8 +171,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		setDefaultChart();
 		mainDisplay = new ChartPanel(simResults);
 		GridBagConstraints gbc_mainDisplay = new GridBagConstraints();
-		gbc_mainDisplay.weighty = 2.0;
-		gbc_mainDisplay.weightx = 2.0;
+		gbc_mainDisplay.weighty = 1.0;
+		gbc_mainDisplay.weightx = 1.0;
 		gbc_mainDisplay.insets = new Insets(0, 0, 5, 5);
 		gbc_mainDisplay.fill = GridBagConstraints.BOTH;
 		gbc_mainDisplay.gridx = 0;
@@ -181,20 +187,25 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		gbc_panel_1.gridy = 0;
 		chartHoldingPanel.add(panel_1, gbc_panel_1);
 		
-		JPanel panel_2 = new JPanel();
-		GridBagConstraints gbc_panel_2 = new GridBagConstraints();
-		gbc_panel_2.insets = new Insets(0, 0, 0, 5);
-		gbc_panel_2.fill = GridBagConstraints.BOTH;
-		gbc_panel_2.gridx = 0;
-		gbc_panel_2.gridy = 1;
-		chartHoldingPanel.add(panel_2, gbc_panel_2);
-		
 		JPanel panel = new JPanel();
 		GridBagConstraints gbc_panel = new GridBagConstraints();
 		gbc_panel.fill = GridBagConstraints.BOTH;
 		gbc_panel.gridx = 1;
 		gbc_panel.gridy = 1;
 		chartHoldingPanel.add(panel, gbc_panel);
+		
+		speedSlidersPanel = new JScrollPane();
+		speedSlidersPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		contentPane.add(speedSlidersPanel, BorderLayout.SOUTH);
+		
+		JPanel panel_2 = new JPanel();
+		speedSlidersPanel.setViewportView(panel_2);
+		
+		JSlider slider = new JSlider();
+		slider.setMinorTickSpacing(20);
+		slider.setPaintTicks(true);
+		slider.setOrientation(SwingConstants.VERTICAL);
+		panel_2.add(slider);
 		
 		setDefaultChart();
 		
