@@ -322,21 +322,21 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		
 		private Map<GeoCoord, Double> generateRequestedSpeedMap() {
 			HashMap<GeoCoord, Double> toReturn = new HashMap<GeoCoord, Double>();
-			Random rng = new Random();
+			/*Random rng = new Random();
 			if(rng.nextBoolean()){
 				for(SimFrame g : this.lastSimReport.getSimFrames()){
 					toReturn.put(g.getGPSReport().getLocation(), 25.0);
 				}
-			}
+			}*/ //used this for testing. 
 			
-			/*for(SliderSpinnerFrame f : this.displayedSpeedSliderSpinners){
+			for(SliderSpinnerFrame f : this.displayedSpeedSliderSpinners){
 				if(f.isManuallySet()){
 					for(GeoCoord g : f.getRepresentedCoordinates()){
 						toReturn.put(g, f.getValue()+0.0); //the '+0.0' is to make it a Double. 
 					}
 					System.out.println("Manually Requesting speed to: " + f.getValue());
 				}
-			}*/
+			}
 			
 			return toReturn;
 		}
