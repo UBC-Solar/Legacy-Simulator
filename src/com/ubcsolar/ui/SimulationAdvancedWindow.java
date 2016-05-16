@@ -41,6 +41,8 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.awt.event.ActionEvent;
 import java.awt.Insets;
 import javax.swing.JCheckBox;
@@ -74,7 +76,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private JScrollPane speedSlidersPanel;
 	private JTextField textField_1;
 	private JPanel SliderHoldingPanel;
-	private List<JPanel> displayedSpeedSliderSpinners;
+	private List<SliderSpinnerFrame> displayedSpeedSliderSpinners;
 
 	
 	private void handleError(String message){
@@ -241,7 +243,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		
 		
 		//add the panels dynamically
-		this.displayedSpeedSliderSpinners = new ArrayList<JPanel>();
+		this.displayedSpeedSliderSpinners = new ArrayList<SliderSpinnerFrame>();
 		double runningTotalDistance = 0;
 		int lastAddedPointIndex = 0;
 		double lastAddedPointDistance = 0.0;
@@ -274,6 +276,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			}			
 		}
 		
+		
+		
 		for(int i = 0; i<displayedSpeedSliderSpinners.size(); i++){
 			GridBagConstraints temp_gbc_panel = new GridBagConstraints();
 			temp_gbc_panel.insets = new Insets(0, 0, 0, 5);
@@ -298,24 +302,45 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		 * is not loaded, displays an error message to end user. 
 		 */
 		protected void runSimultion() {
-		
-		try {
-			mySession.getMySimController().runSimulation(new HashMap<GeoCoord,Double>());
-		} catch (NoForecastReportException e) {
-			this.handleError("No Forcecasts Loaded");
-			return;
-		} catch (NoLoadedRouteException e) {
-			this.handleError("No Route Loaded");
-			return;
-		} catch (NoLocationReportedException e) {
-			this.handleError("No Location Reported Yet");
-			return;
-		} catch (NoCarStatusException e) {
-			this.handleError("No Car Status Reported Yet");
-			return;
-		}
+			Map<GeoCoord, Double> requestedSpeeds = generateRequestedSpeedMap();
+			try {
+				mySession.getMySimController().runSimulation(requestedSpeeds);
+			} catch (NoForecastReportException e) {
+				this.handleError("No Forcecasts Loaded");
+				return;
+			} catch (NoLoadedRouteException e) {
+				this.handleError("No Route Loaded");
+				return;
+			} catch (NoLocationReportedException e) {
+				this.handleError("No Location Reported Yet");
+				return;
+			} catch (NoCarStatusException e) {
+				this.handleError("No Car Status Reported Yet");
+				return;
+			}
 	}
 		
+		private Map<GeoCoord, Double> generateRequestedSpeedMap() {
+			HashMap<GeoCoord, Double> toReturn = new HashMap<GeoCoord, Double>();
+			Random rng = new Random();
+			if(rng.nextBoolean()){
+				for(SimFrame g : this.lastSimReport.getSimFrames()){
+					toReturn.put(g.getGPSReport().getLocation(), 25.0);
+				}
+			}
+			
+			/*for(SliderSpinnerFrame f : this.displayedSpeedSliderSpinners){
+				if(f.isManuallySet()){
+					for(GeoCoord g : f.getRepresentedCoordinates()){
+						toReturn.put(g, f.getValue()+0.0); //the '+0.0' is to make it a Double. 
+					}
+					System.out.println("Manually Requesting speed to: " + f.getValue());
+				}
+			}*/
+			
+			return toReturn;
+		}
+
 		/**
 		 * Builds a default, empty chart. 
 		 */
