@@ -2,12 +2,6 @@ package com.ubcsolar.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.EventQueue;
-
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -25,10 +19,8 @@ import org.jfree.data.xy.XYDataset;
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
-import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SimFrame;
 import com.ubcsolar.common.SimulationReport;
-import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.exception.NoCarStatusException;
 import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.exception.NoLoadedRouteException;
@@ -49,24 +41,20 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.awt.event.ActionEvent;
 import java.awt.Insets;
 import javax.swing.JCheckBox;
 import java.awt.FlowLayout;
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.SwingConstants;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JTextField;
-import javax.swing.JLabel;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 
 public class SimulationAdvancedWindow extends JFrame implements Listener{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2684909507474196406L;
 	private static final String CHART_TITLE = "Sim Results";
 	private JPanel contentPane; //the root content holder
 	private GlobalController mySession; 
@@ -84,8 +72,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private boolean showCloud = true;
 	private boolean showElevation = true;
 	private JScrollPane speedSlidersPanel;
-	private JTextField textField = new JTextField();
-	private JSpinner speedSpinnerOne  = new JSpinner();
 	private JTextField textField_1;
 	private JPanel SliderHoldingPanel;
 	private List<JPanel> displayedSpeedSliderSpinners;

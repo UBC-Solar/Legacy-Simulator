@@ -2,9 +2,12 @@ package com.ubcsolar.ui;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
+import java.awt.Component;
+
 import javax.swing.JSpinner;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
@@ -39,6 +42,9 @@ public class SliderSpinnerFrame extends JPanel {
 			}
 		});
 		spinner.setValue(initialValue);
+		Component mySpinnerEditor = spinner.getEditor();
+		JFormattedTextField jftf = ((JSpinner.DefaultEditor) mySpinnerEditor).getTextField();
+		jftf.setColumns(3); //won't go faster than 999 km/h. 
 		panel.add(spinner, BorderLayout.SOUTH);
 		
 		slider = new JSlider();
