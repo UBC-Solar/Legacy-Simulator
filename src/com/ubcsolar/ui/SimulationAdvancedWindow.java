@@ -221,6 +221,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		}
 
 	private void clearAndLoadSpeedSliders(List<SimFrame> simResultValues, int pointsPerSlider) {
+		int KM_PER_SLIDER = 1; //could make this dynamic
+	
 		SliderHoldingPanel.removeAll();
 		
 		GridBagLayout gbl_SliderHoldingPanel = new GridBagLayout();
@@ -241,28 +243,36 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		//add the panels dynamically
 		this.displayedSpeedSliderSpinners = new ArrayList<JPanel>();
 		double runningTotalDistance = 0;
+		int lastAddedPointIndex = 0;
+		double lastAddedPointDistance = 0.0;
 		
-		//do the first one
-		List<GeoCoord> firstPointSet = new ArrayList<GeoCoord>();
-		firstPointSet.add(simResultValues.get(0).getGPSReport().getLocation());
-		displayedSpeedSliderSpinners.add(
-				new SliderSpinnerFrame("km: " + runningTotalDistance,
-										(int) simResultValues.get(0).getCarStatus().getSpeed(),
-										false,
-										firstPointSet));
-		
-		//do the rest of them
-		for(int i = 0; i<simResultValues.size()-1; i++){
-			GeoCoord start = simResultValues.get(i).getGPSReport().getLocation();
-			GeoCoord end = simResultValues.get(i+1).getGPSReport().getLocation();
+		//can't set the first speed anyway. 
+		for(int i = 1; i<simResultValues.size(); i++){
+			GeoCoord start = simResultValues.get(i-1).getGPSReport().getLocation();
+			GeoCoord end = simResultValues.get(i).getGPSReport().getLocation();
 			runningTotalDistance += start.calculateDistance(end);
 			
-			int averageSpeed = (int) simResultValues.get(i+1).getCarStatus().getSpeed();
-			List<GeoCoord> pointsToRepresent = new ArrayList<GeoCoord>();
-			pointsToRepresent.add(end);
-			SliderSpinnerFrame toAddToPanel = new SliderSpinnerFrame("km: " + runningTotalDistance,
-																	averageSpeed, false,pointsToRepresent);
-			displayedSpeedSliderSpinners.add(toAddToPanel);
+			if((runningTotalDistance-lastAddedPointDistance)>KM_PER_SLIDER){
+				List<GeoCoord> pointsToRepresent = new ArrayList<GeoCoord>();
+				double totalSpeed = 0;
+				for(int index = lastAddedPointIndex+1; index<=i; index++){
+					totalSpeed += simResultValues.get(index).getCarStatus().getSpeed();
+					pointsToRepresent.add(simResultValues.get(index).getGPSReport().getLocation());
+				}
+				
+				double averageSpeed = totalSpeed/(i-(lastAddedPointIndex+1)); //double check the off-by-one error.
+				String label = lastAddedPointDistance+"km-"+runningTotalDistance+"km";
+				SliderSpinnerFrame toAddToPanel = new SliderSpinnerFrame(label ,
+										(int) averageSpeed, false,pointsToRepresent);
+				displayedSpeedSliderSpinners.add(toAddToPanel);
+				
+				lastAddedPointIndex = i;
+				lastAddedPointDistance = runningTotalDistance;
+				
+				
+			}			
+			
+
 		}
 		
 		for(int i = 0; i<displayedSpeedSliderSpinners.size(); i++){
