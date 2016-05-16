@@ -220,7 +220,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		this.register();
 		}
 
-	private void clearAndLoadSpeedSliders(List<SimFrame> simResultValues) {
+	private void clearAndLoadSpeedSliders(List<SimFrame> simResultValues, int pointsPerSlider) {
 		SliderHoldingPanel.removeAll();
 		
 		GridBagLayout gbl_SliderHoldingPanel = new GridBagLayout();
@@ -232,23 +232,44 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		
 		gbl_SliderHoldingPanel.columnWeights = new double[simResultValues.size()];
 		for(int i = 0; i<simResultValues.size(); i++){
-			gbl_SliderHoldingPanel.columnWeights[i] = 0;
-		}
+			gbl_SliderHoldingPanel.columnWeights[i] = 0; //don't want any slider column growing
+		} 
 		gbl_SliderHoldingPanel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
 		SliderHoldingPanel.setLayout(gbl_SliderHoldingPanel);
 		
 		
-		//test: add the panels dynamically
+		//add the panels dynamically
 		this.displayedSpeedSliderSpinners = new ArrayList<JPanel>();
-		for(int i = 0; i<5; i++){
-			displayedSpeedSliderSpinners.add(new SliderSpinnerFrame("Test" + i, 5*i, false));
+		double runningTotalDistance = 0;
+		
+		//do the first one
+		List<GeoCoord> firstPointSet = new ArrayList<GeoCoord>();
+		firstPointSet.add(simResultValues.get(0).getGPSReport().getLocation());
+		displayedSpeedSliderSpinners.add(
+				new SliderSpinnerFrame("km: " + runningTotalDistance,
+										(int) simResultValues.get(0).getCarStatus().getSpeed(),
+										false,
+										firstPointSet));
+		
+		//do the rest of them
+		for(int i = 0; i<simResultValues.size()-1; i++){
+			GeoCoord start = simResultValues.get(i).getGPSReport().getLocation();
+			GeoCoord end = simResultValues.get(i+1).getGPSReport().getLocation();
+			runningTotalDistance += start.calculateDistance(end);
+			
+			int averageSpeed = (int) simResultValues.get(i+1).getCarStatus().getSpeed();
+			List<GeoCoord> pointsToRepresent = new ArrayList<GeoCoord>();
+			pointsToRepresent.add(end);
+			SliderSpinnerFrame toAddToPanel = new SliderSpinnerFrame("km: " + runningTotalDistance,
+																	averageSpeed, false,pointsToRepresent);
+			displayedSpeedSliderSpinners.add(toAddToPanel);
 		}
 		
 		for(int i = 0; i<displayedSpeedSliderSpinners.size(); i++){
 			GridBagConstraints temp_gbc_panel = new GridBagConstraints();
 			temp_gbc_panel.insets = new Insets(0, 0, 0, 5);
 			temp_gbc_panel.fill = GridBagConstraints.BOTH;
-			temp_gbc_panel.gridx = i;
+			temp_gbc_panel.gridx = i; //add it on the right
 			temp_gbc_panel.gridy = 0;
 			SliderHoldingPanel.add(displayedSpeedSliderSpinners.get(i), temp_gbc_panel);
 		}
@@ -323,7 +344,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			if(n.getClass() == NewSimulationReportNotification.class){
 				NewSimulationReportNotification test = (NewSimulationReportNotification) n;
 				updateChart(test.getSimReport());
-				this.clearAndLoadSpeedSliders(test.getSimReport().getSimFrames());
+				this.clearAndLoadSpeedSliders(test.getSimReport().getSimFrames(), 1);
 			}
 			
 		}
