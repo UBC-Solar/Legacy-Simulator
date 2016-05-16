@@ -260,19 +260,18 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 					pointsToRepresent.add(simResultValues.get(index).getGPSReport().getLocation());
 				}
 				
-				double averageSpeed = totalSpeed/(i-(lastAddedPointIndex+1)); //double check the off-by-one error.
-				String label = lastAddedPointDistance+"km-"+runningTotalDistance+"km";
+				double averageSpeed = totalSpeed/(i-(lastAddedPointIndex+1)); //avg speed across all points represented
+				String formattedKMOne = String.format("%.2f", lastAddedPointDistance); //to avoid having 16 digits
+				String formattedKMTwo = String.format("%.2f", runningTotalDistance);
+				String label = "KMs: " + formattedKMOne+"-"+formattedKMTwo;
+				//String label = lastAddedPointDistance+"km-"+runningTotalDistance+"km";
 				SliderSpinnerFrame toAddToPanel = new SliderSpinnerFrame(label ,
 										(int) averageSpeed, false,pointsToRepresent);
 				displayedSpeedSliderSpinners.add(toAddToPanel);
 				
 				lastAddedPointIndex = i;
 				lastAddedPointDistance = runningTotalDistance;
-				
-				
 			}			
-			
-
 		}
 		
 		for(int i = 0; i<displayedSpeedSliderSpinners.size(); i++){
