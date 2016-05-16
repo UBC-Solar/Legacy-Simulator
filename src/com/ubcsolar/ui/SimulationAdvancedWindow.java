@@ -210,84 +210,19 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		JPanel panel_2 = new JPanel();
 		speedSlidersPanel.setViewportView(panel_2);
 		GridBagLayout gbl_panel_2 = new GridBagLayout();
-		gbl_panel_2.columnWidths = new int[]{60, 31, 0};
-		gbl_panel_2.rowHeights = new int[]{0, 0, 0, 0};
-		gbl_panel_2.columnWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
-		gbl_panel_2.rowWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_2.columnWidths = new int[]{0, 60, 31, 0};
+		gbl_panel_2.rowHeights = new int[]{0, 0};
+		gbl_panel_2.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_2.rowWeights = new double[]{1.0, Double.MIN_VALUE};
 		panel_2.setLayout(gbl_panel_2);
 		
-		JLabel lblTest = new JLabel("test");
-		GridBagConstraints gbc_lblTest = new GridBagConstraints();
-		gbc_lblTest.insets = new Insets(0, 0, 5, 5);
-		gbc_lblTest.gridx = 0;
-		gbc_lblTest.gridy = 0;
-		panel_2.add(lblTest, gbc_lblTest);
-		
-		JLabel label = new JLabel("test");
-		GridBagConstraints gbc_label = new GridBagConstraints();
-		gbc_label.insets = new Insets(0, 0, 5, 0);
-		gbc_label.gridx = 1;
-		gbc_label.gridy = 0;
-		panel_2.add(label, gbc_label);
-		
-		JSlider slider = new JSlider();
-		slider.setValue(62);
-		slider.setMaximum(125);
-		slider.setMinorTickSpacing(15);
-		slider.setPaintTicks(true);
-		slider.setPaintLabels(true);
-		slider.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				speedSpinnerOne.setValue(slider.getValue());
-			}
-		});
-		slider.setOrientation(SwingConstants.VERTICAL);
-		GridBagConstraints gbc_slider = new GridBagConstraints();
-		gbc_slider.insets = new Insets(0, 0, 5, 5);
-		gbc_slider.gridx = 0;
-		gbc_slider.gridy = 1;
-		panel_2.add(slider, gbc_slider);
-		
-		JSlider slider_1 = new JSlider();
-		slider_1.setValue(62);
-		slider_1.setPaintTicks(true);
-		slider_1.setPaintLabels(true);
-		slider_1.setOrientation(SwingConstants.VERTICAL);
-		slider_1.setMinorTickSpacing(15);
-		slider_1.setMaximum(125);
-		GridBagConstraints gbc_slider_1 = new GridBagConstraints();
-		gbc_slider_1.insets = new Insets(0, 0, 5, 0);
-		gbc_slider_1.gridx = 1;
-		gbc_slider_1.gridy = 1;
-		panel_2.add(slider_1, gbc_slider_1);
-		
-		speedSpinnerOne = new JSpinner();
-		speedSpinnerOne.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				slider.setValue((int) speedSpinnerOne.getValue());
-			}
-		});
-		speedSpinnerOne.setModel(new SpinnerNumberModel(new Integer(100), null, null, new Integer(1)));
-		speedSpinnerOne.setValue(slider.getValue());
-		Component mySpinnerEditor = speedSpinnerOne.getEditor();
-		JFormattedTextField jftf = ((JSpinner.DefaultEditor) mySpinnerEditor).getTextField();
-		jftf.setColumns(3); //makes it at least 3 digits. 
-		GridBagConstraints gbc_spinner = new GridBagConstraints();
-		gbc_spinner.insets = new Insets(0, 0, 0, 5);
-		gbc_spinner.gridx = 0;
-		gbc_spinner.gridy = 2;
-		panel_2.add(speedSpinnerOne, gbc_spinner);
-		
-		textField = new JTextField();
-		textField.setText("120");
-		textField.setHorizontalAlignment(SwingConstants.CENTER);
-		textField.setColumns(10);
-		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.gridx = 1;
-		gbc_textField.gridy = 2;
-		panel_2.add(textField, gbc_textField);
-		
+		JPanel panel_3 = new SliderSpinnerFrame("TEST", 25, true);
+		GridBagConstraints gbc_panel_3 = new GridBagConstraints();
+		gbc_panel_3.insets = new Insets(0, 0, 0, 5);
+		gbc_panel_3.fill = GridBagConstraints.BOTH;
+		gbc_panel_3.gridx = 0;
+		gbc_panel_3.gridy = 0;
+		panel_2.add(panel_3, gbc_panel_3);
 		setDefaultChart();
 		
 		setTitleAndLogo();
