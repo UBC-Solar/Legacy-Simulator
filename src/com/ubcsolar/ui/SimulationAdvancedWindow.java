@@ -46,6 +46,7 @@ import javax.swing.JButton;
 
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,6 +86,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private JScrollPane speedSlidersPanel;
 	private JTextField textField = new JTextField();
 	private JSpinner speedSpinnerOne  = new JSpinner();
+	private JTextField textField_1;
 
 	
 	private void handleError(String message){
@@ -99,7 +101,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		
 		this.mySession = mySession;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 450, 400);
+		setBounds(100, 100, 450, 543);
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -207,22 +209,38 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		speedSlidersPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		contentPane.add(speedSlidersPanel, BorderLayout.SOUTH);
 		
-		JPanel panel_2 = new JPanel();
-		speedSlidersPanel.setViewportView(panel_2);
-		GridBagLayout gbl_panel_2 = new GridBagLayout();
-		gbl_panel_2.columnWidths = new int[]{0, 60, 31, 0};
-		gbl_panel_2.rowHeights = new int[]{0, 0};
-		gbl_panel_2.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_panel_2.rowWeights = new double[]{1.0, Double.MIN_VALUE};
-		panel_2.setLayout(gbl_panel_2);
+		JPanel SliderHoldingPanel = new JPanel();
+		speedSlidersPanel.setViewportView(SliderHoldingPanel);
+		GridBagLayout gbl_SliderHoldingPanel = new GridBagLayout();
+		gbl_SliderHoldingPanel.columnWidths = new int[]{0, 0, 0, 0};
+		gbl_SliderHoldingPanel.rowHeights = new int[]{0, 0};
+		gbl_SliderHoldingPanel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_SliderHoldingPanel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
+		SliderHoldingPanel.setLayout(gbl_SliderHoldingPanel);
 		
-		JPanel panel_3 = new SliderSpinnerFrame("TEST", 25, true);
-		GridBagConstraints gbc_panel_3 = new GridBagConstraints();
-		gbc_panel_3.insets = new Insets(0, 0, 0, 5);
-		gbc_panel_3.fill = GridBagConstraints.BOTH;
-		gbc_panel_3.gridx = 0;
-		gbc_panel_3.gridy = 0;
-		panel_2.add(panel_3, gbc_panel_3);
+		//test: add the panels dynamically
+		List<JPanel> speedSlidersToAdd = new ArrayList<JPanel>();
+		for(int i = 0; i<5; i++){
+			speedSlidersToAdd.add(new SliderSpinnerFrame("Test" + i, 5*i, false));
+		}
+		
+		for(int i = 0; i<speedSlidersToAdd.size(); i++){
+			GridBagConstraints temp_gbc_panel = new GridBagConstraints();
+			temp_gbc_panel.insets = new Insets(0, 0, 0, 5);
+			temp_gbc_panel.fill = GridBagConstraints.BOTH;
+			temp_gbc_panel.gridx = i;
+			temp_gbc_panel.gridy = 0;
+			SliderHoldingPanel.add(speedSlidersToAdd.get(i), temp_gbc_panel);
+		}
+		
+		
+		textField_1 = new JTextField();
+		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
+		gbc_textField_1.insets = new Insets(0, 0, 0, 5);
+		gbc_textField_1.gridx = 0;
+		gbc_textField_1.gridy = 1;
+		SliderHoldingPanel.add(textField_1, gbc_textField_1);
+		textField_1.setColumns(10);
 		setDefaultChart();
 		
 		setTitleAndLogo();
