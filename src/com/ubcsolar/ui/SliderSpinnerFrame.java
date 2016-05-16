@@ -8,13 +8,23 @@ import java.util.*;
 import javax.swing.JSpinner;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
+import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.DefaultFormatter;
 
 import com.ubcsolar.common.GeoCoord;
 
 import javax.swing.event.ChangeEvent;
+import java.awt.event.InputMethodListener;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class SliderSpinnerFrame extends JPanel {
 	/**
@@ -41,13 +51,29 @@ public class SliderSpinnerFrame extends JPanel {
 		panel.setLayout(new BorderLayout(0, 0));
 		
 		spinner = new JSpinner();
-		spinner.addChangeListener(new ChangeListener() {
+		JComponent comp = spinner.getEditor();
+	    JFormattedTextField field = (JFormattedTextField) comp.getComponent(0);
+	    DefaultFormatter formatter = (DefaultFormatter) field.getFormatter();
+	    formatter.setCommitsOnValidEdit(true);
+	    spinner.addChangeListener(new ChangeListener() {
+
+	        @Override
+	        public void stateChanged(ChangeEvent e) {
+	        	currentValue = (int) spinner.getValue();
+				isManuallySet = true;
+				updateSelectors();
+	        }
+	    });
+		
+		
+		
+		/*spinner.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				currentValue = (int) spinner.getValue();
 				isManuallySet = true;
 				updateSelectors();
 			}
-		});
+		});*/
 		spinner.setValue(initialValue);
 		Component mySpinnerEditor = spinner.getEditor();
 		JFormattedTextField jftf = ((JSpinner.DefaultEditor) mySpinnerEditor).getTextField();
@@ -56,12 +82,47 @@ public class SliderSpinnerFrame extends JPanel {
 		
 		slider = new JSlider();
 		slider.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
+			public void stateChanged(ChangeEvent evt) {
+				  JSlider slider = (JSlider) evt.getSource();
+			        if (!slider.getValueIsAdjusting()) {
+			        	currentValue = slider.getValue();
+						isManuallySet = true;
+						updateSelectors();
+			        }
+			}
+		});
+		/*slider.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent arg0) {
 				currentValue = slider.getValue();
 				isManuallySet = true;
 				updateSelectors();
 			}
 		});
+		slider.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				currentValue = slider.getValue();
+				isManuallySet = true;
+				updateSelectors();
+			}
+		});
+		slider.addMouseWheelListener(new MouseWheelListener() {
+			public void mouseWheelMoved(MouseWheelEvent arg0) {
+				currentValue = slider.getValue();
+				isManuallySet = true;
+				updateSelectors();
+			}
+		});*/
+		
+		
+		/*slider.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				currentValue = slider.getValue();
+				isManuallySet = true;
+				updateSelectors();
+			}
+		});*/
 		slider.setMinorTickSpacing(25);
 		slider.setMaximum(125);
 		slider.setPaintTicks(true);
