@@ -87,6 +87,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private JTextField textField = new JTextField();
 	private JSpinner speedSpinnerOne  = new JSpinner();
 	private JTextField textField_1;
+	private JPanel SliderHoldingPanel;
+	private List<JPanel> displayedSpeedSliderSpinners;
 
 	
 	private void handleError(String message){
@@ -209,7 +211,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		speedSlidersPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		contentPane.add(speedSlidersPanel, BorderLayout.SOUTH);
 		
-		JPanel SliderHoldingPanel = new JPanel();
+		SliderHoldingPanel = new JPanel();
 		speedSlidersPanel.setViewportView(SliderHoldingPanel);
 		GridBagLayout gbl_SliderHoldingPanel = new GridBagLayout();
 		gbl_SliderHoldingPanel.columnWidths = new int[]{0, 0, 0, 0};
@@ -217,21 +219,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		gbl_SliderHoldingPanel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
 		gbl_SliderHoldingPanel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
 		SliderHoldingPanel.setLayout(gbl_SliderHoldingPanel);
-		
-		//test: add the panels dynamically
-		List<JPanel> speedSlidersToAdd = new ArrayList<JPanel>();
-		for(int i = 0; i<5; i++){
-			speedSlidersToAdd.add(new SliderSpinnerFrame("Test" + i, 5*i, false));
-		}
-		
-		for(int i = 0; i<speedSlidersToAdd.size(); i++){
-			GridBagConstraints temp_gbc_panel = new GridBagConstraints();
-			temp_gbc_panel.insets = new Insets(0, 0, 0, 5);
-			temp_gbc_panel.fill = GridBagConstraints.BOTH;
-			temp_gbc_panel.gridx = i;
-			temp_gbc_panel.gridy = 0;
-			SliderHoldingPanel.add(speedSlidersToAdd.get(i), temp_gbc_panel);
-		}
 		
 		
 		textField_1 = new JTextField();
@@ -246,6 +233,49 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		setTitleAndLogo();
 		this.register();
 		}
+
+	private void clearAndLoadSpeedSliders(List<SimFrame> simResultValues) {
+		SliderHoldingPanel.removeAll();
+		
+		GridBagLayout gbl_SliderHoldingPanel = new GridBagLayout();
+		gbl_SliderHoldingPanel.columnWidths = new int[simResultValues.size()];
+		for(int i = 0; i<simResultValues.size(); i++){
+			gbl_SliderHoldingPanel.columnWidths[i] = 0;
+		}
+		gbl_SliderHoldingPanel.rowHeights = new int[]{0, 0};
+		
+		gbl_SliderHoldingPanel.columnWeights = new double[simResultValues.size()];
+		for(int i = 0; i<simResultValues.size(); i++){
+			gbl_SliderHoldingPanel.columnWeights[i] = 0;
+		}
+		gbl_SliderHoldingPanel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
+		SliderHoldingPanel.setLayout(gbl_SliderHoldingPanel);
+		
+		
+		//test: add the panels dynamically
+		this.displayedSpeedSliderSpinners = new ArrayList<JPanel>();
+		for(int i = 0; i<5; i++){
+			displayedSpeedSliderSpinners.add(new SliderSpinnerFrame("Test" + i, 5*i, false));
+		}
+		
+		for(int i = 0; i<displayedSpeedSliderSpinners.size(); i++){
+			GridBagConstraints temp_gbc_panel = new GridBagConstraints();
+			temp_gbc_panel.insets = new Insets(0, 0, 0, 5);
+			temp_gbc_panel.fill = GridBagConstraints.BOTH;
+			temp_gbc_panel.gridx = i;
+			temp_gbc_panel.gridy = 0;
+			SliderHoldingPanel.add(displayedSpeedSliderSpinners.get(i), temp_gbc_panel);
+		}
+		
+		//this text box is just to force it to be bigger so the scroll bar doesn't cover anything. 
+		textField_1 = new JTextField();
+		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
+		gbc_textField_1.insets = new Insets(0, 0, 0, 5);
+		gbc_textField_1.gridx = 0;
+		gbc_textField_1.gridy = 1;
+		SliderHoldingPanel.add(textField_1, gbc_textField_1);
+		textField_1.setColumns(5);
+	}
 		
 		/**
 		 * Attempts to run a simulation with the loaded data. If there is needed data that
@@ -307,6 +337,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			if(n.getClass() == NewSimulationReportNotification.class){
 				NewSimulationReportNotification test = (NewSimulationReportNotification) n;
 				updateChart(test.getSimReport());
+				this.clearAndLoadSpeedSliders(test.getSimReport().getSimFrames());
 			}
 			
 		}
