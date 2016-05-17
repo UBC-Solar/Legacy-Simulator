@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<kml xmlns='http://www.opengis.net/kml/2.2'>
+	<Document>
+		<name>Directions from AB-884, Ralston, AB T0J 2N0, Canada to AB-884, Ralston, AB T0J 2N0, Canada</name>
+		<Placemark>
+			<name>Directions from AB-884, Ralston, AB T0J 2N0, Canada to AB-884, Ralston, AB T0J 2N0, Canada</name>
+			<styleUrl>#line-1267FF-5-nodesc</styleUrl>
+			<LineString>
+				<tessellate>1</tessellate>
+				<coordinates>-111.17312,50.22316,0.0 -111.17312,50.22344,0.0 -111.17314,50.2315,0.0 -111.17313,50.23564,0.0 -111.17314,50.23723,0.0 -111.17312,50.24128,0.0 -111.17312,50.24463000000001,0.0 -111.17314,50.24576,0.0 -111.17316,50.24608,0.0 -111.17316,50.24644,0.0 -111.17316,50.24694,0.0 -111.17316,50.24726,0.0 -111.17317,50.24792000000001,0.0 -111.17317,50.24817,0.0 -111.17315,50.24998,0.0 -111.17315,50.25084,0.0 -111.17312,50.25232,0.0 -111.17311,50.25266,0.0 -111.17311,50.25304,0.0 -111.17309,50.25861,0.0 -111.1731,50.262220000000006,0.0 -111.1731,50.26633,0.0 -111.17307,50.26873,0.0 -111.17308,50.268890000000006,0.0 -111.17304,50.26996,0.0 -111.17305,50.2705,0.0 -111.17305,50.27101,0.0 -111.17305,50.27134,0.0 -111.17305,50.27211,0.0 -111.17304,50.27352,0.0 -111.17303,50.27579,0.0 -111.17303,50.276430000000005,0.0 -111.17303,50.277,0.0 -111.17304,50.277860000000004,0.0 -111.17304,50.28084,0.0 -111.17314,50.28249,0.0 -111.17316,50.28342,0.0 -111.17317,50.29509,0.0 -111.17317,50.29536000000001,0.0 -111.17316,50.2963,0.0 -111.17315,50.30609,0.0 -111.17315,50.30993,0.0 -111.17314,50.3245,0.0 -111.17313,50.33407,0.0 -111.17313,50.33497,0.0 -111.17313,50.33553,0.0 -111.17313,50.33597,0.0 -111.17313,50.33909,0.0 -111.17312,50.35363000000001,0.0 -111.17312,50.36818,0.0 -111.1731,50.3827,0.0 -111.17311,50.3972,0.0 -111.17314,50.40878,0.0 -111.17314,50.41185,0.0 -111.17314,50.42017,0.0 -111.17315,50.42643,0.0 -111.17314,50.44094,0.0 -111.17314,50.45547,0.0 -111.17313,50.47001,0.0 -111.17313,50.47816,0.0</coordinates>
+			</LineString>
+		</Placemark>
+		<Placemark>
+			<name>AB-884, Ralston, AB T0J 2N0, Canada</name>
+			<styleUrl>#icon-503-DB4436-nodesc</styleUrl>
+			<Point>
+				<coordinates>-111.173123,50.2231585,0.0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>AB-884, Ralston, AB T0J 2N0, Canada</name>
+			<styleUrl>#icon-503-DB4436-nodesc</styleUrl>
+			<Point>
+				<coordinates>-111.1731277,50.4781618,0.0</coordinates>
+			</Point>
+		</Placemark>
+		<Style id='icon-503-DB4436-nodesc-normal'>
+			<IconStyle>
+				<color>ff3644DB</color>
+				<scale>1.1</scale>
+				<Icon>
+					<href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+				</Icon>
+				<hotSpot x='16' y='31' xunits='pixels' yunits='insetPixels'>
+				</hotSpot>
+			</IconStyle>
+			<LabelStyle>
+				<scale>0.0</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<Style id='icon-503-DB4436-nodesc-highlight'>
+			<IconStyle>
+				<color>ff3644DB</color>
+				<scale>1.1</scale>
+				<Icon>
+					<href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+				</Icon>
+				<hotSpot x='16' y='31' xunits='pixels' yunits='insetPixels'>
+				</hotSpot>
+			</IconStyle>
+			<LabelStyle>
+				<scale>1.1</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<StyleMap id='icon-503-DB4436-nodesc'>
+			<Pair>
+				<key>normal</key>
+				<styleUrl>#icon-503-DB4436-nodesc-normal</styleUrl>
+			</Pair>
+			<Pair>
+				<key>highlight</key>
+				<styleUrl>#icon-503-DB4436-nodesc-highlight</styleUrl>
+			</Pair>
+		</StyleMap>
+		<Style id='line-1267FF-5-nodesc-normal'>
+			<LineStyle>
+				<color>ffFF6712</color>
+				<width>5</width>
+			</LineStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<Style id='line-1267FF-5-nodesc-highlight'>
+			<LineStyle>
+				<color>ffFF6712</color>
+				<width>8.0</width>
+			</LineStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<StyleMap id='line-1267FF-5-nodesc'>
+			<Pair>
+				<key>normal</key>
+				<styleUrl>#line-1267FF-5-nodesc-normal</styleUrl>
+			</Pair>
+			<Pair>
+				<key>highlight</key>
+				<styleUrl>#line-1267FF-5-nodesc-highlight</styleUrl>
+			</Pair>
+		</StyleMap>
+	</Document>
+</kml>
