@@ -226,6 +226,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		int KM_PER_SLIDER = 1; //could make this dynamic
 	
 		SliderHoldingPanel.removeAll();
+		SliderHoldingPanel.validate();
+		SliderHoldingPanel.repaint();
 		
 		GridBagLayout gbl_SliderHoldingPanel = new GridBagLayout();
 		gbl_SliderHoldingPanel.columnWidths = new int[simResultValues.size()];
@@ -285,6 +287,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			temp_gbc_panel.gridx = i; //add it on the right
 			temp_gbc_panel.gridy = 0;
 			SliderHoldingPanel.add(displayedSpeedSliderSpinners.get(i), temp_gbc_panel);
+			SliderHoldingPanel.validate();
+			SliderHoldingPanel.repaint();
 		}
 		
 		//this text box is just to force it to be bigger so the scroll bar doesn't cover anything. 
@@ -295,6 +299,12 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		gbc_textField_1.gridy = 1;
 		SliderHoldingPanel.add(textField_1, gbc_textField_1);
 		textField_1.setColumns(5);
+		
+		
+		this.repaint();
+		this.SliderHoldingPanel.repaint();
+		this.speedSlidersPanel.repaint();
+		
 	}
 		
 		/**
@@ -379,6 +389,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				NewSimulationReportNotification test = (NewSimulationReportNotification) n;
 				updateChart(test.getSimReport());
 				this.clearAndLoadSpeedSliders(test.getSimReport().getSimFrames(), 1);
+				this.repaint();
 			}
 			
 		}
