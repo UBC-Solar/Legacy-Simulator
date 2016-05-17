@@ -76,7 +76,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private JScrollPane speedSlidersPanel;
 	private JTextField textField_1;
 	private JPanel SliderHoldingPanel;
-	private List<SliderSpinnerFrame> displayedSpeedSliderSpinners;
+	private List<SliderSpinnerFrame> displayedSpeedSliderSpinners = new ArrayList<SliderSpinnerFrame>();
 
 	
 	private void handleError(String message){
