@@ -59,7 +59,6 @@ public class SliderSpinnerFrame extends JPanel {
 				currentValue = (int) spinner.getValue();
 				isManuallySet = true;
 				updateSelectors();
-				System.out.println("Spinner REPORTS IS MANUALLY SET");
 			}
 		});
 		
@@ -76,7 +75,6 @@ public class SliderSpinnerFrame extends JPanel {
 			        	currentValue = slider.getValue();
 						isManuallySet = true;
 						updateSelectors();
-						System.out.println("SLIDER REPORTS IS MANUALLY SET");
 			        }
 			}
 		});
