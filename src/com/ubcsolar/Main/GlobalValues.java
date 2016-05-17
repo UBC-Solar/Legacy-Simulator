@@ -21,5 +21,8 @@ public class GlobalValues {
 	
 	//Strategy@ubcsolar.com's key
 	public final static String WEATHER_KEY= "e4f99878991a762e85efbffc7db8d657";
+	
+	//hooman.vaseli@ubcsolar.com's key
+//	public final static String WEATHER_KEY= "26b799961238234d81780b220bb1d7b5";
 
 }
