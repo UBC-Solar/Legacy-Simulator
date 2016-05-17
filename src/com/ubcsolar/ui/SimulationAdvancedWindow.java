@@ -223,7 +223,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		}
 
 	private void clearAndLoadSpeedSliders(List<SimFrame> simResultValues, int pointsPerSlider) {
-		int KM_PER_SLIDER = 1; //could make this dynamic
+		int KM_PER_SLIDER = 5; //could make this dynamic
 	
 		SliderHoldingPanel.removeAll();
 		SliderHoldingPanel.validate();
