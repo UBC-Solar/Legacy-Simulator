@@ -131,5 +131,9 @@ public class SliderSpinnerFrame extends JPanel {
 	public boolean isManuallySet() {
 		return isManuallySet;
 	}
+	
+	public void changeManuallySet(Boolean newValue) {
+		isManuallySet = newValue;
+	}
 
 }
