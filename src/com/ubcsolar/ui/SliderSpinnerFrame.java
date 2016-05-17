@@ -53,34 +53,16 @@ public class SliderSpinnerFrame extends JPanel {
 		panel.setLayout(new BorderLayout(0, 0));
 		
 		spinner = new JSpinner();
-		spinner.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyTyped(KeyEvent e) {
+		spinner.setValue(initialValue);
+		spinner.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
 				currentValue = (int) spinner.getValue();
 				isManuallySet = true;
 				updateSelectors();
-				System.out.println("SPINNER REPORTS IS MANUALLY SET");
-			}
-		});
-		spinner.addMouseWheelListener(new MouseWheelListener() {
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				currentValue = (int) spinner.getValue();
-				isManuallySet = true;
-				updateSelectors();
-				System.out.println("SPINNER REPORTS IS MANUALLY SET");
-			}
-		});
-		spinner.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				currentValue = (int) spinner.getValue();
-				isManuallySet = true;
-				updateSelectors();
-				System.out.println("SPINNER REPORTS IS MANUALLY SET");
+				System.out.println("Spinner REPORTS IS MANUALLY SET");
 			}
 		});
 		
-		spinner.setValue(initialValue);
 		Component mySpinnerEditor = spinner.getEditor();
 		JFormattedTextField jftf = ((JSpinner.DefaultEditor) mySpinnerEditor).getTextField();
 		jftf.setColumns(3); //won't go faster than 999 km/h. 
@@ -98,38 +80,6 @@ public class SliderSpinnerFrame extends JPanel {
 			        }
 			}
 		});
-		/*slider.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyTyped(KeyEvent arg0) {
-				currentValue = slider.getValue();
-				isManuallySet = true;
-				updateSelectors();
-			}
-		});
-		slider.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				currentValue = slider.getValue();
-				isManuallySet = true;
-				updateSelectors();
-			}
-		});
-		slider.addMouseWheelListener(new MouseWheelListener() {
-			public void mouseWheelMoved(MouseWheelEvent arg0) {
-				currentValue = slider.getValue();
-				isManuallySet = true;
-				updateSelectors();
-			}
-		});*/
-		
-		
-		/*slider.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				currentValue = slider.getValue();
-				isManuallySet = true;
-				updateSelectors();
-			}
-		});*/
 		slider.setMinorTickSpacing(25);
 		slider.setMaximum(125);
 		slider.setPaintTicks(true);
