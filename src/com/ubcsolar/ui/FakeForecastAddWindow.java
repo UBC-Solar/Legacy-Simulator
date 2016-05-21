@@ -3,13 +3,16 @@ package com.ubcsolar.ui;
 import javax.swing.JFrame;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
+import com.github.dvdme.ForecastIOLib.FIODataPoint;
 import com.ubcsolar.Main.GlobalController;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
 
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -34,6 +37,7 @@ public class FakeForecastAddWindow extends JFrame{
 		
 		this.mySession = mySession;
 		this.setBounds(500, 250, 400, 400);
+		setTitleAndLogo();
 		
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] {30, 0, 0, 0};
@@ -262,6 +266,12 @@ public class FakeForecastAddWindow extends JFrame{
 		txtPrecipType.setColumns(10);
 		
 		JButton btnOk = new JButton("OK");
+		btnOk.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				handleOkClick();
+			}
+		});
 		GridBagConstraints gbc_btnOk = new GridBagConstraints();
 		gbc_btnOk.insets = new Insets(0, 0, 5, 5);
 		gbc_btnOk.gridx = 1;
@@ -282,8 +292,130 @@ public class FakeForecastAddWindow extends JFrame{
 		getContentPane().add(btnCancel, gbc_btnCancel);
 	}
 	
+	/**
+	 * creates an FIODataPoint with the values entered into the input window. For fields that
+	 * aren't included in the window, a garbage value is entered
+	 */
+	private void handleOkClick(){
+		double latitude;
+		try{
+		latitude = Double.parseDouble(this.txtLatitude.getText());
+		}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Latitude formatted incorrectly");
+			return;
+		}
+		double longitude;
+		try{
+			longitude = Double.parseDouble(this.txtLongitude.getText());
+			}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Longitude formatted incorrectly");
+			return;
+		}
+		double temp;
+		try{
+			temp = Double.parseDouble(this.txtTemp.getText());
+			}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Temperature formatted incorrectly");
+			return;
+		}
+		double cldCover;
+		try{
+			cldCover = Double.parseDouble(this.txtCloudCover.getText());
+		}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Cloud cover % formatted incorrectly");
+			return;
+		}
+		double dewPoint;
+		try{
+			dewPoint = Double.parseDouble(this.txtDewPoint.getText());
+			}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Dew point formatted incorrectly");
+			return;
+		}
+		double humidity;
+		try{
+			humidity = Double.parseDouble(this.txtHumidity.getText());
+			}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Humidity formatted incorrectly");
+			return;
+		}
+		double strmBearing;
+		try{
+			strmBearing = Double.parseDouble(this.txtNearestStormBearing.getText());
+			}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Storm bearing formatted incorrectly");
+			return;
+		}
+		double strmDistance;
+		try{
+			strmDistance = Double.parseDouble(this.txtNearestStormDistance.getText());
+			}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Storm distance formatted incorrectly");
+			return;
+		}
+		double windBearing;
+		try{
+			windBearing = Double.parseDouble(this.txtWindBearing.getText());
+			}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Wind bearing formatted incorrectly");
+			return;
+		}
+		double windSpeed;
+		try{
+			windSpeed = Double.parseDouble(this.txtWindSpeed.getText());
+		}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Wind speed formatted incorrectly");
+			return;
+		}
+		double precipProb;
+		try{
+			precipProb = Double.parseDouble(this.txtPrecipProb.getText());
+			}
+		catch(java.lang.NumberFormatException e){
+			this.handleError("Precipitation probability formatted incorrectly");
+			return;
+		}
+		String precipType = this.txtPrecipType.getText();
+		HashMap<String, Object> customData = new HashMap<String, Object>();
+		customData.put("summary", "Custom forecast data");
+		customData.put("precipProbability", precipProb);
+		customData.put("visibility", 0.0);
+		customData.put("precipIntensity", 100.0);
+		customData.put("icon", "custom");
+		customData.put("cloudCover", cldCover);
+		customData.put("windBearing", windBearing);
+		customData.put("apparentTemperature", temp);
+		customData.put("pressure", 20.0);
+		customData.put("dewPoint", dewPoint);
+		customData.put("ozone", 10000.0);
+		customData.put("temperature", temp);
+		customData.put("humidity", humidity);
+		customData.put("time", "12:00");
+		customData.put("windSpeed", windSpeed);
+		FIODataPoint customReport = new FIODataPoint(customData);
+	}
+	
 	private void closeWindow(){
 		this.dispose();
+	}
+	
+	private void handleError(String message){
+		JOptionPane.showMessageDialog(this, message);
+	}
+	
+	private void setTitleAndLogo() {
+		this.setIconImage(mySession.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
+		this.setTitle("Custom Forecast Report");
 	}
 
 }
