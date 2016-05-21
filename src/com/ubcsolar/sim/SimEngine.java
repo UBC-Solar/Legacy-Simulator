@@ -139,7 +139,8 @@ public class SimEngine {
 		TelemDataPacket toReturn = new TelemDataPacket(speedToDrive,
 				lastCarStatus.getTotalVoltage(), 
 				lastCarStatus.getTemperatures(), 
-				lastCarStatus.getCellVoltages(), generateRandomSoC(lastCarStatus.getStateOfCharge()), 
+				lastCarStatus.getCellVoltages(), 
+				generateSoC(lastCarStatus.getStateOfCharge(), elevationChange), 
 				(distanceCovered/(speedToDrive*1000)*60*60*1000));
 		
 		return toReturn;
@@ -152,7 +153,34 @@ public class SimEngine {
 	 * @param lastSoC
 	 * @return
 	 */
-	private int generateRandomSoC(int lastSoC) {
+	
+	private int generateSoC(int lastSoC, double elevationChange) {
+		if (elevationChange < 0){
+			if (lastSoC+2>=100){
+				lastSoC=100;
+				return lastSoC;
+			}
+			else{
+				return lastSoC+2;
+				}
+		}
+		if(elevationChange >0){
+			if(lastSoC-2<=0){
+				lastSoC=0;
+				return lastSoC;
+			}
+			else{
+				return lastSoC-2;
+				}
+		}
+		else{
+			return lastSoC;
+		}
+	}
+		
+		
+		
+		/*
 		Random rng = new Random();
 		int change = rng.nextInt(5); //up or down max 2% in a frame.
 		if(lastSoC<=0){
@@ -165,7 +193,7 @@ public class SimEngine {
 			return lastSoC + change - 2; 
 		}
 	}
-
+*/
 
 	/**
 	 * Helper function; calculate the amount of solar power falling on the car during the frame. 
