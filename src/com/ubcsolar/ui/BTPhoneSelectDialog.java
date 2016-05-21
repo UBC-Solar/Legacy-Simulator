@@ -104,7 +104,7 @@ public class BTPhoneSelectDialog extends JFrame {
 	}
 	private void connectToCar(){
 		String comPort = this.comPortComboBox.getSelectedItem() + "";
-		mySession.getMyCarController().establishNewConnection(comPort);// (comPort);
+		mySession.getMapController().connectToCellPhone(comPort);// (comPort);
 	}
 	
 	private void disconnectCellPhone(){
