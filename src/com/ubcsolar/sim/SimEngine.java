@@ -3,6 +3,7 @@ package com.ubcsolar.sim;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -211,14 +212,27 @@ public class SimEngine {
 	 * @return
 	 */
    private double calculateSunPower(GeoCoord nextPoint, FIODataPoint forecastForPoint, double timeOfDay, double squareMetersOfPanel) {
-		// TODO Auto-generated method stub
+	   Calendar rightNow = Calendar.getInstance();
+	   rightNow.setTimeInMillis((long) timeOfDay);
+	   
+	   int hour= rightNow.HOUR_OF_DAY;
+	   // TODO Auto-generated method stub
 	   
 	   //Get the sun elevation given the time of day and the latitude and longitude. 
 	   
 	   //assume 100 watts per square foot. (thanks random forum guy)
 	   //10.7639 sq feet per sq. meter. 
+	   double timeFactor=1;
 	   
-	   double watts = 100*10.7639 * squareMetersOfPanel;
+	   //replace with sunrise equation later
+	   if (hour<12 && hour>6){
+		   timeFactor=(4-24/hour)/2; //calculations just meant to get a 0-1 scale
+	   }
+	   if (hour>12 && hour<21){
+		   timeFactor=(1-hour/21)/.4286; //.4286 is a conversion factor to get on a scale of 0-1
+	   }
+	   
+	   double watts = 100*10.7639 * squareMetersOfPanel* timeFactor;
 	   
 	   //calculate how much sun there is given the weather (cloudy? Probably not much). 
 	   //I think there's actually a parameter in FIODataPoint for sun exposure. If not, use the cloudyness measurement. 
