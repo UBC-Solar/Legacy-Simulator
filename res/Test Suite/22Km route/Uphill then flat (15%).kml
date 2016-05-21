@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+	<Document>
+		<name>Directions from AB-884, Ralston, AB T0J 2N0, Canada to AB-884, Ralston, AB T0J 2N0, Canada</name>
+		<Placemark>
+			<name>Directions from AB-884, Ralston, AB T0J 2N0, Canada to AB-884, Ralston, AB T0J 2N0, Canada</name>
+			<styleUrl>#line-1267FF-5-nodesc</styleUrl>
+			<LineString>
+				<tessellate>1</tessellate>
+				<coordinates>-111.17312,50.22316,755.0 -111.17312,50.22344,759.6701869
+-111.17314,50.2315,894.1050226
+ -111.17313,50.23564,963.1571545
+ -111.17314,50.23723,989.6773591
+ -111.17312,50.24128,1057.228614
+ -111.17312,50.24463000000001,1113.104065
+ -111.17314,50.24576,1131.952812
+ -111.17316,50.24608,1137.29443
+ -111.17316,50.24644,1143.298956
+ -111.17316,50.24694,1151.638575
+-111.17316,50.24726,1156.975932
+ -111.17317,50.24792000000001,1167.984746
+ -111.17317,50.24817,1172.154556
+ -111.17315,50.24998,1202.344732
+ -111.17315,50.25084,1216.688878
+ -111.17312,50.25232,1241.376225
+ -111.17311,50.25266,1247.048169
+ -111.17311,50.25304,1253.38628
+ -111.17309,50.25861,1346.289886
+ -111.1731,50.26222000000001,1406.502033
+ -111.1731,50.26633,1475.053705
+ -111.17307,50.26873,1515.085156
+ -111.17308,50.26889000000001,1517.755963
+ -111.17304,50.26996,1535.607843
+ -111.17305,50.2705,1544.615263
+ -111.17305,50.27101,1553.121675
+ -111.17305,50.27134,1558.625824
+ -111.17305,50.27211,1571.468838
+-111.17304,50.27352,1594.986807
+ -111.17303,50.27579,1632.848829
+ -111.17303,50.27643,1643.523542
+ -111.17303,50.277,1653.030708
+ -111.17304,50.27786,1667.37525
+ -111.17304,50.28084,1717.079382
+ -111.17314,50.28249,1744.620757
+ -111.17316,50.28342,1760.133914
+-111.17317,50.29509,1954.780662
+ -111.17317,50.29536000000001,1959.284057
+ -111.17316,50.2963,1974.962904
+ -111.17315,50.30609,2138.252688
+ -111.17315,50.30993,2202.300966
+ -111.17314,50.3245,2445.317502
+ -111.17313,50.33407,2604.937854
+-111.17313,50.33497,2619.949169
+-111.17313,50.33553,2629.289543
+ -111.17313,50.33597,2636.628408
+ -111.17313,50.33909,2688.667634
+ -111.17312,50.35363000000001,2931.183792
+ -111.17312,50.36818,2931.183792
+ -111.1731,50.3827,2931.183792
+ -111.17311,50.3972,2931.183792
+ -111.17314,50.40878,2931.183792
+ -111.17314,50.41185,2931.183792
+ -111.17314,50.42017,2931.183792
+ -111.17315,50.42643,2931.183792
+ -111.17314,50.44094,2931.183792
+-111.17314,50.45547,2931.183792
+ -111.17313,50.47001,2931.183792
+ -111.17313,50.47816,2931.183792
+ </coordinates>
+			</LineString>
+		</Placemark>
+		<Placemark>
+			<name>AB-884, Ralston, AB T0J 2N0, Canada</name>
+			<styleUrl>#icon-503-DB4436-nodesc</styleUrl>
+			<Point>
+				<coordinates>-111.173123,50.2231585,755.0 </coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>AB-884, Ralston, AB T0J 2N0, Canada</name>
+			<styleUrl>#icon-503-DB4436-nodesc</styleUrl>
+			<Point>
+				<coordinates>-111.1731277,50.4781618,2931.183792
+ </coordinates>
+			</Point>
+		</Placemark>
+		<Style id="icon-503-DB4436-nodesc-normal">
+			<IconStyle>
+				<color>ff3644DB</color>
+				<scale>1.1</scale>
+				<Icon>
+					<href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+				</Icon>
+				<hotSpot x="16" y="31" xunits="pixels" yunits="insetPixels">
+				</hotSpot>
+			</IconStyle>
+			<LabelStyle>
+				<scale>0.0</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<Style id="icon-503-DB4436-nodesc-highlight">
+			<IconStyle>
+				<color>ff3644DB</color>
+				<scale>1.1</scale>
+				<Icon>
+					<href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+				</Icon>
+				<hotSpot x="16" y="31" xunits="pixels" yunits="insetPixels">
+				</hotSpot>
+			</IconStyle>
+			<LabelStyle>
+				<scale>1.1</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<StyleMap id="icon-503-DB4436-nodesc">
+			<Pair>
+				<key>normal</key>
+				<styleUrl>#icon-503-DB4436-nodesc-normal</styleUrl>
+			</Pair>
+			<Pair>
+				<key>highlight</key>
+				<styleUrl>#icon-503-DB4436-nodesc-highlight</styleUrl>
+			</Pair>
+		</StyleMap>
+		<Style id="line-1267FF-5-nodesc-normal">
+			<LineStyle>
+				<color>ffFF6712</color>
+				<width>5</width>
+			</LineStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<Style id="line-1267FF-5-nodesc-highlight">
+			<LineStyle>
+				<color>ffFF6712</color>
+				<width>8.0</width>
+			</LineStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<StyleMap id="line-1267FF-5-nodesc">
+			<Pair>
+				<key>normal</key>
+				<styleUrl>#line-1267FF-5-nodesc-normal</styleUrl>
+			</Pair>
+			<Pair>
+				<key>highlight</key>
+				<styleUrl>#line-1267FF-5-nodesc-highlight</styleUrl>
+			</Pair>
+		</StyleMap>
+	</Document>
+</kml>

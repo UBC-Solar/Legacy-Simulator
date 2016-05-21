@@ -22,13 +22,13 @@ public Map<String, Object> getAllValues() {
 	private final int totalVoltage; //used to guesstimate state of charge
 	private final HashMap<String,Integer> temperatures;
 	private final HashMap<Integer,ArrayList<Float>> cellVoltages;
-	private final int stateOfCharge;
+	private final double stateOfCharge;
 	
 	/**
 	 * This constructor used if packet was received at an earlier time and needs to be specified.
 	 * I.e pulled out of a database. 
 	 */
-	public TelemDataPacket(double newSpeed, int newTotalVoltage, Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages, int newStateOfCharge, double timeCreated){
+	public TelemDataPacket(double newSpeed, int newTotalVoltage, Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages, double stateOfCharge2, double timeCreated){
 		if(newTemperatures == null || newCellVoltages == null){
 			throw new NullPointerException("Can't created a DataUnit with a null value");
 		}
@@ -39,7 +39,7 @@ public Map<String, Object> getAllValues() {
 		this.temperatures = new HashMap<String,Integer>(newTemperatures);
 		this.cellVoltages = new HashMap<Integer, ArrayList<Float>>();//(newCellVoltages);
 		this.copyOverCellVoltages(cellVoltages,newCellVoltages);
-		this.stateOfCharge= newStateOfCharge;
+		this.stateOfCharge= stateOfCharge2;
 	}
 	
 	/*
@@ -70,7 +70,7 @@ public Map<String, Object> getAllValues() {
 	 * @param newCellVoltages a map of cell voltages.
 	 * @param newStateOfCharge state of charge of the car
 	 */
-	public TelemDataPacket(double newSpeed, int newTotalVoltage, Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages, int newStateOfCharge){
+	public TelemDataPacket(double newSpeed, int newTotalVoltage, Map<String,Integer> newTemperatures, Map<Integer,ArrayList<Float>> newCellVoltages, double newStateOfCharge){
 		if(newTemperatures == null || newCellVoltages == null){
 			throw new NullPointerException("Can't created a DataUnit with a null value");
 		}
@@ -112,7 +112,7 @@ public Map<String, Object> getAllValues() {
 		}
 		return copyCellVoltages;
 	}
-	public int getStateOfCharge(){
+	public double getStateOfCharge(){
 		return stateOfCharge;
 	}
 	

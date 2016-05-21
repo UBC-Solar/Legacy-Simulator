@@ -74,10 +74,11 @@ public class SimEngine {
 		double lastSpeed = lastCarStatus.getSpeed();
 		long lastTimeStamp = lastFrame.getRepresentedTime();
 		
+		double elevationChange = nextPoint.getElevation() - lastPosition.getElevation();
 		
 		double speedToDrive;
 		if(requestedSpeed == null){
-			speedToDrive = calculateBestSpeed(lastCarStatus.getSpeed()); //stubMethod. Also this is a greedy algo.
+			speedToDrive = calculateBestSpeed(lastCarStatus.getSpeed(), elevationChange, lastCarStatus.getStateOfCharge()); //stubMethod. Also this is a greedy algo.
 			//obviously need to add more arguments ^^
 		}
 		else{
@@ -87,7 +88,7 @@ public class SimEngine {
 		//not sure if calculateDistance() takes elevation into account....
 		double distanceCovered = lastPosition.calculateDistance(nextPoint)*1000; 
 		
-		double elevationChange = nextPoint.getElevation() - lastPosition.getElevation();
+	
 		
 		
 		double tempTime = (distanceCovered/(speedToDrive * 1000))*60*1000*60; //double check units. km/h and m??
@@ -140,7 +141,7 @@ public class SimEngine {
 				lastCarStatus.getTotalVoltage(), 
 				lastCarStatus.getTemperatures(), 
 				lastCarStatus.getCellVoltages(), 
-				generateSoC(lastCarStatus.getStateOfCharge(), elevationChange), 
+				generateSoC(lastCarStatus.getStateOfCharge(), elevationChange, speedToDrive), 
 				(distanceCovered/(speedToDrive*1000)*60*60*1000));
 		
 		return toReturn;
@@ -154,7 +155,7 @@ public class SimEngine {
 	 * @return
 	 */
 	
-	private int generateSoC(int lastSoC, double elevationChange) {
+	private double generateSoC(double lastSoC, double elevationChange, double speed) {
 		if (elevationChange < 0){
 			if (lastSoC+2>=100){
 				lastSoC=100;
@@ -165,22 +166,29 @@ public class SimEngine {
 				}
 		}
 		if(elevationChange >0){
-			if(lastSoC-2<=0){
+			if(lastSoC-speed/50.0<=0){
 				lastSoC=0;
 				return lastSoC;
 			}
 			else{
-				return lastSoC-2;
+				return lastSoC-speed/50.0;
 				}
 		}
 		else{
-			return lastSoC;
+			if(lastSoC-speed/100.0<=0){
+				lastSoC=0;
+				return lastSoC;
+			}
+			else{
+				return lastSoC-speed/100.0;
+				}
 		}
 	}
 		
 		
 		
 		/*
+	private double generateRandomSoC(double lastSoC) {
 		Random rng = new Random();
 		int change = rng.nextInt(5); //up or down max 2% in a frame.
 		if(lastSoC<=0){
@@ -236,11 +244,48 @@ public class SimEngine {
 	}
 
 
-	private double calculateBestSpeed(double lastCarSpeed) {
+	private double calculateBestSpeed(double lastCarSpeed, double elevationChange, double SoC) {
+		double SpeedReturn;
+		double MaxCarSpeed=110;
+		
+		if (SoC<=0){
+			if(lastCarSpeed-2<0){
+				return 0;
+			}
+			else{
+				SpeedReturn=lastCarSpeed-2;
+				return SpeedReturn;
+			}
+		}
+		else if(elevationChange<0){
+			SpeedReturn=lastCarSpeed;
+			return SpeedReturn;
+		}
+		else if(elevationChange>0){
+			if (lastCarSpeed+2>MaxCarSpeed){
+				SpeedReturn=MaxCarSpeed;
+				return SpeedReturn;
+			}
+			else{
+				SpeedReturn=lastCarSpeed+2;
+				return SpeedReturn;
+			}
+		}
+		else{
+			if (lastCarSpeed+3>MaxCarSpeed){
+				SpeedReturn=MaxCarSpeed;
+				return SpeedReturn;
+			}
+			else{
+				SpeedReturn=lastCarSpeed+3;
+				return SpeedReturn;
+			}
+		}
+		
 		//return 22.0; // Chosen by fair dice roll, guaranteed to be random. https://xkcd.com/221/ 
 		
 		
-		
+		/*
 		Random rng = new Random();
 		if(rng.nextInt(4)<=2){
 			return lastCarSpeed;
@@ -259,9 +304,11 @@ public class SimEngine {
 		
 		return speedToReturn;
 		//TODO put real algo here. 
+		*/
 	}
 
 
+	
 	private int getStartPos(ArrayList<GeoCoord> trailMarkers, GeoCoord location) {
 		// find the closest point and return the position number. 
 		//TODO actually calculate start position. 

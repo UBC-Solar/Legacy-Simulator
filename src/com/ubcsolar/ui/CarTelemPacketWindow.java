@@ -77,7 +77,7 @@ public class CarTelemPacketWindow extends JFrame {
 		
 		txtCharge = new JTextField();
 		txtCharge.setHorizontalAlignment(SwingConstants.CENTER);
-		txtCharge.setText("1");
+		txtCharge.setText("95.5");
 		GridBagConstraints gbc_textField_4 = new GridBagConstraints();
 		gbc_textField_4.insets = new Insets(0, 0, 5, 5);
 		gbc_textField_4.fill = GridBagConstraints.HORIZONTAL;
@@ -127,7 +127,7 @@ public class CarTelemPacketWindow extends JFrame {
 		});
 		
 		txttotalcellvolt = new JTextField();
-		txttotalcellvolt.setText("12");
+		txttotalcellvolt.setText("44");
 		txttotalcellvolt.setHorizontalAlignment(SwingConstants.CENTER);
 		txttotalcellvolt.setColumns(10);
 		GridBagConstraints gbc_txtLongitude = new GridBagConstraints();
@@ -407,9 +407,9 @@ public class CarTelemPacketWindow extends JFrame {
 			return;
 		}
 		
-		int stateOfCharge;
+		double stateOfCharge;
 		try{ 
-			stateOfCharge = Integer.parseInt(this.txtCharge.getText()); // TODO
+			stateOfCharge = Double.parseDouble(this.txtCharge.getText()); // TODO
 		}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("State of charge formatted incorrectly");
@@ -453,7 +453,7 @@ public class CarTelemPacketWindow extends JFrame {
 			speed = 0;
 		int totalV = 5;
 		totalV = totalV > 50 ? 50 : totalV < 40 ? 40 : totalV;
-		int stateOfCharge= 80;
+		double stateOfCharge= 80;
 		
 		HashMap<String,Integer> temperatures = new HashMap<String,Integer>();
 		temperatures.put("bms", 1);
