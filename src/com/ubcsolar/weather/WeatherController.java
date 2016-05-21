@@ -18,6 +18,7 @@ import com.ubcsolar.notification.Notification;
 
 public class WeatherController extends ModuleController {
 	ForecastReport lastDownloadedReport = null;
+	private List<ForecastIO> retrievedForecasts;
 	
 	public WeatherController(GlobalController toAdd) {
 		super(toAdd);
@@ -37,7 +38,7 @@ public class WeatherController extends ModuleController {
 		List<GeoCoord> toGet = this.calculatePointsForForecast(numOfKMBetweenForecasts, currentlyLoadedRoute.getTrailMarkers());
 		
 		ForecastFactory forecastGetter = new ForecastFactory();
-		List<ForecastIO> retrievedForecasts = forecastGetter.getForecasts(toGet);
+		retrievedForecasts = forecastGetter.getForecasts(toGet);
 		ForecastReport theReport = new ForecastReport(retrievedForecasts, this.mySession.getMapController().getLoadedMapName());
 		lastDownloadedReport = theReport;
 		this.mySession.sendNotification(new NewForecastReport(theReport));

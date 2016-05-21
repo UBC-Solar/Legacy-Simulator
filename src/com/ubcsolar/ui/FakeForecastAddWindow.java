@@ -6,22 +6,36 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import com.github.dvdme.ForecastIOLib.FIODataPoint;
+import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.common.DistanceUnit;
+import com.ubcsolar.common.GeoCoord;
+import com.ubcsolar.common.Route;
+import com.ubcsolar.map.MapController;
+import com.ubcsolar.weather.WeatherController;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
 
 public class FakeForecastAddWindow extends JFrame{
 	
+	//TODO: figure out what to do if window is opened before route is loaded
+	
 	private GlobalController mySession;
-	private JTextField txtLatitude;
-	private JTextField txtLongitude;
+	private MapController currMapController;
+	private Route theRoute;
 	private JTextField txtTemp;
 	private JTextField txtCloudCover;
 	private JTextField txtDewPoint;
@@ -32,10 +46,13 @@ public class FakeForecastAddWindow extends JFrame{
 	private JTextField txtWindSpeed;
 	private JTextField txtPrecipProb;
 	private JTextField txtPrecipType;
+	private double travelDistance;
 	
-	public FakeForecastAddWindow(GlobalController mySession) {
+	public FakeForecastAddWindow(GlobalController mySession, double travelDistance) {
 		
+		this.travelDistance = travelDistance;
 		this.mySession = mySession;
+		
 		this.setBounds(500, 250, 400, 400);
 		setTitleAndLogo();
 		
@@ -46,42 +63,21 @@ public class FakeForecastAddWindow extends JFrame{
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		getContentPane().setLayout(gridBagLayout);
 		
-		JLabel lblLatitude = new JLabel("Latitude:");
-		GridBagConstraints gbc_lblLatitude = new GridBagConstraints();
-		gbc_lblLatitude.anchor = GridBagConstraints.EAST;
-		gbc_lblLatitude.insets = new Insets(0, 0, 5, 5);
-		gbc_lblLatitude.gridx = 0;
-		gbc_lblLatitude.gridy = 0;
-		getContentPane().add(lblLatitude, gbc_lblLatitude);
+		JLabel lblDistanceAlongRoute = new JLabel("Distance along route (km):");
+		GridBagConstraints gbc_lblDistanceAlongRoute = new GridBagConstraints();
+		gbc_lblDistanceAlongRoute.anchor = GridBagConstraints.EAST;
+		gbc_lblDistanceAlongRoute.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDistanceAlongRoute.gridx = 0;
+		gbc_lblDistanceAlongRoute.gridy = 1;
+		getContentPane().add(lblDistanceAlongRoute, gbc_lblDistanceAlongRoute);
 		
-		txtLatitude = new JTextField();
-		txtLatitude.setText("49.2496600");
-		GridBagConstraints gbc_txtLatitude = new GridBagConstraints();
-		gbc_txtLatitude.insets = new Insets(0, 0, 5, 5);
-		gbc_txtLatitude.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtLatitude.gridx = 1;
-		gbc_txtLatitude.gridy = 0;
-		getContentPane().add(txtLatitude, gbc_txtLatitude);
-		txtLatitude.setColumns(10);
-		
-		JLabel lblLongitude = new JLabel("Longitude:");
-		GridBagConstraints gbc_lblLongitude = new GridBagConstraints();
-		gbc_lblLongitude.anchor = GridBagConstraints.EAST;
-		gbc_lblLongitude.insets = new Insets(0, 0, 5, 5);
-		gbc_lblLongitude.gridx = 0;
-		gbc_lblLongitude.gridy = 1;
-		getContentPane().add(lblLongitude, gbc_lblLongitude);
-		
-		txtLongitude = new JTextField();
-		txtLongitude.setText("-123.1193400");
-		GridBagConstraints gbc_txtLongitude = new GridBagConstraints();
-		gbc_txtLongitude.anchor = GridBagConstraints.NORTH;
-		gbc_txtLongitude.insets = new Insets(0, 0, 5, 5);
-		gbc_txtLongitude.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtLongitude.gridx = 1;
-		gbc_txtLongitude.gridy = 1;
-		getContentPane().add(txtLongitude, gbc_txtLongitude);
-		txtLongitude.setColumns(10);
+		JSpinner distanceSpinner = new JSpinner();
+		distanceSpinner.setModel(new SpinnerNumberModel(0, 0, travelDistance, 1));
+		GridBagConstraints gbc_distanceSpinner = new GridBagConstraints();
+		gbc_distanceSpinner.insets = new Insets(0, 0, 5, 5);
+		gbc_distanceSpinner.gridx = 1;
+		gbc_distanceSpinner.gridy = 1;
+		getContentPane().add(distanceSpinner, gbc_distanceSpinner);
 		
 		JLabel lblTemp = new JLabel("Temp. (\u00B0C):");
 		GridBagConstraints gbc_lblTemp = new GridBagConstraints();
@@ -297,29 +293,45 @@ public class FakeForecastAddWindow extends JFrame{
 	 * aren't included in the window, a garbage value is entered
 	 */
 	private void handleOkClick(){
-		double latitude;
-		try{
-		latitude = Double.parseDouble(this.txtLatitude.getText());
-		}
-		catch(java.lang.NumberFormatException e){
-			this.handleError("Latitude formatted incorrectly");
+		FIODataPoint customData = buildFIODataPoint();
+		if(customData == null){
 			return;
+		}else{
+			
+			closeWindow();
 		}
-		double longitude;
-		try{
-			longitude = Double.parseDouble(this.txtLongitude.getText());
-			}
-		catch(java.lang.NumberFormatException e){
-			this.handleError("Longitude formatted incorrectly");
-			return;
-		}
+	}
+	
+	private void closeWindow(){
+		this.dispose();
+	}
+	
+	private void handleError(String message){
+		JOptionPane.showMessageDialog(this, message);
+	}
+	
+	private void setTitleAndLogo() {
+		this.setIconImage(mySession.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
+		this.setTitle("Custom Forecast Report");
+	}
+	
+	/**
+	 * Will build an FIODataPoint from the information entered into the fields in the window.
+	 * Fields that aren't included in the window will be filled with garbage values
+	 * If one of the entries is formatted incorrectly, the method will spit an error message
+	 * and return a null value
+	 * @return an FIODataPoint with the data entered into the window, or null if that data
+	 * was formatted incorrectly
+	 */
+	
+	private FIODataPoint buildFIODataPoint(){
 		double temp;
 		try{
 			temp = Double.parseDouble(this.txtTemp.getText());
 			}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Temperature formatted incorrectly");
-			return;
+			return null;
 		}
 		double cldCover;
 		try{
@@ -327,7 +339,7 @@ public class FakeForecastAddWindow extends JFrame{
 		}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Cloud cover % formatted incorrectly");
-			return;
+			return null;
 		}
 		double dewPoint;
 		try{
@@ -335,7 +347,7 @@ public class FakeForecastAddWindow extends JFrame{
 			}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Dew point formatted incorrectly");
-			return;
+			return null;
 		}
 		double humidity;
 		try{
@@ -343,7 +355,7 @@ public class FakeForecastAddWindow extends JFrame{
 			}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Humidity formatted incorrectly");
-			return;
+			return null;
 		}
 		double strmBearing;
 		try{
@@ -351,7 +363,7 @@ public class FakeForecastAddWindow extends JFrame{
 			}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Storm bearing formatted incorrectly");
-			return;
+			return null;
 		}
 		double strmDistance;
 		try{
@@ -359,7 +371,7 @@ public class FakeForecastAddWindow extends JFrame{
 			}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Storm distance formatted incorrectly");
-			return;
+			return null;
 		}
 		double windBearing;
 		try{
@@ -367,7 +379,7 @@ public class FakeForecastAddWindow extends JFrame{
 			}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Wind bearing formatted incorrectly");
-			return;
+			return null;
 		}
 		double windSpeed;
 		try{
@@ -375,7 +387,7 @@ public class FakeForecastAddWindow extends JFrame{
 		}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Wind speed formatted incorrectly");
-			return;
+			return null;
 		}
 		double precipProb;
 		try{
@@ -383,7 +395,7 @@ public class FakeForecastAddWindow extends JFrame{
 			}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Precipitation probability formatted incorrectly");
-			return;
+			return null;
 		}
 		String precipType = this.txtPrecipType.getText();
 		HashMap<String, Object> customData = new HashMap<String, Object>();
@@ -403,19 +415,17 @@ public class FakeForecastAddWindow extends JFrame{
 		customData.put("time", "12:00");
 		customData.put("windSpeed", windSpeed);
 		FIODataPoint customReport = new FIODataPoint(customData);
+		return customReport;
 	}
 	
-	private void closeWindow(){
-		this.dispose();
+	private ForecastIO buildForecast(){
+		JsonObject forecast = new JsonObject();
+		forecast.add("latitude", 51.0486);
+		forecast.add("longitude", -114.07085);
+		forecast.add("timezone", "America/Vancouver");
+		forecast.add("offset", -6);
+		
 	}
 	
-	private void handleError(String message){
-		JOptionPane.showMessageDialog(this, message);
-	}
-	
-	private void setTitleAndLogo() {
-		this.setIconImage(mySession.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
-		this.setTitle("Custom Forecast Report");
-	}
 
 }

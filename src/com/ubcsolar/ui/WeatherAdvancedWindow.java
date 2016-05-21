@@ -69,6 +69,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private JLabel windDirectionLabel;
 	private GeoCoord currentLocation;
 	private JMenuItem mntmLoadFakeForecast;
+	private final int DEW_POINT_DIFF = 7;
+	private double travelDistance;
 
 	/**
 	 * Launch the application.
@@ -93,6 +95,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	public WeatherAdvancedWindow(final GlobalController mySession) {
 		setTitle("Advanced Weather");
 		this.mySession = mySession;
+		travelDistance = 0.0;
 		register();
 		setTitle("Weather");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -126,7 +129,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		mntmLoadFakeForecast.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){
 				System.out.println("Asked to create a fake forecast");
-				JFrame frame = new FakeForecastAddWindow(mySession);
+				JFrame frame = new FakeForecastAddWindow(mySession, travelDistance);
 				frame.setVisible(true);
 			}
 		});
@@ -327,11 +330,12 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				
 				boolean fogWarning = false;
 				String dewDifference = "";
-				if(closestForecastNow.dewPoint()+7 >= closestForecastNow.temperature()){
+				if(closestForecastNow.dewPoint()+DEW_POINT_DIFF >= closestForecastNow.temperature()){
 					fogWarning = true;
 					 double dewDifferenceNum = closestForecastNow.temperature()-closestForecastNow.dewPoint();
 					 dewDifference = new DecimalFormat("#.##").format(dewDifferenceNum);
 				}
+				
 				boolean stormWarning = false;
 				if(closestForecastNow.nearestStormDistance() < 100 && 
 						closestForecastNow.nearestStormDistance() >= 0){
@@ -460,7 +464,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				double[] distances = new double[forecasts.size()];
 				int distanceIndex = 1;
 				int trailMarkerIndex = 1;
-				double travelDistance = 0.0;
+				travelDistance = 0.0;
 				distances[0] = travelDistance;
 				while(distanceIndex < distances.length && trailMarkerIndex < trailMarkers.size()){
 					travelDistance += trailMarkers.get(trailMarkerIndex-1).calculateDistance(
@@ -520,6 +524,10 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			double[][] data = new double[2][0];
 			dds.addSeries("", data);
 			return dds;
+		}
+		
+		public double getTravelDistance(){
+			return travelDistance;
 		}
 
 }
