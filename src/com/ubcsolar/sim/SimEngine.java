@@ -152,7 +152,7 @@ public class SimEngine {
 	 * @param lastSoC
 	 * @return
 	 */
-	private int generateRandomSoC(int lastSoC) {
+	private double generateRandomSoC(double lastSoC) {
 		Random rng = new Random();
 		int change = rng.nextInt(5); //up or down max 2% in a frame.
 		if(lastSoC<=0){
