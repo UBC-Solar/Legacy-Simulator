@@ -12,6 +12,7 @@ import com.ubcsolar.common.DistanceUnit;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Route;
 import com.ubcsolar.map.MapController;
+import com.ubcsolar.weather.ForecastIOFactory;
 import com.ubcsolar.weather.WeatherController;
 
 import java.awt.GridBagConstraints;
@@ -324,7 +325,7 @@ public class FakeForecastAddWindow extends JFrame{
 	 * was formatted incorrectly
 	 */
 	
-	private FIODataPoint buildFIODataPoint(){
+	private ForecastIO buildForecastIO(){
 		double temp;
 		try{
 			temp = Double.parseDouble(this.txtTemp.getText());
@@ -398,34 +399,15 @@ public class FakeForecastAddWindow extends JFrame{
 			return null;
 		}
 		String precipType = this.txtPrecipType.getText();
-		HashMap<String, Object> customData = new HashMap<String, Object>();
-		customData.put("summary", "Custom forecast data");
-		customData.put("precipProbability", precipProb);
-		customData.put("visibility", 0.0);
-		customData.put("precipIntensity", 100.0);
-		customData.put("icon", "custom");
-		customData.put("cloudCover", cldCover);
-		customData.put("windBearing", windBearing);
-		customData.put("apparentTemperature", temp);
-		customData.put("pressure", 20.0);
-		customData.put("dewPoint", dewPoint);
-		customData.put("ozone", 10000.0);
-		customData.put("temperature", temp);
-		customData.put("humidity", humidity);
-		customData.put("time", "12:00");
-		customData.put("windSpeed", windSpeed);
-		FIODataPoint customReport = new FIODataPoint(customData);
-		return customReport;
-	}
-	
-	private ForecastIO buildForecast(){
-		JsonObject forecast = new JsonObject();
-		forecast.add("latitude", 51.0486);
-		forecast.add("longitude", -114.07085);
-		forecast.add("timezone", "America/Vancouver");
-		forecast.add("offset", -6);
 		
+		
+		ForecastIOFactory factory = new ForecastIOFactory();
+		
+		factory.cloudCover(cldCover).dewPoint(dewPoint).humidity(humidity).precipProb(precipProb);
+		factory.precipType(precipType).temperature(temp).windBearing(windBearing).windSpeed(windSpeed);
+		
+		ForecastIO forecast = factory.build();
+		return forecast;
 	}
-	
 
 }
