@@ -100,7 +100,7 @@ public class ForecastIO {
 			this.langURL = LANG_ENGLISH;
 
 			getForecast(LATITUDE, LONGITUDE);
-			System.out.println(forecast.asString());//TODO: remove this line
+			System.out.println(forecast.toString());//TODO: remove this line
 		}
 		else {
 			System.err.println("The API Key doesn't seam to be valid.");
