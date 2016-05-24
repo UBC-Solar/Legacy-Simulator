@@ -1,6 +1,7 @@
 package com.ubcsolar.weather;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.github.dvdme.ForecastIOLib.ForecastIO;
@@ -18,7 +19,9 @@ import com.ubcsolar.notification.Notification;
 
 public class WeatherController extends ModuleController {
 	ForecastReport lastDownloadedReport = null;
+	ForecastReport lastCustomReport = null;
 	private List<ForecastIO> retrievedForecasts;
+	private List<ForecastIO> customForecasts = new ArrayList<ForecastIO>();
 	
 	public WeatherController(GlobalController toAdd) {
 		super(toAdd);
@@ -42,6 +45,33 @@ public class WeatherController extends ModuleController {
 		ForecastReport theReport = new ForecastReport(retrievedForecasts, this.mySession.getMapController().getLoadedMapName());
 		lastDownloadedReport = theReport;
 		this.mySession.sendNotification(new NewForecastReport(theReport));
+	}
+	
+	/**
+	 * Adds a new custom forecast to the list of custom forecasts. This can be done multiple
+	 * times by calling the method repeatedly. Will not overwrite legitimate downloaded reports
+	 * 
+	 * @param customForecast: the custom forecast report to be added to the list of custom forecasts.
+	 * Usually produced through the FakeForecastWindow.
+	 */
+	
+	public void loadCustomForecast(ForecastIO customForecast){
+		customForecasts.add(customForecast);
+		List<ForecastIO> comboForecasts = new ArrayList<ForecastIO>();
+		Collections.copy(retrievedForecasts, comboForecasts);
+		comboForecasts.addAll(customForecasts);
+		ForecastReport theReport = new ForecastReport(comboForecasts, this.mySession.getMapController().getLoadedMapName());
+		lastCustomReport = theReport;
+		this.mySession.sendNotification(new NewForecastReport(theReport));
+	}
+	
+	/**
+	 * Clears all custom forecasts and resends the most recent downloaded report
+	 */
+	
+	public void clearCustomForecasts(){
+		customForecasts = new ArrayList<ForecastIO>();
+		this.mySession.sendNotification(new NewForecastReport(lastDownloadedReport));
 	}
 	
 	

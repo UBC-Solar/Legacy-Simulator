@@ -33,6 +33,8 @@ public class ForecastIOFactory {
 	private double pressure = 0;
 	private double ozone = 0;
 	
+	private final int NUM_HOURS_NEEDED = 4;
+	
 	public ForecastIOFactory location(GeoCoord location){
 		this.latitude = location.getLat();
 		this.longitude = location.getLon();
@@ -111,8 +113,10 @@ public class ForecastIOFactory {
 		dataArrayEntry.add("pressure", pressure);
 		dataArrayEntry.add("ozone", ozone);
 		
-		dataArray.add(dataArrayEntry);
-		//TODO: decide whether need to replicate the given entry in the dataArray
+		for(int i = 0; i < NUM_HOURS_NEEDED; i++){
+			dataArray.add(dataArrayEntry);
+		}
+		//TODO: decide whether need to change the time in entries in the dataArray
 		
 		hourlyForecast.add("data", dataArray);
 		

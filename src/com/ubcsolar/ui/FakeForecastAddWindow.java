@@ -21,6 +21,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -35,7 +36,7 @@ public class FakeForecastAddWindow extends JFrame{
 	//TODO: figure out what to do if window is opened before route is loaded
 	
 	private GlobalController mySession;
-	private MapController currMapController;
+	private WeatherController myWeather;
 	private Route theRoute;
 	private JTextField txtTemp;
 	private JTextField txtCloudCover;
@@ -47,12 +48,14 @@ public class FakeForecastAddWindow extends JFrame{
 	private JTextField txtWindSpeed;
 	private JTextField txtPrecipProb;
 	private JTextField txtPrecipType;
+	private JSpinner distanceSpinner;
 	private double travelDistance;
 	
 	public FakeForecastAddWindow(GlobalController mySession, double travelDistance) {
 		
 		this.travelDistance = travelDistance;
 		this.mySession = mySession;
+		this.myWeather = mySession.getMyWeatherController();
 		
 		this.setBounds(500, 250, 400, 400);
 		setTitleAndLogo();
@@ -72,7 +75,7 @@ public class FakeForecastAddWindow extends JFrame{
 		gbc_lblDistanceAlongRoute.gridy = 1;
 		getContentPane().add(lblDistanceAlongRoute, gbc_lblDistanceAlongRoute);
 		
-		JSpinner distanceSpinner = new JSpinner();
+		distanceSpinner = new JSpinner();
 		distanceSpinner.setModel(new SpinnerNumberModel(0, 0, travelDistance, 1));
 		GridBagConstraints gbc_distanceSpinner = new GridBagConstraints();
 		gbc_distanceSpinner.insets = new Insets(0, 0, 5, 5);
@@ -290,15 +293,16 @@ public class FakeForecastAddWindow extends JFrame{
 	}
 	
 	/**
-	 * creates an FIODataPoint with the values entered into the input window. For fields that
-	 * aren't included in the window, a garbage value is entered
+	 * creates a ForecastIO with the values entered into the input window. For fields that
+	 * aren't included in the window, a garbage value is entered. If one of the fields is formatted
+	 * incorrectly, it will spit an error message but won't close the window.
 	 */
 	private void handleOkClick(){
-		FIODataPoint customData = buildFIODataPoint();
-		if(customData == null){
+		ForecastIO customForecast = buildForecastIO();
+		if(customForecast == null){
 			return;
 		}else{
-			
+			myWeather.loadCustomForecast(customForecast);
 			closeWindow();
 		}
 	}
@@ -317,11 +321,11 @@ public class FakeForecastAddWindow extends JFrame{
 	}
 	
 	/**
-	 * Will build an FIODataPoint from the information entered into the fields in the window.
+	 * Will build a ForecastIO from the information entered into the fields in the window.
 	 * Fields that aren't included in the window will be filled with garbage values
 	 * If one of the entries is formatted incorrectly, the method will spit an error message
 	 * and return a null value
-	 * @return an FIODataPoint with the data entered into the window, or null if that data
+	 * @return a ForecastIO with the data entered into the window, or null if that data
 	 * was formatted incorrectly
 	 */
 	
@@ -399,15 +403,29 @@ public class FakeForecastAddWindow extends JFrame{
 			return null;
 		}
 		String precipType = this.txtPrecipType.getText();
-		
+		double distance = (double)distanceSpinner.getValue();
+		GeoCoord location = findNearestPoint(distance);
 		
 		ForecastIOFactory factory = new ForecastIOFactory();
 		
-		factory.cloudCover(cldCover).dewPoint(dewPoint).humidity(humidity).precipProb(precipProb);
-		factory.precipType(precipType).temperature(temp).windBearing(windBearing).windSpeed(windSpeed);
+		factory.location(location).cloudCover(cldCover).dewPoint(dewPoint).humidity(humidity).
+			precipProb(precipProb).precipType(precipType).temperature(temp).windBearing(windBearing).
+			windSpeed(windSpeed);
 		
 		ForecastIO forecast = factory.build();
 		return forecast;
+	}
+	
+	private GeoCoord findNearestPoint(double distance){
+		double travelDistance = 0.0;
+		List<GeoCoord> trailMarkers = mySession.getMapController().getAllPoints().getTrailMarkers();
+		int trailMarkerIndex = 1;
+		while(travelDistance < distance && trailMarkerIndex < trailMarkers.size()){
+			travelDistance += trailMarkers.get(trailMarkerIndex-1).calculateDistance(
+					trailMarkers.get(trailMarkerIndex), DistanceUnit.KILOMETERS);
+			trailMarkerIndex++;
+		}
+		return trailMarkers.get(trailMarkerIndex-1);
 	}
 
 }

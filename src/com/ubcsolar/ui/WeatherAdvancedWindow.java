@@ -71,6 +71,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private JMenuItem mntmLoadFakeForecast;
 	private final int DEW_POINT_DIFF = 7;
 	private double travelDistance;
+	private double[] distances;
+	private List<GeoCoord> forecastPoints;
 
 	/**
 	 * Launch the application.
@@ -128,7 +130,6 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		mntmLoadFakeForecast = new JMenuItem("Load Fake Forecast");
 		mntmLoadFakeForecast.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){
-				System.out.println("Asked to create a fake forecast");
 				JFrame frame = new FakeForecastAddWindow(mySession, travelDistance);
 				frame.setVisible(true);
 			}
@@ -452,16 +453,18 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				return createBlankDataset();
 			}else{
 				DefaultXYDataset dds = new DefaultXYDataset();
-				List<ForecastIO> forecasts = currentForecastReport.getForecasts();
-				List<GeoCoord> forecastPoints = new ArrayList<GeoCoord>();
-				List<GeoCoord> trailMarkers = mySession.getMapController().getAllPoints().getTrailMarkers();
+				List<ForecastIO> forecastsForChart = currentForecastReport.getForecasts();
+				forecastPoints = new ArrayList<GeoCoord>();
+				
 				List<FIODataBlock> hourlyForecasts = new ArrayList<FIODataBlock>();
-				for(int i = 0; i < forecasts.size(); i++){
-					forecastPoints.add(new GeoCoord(forecasts.get(i).getLatitude(), 
-							forecasts.get(i).getLongitude(), 0.0));//uses 0 for elevation cause it doesn't matter for our uses
-					hourlyForecasts.add(new FIODataBlock(forecasts.get(i).getHourly()));
+				for(int i = 0; i < forecastsForChart.size(); i++){
+					forecastPoints.add(new GeoCoord(forecastsForChart.get(i).getLatitude(), 
+							forecastsForChart.get(i).getLongitude(), 0.0));//uses 0 for elevation cause it doesn't matter for our uses
+					hourlyForecasts.add(new FIODataBlock(forecastsForChart.get(i).getHourly()));
 				}
-				double[] distances = new double[forecasts.size()];
+				
+				distances = new double[forecastsForChart.size()];
+				List<GeoCoord> trailMarkers = mySession.getMapController().getAllPoints().getTrailMarkers();
 				int distanceIndex = 1;
 				int trailMarkerIndex = 1;
 				travelDistance = 0.0;
@@ -480,11 +483,6 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 					}
 					trailMarkerIndex++;
 				}
-				/*for(int i = 1; i < distances.length; i++){
-					travelDistance += forecastPoints.get(i-1).calculateDistance(forecastPoints.get(i), 
-							DistanceUnit.KILOMETERS);
-					distances[i] = travelDistance;
-				}*/
 				
 				int numHours = 0;
 				
