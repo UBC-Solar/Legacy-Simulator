@@ -8,6 +8,38 @@ import com.github.dvdme.ForecastIOLib.FIODataPoint;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 
 public class SimFrame extends DataUnit {
+	
+	
+	private static String classCSVHeaderRow;
+	/**
+	 * turns the class fields into an entry for a csv file
+	 * see returnsEntireTable for info on row versus table
+	 * @return the row as a string
+	 */
+	public String getCSVEntry()
+	{
+		return null;
+	}
+	
+	/**
+	 * gets the column headings as a csv row
+	 * @return the row as a string
+	 */
+	public String getCSVHeaderRow()
+	{
+		return classCSVHeaderRow;
+	}
+	
+	/**
+	 * if the CSV output is multiline rather than a single line
+	 * @return 
+	 */
+	public boolean returnsEntireTable ()
+	{
+		return false;
+	}
+
+	
 	private final long timeCreated; //the time this frame was created, not the time it represents. 
 	private final long representedTime;
 	private final FIODataPoint forecast;
