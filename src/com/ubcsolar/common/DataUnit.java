@@ -5,7 +5,7 @@ package com.ubcsolar.common;
 
 import java.util.Map;
 
-public abstract class DataUnit {
+public abstract class DataUnit implements CSVCapable {
 	
 	/**
 	 * Should return the time of creation of the data. 
@@ -19,6 +19,7 @@ public abstract class DataUnit {
 	 * @return
 	 */
 	public abstract Map<String, ? extends Object> getAllValues();
+	
 	
 
 }
