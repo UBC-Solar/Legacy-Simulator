@@ -413,8 +413,6 @@ public class FakeForecastAddWindow extends JFrame{
 			windSpeed(windSpeed);
 		
 		ForecastIO forecast = factory.build();
-		System.out.println(forecast.getLatitude());
-		System.out.println(forecast.getLongitude());
 		return forecast;
 	}
 	

@@ -58,7 +58,6 @@ public class WeatherController extends ModuleController {
 	public void loadCustomForecast(ForecastIO customForecast){
 		customForecasts.add(customForecast);
 		List<ForecastIO> comboForecasts = addCustomForecasts();
-		System.out.println(comboForecasts.size());
 		ForecastReport theReport = new ForecastReport(comboForecasts, this.mySession.getMapController().getLoadedMapName());
 		lastCustomReport = theReport;
 		this.mySession.sendNotification(new NewForecastReport(theReport));

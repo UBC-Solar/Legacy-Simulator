@@ -127,7 +127,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		
 		mnForecasts.add(mntmLoadForecastsFor_1);
 		
-		mntmLoadFakeForecast = new JMenuItem("Load Fake Forecast");
+		mntmLoadFakeForecast = new JMenuItem("Load Custom Forecast");
 		mntmLoadFakeForecast.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){
 				JFrame frame = new FakeForecastAddWindow(mySession, travelDistance);
@@ -286,8 +286,9 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			precipitationChart.revalidate();
 			windSpeedChart.repaint();
 			windSpeedChart.revalidate();
-			contentPane.revalidate();
 			contentPane.repaint();
+			contentPane.revalidate();
+			
 		}
 		
 		public void updateLabels(){
