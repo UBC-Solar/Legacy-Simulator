@@ -1,10 +1,18 @@
 package com.ubcsolar.common;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Map;
 
 public class LocationReport extends DataUnit {
 	
-	private static String classCSVHeaderRow;
+	private DateFormat actualDateFormat = new SimpleDateFormat("HH:mm:ss.SSS"); //time format. ss = seconds, SSS = ms
+	//couldn't manage to format milliseconds in a way that Excel can handle as time
+	//so just generated a second column to be able to graph it properly. 
+	private DateFormat excelDateFormat = new SimpleDateFormat("HH:mm:ss"); //time format. ss = seconds, SSS = ms
+	
+	
+	private static String classCSVHeaderRow= "RealTime, ExcelTime, Car, Source, latitude, longitude, elevation";
 	/**
 	 * turns the class fields into an entry for a csv file
 	 * see returnsEntireTable for info on row versus table
@@ -12,7 +20,16 @@ public class LocationReport extends DataUnit {
 	 */
 	public String getCSVEntry()
 	{
-		return null;
+		GeoCoord locToAdd = this.getLocation();
+		String toPrint = "";
+		toPrint += actualDateFormat.format(this.getTimeCreated()) + ",";
+		toPrint += excelDateFormat.format(this.getTimeCreated()) + ",";
+		toPrint += this.getCarName() + ",";
+		toPrint += this.getSource() + ",";
+		toPrint += locToAdd.getLat() + ",";
+		toPrint += locToAdd.getLon() + ",";
+		toPrint += locToAdd.getElevation() + ",";
+		return toPrint;
 	}
 	
 	/**

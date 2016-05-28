@@ -7,14 +7,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TelemDataPacket extends DataUnit{
-	
+
 	private DateFormat actualDateFormat = new SimpleDateFormat("HH:mm:ss.SSS"); //time format. ss = seconds, SSS = ms
 	//couldn't manage to format milliseconds in a way that Excel can handle as time
 	//so just generated a second column to be able to graph it properly. 
 	private DateFormat excelDateFormat = new SimpleDateFormat("HH:mm:ss"); //time format. ss = seconds, SSS = ms
 	
 	// the whole thing is so wired. :D TODO ask Noah
-	private static String classCSVHeaderRow;
+	private static String classCSVHeaderRow = "RealTime,ExcelTime,Speed,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,"
+			+ "Pck0Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
+			+ "Pck1Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
+			+ "Pck2Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
+			+ "Pck3Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg";
 
 	/**
 	 * turns the class fields into an entry for a csv file
@@ -27,9 +31,7 @@ public class TelemDataPacket extends DataUnit{
 		HashMap<Integer, ArrayList<Float>> voltages = this.getCellVoltages();
 		String toPrint = "";
 		
-		// TODO
-	//	toPrint += this.entryCounter + ","; 
-	//	this.entryCounter++;
+	
 		toPrint += actualDateFormat.format(this.getTimeCreated()) + ",";
 		toPrint += excelDateFormat.format(this.getTimeCreated()) + ",";
 		
@@ -48,7 +50,7 @@ public class TelemDataPacket extends DataUnit{
 		//or the amount per pack.
 		int expectedNumOfCells = 10;
 				
-		for(int i = 0; i<4; i++){ //I have a question Noah :D TODO
+		for(int i = 0; i<4; i++){ 
 			if(voltages.get(i) == null){ //will need to offset this so the rest are in position
 				toPrint += this.numberOfCommas(expectedNumOfCells);
 			}
@@ -70,6 +72,8 @@ public class TelemDataPacket extends DataUnit{
 		
 		return toReturn;
 	}
+	
+
 	/**
 	 * gets the column headings as a csv row
 	 * @return the row as a string
