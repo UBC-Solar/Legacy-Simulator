@@ -26,14 +26,16 @@ import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.TelemDataPacket;
 
 public class SimEngine {
-
+private final double RECHARGE_TIME_MS= 3*1000;
+	
 	public SimEngine() {
 		
 	}
 
+	private CarModel inUseCarModel;
 	
 	public List<SimFrame> runSimulation(Route toTraverse, LocationReport startLocation, ForecastReport weatherReports, TelemDataPacket carStartingCondition, Map<GeoCoord,Double> requestedSpeeds){
-	
+	inUseCarModel = new DefaultCarModel();
 	SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "simulation starting");
 	List<SimFrame> listOfFrames = new ArrayList<SimFrame>(toTraverse.getTrailMarkers().size());
 	
@@ -56,8 +58,25 @@ public class SimEngine {
 		 * This way may produce errors if the car is actually far off the trail, but the alternative is to advance the car
 		 * magically to next breadcrumb, and if the gap between breadcrumbs is big, it may produce an error.  
 		 */
-		ForecastIO nextWeather = weatherReports.getForecasts().get(i);
-		GeoCoord nextPoint = toTraverse.getTrailMarkers().get(i);
+		
+		ForecastIO nextWeather;
+		GeoCoord nextPoint;
+		if (lastFrame.getCarStatus().getSpeed()<=0){
+			i--; //if the speed is zero then we need to redo the frame because the car is not moving, and thus is in the same place
+			if(i<0){
+				nextWeather = weatherReports.getForecasts().get(startPos);
+			}
+			else{
+				nextWeather = weatherReports.getForecasts().get(i);
+			}
+			
+			nextPoint = lastFrame.getGPSReport().getLocation();
+		}
+		else{
+			nextWeather = weatherReports.getForecasts().get(i);
+			nextPoint = toTraverse.getTrailMarkers().get(i);
+		}
+
 		SimFrame nextFrame = this.generateNextFrame(lastFrame, nextPoint, nextWeather, requestedSpeeds.get(nextPoint));
 		lastFrame = nextFrame;
 		listOfFrames.add(nextFrame);
@@ -88,19 +107,42 @@ public class SimEngine {
 		
 		//not sure if calculateDistance() takes elevation into account....
 		double distanceCovered = lastPosition.calculateDistance(nextPoint)*1000; 
+		long nextSimFrameTime;
+		long timeSinceLastFrame;
+		double timeSinceLastFrameInHr;
 		
-	
+		if (speedToDrive >= .001){
+			double tempTime = (distanceCovered/(speedToDrive * 1000.0))*60.0*1000.0*60.0; //double check units. km/h and m?? distanceCovered is in meters
+			timeSinceLastFrame = (long) tempTime;		
+			nextSimFrameTime = lastTimeStamp + timeSinceLastFrame;
+			timeSinceLastFrameInHr = timeSinceLastFrame/(60.0*1000.0*60.0);
+			
+			System.out.println(distanceCovered);
+		}
+		else{
+			double tempTime = RECHARGE_TIME_MS; //double check units. km/h and m?? distanceCovered is in meters
+			timeSinceLastFrame = (long) tempTime;		
+			nextSimFrameTime = lastTimeStamp + timeSinceLastFrame;
+			timeSinceLastFrameInHr = tempTime/(1000*60*60);
+			System.out.println("AGAHAHAHAHAHAHAH RAN");
+			System.out.println(timeSinceLastFrameInHr);
+			System.out.println(distanceCovered);
+		}
 		
 		
-		double tempTime = (distanceCovered/(speedToDrive * 1000))*60*1000*60; //double check units. km/h and m??
-		long timeSinceLastFrame = (long) tempTime;		
-		long nextSimFrameTime = lastTimeStamp + timeSinceLastFrame;
+		
 		FIODataPoint forecastForPoint = chooseReport(nextWeather, nextSimFrameTime);
-		double squareMetersOfPanel = 10; //total random guess. TODO: get actual measurement. 
+		double squareMetersOfPanel = inUseCarModel.getSolarPanelArea();
 		double sunPowerInWatts = calculateSunPower(nextPoint, forecastForPoint, (lastTimeStamp + (timeSinceLastFrame/2)), squareMetersOfPanel, lastFrame);
+
+		
+		double SunCharge = (sunPowerInWatts*timeSinceLastFrameInHr)/(inUseCarModel.getMaxBatteryCap()); //divide watt hrs from the sun by max watt hrs to get the percentage of charge from the sun
+		if(SunCharge>2000000){
+			System.out.println("" + distanceCovered + " " +  timeSinceLastFrameInHr + " Speed: " + speedToDrive);
+		}
 		
 		TelemDataPacket newCarStatus;
-		newCarStatus = calculateNewCarStatus(lastCarStatus, distanceCovered, elevationChange, forecastForPoint, speedToDrive, sunPowerInWatts);
+		newCarStatus = calculateNewCarStatus(lastCarStatus, distanceCovered, elevationChange, forecastForPoint, speedToDrive, SunCharge);
 		LocationReport nextLocationReport = generateLocationReport(lastFrame.getGPSReport(), nextPoint);
 		
 		SimFrame toReturn = new SimFrame(forecastForPoint, newCarStatus, nextLocationReport, nextSimFrameTime);
@@ -135,14 +177,16 @@ public class SimEngine {
 	 * @return
 	 */
 	private TelemDataPacket calculateNewCarStatus(TelemDataPacket lastCarStatus, double distanceCovered,
-			double elevationChange, FIODataPoint forecastForPoint, double speedToDrive, double sunPowerInWatts2) {
+			double elevationChange, FIODataPoint forecastForPoint, double speedToDrive, double SunCharge) {
 		//TODO actually calculate the car...
 		//TODO review the state of charge
-		TelemDataPacket toReturn = new TelemDataPacket(speedToDrive,
+
+		 double generateSoC = generateSoC(lastCarStatus.getStateOfCharge(), elevationChange, speedToDrive, SunCharge);
+		 TelemDataPacket toReturn = new TelemDataPacket(speedToDrive,
 				lastCarStatus.getTotalVoltage(), 
 				lastCarStatus.getTemperatures(), 
 				lastCarStatus.getCellVoltages(), 
-				generateSoC(lastCarStatus.getStateOfCharge(), elevationChange, speedToDrive), 
+				generateSoC, 
 				(distanceCovered/(speedToDrive*1000)*60*60*1000));
 		
 		return toReturn;
@@ -156,41 +200,41 @@ public class SimEngine {
 	 * @return
 	 */
 	
-	private double generateSoC(double lastSoC, double elevationChange, double speed) {
+	private double generateSoC(double lastSoC, double elevationChange, double speed, double SoCFromSun) {
 		if (elevationChange < 0){
-			if (lastSoC+2>=100){
+			if (lastSoC+2+SoCFromSun>=100){
 				lastSoC=100;
 				return lastSoC;
 			}
 			else{
-				return lastSoC+2;
+				return lastSoC+2+SoCFromSun;
 				}
 		}
 		else if(elevationChange >0){
-			if(lastSoC-speed/50.0<=0){
+			if(lastSoC-speed/50.0+SoCFromSun<=0){
 				lastSoC=0;
 				return lastSoC;
 			}
 			else{
-				return lastSoC-speed/50.0;
+				return lastSoC-speed/50.0+SoCFromSun;
 				}
 		}
 		else if(speed == 0){
-			if (lastSoC+1.5>=100){
+			if (lastSoC+1.5+SoCFromSun>=100){
 				lastSoC=100;
 				return lastSoC;
 			}
 			else{
-				return lastSoC+1.5;
+				return lastSoC+1.5+SoCFromSun;
 				}
 		}
 		else{
-			if(lastSoC-speed/100.0<=0){
+			if(lastSoC-speed/100.0+SoCFromSun<=0){
 				lastSoC=0;
 				return lastSoC;
 			}
 			else{
-				return lastSoC-speed/100.0;
+				return lastSoC-speed/100.0+SoCFromSun;
 				}
 		}
 	}
@@ -284,19 +328,9 @@ public class SimEngine {
 				return SpeedReturn;
 			}
 		}
-		else if(elevationChange<0){
+		else if(elevationChange<0 || elevationChange>0){
 			SpeedReturn=lastCarSpeed;
 			return SpeedReturn;
-		}
-		else if(elevationChange>0){
-			if (lastCarSpeed+2>MaxCarSpeed){
-				SpeedReturn=MaxCarSpeed;
-				return SpeedReturn;
-			}
-			else{
-				SpeedReturn=lastCarSpeed+2;
-				return SpeedReturn;
-			}
 		}
 		else{
 			if (lastCarSpeed+3>MaxCarSpeed){
