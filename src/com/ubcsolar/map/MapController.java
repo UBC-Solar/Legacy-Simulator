@@ -121,5 +121,10 @@ public class MapController extends ModuleController{
 		this.lastReported = carLocationReported;
 		sendNotification(new NewLocationReportNotification(carLocationReported));
 	}
+	
+	public double findDistanceAlongLoadedRoute(GeoCoord location){
+		GeoCoord start = this.getAllPoints().getTrailMarkers().get(0);
+		return start.calculateDistance(location);
+	}
 
 }
