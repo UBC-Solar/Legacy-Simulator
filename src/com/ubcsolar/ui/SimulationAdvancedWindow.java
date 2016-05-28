@@ -256,7 +256,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			GeoCoord end = simResultValues.get(i).getGPSReport().getLocation();
 			runningTotalDistance += start.calculateDistance(end);
 			
-			if((runningTotalDistance-lastAddedPointDistance)>KM_PER_SLIDER){
+			if((runningTotalDistance-lastAddedPointDistance)>KM_PER_SLIDER || i == simResultValues.size() - 1){
 				List<GeoCoord> pointsToRepresent = new ArrayList<GeoCoord>();
 				double totalSpeed = 0;
 				for(int index = lastAddedPointIndex+1; index<=i; index++){
