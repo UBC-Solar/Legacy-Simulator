@@ -36,6 +36,7 @@ public class FakeForecastAddWindow extends JFrame{
 	
 	private GlobalController mySession;
 	private WeatherController myWeather;
+	private MapController myMap;
 	private Route theRoute;
 	private JTextField txtTemp;
 	private JTextField txtCloudCover;
@@ -48,13 +49,12 @@ public class FakeForecastAddWindow extends JFrame{
 	private JTextField txtPrecipProb;
 	private JTextField txtPrecipType;
 	private JSpinner distanceSpinner;
-	private double travelDistance;
 	
-	public FakeForecastAddWindow(GlobalController mySession, double travelDistance) {
+	public FakeForecastAddWindow(GlobalController mySession) {
 		
-		this.travelDistance = travelDistance;
 		this.mySession = mySession;
 		this.myWeather = mySession.getMyWeatherController();
+		this.myMap = mySession.getMapController();
 		
 		this.setBounds(500, 250, 400, 400);
 		setTitleAndLogo();
@@ -75,7 +75,7 @@ public class FakeForecastAddWindow extends JFrame{
 		getContentPane().add(lblDistanceAlongRoute, gbc_lblDistanceAlongRoute);
 		
 		distanceSpinner = new JSpinner();
-		distanceSpinner.setModel(new SpinnerNumberModel(0, 0, travelDistance, 1));
+		distanceSpinner.setModel(new SpinnerNumberModel(0, 0, findTotalDistance(), 1));
 		GridBagConstraints gbc_distanceSpinner = new GridBagConstraints();
 		gbc_distanceSpinner.insets = new Insets(0, 0, 5, 5);
 		gbc_distanceSpinner.gridx = 1;
@@ -425,6 +425,12 @@ public class FakeForecastAddWindow extends JFrame{
 			trailMarkerIndex++;
 		}
 		return trailMarkers.get(trailMarkerIndex-1);
+	}
+	
+	private double findTotalDistance(){
+		List<GeoCoord> trailMarkers = myMap.getAllPoints().getTrailMarkers();
+		GeoCoord finalPoint = trailMarkers.get(trailMarkers.size()-1);
+		return myMap.findDistanceAlongLoadedRoute(finalPoint);
 	}
 
 }

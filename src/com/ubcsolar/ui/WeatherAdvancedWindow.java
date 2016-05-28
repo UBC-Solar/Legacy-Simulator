@@ -67,7 +67,6 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private JLabel stormLabel;
 	private JLabel windDirectionLabel;
 	private GeoCoord currentLocation;
-	private JMenuItem mntmLoadFakeForecast;
 	private final int DEW_POINT_DIFF = 7;
 	private double travelDistance;
 	private double[] distances;
@@ -125,15 +124,6 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		});
 		
 		mnForecasts.add(mntmLoadForecastsFor_1);
-		
-		mntmLoadFakeForecast = new JMenuItem("Load Custom Forecast");
-		mntmLoadFakeForecast.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e){
-				JFrame frame = new FakeForecastAddWindow(mySession, travelDistance);
-				frame.setVisible(true);
-			}
-		});
-		mnForecasts.add(mntmLoadFakeForecast);
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

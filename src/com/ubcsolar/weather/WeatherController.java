@@ -12,18 +12,21 @@ import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.Route;
 import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.exception.NoLoadedRouteException;
+import com.ubcsolar.map.MapController;
 import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewForecastReport;
 import com.ubcsolar.notification.Notification;
 
 public class WeatherController extends ModuleController {
-	ForecastReport lastDownloadedReport = null;
-	ForecastReport lastCustomReport = null;
+	private ForecastReport lastDownloadedReport = null;
+	private ForecastReport lastCustomReport = null;
 	private List<ForecastIO> retrievedForecasts;
 	private List<ForecastIO> customForecasts = new ArrayList<ForecastIO>();
+	private MapController myMapController;
 	
 	public WeatherController(GlobalController toAdd) {
 		super(toAdd);
+		myMapController = toAdd.getMapController();
 	}
 	
 	/**
@@ -209,8 +212,16 @@ public class WeatherController extends ModuleController {
 						comboForecasts.get(j).getLongitude(), 0.0);
 				GeoCoord nextCombo = new GeoCoord(comboForecasts.get(j+1).getLatitude(), 
 						comboForecasts.get(j+1).getLongitude(), 0.0);
-				if(currCustom.calculateDistance(currCombo) <
-						currCustom.calculateDistance(nextCombo)){
+				if(myMapController.findDistanceAlongLoadedRoute(currCustom) == 
+						myMapController.findDistanceAlongLoadedRoute(currCombo)){
+					comboForecasts.remove(j);
+					comboForecasts.add(j, customForecasts.get(i));
+					break;
+				}
+				if(myMapController.findDistanceAlongLoadedRoute(currCustom) > 
+						myMapController.findDistanceAlongLoadedRoute(currCombo) &&
+						myMapController.findDistanceAlongLoadedRoute(currCustom) < 
+						myMapController.findDistanceAlongLoadedRoute(nextCombo)){
 					comboForecasts.add(j+1, customForecasts.get(i));
 					break;
 				}
