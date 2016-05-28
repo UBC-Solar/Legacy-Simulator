@@ -77,7 +77,7 @@ public class CarTelemPacketWindow extends JFrame {
 		
 		txtCharge = new JTextField();
 		txtCharge.setHorizontalAlignment(SwingConstants.CENTER);
-		txtCharge.setText("95");
+		txtCharge.setText("95.5");
 		GridBagConstraints gbc_textField_4 = new GridBagConstraints();
 		gbc_textField_4.insets = new Insets(0, 0, 5, 5);
 		gbc_textField_4.fill = GridBagConstraints.HORIZONTAL;
@@ -127,7 +127,7 @@ public class CarTelemPacketWindow extends JFrame {
 		});
 		
 		txttotalcellvolt = new JTextField();
-		txttotalcellvolt.setText("12");
+		txttotalcellvolt.setText("44");
 		txttotalcellvolt.setHorizontalAlignment(SwingConstants.CENTER);
 		txttotalcellvolt.setColumns(10);
 		GridBagConstraints gbc_txtLongitude = new GridBagConstraints();

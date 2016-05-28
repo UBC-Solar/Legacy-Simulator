@@ -2,10 +2,6 @@ package com.ubcsolar.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.EventQueue;
-
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -23,10 +19,8 @@ import org.jfree.data.xy.XYDataset;
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
-import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SimFrame;
 import com.ubcsolar.common.SimulationReport;
-import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.exception.NoCarStatusException;
 import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.exception.NoLoadedRouteException;
@@ -44,16 +38,25 @@ import javax.swing.JButton;
 
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.awt.event.ActionEvent;
 import java.awt.Insets;
 import javax.swing.JCheckBox;
 import java.awt.FlowLayout;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.JTextField;
 
 public class SimulationAdvancedWindow extends JFrame implements Listener{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2684909507474196406L;
 	private static final String CHART_TITLE = "Sim Results";
 	private JPanel contentPane; //the root content holder
 	private GlobalController mySession; 
@@ -70,6 +73,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private boolean showStateOfCharge = true;
 	private boolean showCloud = true;
 	private boolean showElevation = true;
+	private JScrollPane speedSlidersPanel;
+	private JTextField textField_1;
+	private JPanel SliderHoldingPanel;
+	private List<SliderSpinnerFrame> displayedSpeedSliderSpinners = new ArrayList<SliderSpinnerFrame>();
 
 	
 	private void handleError(String message){
@@ -84,7 +91,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		
 		this.mySession = mySession;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 450, 400);
+		setBounds(100, 100, 450, 543);
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -165,8 +172,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		setDefaultChart();
 		mainDisplay = new ChartPanel(simResults);
 		GridBagConstraints gbc_mainDisplay = new GridBagConstraints();
-		gbc_mainDisplay.weighty = 2.0;
-		gbc_mainDisplay.weightx = 2.0;
+		gbc_mainDisplay.weighty = 1.0;
+		gbc_mainDisplay.weightx = 1.0;
 		gbc_mainDisplay.insets = new Insets(0, 0, 5, 5);
 		gbc_mainDisplay.fill = GridBagConstraints.BOTH;
 		gbc_mainDisplay.gridx = 0;
@@ -181,14 +188,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		gbc_panel_1.gridy = 0;
 		chartHoldingPanel.add(panel_1, gbc_panel_1);
 		
-		JPanel panel_2 = new JPanel();
-		GridBagConstraints gbc_panel_2 = new GridBagConstraints();
-		gbc_panel_2.insets = new Insets(0, 0, 0, 5);
-		gbc_panel_2.fill = GridBagConstraints.BOTH;
-		gbc_panel_2.gridx = 0;
-		gbc_panel_2.gridy = 1;
-		chartHoldingPanel.add(panel_2, gbc_panel_2);
-		
 		JPanel panel = new JPanel();
 		GridBagConstraints gbc_panel = new GridBagConstraints();
 		gbc_panel.fill = GridBagConstraints.BOTH;
@@ -196,35 +195,162 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		gbc_panel.gridy = 1;
 		chartHoldingPanel.add(panel, gbc_panel);
 		
+		speedSlidersPanel = new JScrollPane();
+		speedSlidersPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		contentPane.add(speedSlidersPanel, BorderLayout.SOUTH);
+		
+		SliderHoldingPanel = new JPanel();
+		speedSlidersPanel.setViewportView(SliderHoldingPanel);
+		GridBagLayout gbl_SliderHoldingPanel = new GridBagLayout();
+		gbl_SliderHoldingPanel.columnWidths = new int[]{0, 0, 0, 0};
+		gbl_SliderHoldingPanel.rowHeights = new int[]{0, 0};
+		gbl_SliderHoldingPanel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_SliderHoldingPanel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
+		SliderHoldingPanel.setLayout(gbl_SliderHoldingPanel);
+		
+		
+		textField_1 = new JTextField();
+		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
+		gbc_textField_1.insets = new Insets(0, 0, 0, 5);
+		gbc_textField_1.gridx = 0;
+		gbc_textField_1.gridy = 1;
+		SliderHoldingPanel.add(textField_1, gbc_textField_1);
+		textField_1.setColumns(10);
 		setDefaultChart();
 		
 		setTitleAndLogo();
 		this.register();
 		}
+
+	private void clearAndLoadSpeedSliders(List<SimFrame> simResultValues, int pointsPerSlider) {
+		int KM_PER_SLIDER = 5; //could make this dynamic
+	
+		SliderHoldingPanel.removeAll();
+		SliderHoldingPanel.validate();
+		SliderHoldingPanel.repaint();
+		
+		GridBagLayout gbl_SliderHoldingPanel = new GridBagLayout();
+		gbl_SliderHoldingPanel.columnWidths = new int[simResultValues.size()];
+		for(int i = 0; i<simResultValues.size(); i++){
+			gbl_SliderHoldingPanel.columnWidths[i] = 0;
+		}
+		gbl_SliderHoldingPanel.rowHeights = new int[]{0, 0};
+		
+		gbl_SliderHoldingPanel.columnWeights = new double[simResultValues.size()];
+		for(int i = 0; i<simResultValues.size(); i++){
+			gbl_SliderHoldingPanel.columnWeights[i] = 0; //don't want any slider column growing
+		} 
+		gbl_SliderHoldingPanel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
+		SliderHoldingPanel.setLayout(gbl_SliderHoldingPanel);
+		
+		
+		//add the panels dynamically
+		this.displayedSpeedSliderSpinners = new ArrayList<SliderSpinnerFrame>();
+		double runningTotalDistance = 0;
+		int lastAddedPointIndex = 0;
+		double lastAddedPointDistance = 0.0;
+		
+		//can't set the first speed anyway. 
+		for(int i = 1; i<simResultValues.size(); i++){
+			GeoCoord start = simResultValues.get(i-1).getGPSReport().getLocation();
+			GeoCoord end = simResultValues.get(i).getGPSReport().getLocation();
+			runningTotalDistance += start.calculateDistance(end);
+			
+			if((runningTotalDistance-lastAddedPointDistance)>KM_PER_SLIDER){
+				List<GeoCoord> pointsToRepresent = new ArrayList<GeoCoord>();
+				double totalSpeed = 0;
+				for(int index = lastAddedPointIndex+1; index<=i; index++){
+					totalSpeed += simResultValues.get(index).getCarStatus().getSpeed();
+					pointsToRepresent.add(simResultValues.get(index).getGPSReport().getLocation());
+				}
+				
+				double averageSpeed = totalSpeed/(i-(lastAddedPointIndex+1)); //avg speed across all points represented
+				String formattedKMOne = String.format("%.2f", lastAddedPointDistance); //to avoid having 16 digits
+				String formattedKMTwo = String.format("%.2f", runningTotalDistance);
+				String label = "KMs: " + formattedKMOne+"-"+formattedKMTwo;
+				//String label = lastAddedPointDistance+"km-"+runningTotalDistance+"km";
+				SliderSpinnerFrame toAddToPanel = new SliderSpinnerFrame(label ,
+										(int) averageSpeed, false,pointsToRepresent);
+				displayedSpeedSliderSpinners.add(toAddToPanel);
+				
+				lastAddedPointIndex = i;
+				lastAddedPointDistance = runningTotalDistance;
+			}			
+		}
+		
+		
+		
+		for(int i = 0; i<displayedSpeedSliderSpinners.size(); i++){
+			GridBagConstraints temp_gbc_panel = new GridBagConstraints();
+			temp_gbc_panel.insets = new Insets(0, 0, 0, 5);
+			temp_gbc_panel.fill = GridBagConstraints.BOTH;
+			temp_gbc_panel.gridx = i; //add it on the right
+			temp_gbc_panel.gridy = 0;
+			SliderHoldingPanel.add(displayedSpeedSliderSpinners.get(i), temp_gbc_panel);
+			SliderHoldingPanel.validate();
+			SliderHoldingPanel.repaint();
+		}
+		
+		//this text box is just to force it to be bigger so the scroll bar doesn't cover anything. 
+		textField_1 = new JTextField();
+		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
+		gbc_textField_1.insets = new Insets(0, 0, 0, 5);
+		gbc_textField_1.gridx = 0;
+		gbc_textField_1.gridy = 1;
+		SliderHoldingPanel.add(textField_1, gbc_textField_1);
+		textField_1.setColumns(5);
+		
+		
+		this.repaint();
+		this.SliderHoldingPanel.repaint();
+		this.speedSlidersPanel.repaint();
+		
+	}
 		
 		/**
 		 * Attempts to run a simulation with the loaded data. If there is needed data that
 		 * is not loaded, displays an error message to end user. 
 		 */
 		protected void runSimultion() {
-		
-		try {
-			mySession.getMySimController().runSimulation(new HashMap<GeoCoord,Double>());
-		} catch (NoForecastReportException e) {
-			this.handleError("No Forcecasts Loaded");
-			return;
-		} catch (NoLoadedRouteException e) {
-			this.handleError("No Route Loaded");
-			return;
-		} catch (NoLocationReportedException e) {
-			this.handleError("No Location Reported Yet");
-			return;
-		} catch (NoCarStatusException e) {
-			this.handleError("No Car Status Reported Yet");
-			return;
-		}
+			Map<GeoCoord, Double> requestedSpeeds = generateRequestedSpeedMap();
+			try {
+				mySession.getMySimController().runSimulation(requestedSpeeds);
+			} catch (NoForecastReportException e) {
+				this.handleError("No Forcecasts Loaded");
+				return;
+			} catch (NoLoadedRouteException e) {
+				this.handleError("No Route Loaded");
+				return;
+			} catch (NoLocationReportedException e) {
+				this.handleError("No Location Reported Yet");
+				return;
+			} catch (NoCarStatusException e) {
+				this.handleError("No Car Status Reported Yet");
+				return;
+			}
 	}
 		
+		private Map<GeoCoord, Double> generateRequestedSpeedMap() {
+			HashMap<GeoCoord, Double> toReturn = new HashMap<GeoCoord, Double>();
+			/*Random rng = new Random();
+			if(rng.nextBoolean()){
+				for(SimFrame g : this.lastSimReport.getSimFrames()){
+					toReturn.put(g.getGPSReport().getLocation(), 25.0);
+				}
+			}*/ //used this for testing. 
+			
+			for(SliderSpinnerFrame f : this.displayedSpeedSliderSpinners){
+				if(f.isManuallySet()){
+					for(GeoCoord g : f.getRepresentedCoordinates()){
+						toReturn.put(g, f.getValue()+0.0); //the '+0.0' is to make it a Double. 
+					}
+					System.out.println("Manually Requesting speed to: " + f.getValue());
+				}
+			}
+			
+			return toReturn;
+		}
+
 		/**
 		 * Builds a default, empty chart. 
 		 */
@@ -262,6 +388,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			if(n.getClass() == NewSimulationReportNotification.class){
 				NewSimulationReportNotification test = (NewSimulationReportNotification) n;
 				updateChart(test.getSimReport());
+				this.clearAndLoadSpeedSliders(test.getSimReport().getSimFrames(), 1);
+				this.repaint();
 			}
 			
 		}

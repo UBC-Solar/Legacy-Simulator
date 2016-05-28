@@ -3,6 +3,7 @@ package com.ubcsolar.sim;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -25,14 +26,16 @@ import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.TelemDataPacket;
 
 public class SimEngine {
-
+private final double RECHARGE_TIME_MS= 3*1000;
+	
 	public SimEngine() {
 		
 	}
 
+	private CarModel inUseCarModel;
 	
 	public List<SimFrame> runSimulation(Route toTraverse, LocationReport startLocation, ForecastReport weatherReports, TelemDataPacket carStartingCondition, Map<GeoCoord,Double> requestedSpeeds){
-	
+	inUseCarModel = new DefaultCarModel();
 	SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "simulation starting");
 	List<SimFrame> listOfFrames = new ArrayList<SimFrame>(toTraverse.getTrailMarkers().size());
 	
@@ -55,8 +58,25 @@ public class SimEngine {
 		 * This way may produce errors if the car is actually far off the trail, but the alternative is to advance the car
 		 * magically to next breadcrumb, and if the gap between breadcrumbs is big, it may produce an error.  
 		 */
-		ForecastIO nextWeather = weatherReports.getForecasts().get(i);
-		GeoCoord nextPoint = toTraverse.getTrailMarkers().get(i);
+		
+		ForecastIO nextWeather;
+		GeoCoord nextPoint;
+		if (lastFrame.getCarStatus().getSpeed()<=0){
+			i--; //if the speed is zero then we need to redo the frame because the car is not moving, and thus is in the same place
+			if(i<0){
+				nextWeather = weatherReports.getForecasts().get(startPos);
+			}
+			else{
+				nextWeather = weatherReports.getForecasts().get(i);
+			}
+			
+			nextPoint = lastFrame.getGPSReport().getLocation();
+		}
+		else{
+			nextWeather = weatherReports.getForecasts().get(i);
+			nextPoint = toTraverse.getTrailMarkers().get(i);
+		}
+
 		SimFrame nextFrame = this.generateNextFrame(lastFrame, nextPoint, nextWeather, requestedSpeeds.get(nextPoint));
 		lastFrame = nextFrame;
 		listOfFrames.add(nextFrame);
@@ -74,10 +94,11 @@ public class SimEngine {
 		double lastSpeed = lastCarStatus.getSpeed();
 		long lastTimeStamp = lastFrame.getRepresentedTime();
 		
+		double elevationChange = nextPoint.getElevation() - lastPosition.getElevation();
 		
 		double speedToDrive;
 		if(requestedSpeed == null){
-			speedToDrive = calculateBestSpeed(lastCarStatus.getSpeed()); //stubMethod. Also this is a greedy algo.
+			speedToDrive = calculateBestSpeed(lastCarStatus.getSpeed(), elevationChange, lastCarStatus.getStateOfCharge()); //stubMethod. Also this is a greedy algo.
 			//obviously need to add more arguments ^^
 		}
 		else{
@@ -86,19 +107,42 @@ public class SimEngine {
 		
 		//not sure if calculateDistance() takes elevation into account....
 		double distanceCovered = lastPosition.calculateDistance(nextPoint)*1000; 
+		long nextSimFrameTime;
+		long timeSinceLastFrame;
+		double timeSinceLastFrameInHr;
 		
-		double elevationChange = nextPoint.getElevation() - lastPosition.getElevation();
+		if (speedToDrive >= .001){
+			double tempTime = (distanceCovered/(speedToDrive * 1000.0))*60.0*1000.0*60.0; //double check units. km/h and m?? distanceCovered is in meters
+			timeSinceLastFrame = (long) tempTime;		
+			nextSimFrameTime = lastTimeStamp + timeSinceLastFrame;
+			timeSinceLastFrameInHr = timeSinceLastFrame/(60.0*1000.0*60.0);
+			
+			System.out.println(distanceCovered);
+		}
+		else{
+			double tempTime = RECHARGE_TIME_MS; //double check units. km/h and m?? distanceCovered is in meters
+			timeSinceLastFrame = (long) tempTime;		
+			nextSimFrameTime = lastTimeStamp + timeSinceLastFrame;
+			timeSinceLastFrameInHr = tempTime/(1000*60*60);
+			System.out.println("AGAHAHAHAHAHAHAH RAN");
+			System.out.println(timeSinceLastFrameInHr);
+			System.out.println(distanceCovered);
+		}
 		
 		
-		double tempTime = (distanceCovered/(speedToDrive * 1000))*60*1000*60; //double check units. km/h and m??
-		long timeSinceLastFrame = (long) tempTime;		
-		long nextSimFrameTime = lastTimeStamp + timeSinceLastFrame;
+		
 		FIODataPoint forecastForPoint = chooseReport(nextWeather, nextSimFrameTime);
-		double squareMetersOfPanel = 10; //total random guess. TODO: get actual measurement. 
-		double sunPowerInWatts = calculateSunPower(nextPoint, forecastForPoint, (lastTimeStamp + (timeSinceLastFrame/2)), squareMetersOfPanel);
+		double squareMetersOfPanel = inUseCarModel.getSolarPanelArea();
+		double sunPowerInWatts = calculateSunPower(nextPoint, forecastForPoint, (lastTimeStamp + (timeSinceLastFrame/2)), squareMetersOfPanel, lastFrame);
+
+		
+		double SunCharge = (sunPowerInWatts*timeSinceLastFrameInHr)/(inUseCarModel.getMaxBatteryCap()); //divide watt hrs from the sun by max watt hrs to get the percentage of charge from the sun
+		if(SunCharge>2000000){
+			System.out.println("" + distanceCovered + " " +  timeSinceLastFrameInHr + " Speed: " + speedToDrive);
+		}
 		
 		TelemDataPacket newCarStatus;
-		newCarStatus = calculateNewCarStatus(lastCarStatus, distanceCovered, elevationChange, forecastForPoint, speedToDrive, sunPowerInWatts);
+		newCarStatus = calculateNewCarStatus(lastCarStatus, distanceCovered, elevationChange, forecastForPoint, speedToDrive, SunCharge);
 		LocationReport nextLocationReport = generateLocationReport(lastFrame.getGPSReport(), nextPoint);
 		
 		SimFrame toReturn = new SimFrame(forecastForPoint, newCarStatus, nextLocationReport, nextSimFrameTime);
@@ -133,13 +177,16 @@ public class SimEngine {
 	 * @return
 	 */
 	private TelemDataPacket calculateNewCarStatus(TelemDataPacket lastCarStatus, double distanceCovered,
-			double elevationChange, FIODataPoint forecastForPoint, double speedToDrive, double sunPowerInWatts2) {
+			double elevationChange, FIODataPoint forecastForPoint, double speedToDrive, double SunCharge) {
 		//TODO actually calculate the car...
 		//TODO review the state of charge
-		TelemDataPacket toReturn = new TelemDataPacket(speedToDrive,
+
+		 double generateSoC = generateSoC(lastCarStatus.getStateOfCharge(), elevationChange, speedToDrive, SunCharge);
+		 TelemDataPacket toReturn = new TelemDataPacket(speedToDrive,
 				lastCarStatus.getTotalVoltage(), 
 				lastCarStatus.getTemperatures(), 
-				lastCarStatus.getCellVoltages(), generateRandomSoC(lastCarStatus.getStateOfCharge()), 
+				lastCarStatus.getCellVoltages(), 
+				generateSoC, 
 				(distanceCovered/(speedToDrive*1000)*60*60*1000));
 		
 		return toReturn;
@@ -152,6 +199,49 @@ public class SimEngine {
 	 * @param lastSoC
 	 * @return
 	 */
+	
+	private double generateSoC(double lastSoC, double elevationChange, double speed, double SoCFromSun) {
+		if (elevationChange < 0){
+			if (lastSoC+2+SoCFromSun>=100){
+				lastSoC=100;
+				return lastSoC;
+			}
+			else{
+				return lastSoC+2+SoCFromSun;
+				}
+		}
+		else if(elevationChange >0){
+			if(lastSoC-speed/50.0+SoCFromSun<=0){
+				lastSoC=0;
+				return lastSoC;
+			}
+			else{
+				return lastSoC-speed/50.0+SoCFromSun;
+				}
+		}
+		else if(speed == 0){
+			if (lastSoC+1.5+SoCFromSun>=100){
+				lastSoC=100;
+				return lastSoC;
+			}
+			else{
+				return lastSoC+1.5+SoCFromSun;
+				}
+		}
+		else{
+			if(lastSoC-speed/100.0+SoCFromSun<=0){
+				lastSoC=0;
+				return lastSoC;
+			}
+			else{
+				return lastSoC-speed/100.0+SoCFromSun;
+				}
+		}
+	}
+		
+		
+		
+		/*
 	private double generateRandomSoC(double lastSoC) {
 		Random rng = new Random();
 		int change = rng.nextInt(5); //up or down max 2% in a frame.
@@ -165,7 +255,7 @@ public class SimEngine {
 			return lastSoC + change - 2; 
 		}
 	}
-
+*/
 
 	/**
 	 * Helper function; calculate the amount of solar power falling on the car during the frame. 
@@ -174,15 +264,32 @@ public class SimEngine {
 	 * @param squareMetersOfPanel - the total collection area of solar panels
 	 * @return
 	 */
-   private double calculateSunPower(GeoCoord nextPoint, FIODataPoint forecastForPoint, double timeOfDay, double squareMetersOfPanel) {
-		// TODO Auto-generated method stub
+   private double calculateSunPower(GeoCoord nextPoint, FIODataPoint forecastForPoint, double timeOfDay, double squareMetersOfPanel, SimFrame lastFrame) {
+	   Calendar rightNow = Calendar.getInstance();
+	   rightNow.setTimeInMillis((long) timeOfDay);
+	   
+	   int hour= rightNow.HOUR_OF_DAY;
+	   // TODO Auto-generated method stub
 	   
 	   //Get the sun elevation given the time of day and the latitude and longitude. 
 	   
+	   double cloudCover = lastFrame.getForecast().cloudCover();
+	   
+	   
+	   
 	   //assume 100 watts per square foot. (thanks random forum guy)
 	   //10.7639 sq feet per sq. meter. 
+	   double timeFactor=1;
 	   
-	   double watts = 100*10.7639 * squareMetersOfPanel;
+	   //replace with sunrise equation later
+	   if (hour<12 && hour>6){
+		   timeFactor=(4-24/hour)/2; //calculations just meant to get a 0-1 scale
+	   }
+	   if (hour>12 && hour<21){
+		   timeFactor=(1-hour/21)/.4286; //.4286 is a conversion factor to get on a scale of 0-1
+	   }
+	   
+	   double watts = 100*10.7639 * squareMetersOfPanel* timeFactor* cloudCover;
 	   
 	   //calculate how much sun there is given the weather (cloudy? Probably not much). 
 	   //I think there's actually a parameter in FIODataPoint for sun exposure. If not, use the cloudyness measurement. 
@@ -208,11 +315,38 @@ public class SimEngine {
 	}
 
 
-	private double calculateBestSpeed(double lastCarSpeed) {
+	private double calculateBestSpeed(double lastCarSpeed, double elevationChange, double SoC) {
+		double SpeedReturn;
+		double MaxCarSpeed=110;
+		
+		if (SoC<=0){
+			if(lastCarSpeed-2<0){
+				return 0;
+			}
+			else{
+				SpeedReturn=lastCarSpeed-2;
+				return SpeedReturn;
+			}
+		}
+		else if(elevationChange<0 || elevationChange>0){
+			SpeedReturn=lastCarSpeed;
+			return SpeedReturn;
+		}
+		else{
+			if (lastCarSpeed+3>MaxCarSpeed){
+				SpeedReturn=MaxCarSpeed;
+				return SpeedReturn;
+			}
+			else{
+				SpeedReturn=lastCarSpeed+3;
+				return SpeedReturn;
+			}
+		}
+		
 		//return 22.0; // Chosen by fair dice roll, guaranteed to be random. https://xkcd.com/221/ 
 		
 		
-		
+		/*
 		Random rng = new Random();
 		if(rng.nextInt(4)<=2){
 			return lastCarSpeed;
@@ -231,9 +365,11 @@ public class SimEngine {
 		
 		return speedToReturn;
 		//TODO put real algo here. 
+		*/
 	}
 
 
+	
 	private int getStartPos(ArrayList<GeoCoord> trailMarkers, GeoCoord location) {
 		// find the closest point and return the position number. 
 		//TODO actually calculate start position. 
