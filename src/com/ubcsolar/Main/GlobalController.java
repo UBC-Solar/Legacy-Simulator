@@ -8,22 +8,13 @@
 
 package com.ubcsolar.Main;
 
-import java.awt.EventQueue;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-
-import org.jdom2.JDOMException;
-
 import com.ubcsolar.car.CarController;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LogType;
@@ -37,6 +28,7 @@ import com.ubcsolar.weather.WeatherController;
 
 public class GlobalController {
 								//listener in pos. 1 is waiting for the trigger in pos. 1, etc. 
+	@SuppressWarnings("unused")
 	private GUImain mainWindow; //the root panel for the UI
 	private MapController myMapController; //the Map controller
 	private CarController myCarController; //the Car controller
@@ -48,18 +40,14 @@ public class GlobalController {
 		
 	/**
 	 * constructor. 
-	 * @param mainWindow - the root window for the UI
-	 * (Note: could change that order of execution to do a GlobalController first, then the GUIMain
+	 * @param doBuildUI - if True, creates a UI. If false, starts the rest of the program, but no UI. 
+	 * useful if you want to do automated tests or other automation with no user input
 	 * @throws IOException 
 	 */
 	public GlobalController(boolean doBuildUI) throws IOException{
 		iconImage = new ImageIcon("res/windowIcon.png");
 		
 		triggerNotifyMap = new HashMap<Class<? extends Notification>, List<Listener>>();		
-		//Currently structured as a 1:1 list; the Class in position 3 of the Listeners list
-		//is listening for the trigger in position 3 of the triggers list. 
-		//there are much more elegant and efficient ways of doing that. 
-		
 		
 		//TODO many of these are interrelated: the main window asks for the Database Controller. 
 		//If it's 'null' (as in, didn't build properly), the program crashes. It shouldn't. 
@@ -72,14 +60,13 @@ public class GlobalController {
 		try {
 			myDatabaseController = new DatabaseController(this);
 		} catch (IOException e) {
-			// Means that it couldn't create the DB file (currently a .csv)
+			//Means that it couldn't create the DB file (currently a .csv)
 			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "IO Error when creating DB, check file name and location");
 			this.sendNotification(new ExceptionNotification(e, "IO Error when creating DB, check file name and location"));
 		}
 		
 		if(doBuildUI){
 			mainWindow = new GUImain(this); //See note below about starting this as a Runnable.
-			
 		}
 		
 		//TODO start Window in it's own thread. Here's the original boilerplate code 
@@ -102,6 +89,7 @@ public class GlobalController {
 	public GlobalController getGlobalController(){
 		return this;
 	}
+	
 	/**
 	 * Adds the listener to the registry for that notification. If a notification comes in,
 	 * it will be sent to every class that registered for it. 
@@ -111,7 +99,6 @@ public class GlobalController {
 	 * @param n - the notification that the class is looking for. 
 	 */
 	public synchronized void register(Listener l, Class<? extends Notification> n){		
-		//oldRegister(l, n);
 		/* Design decision here: It appears that setting up a map 
 		 * and making/adding to the list each time may be slower 
 		 * at registering than the old dual-list system. 
@@ -130,17 +117,20 @@ public class GlobalController {
 		 * performance hit. The only place so far I wanted to use it was the Database, but it's not that
 		 * hard to change it to register for each concrete subclass. 
 		 */
+		
 		if(triggerNotifyMap.containsKey(n)){
 			triggerNotifyMap.get(n).add(l);
 		}
 		else{
 			List<Listener> temp = new LinkedList<Listener>();
 			//Gotta make sure to initialize it.
+			//You may consider implementing an ArrayList or Vector instead. I though performance would be worse
+			//but a brief search of StackOverflow suggests it might actually be better. 
+			
 			temp.add(l);
 			triggerNotifyMap.put(n, temp); //Will have one value. 
 		}
-		System.out.println(l.getClass() + " registered for " + n);
-		System.out.println("Map Size: " + triggerNotifyMap.size());
+		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),l.getClass() + " registered for " + n);
 	}
 	
 	/**
@@ -149,23 +139,22 @@ public class GlobalController {
 	 */
 	public synchronized void sendNotification(Notification n){
 		SolarLog.write(LogType.NOTIFICATION, n.getTimeCreated(), n.getMessage());
-		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-		Calendar cal = Calendar.getInstance();
+
 		//Can turn this on if you need to see when notifications go out.
+		//DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+		//Calendar cal = Calendar.getInstance();
 		//System.out.println(dateFormat.format(cal.getTime()) + "- Global Controller got a notification " + n.getClass() );
 		
 		//oldSendNotification(n);
 		//Hoping this will be much faster than the alternative. 
-		/*TODO verify that a LinkedList iterator is O(n), and 
-		not O(n^2) (as it would be for (for int i=0; i++)*/
-		//TODO consider implementing an ArrayList or Vector instead. I though performance would be worse
-		//but a brief search of StackOverflow suggests it might actually be better. 
+
 		
 		List<Listener> temp = this.triggerNotifyMap.get(n.getClass());
 		if(temp != null){
-			for(Listener l : this.triggerNotifyMap.get(n.getClass())){
-			l.notify(n); //turn on when ready to replace old way below. 
-			//don't want to run both at once. 
+			/*use an 'enhanced for loop' to use the iterator. (get on LinkedLists is O(n),
+			but the iterator on all list types should be O(1) for each list item) */
+			for(Listener l : this.triggerNotifyMap.get(n.getClass())){ 
+			l.notify(n); 
 			}
 		}
 		else{
@@ -175,7 +164,6 @@ public class GlobalController {
 			 * out of order.*/
 			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
 					"When sent, no object wanted: " + n.getClass());
-			
 			}
 
 

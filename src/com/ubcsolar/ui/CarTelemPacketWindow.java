@@ -38,6 +38,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.awt.Font;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class CarTelemPacketWindow extends JFrame {
 	private JTextField txtSpeed;
@@ -65,7 +67,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		getContentPane().setLayout(gridBagLayout);
 		
-		JLabel lblStateOfCharge = new JLabel("State Of Charge:");
+		JLabel lblStateOfCharge = new JLabel("State Of Charge (%):");
 		GridBagConstraints gbc_lblStateOfCharge = new GridBagConstraints();
 		gbc_lblStateOfCharge.anchor = GridBagConstraints.EAST;
 		gbc_lblStateOfCharge.insets = new Insets(0, 0, 5, 5);
@@ -75,7 +77,7 @@ public class CarTelemPacketWindow extends JFrame {
 		
 		txtCharge = new JTextField();
 		txtCharge.setHorizontalAlignment(SwingConstants.CENTER);
-		txtCharge.setText("1");
+		txtCharge.setText("95");
 		GridBagConstraints gbc_textField_4 = new GridBagConstraints();
 		gbc_textField_4.insets = new Insets(0, 0, 5, 5);
 		gbc_textField_4.fill = GridBagConstraints.HORIZONTAL;
@@ -84,7 +86,7 @@ public class CarTelemPacketWindow extends JFrame {
 		getContentPane().add(txtCharge, gbc_textField_4);
 		txtCharge.setColumns(10);
 		
-		JLabel lblSpeed = new JLabel("Speed:");
+		JLabel lblSpeed = new JLabel("Speed (KM/H):");
 		GridBagConstraints gbc_lblSpeed = new GridBagConstraints();
 		gbc_lblSpeed.anchor = GridBagConstraints.EAST;
 		gbc_lblSpeed.insets = new Insets(0, 0, 5, 5);
@@ -103,7 +105,7 @@ public class CarTelemPacketWindow extends JFrame {
 		getContentPane().add(txtSpeed, gbc_txtCarName);
 		txtSpeed.setColumns(10);
 		
-		JLabel lblnewTotalVoltage = new JLabel("Total Voltage:");
+		JLabel lblnewTotalVoltage = new JLabel("Total Voltage (V):");
 		GridBagConstraints gbc_lblnewTotalVoltage = new GridBagConstraints();
 		gbc_lblnewTotalVoltage.anchor = GridBagConstraints.EAST;
 		gbc_lblnewTotalVoltage.insets = new Insets(0, 0, 5, 5);
@@ -112,6 +114,11 @@ public class CarTelemPacketWindow extends JFrame {
 		getContentPane().add(lblnewTotalVoltage, gbc_lblnewTotalVoltage);
 		
 		JButton btnOk = new JButton("OK");
+		btnOk.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				handleOkClick();
+			}
+		});
 		btnOk.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -130,7 +137,7 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_txtLongitude.gridy = 3;
 		getContentPane().add(txttotalcellvolt, gbc_txtLongitude);
 		
-		JLabel lblTemperatures = new JLabel("Temperatures");
+		JLabel lblTemperatures = new JLabel("Temperatures (\u00B0C)");
 		lblTemperatures.setFont(new Font("Tahoma", Font.ITALIC, 11));
 		GridBagConstraints gbc_lblTemperatures = new GridBagConstraints();
 		gbc_lblTemperatures.insets = new Insets(0, 0, 5, 5);
@@ -278,18 +285,31 @@ public class CarTelemPacketWindow extends JFrame {
 		getContentPane().add(btnOk, gbc_btnOk);
 		
 		JButton btnCancel = new JButton("Cancel");
+		btnCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				closeWindow();
+			}
+		});
 		btnCancel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				closeWindow();
 			}
 		});
+		
 		GridBagConstraints gbc_btnCancel = new GridBagConstraints();
 		gbc_btnCancel.anchor = GridBagConstraints.WEST;
 		gbc_btnCancel.gridx = 3;
 		gbc_btnCancel.gridy = 12;
 		getContentPane().add(btnCancel, gbc_btnCancel);
+		
+		btnOk.requestFocus();
+		btnOk.requestFocusInWindow();
+		getRootPane().setDefaultButton(btnOk);
+		btnOk.requestFocus();
 	}
+	
+	//------------------------------------------------------
 	
 	private void handleError(String message){
 		JOptionPane.showMessageDialog(this, message);
@@ -387,9 +407,9 @@ public class CarTelemPacketWindow extends JFrame {
 			return;
 		}
 		
-		int stateOfCharge;
+		double stateOfCharge;
 		try{ 
-			stateOfCharge = Integer.parseInt(this.txtCharge.getText()); // TODO
+			stateOfCharge = Double.parseDouble(this.txtCharge.getText()); // TODO
 		}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("State of charge formatted incorrectly");
@@ -416,6 +436,8 @@ public class CarTelemPacketWindow extends JFrame {
 		this.closeWindow();
 	}
 	
+	
+	
 	private void closeWindow(){
 		this.dispose();
 	}
@@ -431,7 +453,7 @@ public class CarTelemPacketWindow extends JFrame {
 			speed = 0;
 		int totalV = 5;
 		totalV = totalV > 50 ? 50 : totalV < 40 ? 40 : totalV;
-		int stateOfCharge= 80;
+		double stateOfCharge= 80;
 		
 		HashMap<String,Integer> temperatures = new HashMap<String,Integer>();
 		temperatures.put("bms", 1);

@@ -36,9 +36,7 @@ public class GPSFromPhoneReceiver implements Runnable, SentenceListener{
 		this.carName = carName;
 		this.source = source;
 		
-		try{
-			Set<String> portNames = NRSerialPort.getAvailableSerialPorts();
-			String portName = portNames.iterator().next(); //it always gets the first serial port available. 
+		try{ 
 			System.out.println(comPort);
 			serialPort = new NRSerialPort(comPort, 9600);
 			serialPort.connect();

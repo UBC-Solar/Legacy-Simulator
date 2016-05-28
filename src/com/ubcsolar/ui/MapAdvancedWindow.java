@@ -6,7 +6,6 @@
 package com.ubcsolar.ui;
 
 import com.ubcsolar.Main.GlobalController;
-import com.ubcsolar.common.DistanceUnit;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.notification.NewMapLoadedNotification;
@@ -98,7 +97,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		if(n.getClass() == NewMapLoadedNotification.class){ //when a new map is loaded, propogate the new name. 
 			NewMapLoadedNotification n2 = (NewMapLoadedNotification) n; 
 			labelUpdate(n2.getMapLoadedName());
-			updateMap(n2.getRoute().getTrailMarkers(), -1, DistanceUnit.KILOMETERS);
+			updateMap(n2.getRoute().getTrailMarkers(), -1);
 		//	JOptionPane.showMessageDialog(this, "New map: " + (((NewMapLoadedNotification) n).getMapLoadedName()));
 			
 		}
@@ -276,7 +275,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	 * @param unitMeasuredBy - units. 
 	 */
 	private void updateMap(ArrayList<GeoCoord> listOfPoints,
-			int numOfDistanceRequested, DistanceUnit unitMeasuredBy) {
+			int numOfDistanceRequested) {
 
 		double minHeight = -20.0; //blank chart (centers '0')
 		double maxHeight = 20.0; //a blank chart
@@ -296,7 +295,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 					}
 					
 					for(int i = 1; i<listOfPoints.size(); i++){
-						tripDistance +=  listOfPoints.get(i-1).calculateDistance(listOfPoints.get(i), unitMeasuredBy);
+						tripDistance +=  listOfPoints.get(i-1).calculateDistance(listOfPoints.get(i));
 						data[0][i] = tripDistance;
 						
 						//TODO make this change from feet to anything

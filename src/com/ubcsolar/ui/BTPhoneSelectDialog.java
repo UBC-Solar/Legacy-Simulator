@@ -14,6 +14,8 @@ import javax.swing.JLabel;
 
 import com.ubcsolar.Main.GlobalController;
 
+import jssc.SerialPortList;
+
 import javax.swing.JButton;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -50,8 +52,7 @@ public class BTPhoneSelectDialog extends JFrame {
 		getContentPane().add(lblComPort, gbc_lblComPort);
 		
 		comPortComboBox = new JComboBox();
-		comPortComboBox.setModel(new DefaultComboBoxModel(new String[] {"COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "COM10"}));
-		comPortComboBox.setSelectedIndex(6);
+		comPortComboBox.setModel(new DefaultComboBoxModel(SerialPortList.getPortNames()));
 		GridBagConstraints gbc_comPortComboBox = new GridBagConstraints();
 		gbc_comPortComboBox.insets = new Insets(0, 0, 5, 5);
 		gbc_comPortComboBox.fill = GridBagConstraints.HORIZONTAL;
@@ -63,7 +64,7 @@ public class BTPhoneSelectDialog extends JFrame {
 		btnOk.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				connectToCellPhone();
+				connectToCar();
 				closeWindow();
 			}
 		});
@@ -77,6 +78,7 @@ public class BTPhoneSelectDialog extends JFrame {
 		btnCancel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				disconnectCellPhone();
 				closeWindow();
 			}
 		});
@@ -100,9 +102,13 @@ public class BTPhoneSelectDialog extends JFrame {
 	private void closeWindow(){
 		this.dispose();
 	}
-	private void connectToCellPhone(){
+	private void connectToCar(){
 		String comPort = this.comPortComboBox.getSelectedItem() + "";
-		mySession.getMapController().connectToCellPhone(comPort);
+		mySession.getMapController().connectToCellPhone(comPort);// (comPort);
+	}
+	
+	private void disconnectCellPhone(){
+		mySession.getMapController().disconnectCellPhone();
 	}
 	
 }

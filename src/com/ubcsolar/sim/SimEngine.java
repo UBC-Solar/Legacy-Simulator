@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.jfree.data.Values;
 
@@ -14,7 +15,6 @@ import com.github.dvdme.ForecastIOLib.FIODataBlock;
 import com.github.dvdme.ForecastIOLib.FIODataPoint;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalValues;
-import com.ubcsolar.common.DistanceUnit;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.LocationReport;
@@ -77,19 +77,16 @@ public class SimEngine {
 		
 		double speedToDrive;
 		if(requestedSpeed == null){
-			if(lastCarStatus.getSpeed() > 1){
-				speedToDrive = lastCarStatus.getSpeed(); //'always drive the same speed' is simple, but dumb. 
-			}
-			else{
-				speedToDrive = calculateBestSpeed(); //stubMethod. Also this is a greedy algo. 
-			}
+			speedToDrive = calculateBestSpeed(lastCarStatus.getSpeed()); //stubMethod. Also this is a greedy algo.
+			//obviously need to add more arguments ^^
 		}
 		else{
 			speedToDrive = requestedSpeed;
 		}
 		
 		//not sure if calculateDistance() takes elevation into account....
-		double distanceCovered = lastPosition.calculateDistance(nextPoint, DistanceUnit.METERS); 
+		double distanceCovered = lastPosition.calculateDistance(nextPoint)*1000; 
+		
 		double elevationChange = nextPoint.getElevation() - lastPosition.getElevation();
 		
 		
@@ -142,10 +139,31 @@ public class SimEngine {
 		TelemDataPacket toReturn = new TelemDataPacket(speedToDrive,
 				lastCarStatus.getTotalVoltage(), 
 				lastCarStatus.getTemperatures(), 
-				lastCarStatus.getCellVoltages(), lastCarStatus.getStateOfCharge(), 
+				lastCarStatus.getCellVoltages(), generateRandomSoC(lastCarStatus.getStateOfCharge()), 
 				(distanceCovered/(speedToDrive*1000)*60*60*1000));
 		
 		return toReturn;
+	}
+
+
+	/**
+	 * May generate a value more than 100 or less than 0, but keeps it somewhere within that.
+	 * Max change is +/- 2% from last.  
+	 * @param lastSoC
+	 * @return
+	 */
+	private double generateRandomSoC(double lastSoC) {
+		Random rng = new Random();
+		int change = rng.nextInt(5); //up or down max 2% in a frame.
+		if(lastSoC<=0){
+			return lastSoC + change;
+		}
+		if(lastSoC>=100){
+			return lastSoC-change;
+		}
+		else{
+			return lastSoC + change - 2; 
+		}
 	}
 
 
@@ -190,9 +208,28 @@ public class SimEngine {
 	}
 
 
-	private double calculateBestSpeed() {
-		return 22.0; // Chosen by fair dice roll, guaranteed to be random. https://xkcd.com/221/ 
-		//obviously need to put a real algo here... 
+	private double calculateBestSpeed(double lastCarSpeed) {
+		//return 22.0; // Chosen by fair dice roll, guaranteed to be random. https://xkcd.com/221/ 
+		
+		
+		
+		Random rng = new Random();
+		if(rng.nextInt(4)<=2){
+			return lastCarSpeed;
+		}
+		int deltaV = rng.nextInt(7);
+		double speedToReturn = lastCarSpeed;
+		if((lastCarSpeed-deltaV)<0){
+			speedToReturn = lastCarSpeed + deltaV; //don't want negative speed
+		}
+		else if(lastCarSpeed + deltaV>110){//max highway speed
+			speedToReturn = lastCarSpeed - deltaV;
+		}
+		else{
+			speedToReturn += (deltaV - 3); //to generate some negatives. 
+		}
+		
+		return speedToReturn;
 		//TODO put real algo here. 
 	}
 

@@ -8,7 +8,6 @@ import javax.swing.JOptionPane;
 import com.github.dvdme.ForecastIOLib.FIODataPoint;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
-import com.ubcsolar.common.DistanceUnit;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Route;
 import com.ubcsolar.map.MapController;
@@ -422,7 +421,7 @@ public class FakeForecastAddWindow extends JFrame{
 		int trailMarkerIndex = 1;
 		while(travelDistance < distance && trailMarkerIndex < trailMarkers.size()){
 			travelDistance += trailMarkers.get(trailMarkerIndex-1).calculateDistance(
-					trailMarkers.get(trailMarkerIndex), DistanceUnit.KILOMETERS);
+					trailMarkers.get(trailMarkerIndex));
 			trailMarkerIndex++;
 		}
 		return trailMarkers.get(trailMarkerIndex-1);

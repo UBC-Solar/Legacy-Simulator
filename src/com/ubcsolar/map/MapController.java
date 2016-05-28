@@ -113,6 +113,10 @@ public class MapController extends ModuleController{
 		}
 	}
 	
+	public void disconnectCellPhone(){
+		gpsBlueToothConnection.stop();
+	}
+	
 	public void recordNewCarLocation(LocationReport carLocationReported){
 		this.lastReported = carLocationReported;
 		sendNotification(new NewLocationReportNotification(carLocationReported));

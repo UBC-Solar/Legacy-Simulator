@@ -17,7 +17,7 @@ import com.ubcsolar.notification.*;
 import jssc.SerialPortException;
 
 public class CarController extends ModuleController {
-	
+	//test
 	private DatabaseController myDatabase; //references to the data warehouse. Want to store the car's broadcasts
 	private DataProcessor myDataProcessor; //where to send the car's broadcasts for processing. 
 	private AbstractDataReceiver myDataReceiver; //what will capture the car's raw broadcasts
@@ -36,15 +36,14 @@ public class CarController extends ModuleController {
 	}
 	
 	/**
-	 * Create a new connection to a car (will attempt to close any existing ones) 
+	 * Close any existing connection, create a new connection to a car on default Serial Port 
 	 */
 	public void establishNewConnection(){
 		try{
 			stopListeningToCar(); //close any existing current connection
-		
-		myDataReceiver = new XbeeSerialDataReceiver(this, myDataProcessor);
-		myDataReceiver.run();
-		sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
+			myDataReceiver = new XbeeSerialDataReceiver(this, myDataProcessor);
+			myDataReceiver.run();
+			sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
 		}
 		catch(SerialPortException e){
 			//Not able to create the datareceiver connection 
@@ -55,6 +54,29 @@ public class CarController extends ModuleController {
 			stopListeningToCar();
 		}
 	}
+	
+	/**
+	 * Close any existing connection, create a new connection to a car on specified Serial Port
+	 * @param comPort
+	 */
+	public void establishNewConnection(String comPort) {
+		try{
+			stopListeningToCar(); //close any existing current connection
+			myDataReceiver = new XbeeSerialDataReceiver(this, myDataProcessor, comPort);
+			myDataReceiver.run();
+			sendNotification(new NewCarLoadedNotification(myDataReceiver.getName()));
+		}
+		catch(SerialPortException e){
+			//Not able to create the datareceiver connection 
+			ExceptionNotification notification = new ExceptionNotification(e, "Unable to connect to Car, no Serial Port found"); 
+			SolarLog.write(LogType.ERROR, notification.getTimeCreated(), notification.getMessage());
+			sendNotification(notification);
+			e.printStackTrace();
+			stopListeningToCar();
+		}
+		
+	}
+	
 	
 	/**
 	 * This method is a bit of a kludge; starts a data receiver that fakes receiving broadcasts
@@ -141,7 +163,8 @@ public class CarController extends ModuleController {
 		//See the note at the top about further caching. For now, lets just use DB.
 		sendNotification(new CarUpdateNotification(newPacket));
 	}
-	
+
+
 	
 
 	

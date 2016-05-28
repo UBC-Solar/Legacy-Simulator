@@ -87,7 +87,7 @@ public class CarAdvancedWindow extends JFrame {
 		contentPane.add(btnStartRealCar, gbc_btnStartRealCar);
 		btnStartRealCar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				startRealCar();
+				new BTCarSelectDialog(mySession).setVisible(true);
 			}
 		});
 		JButton btnStopCar = new JButton("Stop Car/Connection");

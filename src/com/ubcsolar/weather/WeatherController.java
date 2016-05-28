@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
-import com.ubcsolar.common.DistanceUnit;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.ModuleController;
@@ -168,7 +167,7 @@ public class WeatherController extends ModuleController {
 		ArrayList<GeoCoord> toReturn = new ArrayList<GeoCoord>(trailMarkers.size()/numOfKMBetween);
 		toReturn.add(start);
 		for(GeoCoord g : trailMarkers){
-			if(start.calculateDistance(g, DistanceUnit.KILOMETERS) > numOfKMBetween){
+			if(start.calculateDistance(g) > numOfKMBetween){
 				toReturn.add(g);
 				start = g;
 			}
@@ -210,8 +209,8 @@ public class WeatherController extends ModuleController {
 						comboForecasts.get(j).getLongitude(), 0.0);
 				GeoCoord nextCombo = new GeoCoord(comboForecasts.get(j+1).getLatitude(), 
 						comboForecasts.get(j+1).getLongitude(), 0.0);
-				if(currCustom.calculateDistance(currCombo, DistanceUnit.KILOMETERS) <
-						currCustom.calculateDistance(nextCombo, DistanceUnit.KILOMETERS)){
+				if(currCustom.calculateDistance(currCombo) <
+						currCustom.calculateDistance(nextCombo)){
 					comboForecasts.add(j+1, customForecasts.get(i));
 					break;
 				}

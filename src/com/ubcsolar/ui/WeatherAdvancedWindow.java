@@ -21,7 +21,6 @@ import com.github.dvdme.ForecastIOLib.FIODataBlock;
 import com.github.dvdme.ForecastIOLib.FIODataPoint;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
-import com.ubcsolar.common.DistanceUnit;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
@@ -244,7 +243,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				NewForecastReport n2 = (NewForecastReport) n; 
 				currentForecastReport = n2.getTheReport();
 				//labelUpdate(n2.getMapLoadedName());
-				//updateMap(n2.getRoute().getTrailMarkers(), -1, DistanceUnit.KILOMETERS);
+				//updateMap(n2.getRoute().getTrailMarkers(), -1);
 			//	JOptionPane.showMessageDialog(this, "New map: " + (((NewMapLoadedNotification) n).getMapLoadedName()));	
 			}
 			if(n.getClass() == NewLocationReportNotification.class){
@@ -309,8 +308,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				for(int i = 1; i < forecasts.size(); i++){
 					GeoCoord curr = new GeoCoord(forecasts.get(i).getLatitude(),
 							forecasts.get(i).getLongitude(), 0.0);
-					if(currentLocation.calculateDistance(curr, DistanceUnit.KILOMETERS) <
-							currentLocation.calculateDistance(closestForecastLocation, DistanceUnit.KILOMETERS)){
+					if(currentLocation.calculateDistance(curr) <
+							currentLocation.calculateDistance(closestForecastLocation)){
 						closestForecast = forecasts.get(i);
 						closestForecastLocation = curr;
 						if(i == forecasts.size()-1){
@@ -472,7 +471,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				distances[0] = travelDistance;
 				while(distanceIndex < distances.length && trailMarkerIndex < trailMarkers.size()){
 					travelDistance += trailMarkers.get(trailMarkerIndex-1).calculateDistance(
-							trailMarkers.get(trailMarkerIndex), DistanceUnit.KILOMETERS);
+							trailMarkers.get(trailMarkerIndex));
 					GeoCoord currentMarker = new GeoCoord(trailMarkers.get(trailMarkerIndex).getLat(),
 							trailMarkers.get(trailMarkerIndex).getLon(), 0.0);
 					if(currentMarker.equals(forecastPoints.get(distanceIndex))){
@@ -484,6 +483,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 					}
 					trailMarkerIndex++;
 				}
+
 				
 				int numHours = 0;
 				

@@ -5,28 +5,20 @@ package com.ubcsolar.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Point;
 
-import org.openstreetmap.gui.jmapviewer.Coordinate;
-
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.SpringLayout;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import com.ubcsolar.Main.GlobalController;
-import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.LogType;
-import com.ubcsolar.common.Route;
-import com.ubcsolar.notification.CarUpdateNotification;
 import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewForecastReport;
 import com.ubcsolar.notification.NewLocationReportNotification;
@@ -35,12 +27,6 @@ import com.ubcsolar.notification.Notification;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
@@ -48,19 +34,14 @@ import com.jgoodies.forms.factories.FormFactory;
 
 import javax.swing.JPanel;
 import javax.swing.JButton;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-
-import org.openstreetmap.gui.jmapviewer.JMapViewer;
-import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
-import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
-import org.openstreetmap.gui.jmapviewer.interfaces.MapPolygon;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 
 public class GUImain implements Listener{
 
 	private JFrame mainFrame; //The main/root program window
 	private GlobalController mySession; //Global Controller for the program (interface between code and UI)
-	private JLabel loadedMapName; //a label for the loaded map
 	private JPanel carPanel; //Car status within the main window
 	private CustomDisplayMap mainPanel; //Biggest panel in the main window; Shows amalgamated information
 	private JPanel simPanel; //Sim status within the main window
@@ -185,19 +166,29 @@ public class GUImain implements Listener{
 	 * @param parent 
 	 */
 	private void initialize(GlobalController parent) {
-		mySession = parent; //adds parent
-		//TODO it's a little weird to be creating the controller from within the UI. Consider
-		//moving it up to the MAIN method. 
+		mySession = parent; //adds parent 
 		mainFrame = new JFrame(); //
 		//public void setBounds(int x, int y, int width, int height)
 		mainFrame.setBounds(150, 50, 1000, 600); //main window size on opening
-		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.setVisible(true);
 		//NOTE: Could consider not building all the windows at once in case of performance issues.
 		this.buildAllWindows(); //builds all the windows in one shot
 		JMenuBar menuBar = new JMenuBar();
 		mainFrame.setJMenuBar(menuBar);
 		
+		//adding this to gracefully close the program when the 'x' is hit on the main frame. 
+		mainFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		        if (JOptionPane.showConfirmDialog(mainFrame, 
+		            "Are you sure to close this window?", "Really Closing?", 
+		            JOptionPane.YES_NO_OPTION,
+		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+		            mySession.exit(); //do the graceful exit code. 
+		        }
+		    }
+		});
 		
 		//THIS SECTION CREATES AND ADDS IN THE 'FILE' MENU
 		JMenu mnFile = new JMenu("File"); //Make a 'file' drop down list
@@ -298,14 +289,7 @@ public class GUImain implements Listener{
 		mnDebug.add(mntmAddCarTelempacket);
 		
 		JMenuItem mntmAddWeatherReport = new JMenuItem("Add Weather Report");
-		mnDebug.add(mntmAddWeatherReport);
-		
-		//THIS SECTION ADDS IN THE LABELS
-		this.loadedMapName = new JLabel("None");
-		//TODO set up the rest of the labels to initialize properly
-		//note: Pretty sure I've made them elsewhere in the code, 
-		//probably have to just consolidate them
-		
+		mnDebug.add(mntmAddWeatherReport);		
 		
 		//This sets up the layout for the main window
 		mainFrame.getContentPane().setLayout(new FormLayout(new ColumnSpec[] {
@@ -328,7 +312,6 @@ public class GUImain implements Listener{
 		loadStatusPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		//frame.getContentPane().add(LoadStatusPanel);
 		mainFrame.getContentPane().add(loadStatusPanel, "1, 1, 3, 1, fill, top");
-		//TODO: remove the fills. We don't want it to grow.
 		
 		weatherPanel = new WeatherPanel(this.mySession, this);
 		weatherPanel.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -349,13 +332,53 @@ public class GUImain implements Listener{
 		
 		JLabel lblMain = new JLabel("Main");
 		mainPanel.add(lblMain);
-		//TODO: turn these panels into their own classes, and set them up.
 		simPanel = new JPanel();
 		mainFrame.getContentPane().add(simPanel, "1, 7, fill, fill");
 		simPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+		simPanel.setLayout(new BorderLayout(0, 0));
 		
-		JLabel lblSim = new JLabel("Sim");
-		simPanel.add(lblSim);
+		JPanel panel = new JPanel();
+		simPanel.add(panel, BorderLayout.NORTH);
+		GridBagLayout gbl_panel = new GridBagLayout();
+		gbl_panel.columnWidths = new int[]{0, 0, 0, 0, 0};
+		gbl_panel.rowHeights = new int[]{0, 0};
+		gbl_panel.columnWeights = new double[]{1.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
+		panel.setLayout(gbl_panel);
+		
+		JPanel panel_2 = new JPanel();
+		GridBagConstraints gbc_panel_2 = new GridBagConstraints();
+		gbc_panel_2.insets = new Insets(0, 0, 0, 5);
+		gbc_panel_2.fill = GridBagConstraints.BOTH;
+		gbc_panel_2.gridx = 0;
+		gbc_panel_2.gridy = 0;
+		panel.add(panel_2, gbc_panel_2);
+		
+		JLabel lblNewLabel = new JLabel("Sim");
+		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
+		gbc_lblNewLabel.insets = new Insets(0, 0, 0, 5);
+		gbc_lblNewLabel.gridx = 1;
+		gbc_lblNewLabel.gridy = 0;
+		panel.add(lblNewLabel, gbc_lblNewLabel);
+		
+		JButton btnAdvanced_1 = new JButton("Advanced");
+		btnAdvanced_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				launchSim();
+			}
+		});
+		GridBagConstraints gbc_btnAdvanced_1 = new GridBagConstraints();
+		gbc_btnAdvanced_1.insets = new Insets(0, 0, 0, 5);
+		gbc_btnAdvanced_1.gridx = 2;
+		gbc_btnAdvanced_1.gridy = 0;
+		panel.add(btnAdvanced_1, gbc_btnAdvanced_1);
+		
+		JPanel panel_1 = new JPanel();
+		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
+		gbc_panel_1.fill = GridBagConstraints.BOTH;
+		gbc_panel_1.gridx = 3;
+		gbc_panel_1.gridy = 0;
+		panel.add(panel_1, gbc_panel_1);
 		
 		mapPanel = new JPanel();
 		mainFrame.getContentPane().add(mapPanel, "1, 9, fill, fill");
@@ -380,7 +403,7 @@ public class GUImain implements Listener{
 	}
 	
 	/**
-	 * Sets the window title and logo. Currently Just what I came up with 
+	 * Sets the window title and logo. Currently just what I came up with 
 	 */
 	private void setTitleAndLogo(){
 		mainFrame.setIconImage(mySession.iconImage.getImage());
