@@ -97,7 +97,7 @@ public class SimEngine {
 		long nextSimFrameTime = lastTimeStamp + timeSinceLastFrame;
 		FIODataPoint forecastForPoint = chooseReport(nextWeather, nextSimFrameTime);
 		double squareMetersOfPanel = 10; //total random guess. TODO: get actual measurement. 
-		double sunPowerInWatts = calculateSunPower(nextPoint, forecastForPoint, (lastTimeStamp + (timeSinceLastFrame/2)), squareMetersOfPanel);
+		double sunPowerInWatts = calculateSunPower(nextPoint, forecastForPoint, (lastTimeStamp + (timeSinceLastFrame/2)), squareMetersOfPanel, lastFrame);
 		
 		TelemDataPacket newCarStatus;
 		newCarStatus = calculateNewCarStatus(lastCarStatus, distanceCovered, elevationChange, forecastForPoint, speedToDrive, sunPowerInWatts);
@@ -166,13 +166,22 @@ public class SimEngine {
 				return lastSoC+2;
 				}
 		}
-		if(elevationChange >0){
+		else if(elevationChange >0){
 			if(lastSoC-speed/50.0<=0){
 				lastSoC=0;
 				return lastSoC;
 			}
 			else{
 				return lastSoC-speed/50.0;
+				}
+		}
+		else if(speed == 0){
+			if (lastSoC+1.5>=100){
+				lastSoC=100;
+				return lastSoC;
+			}
+			else{
+				return lastSoC+1.5;
 				}
 		}
 		else{
@@ -211,7 +220,7 @@ public class SimEngine {
 	 * @param squareMetersOfPanel - the total collection area of solar panels
 	 * @return
 	 */
-   private double calculateSunPower(GeoCoord nextPoint, FIODataPoint forecastForPoint, double timeOfDay, double squareMetersOfPanel) {
+   private double calculateSunPower(GeoCoord nextPoint, FIODataPoint forecastForPoint, double timeOfDay, double squareMetersOfPanel, SimFrame lastFrame) {
 	   Calendar rightNow = Calendar.getInstance();
 	   rightNow.setTimeInMillis((long) timeOfDay);
 	   
@@ -219,6 +228,10 @@ public class SimEngine {
 	   // TODO Auto-generated method stub
 	   
 	   //Get the sun elevation given the time of day and the latitude and longitude. 
+	   
+	   double cloudCover = lastFrame.getForecast().cloudCover();
+	   
+	   
 	   
 	   //assume 100 watts per square foot. (thanks random forum guy)
 	   //10.7639 sq feet per sq. meter. 
@@ -232,7 +245,7 @@ public class SimEngine {
 		   timeFactor=(1-hour/21)/.4286; //.4286 is a conversion factor to get on a scale of 0-1
 	   }
 	   
-	   double watts = 100*10.7639 * squareMetersOfPanel* timeFactor;
+	   double watts = 100*10.7639 * squareMetersOfPanel* timeFactor* cloudCover;
 	   
 	   //calculate how much sun there is given the weather (cloudy? Probably not much). 
 	   //I think there's actually a parameter in FIODataPoint for sun exposure. If not, use the cloudyness measurement. 
