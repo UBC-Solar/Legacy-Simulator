@@ -1,11 +1,19 @@
 package com.ubcsolar.common;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class TelemDataPacket extends DataUnit{
 	
+	private DateFormat actualDateFormat = new SimpleDateFormat("HH:mm:ss.SSS"); //time format. ss = seconds, SSS = ms
+	//couldn't manage to format milliseconds in a way that Excel can handle as time
+	//so just generated a second column to be able to graph it properly. 
+	private DateFormat excelDateFormat = new SimpleDateFormat("HH:mm:ss"); //time format. ss = seconds, SSS = ms
+	
+	// the whole thing is so wired. :D TODO ask Noah
 	private static String classCSVHeaderRow;
 
 	/**
@@ -15,9 +23,53 @@ public class TelemDataPacket extends DataUnit{
 	 */
 	public String getCSVEntry()
 	{
-		return null;
+		HashMap<String, Integer> temperatures = this.getTemperatures();
+		HashMap<Integer, ArrayList<Float>> voltages = this.getCellVoltages();
+		String toPrint = "";
+		
+		// TODO
+	//	toPrint += this.entryCounter + ","; 
+	//	this.entryCounter++;
+		toPrint += actualDateFormat.format(this.getTimeCreated()) + ",";
+		toPrint += excelDateFormat.format(this.getTimeCreated()) + ",";
+		
+		toPrint += this.getSpeed() + ",";
+		toPrint += temperatures.get("bms")  + ","; //if the temperature calls return 'null', so be it.
+												  // it can be written as such to the DB. 
+		toPrint += temperatures.get("motor") + ",";
+		toPrint += temperatures.get("pack0") + ",";
+		toPrint += temperatures.get("pack1") + ",";
+		toPrint += temperatures.get("pack2") + ",";
+		toPrint += temperatures.get("pack3") + ",";
+		toPrint += this.getTotalVoltage() + ",";
+		
+		//assumes that they have been loaded with the standard number of voltage entries
+		//NOTE: May need to modify this if you change the number of cells on the car, 
+		//or the amount per pack.
+		int expectedNumOfCells = 10;
+				
+		for(int i = 0; i<4; i++){ //I have a question Noah :D TODO
+			if(voltages.get(i) == null){ //will need to offset this so the rest are in position
+				toPrint += this.numberOfCommas(expectedNumOfCells);
+			}
+			else{
+				for(Float f : voltages.get(0)){
+					toPrint += f + ",";
+				}
+			}
+		}
+				
+				return toPrint;
 	}
 	
+	private String numberOfCommas(int numberOfCommas){
+		String toReturn = "";
+		for(int i=0; i<numberOfCommas; i++){
+			toReturn += ',';
+		}
+		
+		return toReturn;
+	}
 	/**
 	 * gets the column headings as a csv row
 	 * @return the row as a string
