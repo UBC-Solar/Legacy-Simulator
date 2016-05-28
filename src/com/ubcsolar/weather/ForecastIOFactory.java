@@ -48,7 +48,7 @@ public class ForecastIOFactory {
 	}
 	
 	public ForecastIOFactory cloudCover(double cloudCover){
-		this.cloudCover = cloudCover;
+		this.cloudCover = cloudCover / 100;
 		return this;
 	}
 	
@@ -73,7 +73,7 @@ public class ForecastIOFactory {
 	}
 	
 	public ForecastIOFactory precipProb(double precipitationProbability){
-		this.precipProbability = precipitationProbability;
+		this.precipProbability = precipitationProbability / 100;
 		return this;
 	}
 	
@@ -89,44 +89,158 @@ public class ForecastIOFactory {
 		forecastInfo.add("timezone", timezone);
 		forecastInfo.add("offset", offset);
 		
+		
+		JsonObject currentlyDataPoint = buildDataArrayEntry("currently");
+		forecastInfo.add("currently", currentlyDataPoint);
+		
 		JsonObject hourlyForecast = new JsonObject();
 		hourlyForecast.add("summary", summary);
 		hourlyForecast.add("icon", icon);
 		
-		JsonArray dataArray = new JsonArray();
-		
-		JsonObject dataArrayEntry = new JsonObject();
-		dataArrayEntry.add("time", time);
-		dataArrayEntry.add("summary", summary);
-		dataArrayEntry.add("icon", icon);
-		dataArrayEntry.add("precipIntensity", precipIntensity);
-		dataArrayEntry.add("precipProbability", precipProbability);
-		dataArrayEntry.add("precipType", precipType);
-		dataArrayEntry.add("temperature", temperature);
-		dataArrayEntry.add("apparentTemperature", apparentTemperature);
-		dataArrayEntry.add("dewPoint", dewPoint);
-		dataArrayEntry.add("humidity", humidity);
-		dataArrayEntry.add("windSpeed", windSpeed);
-		dataArrayEntry.add("windBearing", windBearing);
-		dataArrayEntry.add("visibility", visibility);
-		dataArrayEntry.add("cloudCover", cloudCover);
-		dataArrayEntry.add("pressure", pressure);
-		dataArrayEntry.add("ozone", ozone);
+		JsonArray hourlyArray = new JsonArray();
+		JsonObject hourlyDataPoint = buildDataArrayEntry("hourly");
 		
 		for(int i = 0; i < NUM_HOURS_NEEDED; i++){
-			dataArray.add(dataArrayEntry);
+			hourlyArray.add(hourlyDataPoint);
 		}
 		//TODO: decide whether need to change the time in entries in the dataArray
 		
-		hourlyForecast.add("data", dataArray);
-		
+		hourlyForecast.add("data", hourlyArray);
 		forecastInfo.add("hourly", hourlyForecast);
+		
+		JsonObject dailyForecast = new JsonObject();
+		dailyForecast.add("summary", summary);
+		dailyForecast.add("icon", icon);
+		
+		JsonArray dailyArray = new JsonArray();
+		JsonObject dailyDataPoint = buildDataArrayEntry("daily");
+		for(int i = 0; i < NUM_HOURS_NEEDED; i++){
+			dailyArray.add(dailyDataPoint);
+		}
+		dailyForecast.add("data", dailyArray);
+		forecastInfo.add("daily", dailyForecast);
+		
+		forecastInfo.add("flags", buildFlagsObject());
 		
 		ForecastIO forecast = new ForecastIO(GlobalValues.WEATHER_KEY);
 		forecast.getForecast(forecastInfo);
 		
 		return forecast;
 		
+	}
+	
+	private JsonObject buildFlagsObject(){
+		JsonArray sourcesArray = new JsonArray();
+		sourcesArray.add("gfs");
+		sourcesArray.add("cmc");
+		sourcesArray.add("nam");
+		sourcesArray.add("rap");
+		sourcesArray.add("rtma");
+		sourcesArray.add("sref");
+		sourcesArray.add("fnmoc");
+		sourcesArray.add("isd");
+		sourcesArray.add("nwspa");
+		sourcesArray.add("madis");
+		
+		JsonArray isdArray = new JsonArray();
+		isdArray.add("712350-99999");
+		isdArray.add("713930-99999");
+		isdArray.add("718600-99999");
+		isdArray.add("718770-99999");
+		isdArray.add("718776-99999");
+		
+		JsonArray madisArray = new JsonArray();
+		madisArray.add("BLDQ1");
+		madisArray.add("CYBW");
+		madisArray.add("CYYC");
+		madisArray.add("D4846");
+		madisArray.add("D4993");
+		madisArray.add("D7650");
+		madisArray.add("E0424");
+		madisArray.add("E1159");
+		madisArray.add("E1808");
+		madisArray.add("E2194");
+		madisArray.add("E5375");
+		madisArray.add("E5393");
+		madisArray.add("E7122");
+		madisArray.add("E7132");
+		madisArray.add("NEIQ1");
+		madisArray.add("PRIQ1");
+		
+		JsonObject flags = new JsonObject();
+		flags.add("sources", sourcesArray);
+		flags.add("isd-stations", isdArray);
+		flags.add("madis-stations", madisArray);
+		flags.add("units", "si");
+		
+		return flags;
+	}
+	
+	private JsonObject buildDataArrayEntry(String timeScale){
+		JsonObject dataArrayEntry = new JsonObject();
+		if(timeScale.equals("currently")){
+			dataArrayEntry.add("time", time);
+			dataArrayEntry.add("summary", summary);
+			dataArrayEntry.add("icon", icon);
+			dataArrayEntry.add("precipIntensity", precipIntensity);
+			dataArrayEntry.add("precipProbability", precipProbability);
+			dataArrayEntry.add("precipType", precipType);
+			dataArrayEntry.add("temperature", temperature);
+			dataArrayEntry.add("apparentTemperature", apparentTemperature);
+			dataArrayEntry.add("dewPoint", dewPoint);
+			dataArrayEntry.add("humidity", humidity);
+			dataArrayEntry.add("windSpeed", windSpeed);
+			dataArrayEntry.add("windBearing", windBearing);
+			dataArrayEntry.add("visibility", visibility);
+			dataArrayEntry.add("cloudCover", cloudCover);
+			dataArrayEntry.add("pressure", pressure);
+			dataArrayEntry.add("ozone", ozone);
+		}else if(timeScale.equals("hourly")){
+			dataArrayEntry.add("time", time);
+			dataArrayEntry.add("summary", summary);
+			dataArrayEntry.add("icon", icon);
+			dataArrayEntry.add("precipIntensity", precipIntensity);
+			dataArrayEntry.add("precipProbability", precipProbability);
+			dataArrayEntry.add("temperature", temperature);
+			dataArrayEntry.add("apparentTemperature", apparentTemperature);
+			dataArrayEntry.add("dewPoint", dewPoint);
+			dataArrayEntry.add("humidity", humidity);
+			dataArrayEntry.add("windSpeed", windSpeed);
+			dataArrayEntry.add("windBearing", windBearing);
+			dataArrayEntry.add("visibility", visibility);
+			dataArrayEntry.add("cloudCover", cloudCover);
+			dataArrayEntry.add("pressure", pressure);
+			dataArrayEntry.add("ozone", ozone);
+		}else if(timeScale.equals("daily")){
+			dataArrayEntry.add("time", time);
+			dataArrayEntry.add("summary", summary);
+			dataArrayEntry.add("icon", icon);
+			dataArrayEntry.add("precipIntensity", precipIntensity);
+			dataArrayEntry.add("precipProbability", precipProbability);
+			dataArrayEntry.add("precipType", precipType);
+			dataArrayEntry.add("dewPoint", dewPoint);
+			dataArrayEntry.add("humidity", humidity);
+			dataArrayEntry.add("windSpeed", windSpeed);
+			dataArrayEntry.add("windBearing", windBearing);
+			dataArrayEntry.add("visibility", visibility);
+			dataArrayEntry.add("cloudCover", cloudCover);
+			dataArrayEntry.add("pressure", pressure);
+			dataArrayEntry.add("ozone", ozone);
+			dataArrayEntry.add("sunriseTime", 0);
+			dataArrayEntry.add("sunsetTime", 100);
+			dataArrayEntry.add("moonPhase", 0);
+			dataArrayEntry.add("precipIntensityMax", precipIntensity);
+			dataArrayEntry.add("precipIntensityMaxTime", 100);
+			dataArrayEntry.add("temperatureMin", temperature);
+			dataArrayEntry.add("temperatureMinTime", 0);
+			dataArrayEntry.add("temperatureMax", temperature);
+			dataArrayEntry.add("temperatureMaxTime", 100);
+			dataArrayEntry.add("apparentTemperatureMin", temperature);
+			dataArrayEntry.add("apparentTemperatureMinTime", 0);
+			dataArrayEntry.add("apparentTemperatureMax", temperature);
+			dataArrayEntry.add("apparentTemperatureMaxTime", 100);
+		}
+		return dataArrayEntry;
 	}
 	
 }

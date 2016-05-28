@@ -57,9 +57,8 @@ public class WeatherController extends ModuleController {
 	
 	public void loadCustomForecast(ForecastIO customForecast){
 		customForecasts.add(customForecast);
-		List<ForecastIO> comboForecasts = new ArrayList<ForecastIO>();
-		Collections.copy(retrievedForecasts, comboForecasts);
-		comboForecasts.addAll(customForecasts);
+		List<ForecastIO> comboForecasts = addCustomForecasts();
+		System.out.println(comboForecasts.size());
 		ForecastReport theReport = new ForecastReport(comboForecasts, this.mySession.getMapController().getLoadedMapName());
 		lastCustomReport = theReport;
 		this.mySession.sendNotification(new NewForecastReport(theReport));
@@ -200,6 +199,31 @@ public class WeatherController extends ModuleController {
 
 		//this.mySession.register(this, NewMapLoadedNotification.class); //example line.
 		
+	}
+	
+	private List<ForecastIO> addCustomForecasts(){
+		List<ForecastIO> comboForecasts = new ArrayList<ForecastIO>(retrievedForecasts);
+		for(int i = 0; i < customForecasts.size(); i++){
+			for(int j = 0; j < comboForecasts.size()-1; j++){
+				GeoCoord currCustom = new GeoCoord(customForecasts.get(i).getLatitude(), 
+						customForecasts.get(i).getLongitude(), 0.0);
+				GeoCoord currCombo = new GeoCoord(comboForecasts.get(j).getLatitude(), 
+						comboForecasts.get(j).getLongitude(), 0.0);
+				GeoCoord nextCombo = new GeoCoord(comboForecasts.get(j+1).getLatitude(), 
+						comboForecasts.get(j+1).getLongitude(), 0.0);
+				if(currCustom.calculateDistance(currCombo, DistanceUnit.KILOMETERS) <
+						currCustom.calculateDistance(nextCombo, DistanceUnit.KILOMETERS)){
+					comboForecasts.add(j+1, customForecasts.get(i));
+					break;
+				}
+				if(j == comboForecasts.size() - 2){
+					comboForecasts.add(customForecasts.get(i));
+				}
+			}
+		}
+		
+		return comboForecasts;
+	
 	}
 
 }
