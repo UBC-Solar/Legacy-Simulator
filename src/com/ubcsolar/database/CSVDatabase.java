@@ -436,12 +436,12 @@ public class CSVDatabase extends Database {
 	double runningTotalDistance = 0;
 	for(GeoCoord g : route.getTrailMarkers()){
 		if(lastPoint == null){
-			this.writingQueue.add(""+entryNum+","+g.getLat()+","+ g.getLon()+","+g.getElevation());
+			this.writingQueue.add(""+entryNum+","+g.getCSVEntry());
 			lastPoint = g;
 		}else{
 			double tempDistance = lastPoint.calculateDistance(g);
 			runningTotalDistance += tempDistance;
-			this.writingQueue.add(""+entryNum+","+g.getLat()+","+ g.getLon()+","+g.getElevation()+","+tempDistance+","+runningTotalDistance);
+			this.writingQueue.add(""+entryNum+","+g.getCSVEntry()+","+tempDistance+","+runningTotalDistance);
 			lastPoint = g;
 		}
 		

@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class Route extends DataUnit{
 	
-	private static String classCSVHeaderRow;
+	private static String classCSVHeaderRow = "pointNum, latitude, longitude, elevation, distanceFromPrevious";
 	/**
 	 * turns the class fields into an entry for a csv file
 	 * see returnsEntireTable for info on row versus table
@@ -15,7 +15,26 @@ public class Route extends DataUnit{
 	 */
 	public String getCSVEntry()
 	{
-		return null;
+		String multiLine = "";
+		int entryNum = 0;
+		double tempDistance=0;
+		GeoCoord lastPoint = null;
+		double runningTotalDistance = 0;
+		for(GeoCoord g : this.getTrailMarkers()){
+			if(lastPoint == null){
+				multiLine += (""+entryNum+","+g.getCSVEntry()+","+tempDistance+","+runningTotalDistance+"\r\n");
+				lastPoint = g;
+			}else{
+				tempDistance = lastPoint.calculateDistance(g);
+				runningTotalDistance += tempDistance;
+				multiLine += (""+entryNum+","+g.getCSVEntry()+","+tempDistance+","+runningTotalDistance+"\r\n");
+				lastPoint = g;
+			}
+			entryNum++;
+			
+		}
+		return multiLine;
+
 	}
 	
 	/**
@@ -33,7 +52,7 @@ public class Route extends DataUnit{
 	 */
 	public boolean returnsEntireTable ()
 	{
-		return false;
+		return true;
 	}
 
 

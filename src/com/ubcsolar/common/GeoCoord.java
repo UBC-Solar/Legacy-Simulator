@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class GeoCoord extends DataUnit {
 	
-	private static String classCSVHeaderRow;
+	private static String classCSVHeaderRow ="latitude, longitude, elevation";
 	/**
 	 * turns the class fields into an entry for a csv file
 	 * see returnsEntireTable for info on row versus table
@@ -13,7 +13,11 @@ public class GeoCoord extends DataUnit {
 	 */
 	public String getCSVEntry()
 	{
-		return null;
+		String toPrint= "";
+		toPrint += this.getLat();
+		toPrint += this.getLon();
+		toPrint += this.getElevation();
+		return toPrint;
 	}
 	
 	/**
