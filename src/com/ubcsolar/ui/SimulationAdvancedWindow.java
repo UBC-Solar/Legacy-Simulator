@@ -222,7 +222,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		this.register();
 		}
 
-	private void clearAndLoadSpeedSliders(List<SimFrame> simResultValues, int pointsPerSlider) {
+	private void clearAndLoadSpeedSliders(List<SimFrame> simResultValues, int pointsPerSlider, Map<GeoCoord, Double> lastManuallyReqSpeeds) {
 		int KM_PER_SLIDER = 5; //could make this dynamic
 	
 		SliderHoldingPanel.removeAll();
@@ -269,8 +269,16 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				String formattedKMTwo = String.format("%.2f", runningTotalDistance);
 				String label = "KMs: " + formattedKMOne+"-"+formattedKMTwo;
 				//String label = lastAddedPointDistance+"km-"+runningTotalDistance+"km";
+				boolean isManuallySet = false;
+				for(GeoCoord g : pointsToRepresent){
+					//not sure to do if any of them, or if majority, or if all, etc. 
+					if(lastManuallyReqSpeeds.get(g)!=null){
+						isManuallySet = true;
+					}
+				}
+				
 				SliderSpinnerFrame toAddToPanel = new SliderSpinnerFrame(label ,
-										(int) averageSpeed, false,pointsToRepresent);
+										(int) averageSpeed, isManuallySet,pointsToRepresent);
 				displayedSpeedSliderSpinners.add(toAddToPanel);
 				
 				lastAddedPointIndex = i;
@@ -388,7 +396,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			if(n.getClass() == NewSimulationReportNotification.class){
 				NewSimulationReportNotification test = (NewSimulationReportNotification) n;
 				updateChart(test.getSimReport());
-				this.clearAndLoadSpeedSliders(test.getSimReport().getSimFrames(), 1);
+				this.clearAndLoadSpeedSliders(test.getSimReport().getSimFrames(), 1, test.getSimReport().getManuallyRequestedSpeeds());
 				this.repaint();
 			}
 			

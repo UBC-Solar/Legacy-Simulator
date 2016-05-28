@@ -5,8 +5,12 @@ import java.util.Map;
 
 public class SimulationReport extends DataUnit {
 	private final List<SimFrame> simData;
-	public SimulationReport(List<SimFrame> simData, String info) {
+	private final Map<GeoCoord, Double> manuallyRequestedSpeeds;
+	
+	
+	public SimulationReport(List<SimFrame> simData, Map<GeoCoord, Double> requestedSpeeds, String info) {
 		this.simData = simData;
+		this.manuallyRequestedSpeeds = requestedSpeeds;
 	}
 	
 	public List<SimFrame> getSimFrames(){
@@ -23,6 +27,10 @@ public class SimulationReport extends DataUnit {
 	public Map<String, ? extends Object> getAllValues() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public Map<GeoCoord, Double> getManuallyRequestedSpeeds() {
+		return manuallyRequestedSpeeds;
 	}
 
 }
