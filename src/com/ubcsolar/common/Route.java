@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class Route extends DataUnit{
 	
-	private static String classCSVHeaderRow = "pointNum, latitude, longitude, elevation, distanceFromPrevious";
+	public final static String classCSVHeaderRow = "pointNum,"+ GeoCoord.classCSVHeaderRow+","+"distanceFromPrevious, Total Distance";
 	/**
 	 * turns the class fields into an entry for a csv file
 	 * see returnsEntireTable for info on row versus table

@@ -8,7 +8,7 @@ import com.github.dvdme.ForecastIOLib.ForecastIO;
 
 public class ForecastReport extends DataUnit {
 	
-	private static String classCSVHeaderRow;
+	public final static String classCSVHeaderRow =""; //TODO
 	/**
 	 * turns the class fields into an entry for a csv file
 	 * see returnsEntireTable for info on row versus table

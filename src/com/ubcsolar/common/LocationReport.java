@@ -12,7 +12,7 @@ public class LocationReport extends DataUnit {
 	private DateFormat excelDateFormat = new SimpleDateFormat("HH:mm:ss"); //time format. ss = seconds, SSS = ms
 	
 	
-	private static String classCSVHeaderRow= "RealTime, ExcelTime, Car, Source, latitude, longitude, elevation";
+	public final static String classCSVHeaderRow= "RealTime, ExcelTime, Car, Source, latitude, longitude, elevation";
 	/**
 	 * turns the class fields into an entry for a csv file
 	 * see returnsEntireTable for info on row versus table

@@ -279,7 +279,7 @@ public class CSVDatabase extends Database {
 		 */
 		TelemDataPacket sanitizedPacket = sanitizeInput(toStore);
 		putIntoRAM(sanitizedPacket);
-		String rowToPrint = buildCSVEntryRow(sanitizedPacket);
+		String rowToPrint = sanitizedPacket.getCSVEntry();
 		this.writingQueue.add(rowToPrint);
 		this.flushAndSave();
 				
@@ -288,7 +288,7 @@ public class CSVDatabase extends Database {
 	private void store(LocationReport toStore) throws IOException{
 		//private final String locationUpdateColumnNames = "Time" + "Car" + "Source" + "latitude" + "longitude" + "elevation";
 		System.out.println("Got a location report");
-		String rowToPrint = buildCSVEntryRow(toStore);
+		String rowToPrint = toStore.getCSVEntry();
 		this.writingQueue.add(rowToPrint);
 		this.flushAndSave();
 	}
@@ -431,24 +431,8 @@ public class CSVDatabase extends Database {
 
 	@Override
 	public void writeRoute(Route route) throws IOException {
-	int entryNum = 0;
-	GeoCoord lastPoint = null;
-	double runningTotalDistance = 0;
-	for(GeoCoord g : route.getTrailMarkers()){
-		if(lastPoint == null){
-			this.writingQueue.add(""+entryNum+","+g.getCSVEntry());
-			lastPoint = g;
-		}else{
-			double tempDistance = lastPoint.calculateDistance(g);
-			runningTotalDistance += tempDistance;
-			this.writingQueue.add(""+entryNum+","+g.getCSVEntry()+","+tempDistance+","+runningTotalDistance);
-			lastPoint = g;
-		}
 		
+		this.writingQueue.add(route.getCSVEntry());
 		this.flushAndSave();
-		entryNum++;
-		
-	}
-
 	}
 }

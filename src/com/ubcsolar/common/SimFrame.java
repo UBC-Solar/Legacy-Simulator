@@ -16,14 +16,9 @@ public class SimFrame extends DataUnit {
 	//so just generated a second column to be able to graph it properly. 
 	private DateFormat excelDateFormat = new SimpleDateFormat("HH:mm:ss"); //time format. ss = seconds, SSS = ms
 	
-	private static String classCSVHeaderRow = "TimeCrt, ExcelTimeCrt, TimeRep, ExcelTimeRep "
-			+ ",,,," //TODO
-			+ "RealTime,ExcelTime,Speed,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,"
-			+ "Pck0Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
-			+ "Pck1Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
-			+ "Pck2Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
-			+ "Pck3Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
-			+ "Time, ExcelTime, Car, Source, latitude, longitude, elevation";
+	public final static String classCSVHeaderRow = "TimeCrt, ExcelTimeCrt, TimeRep, ExcelTimeRep, "
+			+ ForecastReport.classCSVHeaderRow//TODO
+			+ "," + TelemDataPacket.classCSVHeaderRow + "," + LocationReport.classCSVHeaderRow;
 	/**
 	 * turns the class fields into an entry for a csv file
 	 * see returnsEntireTable for info on row versus table
@@ -36,7 +31,7 @@ public class SimFrame extends DataUnit {
 		frameToPrint += excelDateFormat.format(this.getTimeCreated()) + "," + "," ;
 		frameToPrint += actualDateFormat.format (this.getRepresentedTime())+ "," ;
 		frameToPrint += excelDateFormat.format(this.getRepresentedTime()) + "," ;
-		//frameToPrint += this.getForecast().get + ",";
+		//frameToPrint += this.getForecast().get + ","; TODO
 		frameToPrint += this.getCarStatus().getCSVEntry() + ",";
 		frameToPrint += this.getGPSReport().getCSVEntry() + ",";
 		return frameToPrint;

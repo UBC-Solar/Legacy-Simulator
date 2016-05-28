@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class SimulationReport extends DataUnit {
 	
-	private static String classCSVHeaderRow;
+	public final static String classCSVHeaderRow = "simulation frame";
 	/**
 	 * turns the class fields into an entry for a csv file
 	 * see returnsEntireTable for info on row versus table
@@ -13,10 +13,12 @@ public class SimulationReport extends DataUnit {
 	 */
 	public String getCSVEntry()
 	{
+		int frame=0;
 		String simTable="";
+		simTable += frame +",";
 		for (SimFrame f : this.getSimFrames())
 		{
-			simTable += f.getCSVEntry() +"\r\n";
+			simTable += ","+ f.getCSVEntry() +"\r\n";
 		}
 		return simTable;
 	}

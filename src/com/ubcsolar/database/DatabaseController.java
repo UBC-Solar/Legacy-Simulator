@@ -32,14 +32,10 @@ public class DatabaseController extends ModuleController {
  * 
  * I'll leave the more abstract ones commented out until we decide to implement them. 
  */
+	private final String carPacketColumnNames = TelemDataPacket.classCSVHeaderRow;
+	private final String locationUpdateColumnNames = LocationReport.classCSVHeaderRow;
+	private final String printingRouteColumnNames = Route.classCSVHeaderRow;
 	
-	private final String carPacketColumnNames = "entry,RealTime,ExcelTime,Speed,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,"
-			+ "Pck0Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
-			+ "Pck1Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
-			+ "Pck2Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
-			+ "Pck3Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg";
-	private final String locationUpdateColumnNames = "entry, RealTime, ExcelTime, Car, Source, latitude, longitude, elevation";
-	private final String printingRouteColumnNames = "pointNum, latitude, longitude, elevation, distanceFromPrevious";
 	//Added a queue to do asynchronous writes to the permanent storage. 
 	//NOTE: Currently string, but will probably change this
 	//when I actually implement a database (could be a SQL query). 
