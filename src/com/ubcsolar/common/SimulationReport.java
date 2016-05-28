@@ -13,7 +13,12 @@ public class SimulationReport extends DataUnit {
 	 */
 	public String getCSVEntry()
 	{
-		return null;
+		String simTable="";
+		for (SimFrame f : this.getSimFrames())
+		{
+			simTable += f.getCSVEntry() +"\r\n";
+		}
+		return simTable;
 	}
 	
 	/**
@@ -31,7 +36,7 @@ public class SimulationReport extends DataUnit {
 	 */
 	public boolean returnsEntireTable ()
 	{
-		return false;
+		return true;
 	}
 
 	
