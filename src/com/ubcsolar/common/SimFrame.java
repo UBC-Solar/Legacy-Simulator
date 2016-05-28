@@ -1,5 +1,7 @@
 package com.ubcsolar.common;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Map;
 
 import com.github.dvdme.ForecastIOLib.FIOCurrently;
@@ -9,8 +11,19 @@ import com.github.dvdme.ForecastIOLib.ForecastIO;
 
 public class SimFrame extends DataUnit {
 	
+	private DateFormat actualDateFormat = new SimpleDateFormat("HH:mm:ss.SSS"); //time format. ss = seconds, SSS = ms
+	//couldn't manage to format milliseconds in a way that Excel can handle as time
+	//so just generated a second column to be able to graph it properly. 
+	private DateFormat excelDateFormat = new SimpleDateFormat("HH:mm:ss"); //time format. ss = seconds, SSS = ms
 	
-	private static String classCSVHeaderRow;
+	private static String classCSVHeaderRow = "TimeCrt, ExcelTimeCrt, TimeRep, ExcelTimeRep "
+			+ ",,,," //TODO
+			+ "RealTime,ExcelTime,Speed,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,"
+			+ "Pck0Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
+			+ "Pck1Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
+			+ "Pck2Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
+			+ "Pck3Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
+			+ "Time, ExcelTime, Car, Source, latitude, longitude, elevation";
 	/**
 	 * turns the class fields into an entry for a csv file
 	 * see returnsEntireTable for info on row versus table
@@ -18,7 +31,15 @@ public class SimFrame extends DataUnit {
 	 */
 	public String getCSVEntry()
 	{
-		return null;
+		String frameToPrint = "";
+		frameToPrint += actualDateFormat.format (this.getTimeCreated() )+ "," ;
+		frameToPrint += excelDateFormat.format(this.getTimeCreated()) + "," + "," ;
+		frameToPrint += actualDateFormat.format (this.getRepresentedTime())+ "," ;
+		frameToPrint += excelDateFormat.format(this.getRepresentedTime()) + "," ;
+		//frameToPrint += this.getForecast().get + ",";
+		frameToPrint += this.getCarStatus().getCSVEntry() + ",";
+		frameToPrint += this.getGPSReport().getCSVEntry() + ",";
+		return frameToPrint;
 	}
 	
 	/**
