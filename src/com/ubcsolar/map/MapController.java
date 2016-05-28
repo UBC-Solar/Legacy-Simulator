@@ -147,5 +147,20 @@ public class MapController extends ModuleController{
 		}
 		return travelDistance;
 	}
+	
+	public double findTotalDistanceAlongLoadedRoute(){
+		List<GeoCoord> trailMarkers = getAllPoints().getTrailMarkers();
+		int distanceIndex = 1;
+		int trailMarkerIndex = 1;
+		double travelDistance = 0.0;
+		while(trailMarkerIndex < trailMarkers.size()){
+			travelDistance += trailMarkers.get(trailMarkerIndex-1).calculateDistance(
+					trailMarkers.get(trailMarkerIndex));
+			GeoCoord currentMarker = new GeoCoord(trailMarkers.get(trailMarkerIndex).getLat(),
+					trailMarkers.get(trailMarkerIndex).getLon(), 0.0);
+			trailMarkerIndex++;
+		}
+		return travelDistance;
+	}
 
 }

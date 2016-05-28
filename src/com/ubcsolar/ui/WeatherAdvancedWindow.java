@@ -476,25 +476,56 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 
 				
 				int numHours = 0;
-				
-				while((numHours < NUM_LINES) && ( numHours < hourlyForecasts.size()) ){
-					double[][] data = new double[2][distances.length];
-					for(int i = 0; i < hourlyForecasts.size(); i++){
-						data[0][i] = distances[i];
-						FIODataPoint currentHourForecast = hourlyForecasts.get(i).datapoint(numHours);
-						if(chartType.equals(WeatherChartType.TEMPERATURE)){
-							data[1][i] = currentHourForecast.temperature();
-						}else if(chartType.equals(WeatherChartType.CLOUD_COVER)){
-							data[1][i] = currentHourForecast.cloudCover()*100;
-						}else if(chartType.equals(WeatherChartType.PRECIPITATION)){
-							data[1][i] = currentHourForecast.precipProbability()*100;
-						}else if(chartType.equals(WeatherChartType.WIND_SPEED)){
-							data[1][i] = currentHourForecast.windSpeed();
-						}
-					}
-					dds.addSeries("Hour " + numHours, data);
-					numHours++;
+				/*System.out.println(hourlyForecasts.size());
+				if(distances.length == 1){
+					double[] distances2 = new double[2];
+					distances2[0] = 0;
+					distances2[1] = mySession.getMapController().findTotalDistanceAlongLoadedRoute();
+					distances = distances2;
 				}
+				while((numHours < NUM_LINES) && ( numHours < hourlyForecasts.size()) ){
+					if(distances.length == 1){
+						distances = new double[1];
+						distances[0] = 0;
+						distances[1] = mySession.getMapController().findTotalDistanceAlongLoadedRoute();
+						double[][] data = new double[2][distances.length];
+						FIODataPoint currentHourForecast = hourlyForecasts.get(0).datapoint(numHours);
+						data[0][0] = distances[0];
+						data[0][1] = distances[1];
+						if(chartType.equals(WeatherChartType.TEMPERATURE)){
+							data[1][0] = currentHourForecast.temperature();
+							data[1][1] = currentHourForecast.temperature();
+						}else if(chartType.equals(WeatherChartType.CLOUD_COVER)){
+							data[1][0] = currentHourForecast.cloudCover()*100;
+							data[1][1] = currentHourForecast.cloudCover()*100;
+						}else if(chartType.equals(WeatherChartType.PRECIPITATION)){
+							data[1][0] = currentHourForecast.precipProbability()*100;
+							data[1][1] = currentHourForecast.precipProbability()*100;
+						}else if(chartType.equals(WeatherChartType.WIND_SPEED)){
+							data[1][0] = currentHourForecast.windSpeed();
+							data[1][1] = currentHourForecast.windSpeed();
+						}
+						dds.addSeries("Hour " + numHours, data);
+					}else{*/
+						double[][] data = new double[2][distances.length];
+						for(int i = 0; i < hourlyForecasts.size(); i++){
+							data[0][i] = distances[i];
+							FIODataPoint currentHourForecast = hourlyForecasts.get(i).datapoint(numHours);
+							if(chartType.equals(WeatherChartType.TEMPERATURE)){
+								data[1][i] = currentHourForecast.temperature();
+							}else if(chartType.equals(WeatherChartType.CLOUD_COVER)){
+								data[1][i] = currentHourForecast.cloudCover()*100;
+							}else if(chartType.equals(WeatherChartType.PRECIPITATION)){
+								data[1][i] = currentHourForecast.precipProbability()*100;
+							}else if(chartType.equals(WeatherChartType.WIND_SPEED)){
+								data[1][i] = currentHourForecast.windSpeed();
+							}
+						}
+						dds.addSeries("Hour " + numHours, data);
+					//}
+					//dds.addSeries("Hour " + numHours, data);
+					numHours++;
+				//}
 				
 				return dds;
 			}
