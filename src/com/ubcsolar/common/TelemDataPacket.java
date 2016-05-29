@@ -14,7 +14,7 @@ public class TelemDataPacket extends DataUnit{
 	private DateFormat excelDateFormat = new SimpleDateFormat("HH:mm:ss"); //time format. ss = seconds, SSS = ms
 	
 	// the whole thing is so wired. :D TODO ask Noah
-	public final static String classCSVHeaderRow = "RealTime,ExcelTime,Speed,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,"
+	public final static String classCSVHeaderRow = "RealTime,ExcelTime,Speed,StateOfCharge,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,"
 			+ "Pck0Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
 			+ "Pck1Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
 			+ "Pck2Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
@@ -36,6 +36,7 @@ public class TelemDataPacket extends DataUnit{
 		toPrint += excelDateFormat.format(this.getTimeCreated()) + ",";
 		
 		toPrint += this.getSpeed() + ",";
+		toPrint += this.getStateOfCharge() +",";
 		toPrint += temperatures.get("bms")  + ","; //if the temperature calls return 'null', so be it.
 												  // it can be written as such to the DB. 
 		toPrint += temperatures.get("motor") + ",";
