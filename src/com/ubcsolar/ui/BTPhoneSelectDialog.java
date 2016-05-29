@@ -78,7 +78,6 @@ public class BTPhoneSelectDialog extends JFrame {
 		btnCancel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				disconnectCellPhone();
 				closeWindow();
 			}
 		});
