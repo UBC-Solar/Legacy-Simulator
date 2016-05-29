@@ -69,6 +69,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private ChartPanel mainDisplay; //the panel displaying the model
 	private SimulationReport lastSimReport; //cache the last simReport
 	
+	
+	private final int KM_PER_SLIDER = 5; //could make this dynamic to allow for slider 'zooming'
 	private boolean showSpeed = true;
 	private boolean showStateOfCharge = true;
 	private boolean showCloud = true;
@@ -188,6 +190,18 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		gbc_panel_1.gridy = 0;
 		chartHoldingPanel.add(panel_1, gbc_panel_1);
 		
+		JButton btnNewButton = new JButton("Reset Speeds");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				clearManualSpeedSettings();
+			}
+		});
+		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
+		gbc_btnNewButton.insets = new Insets(0, 0, 0, 5);
+		gbc_btnNewButton.gridx = 0;
+		gbc_btnNewButton.gridy = 1;
+		chartHoldingPanel.add(btnNewButton, gbc_btnNewButton);
+		
 		JPanel panel = new JPanel();
 		GridBagConstraints gbc_panel = new GridBagConstraints();
 		gbc_panel.fill = GridBagConstraints.BOTH;
@@ -203,9 +217,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		speedSlidersPanel.setViewportView(SliderHoldingPanel);
 		GridBagLayout gbl_SliderHoldingPanel = new GridBagLayout();
 		gbl_SliderHoldingPanel.columnWidths = new int[]{0, 0, 0, 0};
-		gbl_SliderHoldingPanel.rowHeights = new int[]{0, 0};
+		gbl_SliderHoldingPanel.rowHeights = new int[]{0, 0, 0};
 		gbl_SliderHoldingPanel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_SliderHoldingPanel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_SliderHoldingPanel.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
 		SliderHoldingPanel.setLayout(gbl_SliderHoldingPanel);
 		
 		
@@ -213,7 +227,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
 		gbc_textField_1.insets = new Insets(0, 0, 0, 5);
 		gbc_textField_1.gridx = 0;
-		gbc_textField_1.gridy = 1;
+		gbc_textField_1.gridy = 2;
 		SliderHoldingPanel.add(textField_1, gbc_textField_1);
 		textField_1.setColumns(10);
 		setDefaultChart();
@@ -222,8 +236,15 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		this.register();
 		}
 
-	private void clearAndLoadSpeedSliders(List<SimFrame> simResultValues, int pointsPerSlider, Map<GeoCoord, Double> lastManuallyReqSpeeds) {
-		int KM_PER_SLIDER = 5; //could make this dynamic
+	
+	/**
+	 * To clear the manual speed settings. 
+	 */
+	protected void clearManualSpeedSettings() {
+		this.clearAndLoadSpeedSliders(this.lastSimReport.getSimFrames(), KM_PER_SLIDER, new HashMap<GeoCoord, Double>());
+	}
+
+	private void clearAndLoadSpeedSliders(List<SimFrame> simResultValues, int KM_PER_SLIDER, Map<GeoCoord, Double> lastManuallyReqSpeeds) {
 	
 		SliderHoldingPanel.removeAll();
 		SliderHoldingPanel.validate();
@@ -395,8 +416,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		public void notify(Notification n) {
 			if(n.getClass() == NewSimulationReportNotification.class){
 				NewSimulationReportNotification test = (NewSimulationReportNotification) n;
+				this.lastSimReport = test.getSimReport();
 				updateChart(test.getSimReport());
-				this.clearAndLoadSpeedSliders(test.getSimReport().getSimFrames(), 1, test.getSimReport().getManuallyRequestedSpeeds());
+				this.clearAndLoadSpeedSliders(lastSimReport.getSimFrames(), KM_PER_SLIDER, lastSimReport.getManuallyRequestedSpeeds());
 				this.repaint();
 			}
 			
