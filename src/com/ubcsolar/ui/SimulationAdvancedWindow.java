@@ -434,6 +434,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		 */
 		private void updateChart(SimulationReport simReport) {
 			this.lastSimReport = simReport;
+			if(simReport.getSimFrames().size() == 0){
+				this.setDefaultChart(); //last sim was deleted.
+				return;
+			}
 			this.simResults = 
 					ChartFactory.createXYLineChart(
 							CHART_TITLE,
