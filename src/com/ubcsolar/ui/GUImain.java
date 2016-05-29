@@ -397,7 +397,7 @@ public class GUImain implements Listener{
 		gbc_panel_1.gridy = 0;
 		panel.add(panel_1, gbc_panel_1);
 		
-		mapPanel = new MapPanel(this);
+		mapPanel = new MapPanel(this, mySession);
 		mainFrame.getContentPane().add(mapPanel, "1, 9, fill, fill");
 		mapPanel.validate();
 		mapPanel.repaint();
