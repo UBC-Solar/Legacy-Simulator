@@ -19,6 +19,8 @@ import com.ubcsolar.notification.CarUpdateNotification;
 import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewCarLoadedNotification;
 import com.ubcsolar.notification.Notification;
+import com.ubcsolar.sim.DefaultCarModel;
+
 import java.awt.Insets;
 import javax.swing.SwingConstants;
 import java.awt.Font;
@@ -358,6 +360,78 @@ public class CarPanel extends JPanel implements Listener {
 	lblTempitem_4.setText(temperatureLabels.get(3)); //4th...
 	lblTempitem_5.setText(temperatureLabels.get(4));//5th
 	lblTempitem_6.setText(temperatureLabels.get(5));
+	
+	DefaultCarModel car= new DefaultCarModel();
+	double bmsTemp =   temps.get("bms");
+	double motorTemp = temps.get("motor");
+	double pack0Temp = temps.get("pack0");
+	double pack1Temp = temps.get("pack1");
+	double pack2Temp = temps.get("pack2");
+	double pack3Temp = temps.get("pack3");
+	
+	if (bmsTemp > car.getMaxTempTreshold()){
+		lblTempitem1.setForeground(Color.red);
+	}
+	else if(bmsTemp > car.getMidTempTreshold()){
+		lblTempitem1.setForeground(Color.orange);
+	}
+	else{
+		lblTempitem1.setForeground(Color.green);
+	}
+	
+	
+	if (motorTemp > car.getMaxTempTreshold()){
+		lblTempitem_2_1.setForeground(Color.red);
+	}
+	else if(motorTemp > car.getMidTempTreshold()){
+		lblTempitem_2_1.setForeground(Color.orange);
+	}
+	else{
+		lblTempitem_2_1.setForeground(Color.green);
+	}
+	
+	
+	if (pack0Temp > car.getMaxTempTreshold()){
+		lblTempitem_3_1.setForeground(Color.red);
+	}
+	else if(pack0Temp > car.getMidTempTreshold()){
+		lblTempitem_3_1.setForeground(Color.orange);
+	}
+	else{
+		lblTempitem_3_1.setForeground(Color.green);
+	}
+	
+	if (pack1Temp > car.getMaxTempTreshold()){
+		lblTempitem_4.setForeground(Color.red);
+	}
+	else if(pack1Temp > car.getMidTempTreshold()){
+		lblTempitem_4.setForeground(Color.orange);
+	}
+	else{
+		lblTempitem_4.setForeground(Color.green);
+	}
+	
+	
+	if (pack2Temp > car.getMaxTempTreshold()){
+		lblTempitem_5.setForeground(Color.red);
+	}
+	else if(pack2Temp > car.getMidTempTreshold()){
+		lblTempitem_5.setForeground(Color.orange);
+	}
+	else{
+		lblTempitem_5.setForeground(Color.green);
+	}
+	
+	
+	if (pack3Temp > car.getMaxTempTreshold()){
+		lblTempitem_6.setForeground(Color.red);
+	}
+	else if(pack3Temp > car.getMidTempTreshold()){
+		lblTempitem_6.setForeground(Color.orange);
+	}
+	else{
+		lblTempitem_6.setForeground(Color.green);
+	}
 	
 	//Calculate and display the average value of each pack voltage. 
 	ArrayList<String> voltageLabels = new ArrayList();

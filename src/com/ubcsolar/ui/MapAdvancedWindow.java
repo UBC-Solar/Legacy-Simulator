@@ -59,6 +59,7 @@ import org.xml.sax.SAXException;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
+import javax.swing.SwingConstants;
  
 
 
@@ -84,7 +85,9 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		lblMapName.setText("Map Loaded: " + labelupdate);
 	}
 	
-	
+	private void handleError(String message){
+		JOptionPane.showMessageDialog(this, message);
+	}
 	
 	/**
 	 * All notifications that this class has registered for will come here
@@ -171,6 +174,24 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		});
 		
 		mnLoadMap.add(mntmNewMenuItem_1);
+		
+		JMenuItem mntmDisconnectCellPhone = new JMenuItem("Disconnect Cell Phone");
+		mntmDisconnectCellPhone.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try{
+				mySession.getMapController().disconnectCellPhone();
+				handleError("Cellphone is disconnected.");
+				}
+				catch(NullPointerException r){
+
+						handleError("No cellphone was connected.");
+					
+				}
+				
+			}
+		});
+		mntmDisconnectCellPhone.setHorizontalAlignment(SwingConstants.CENTER);
+		mnLoadMap.add(mntmDisconnectCellPhone);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
