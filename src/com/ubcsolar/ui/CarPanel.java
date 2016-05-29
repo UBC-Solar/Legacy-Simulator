@@ -456,11 +456,14 @@ public class CarPanel extends JPanel implements Listener {
 
 	SoC.setText(""+recentPacket.getStateOfCharge()+"%"); //the label showing the state of charge
 		
-	if (recentPacket.getStateOfCharge()<=10){
-		SoC.setForeground(Color.red);
+	if (recentPacket.getStateOfCharge()>car.getMidStateOfChargeTreshold()){
+		SoC.setForeground(Color.black);
+	}
+	else if(recentPacket.getStateOfCharge()>car.getCriticalStateOfChargeTreshold()){
+		SoC.setForeground(Color.orange);
 	}
 	else{
-		SoC.setForeground(Color.black);
+		SoC.setForeground(Color.red);
 	}
 	SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");
 	Date now = new Date((long) (recentPacket.getTimeCreated()));
