@@ -291,6 +291,23 @@ public class GUImain implements Listener{
 		JMenuItem mntmAddWeatherReport = new JMenuItem("Add Weather Report");
 		mnDebug.add(mntmAddWeatherReport);		
 		
+		JMenuItem mntmAddCustomForecast = new JMenuItem("Add Custom Forecast");
+		mntmAddCustomForecast.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				JFrame frame = new FakeForecastAddWindow(mySession);
+				frame.setVisible(true);
+			}
+		});
+		mnDebug.add(mntmAddCustomForecast);
+		
+		JMenuItem mntmClearCustomForecasts = new JMenuItem("Clear Custom Forecasts");
+		mntmClearCustomForecasts.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				mySession.getMyWeatherController().clearCustomForecasts();
+			}
+		});
+		mnDebug.add(mntmClearCustomForecasts);
+		
 		//This sets up the layout for the main window
 		mainFrame.getContentPane().setLayout(new FormLayout(new ColumnSpec[] {
 				ColumnSpec.decode("300px"),
