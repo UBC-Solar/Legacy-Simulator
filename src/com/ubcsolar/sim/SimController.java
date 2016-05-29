@@ -70,8 +70,11 @@ public class SimController extends ModuleController {
 	@Override
 	public void notify(Notification n) {
 		//handle any notifications that were registered for here
-		SimulationReport toSend = new SimulationReport(new ArrayList<SimFrame>(),new HashMap<GeoCoord, Double>(), "Deleted");
-		this.mySession.sendNotification(new NewSimulationReportNotification(toSend));
+		if(n.getClass() == NewMapLoadedNotification.class){
+			SimulationReport toSend = new SimulationReport(new ArrayList<SimFrame>(),new HashMap<GeoCoord, Double>(), "Deleted");
+			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Deleted last run Sim because new route loaded");
+			this.mySession.sendNotification(new NewSimulationReportNotification(toSend));
+		}
 	}
 
 	/**

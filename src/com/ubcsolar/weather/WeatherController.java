@@ -8,8 +8,10 @@ import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
+import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.Route;
+import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.map.MapController;
@@ -188,6 +190,7 @@ public class WeatherController extends ModuleController {
 	public void notify(Notification n) {
 		if(n.getClass() == NewMapLoadedNotification.class){ //example notification handler
 			this.lastDownloadedReport = null; //remove it. 
+			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Deleted old forecasts because new route loaded");
 			this.mySession.sendNotification(new NewForecastReport(new ForecastReport(new ArrayList<ForecastIO>(), null)));	
 			
 		}
