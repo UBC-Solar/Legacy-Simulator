@@ -392,7 +392,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 							Y_AXIS_LABEL, 
 							ds,
 							PlotOrientation.VERTICAL, true, true, false);
-		
 		}
 		
 		
@@ -436,6 +435,18 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			this.lastSimReport = simReport;
 			if(simReport.getSimFrames().size() == 0){
 				this.setDefaultChart(); //last sim was deleted.
+				this.mainDisplay.setChart(this.simResults);
+				clearAndLoadSpeedSliders(new ArrayList<SimFrame>(),KM_PER_SLIDER,new HashMap<GeoCoord, Double>());
+				
+				contentPane.repaint();
+				contentPane.validate();
+				mainDisplay.repaint();
+				mainDisplay.validate();
+				this.repaint();
+				this.validate();	
+				this.SliderHoldingPanel.validate();
+				this.SliderHoldingPanel.repaint();
+				
 				return;
 			}
 			this.simResults = 
