@@ -403,6 +403,7 @@ public class GUImain implements Listener{
 		mapPanel.repaint();
 		mainFrame.getContentPane().validate();
 		mainFrame.getContentPane().repaint();
+		register();
 		
 		setTitleAndLogo();
 		mainFrame.repaint(); //sometimes the map window button doesn't pop up, hoping this fixes the glitch
