@@ -46,6 +46,7 @@ public class CarPanel extends JPanel implements Listener {
 	private JLabel lblTempitem_3_1; //3rd item in temperature list
 	private JLabel lblTempitem_4; //4th...
 	private JLabel lblTempitem_5; //5th item in temperature list.
+	private JLabel lblTempitem_6;
 	private JLabel lblPackv1; //first item in voltage pack list
 	private JLabel lblPackv2; //second item in voltage pack list
 	private JLabel lblPackv_3; //the third
@@ -194,6 +195,11 @@ public class CarPanel extends JPanel implements Listener {
 		lblTempitem_4.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTempitem_4.setAlignmentX(Component.CENTER_ALIGNMENT);
 		temperatureDispPanel.add(lblTempitem_4);
+		
+		lblTempitem_6 = new JLabel("TempItem6");
+		lblTempitem_6.setHorizontalAlignment(SwingConstants.CENTER);
+		lblTempitem_6.setAlignmentX(Component.CENTER_ALIGNMENT);
+		temperatureDispPanel.add(lblTempitem_6);
 		
 		lblTempitem_5 = new JLabel("d");
 		lblTempitem_5.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -349,7 +355,7 @@ public class CarPanel extends JPanel implements Listener {
 	lblTempitem_3_1.setText(temperatureLabels.get(2)); //3rd item in temperature list
 	lblTempitem_4.setText(temperatureLabels.get(3)); //4th...
 	lblTempitem_5.setText(temperatureLabels.get(4));//5th
-	
+	lblTempitem_6.setText(temperatureLabels.get(4));
 	
 	//Calculate and display the average value of each pack voltage. 
 	ArrayList<String> voltageLabels = new ArrayList();
@@ -479,6 +485,7 @@ public class CarPanel extends JPanel implements Listener {
 		lblTempitem_3_1.setText(""); //3rd item in temperature list
 		lblTempitem_4.setText(""); //4th...
 		lblTempitem_5.setText(""); //5th item in temperature list.
+		lblTempitem_6.setText("");
 		lblPackv1.setText("NONE"); //first item in voltage pack list
 		lblPackv2.setText(""); //second item in voltage pack list
 		lblPackv_3.setText(""); //the thirdf

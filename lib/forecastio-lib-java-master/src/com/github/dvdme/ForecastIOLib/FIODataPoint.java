@@ -30,6 +30,14 @@ public class FIODataPoint {
 		timezone = "GMT";
 		update(dp);	
 	}
+	
+	public FIODataPoint(HashMap<String, Object> data){
+		datapoint = new HashMap<String, Object>();
+		for(String k : data.keySet()){
+			datapoint.put(k, data.get(k));
+		}
+		timezone = "GMT";
+	}
 
 	/**
 	 * Updates the data point data

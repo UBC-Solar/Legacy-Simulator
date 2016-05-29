@@ -11,6 +11,7 @@ package com.ubcsolar.map;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -120,6 +121,46 @@ public class MapController extends ModuleController{
 	public void recordNewCarLocation(LocationReport carLocationReported){
 		this.lastReported = carLocationReported;
 		sendNotification(new NewLocationReportNotification(carLocationReported));
+	}
+	
+	/**
+	 * Finds the distance along the route (NOT as the crow flies) from the start of the
+	 * route to the given location. 
+	 * @param location: location in question. This location MUST be one of the trail markers
+	 * along the route in order for the following method to work correctly. Otherwise, the method
+	 * will give you the total distance along the route.
+	 * @return distance along route from start of route to location
+	 */
+	
+	public double findDistanceAlongLoadedRoute(GeoCoord location){
+		List<GeoCoord> trailMarkers = getAllPoints().getTrailMarkers();
+		int distanceIndex = 1;
+		int trailMarkerIndex = 1;
+		double travelDistance = 0.0;
+		while(trailMarkerIndex < trailMarkers.size() &&
+				location.calculateDistance(trailMarkers.get(trailMarkerIndex)) != 0){
+			travelDistance += trailMarkers.get(trailMarkerIndex-1).calculateDistance(
+					trailMarkers.get(trailMarkerIndex));
+			GeoCoord currentMarker = new GeoCoord(trailMarkers.get(trailMarkerIndex).getLat(),
+					trailMarkers.get(trailMarkerIndex).getLon(), 0.0);
+			trailMarkerIndex++;
+		}
+		return travelDistance;
+	}
+	
+	public double findTotalDistanceAlongLoadedRoute(){
+		List<GeoCoord> trailMarkers = getAllPoints().getTrailMarkers();
+		int distanceIndex = 1;
+		int trailMarkerIndex = 1;
+		double travelDistance = 0.0;
+		while(trailMarkerIndex < trailMarkers.size()){
+			travelDistance += trailMarkers.get(trailMarkerIndex-1).calculateDistance(
+					trailMarkers.get(trailMarkerIndex));
+			GeoCoord currentMarker = new GeoCoord(trailMarkers.get(trailMarkerIndex).getLat(),
+					trailMarkers.get(trailMarkerIndex).getLon(), 0.0);
+			trailMarkerIndex++;
+		}
+		return travelDistance;
 	}
 
 }
