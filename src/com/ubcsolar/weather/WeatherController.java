@@ -15,6 +15,7 @@ import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.map.MapController;
 import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewForecastReport;
+import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 
 public class WeatherController extends ModuleController {
@@ -185,11 +186,11 @@ public class WeatherController extends ModuleController {
 	 */
 	@Override
 	public void notify(Notification n) {
-		
-		/*if(n.getClass() == NewMapLoadedNotification.class){ //example notification handler
-			//Do something
-		}*/
-		
+		if(n.getClass() == NewMapLoadedNotification.class){ //example notification handler
+			this.lastDownloadedReport = null; //remove it. 
+			this.mySession.sendNotification(new NewForecastReport(new ForecastReport(new ArrayList<ForecastIO>(), null)));	
+			
+		}
 	}
 
 	/**
@@ -198,7 +199,7 @@ public class WeatherController extends ModuleController {
 	@Override
 	public void register() {
 
-		//this.mySession.register(this, NewMapLoadedNotification.class); //example line.
+		this.mySession.register(this, NewMapLoadedNotification.class); //example line.
 		
 	}
 	

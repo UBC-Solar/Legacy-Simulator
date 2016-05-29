@@ -439,7 +439,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		}
 		
 		private XYDataset createChartDataset(WeatherChartType chartType){
-			if(currentForecastReport == null){
+			if(currentForecastReport == null || currentForecastReport.getForecasts().size() == 0){
 				return createBlankDataset();
 			}else{
 				DefaultXYDataset dds = new DefaultXYDataset();
