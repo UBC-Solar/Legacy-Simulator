@@ -169,7 +169,14 @@ public class LoadStatusPanel extends JPanel implements Listener {
 			updateCarLabel(((NewCarLoadedNotification) n).getNameOfCar()); //to update the car label
 		}
 		else if(n.getClass() == NewForecastReport.class){
-			updateForcastlbl("Dwnlded @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
+			NewForecastReport test = (NewForecastReport) n;
+			if(test.getTheReport().getRouteNameForecastsWereCreatedFor()== null){
+				updateForcastlbl("Cleared @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
+			}
+			else{
+				updateForcastlbl("Dwnlded @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
+			}
+			
 		}
 		/*else if(n.getClass() == NewMetarReportLoadedNotification.class){
 			updateTafLabel("" + GlobalValues.hourMinSec.format(n.getTimeCreated()));

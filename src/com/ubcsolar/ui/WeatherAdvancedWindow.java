@@ -88,6 +88,12 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		});
 	}*/
 
+	
+	private void setLabelDefaultValues(){
+		this.stormLabel.setText("No storm warning");
+		this.fogLabel.setText("No fog warning");
+		this.windDirectionLabel.setText("Wind is blowing from: None");
+	}
 	/**
 	 * Create the frame.
 	 * @param mySession 
@@ -194,16 +200,17 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		gbc_stormPanel.gridy = 3;
 		contentPane.add(stormPanel, gbc_stormPanel);
 		
-		windDirectionLabel = new JLabel("Wind is blowing from: None");
+		windDirectionLabel = new JLabel("DEFAULT");
 		windDirectionPanel.add(windDirectionLabel);
 		
-		fogLabel = new JLabel("No fog warning");
+		fogLabel = new JLabel("DEFAULT");
 		fogLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		fogPanel.add(fogLabel);
 		
-		stormLabel = new JLabel("No storm warning");
+		stormLabel = new JLabel("DEFAULT");
 		stormPanel.add(stormLabel);
 		
+		this.setLabelDefaultValues();
 		panel = new JPanel();
 		GridBagConstraints gbc_panel = new GridBagConstraints();
 		gbc_panel.fill = GridBagConstraints.BOTH;
@@ -281,7 +288,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		}
 		
 		public void updateLabels(){
-			if(currentLocation != null){
+			if(currentLocation != null &&currentForecastReport.getForecasts().size()>0){
 				//next block figures out which forecast is closest to the current car location
 				//and which one will be the next one in the sequence
 				List<ForecastIO> forecasts = currentForecastReport.getForecasts();
@@ -349,7 +356,10 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				}
 				
 				
-			}	
+			}
+			else{
+				this.setLabelDefaultValues();
+			}
 			windDirectionLabel.repaint();
 			windDirectionPanel.repaint();
 			fogLabel.repaint();
@@ -439,7 +449,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		}
 		
 		private XYDataset createChartDataset(WeatherChartType chartType){
-			if(currentForecastReport == null){
+			if(currentForecastReport == null || currentForecastReport.getForecasts().size() == 0){
 				return createBlankDataset();
 			}else{
 				DefaultXYDataset dds = new DefaultXYDataset();

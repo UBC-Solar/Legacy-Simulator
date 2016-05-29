@@ -8,13 +8,16 @@ import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
+import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.Route;
+import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.map.MapController;
 import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewForecastReport;
+import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 
 public class WeatherController extends ModuleController {
@@ -185,11 +188,12 @@ public class WeatherController extends ModuleController {
 	 */
 	@Override
 	public void notify(Notification n) {
-		
-		/*if(n.getClass() == NewMapLoadedNotification.class){ //example notification handler
-			//Do something
-		}*/
-		
+		if(n.getClass() == NewMapLoadedNotification.class){ //example notification handler
+			this.lastDownloadedReport = null; //remove it. 
+			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Deleted old forecasts because new route loaded");
+			this.mySession.sendNotification(new NewForecastReport(new ForecastReport(new ArrayList<ForecastIO>(), null)));	
+			
+		}
 	}
 
 	/**
@@ -198,7 +202,7 @@ public class WeatherController extends ModuleController {
 	@Override
 	public void register() {
 
-		//this.mySession.register(this, NewMapLoadedNotification.class); //example line.
+		this.mySession.register(this, NewMapLoadedNotification.class); //example line.
 		
 	}
 	
