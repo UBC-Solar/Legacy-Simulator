@@ -52,7 +52,7 @@ public class GUImain implements Listener{
 	private JFrame weatherFrame; //The weather module's 'advanced' options menu
 	private JFrame simFrame; //The sim module's 'advanced' options menu
 	private JPanel loadStatusPanel; //Shows the loaded status of modules at a quick glance
-
+	private JFrame loadFrame;//The Loading frame when loading a map or forecast or simulation to show a process is being done.
 
 	/**
 	 * Constructor; Creates the application.
@@ -78,6 +78,9 @@ public class GUImain implements Listener{
 		if(this.weatherFrame == null){
 		this.weatherFrame = new WeatherAdvancedWindow(this.mySession); //Weather advanced window
 		}
+		if(this.loadFrame==null){
+		this.loadFrame = new LoadingWindow(this.mySession);
+		}
 	}
 	
 	/**
@@ -91,6 +94,7 @@ public class GUImain implements Listener{
 			mySession.register(this, NewMapLoadedNotification.class);
 			mySession.register(this, NewLocationReportNotification.class);
 			mySession.register(this, NewForecastReport.class);
+			//mySession.register(this, ); TODO for loading frame
 	}
 	
 	/**
@@ -116,6 +120,8 @@ public class GUImain implements Listener{
 			NewForecastReport temp = (NewForecastReport) n;
 			mainPanel.addForecastsToMap(temp.getTheReport());
 		}
+		
+		//if(n.getClass() == ) //TODO for loadingFrame
 		
 	}
 	
