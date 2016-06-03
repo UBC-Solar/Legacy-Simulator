@@ -16,16 +16,15 @@ public class LoadingFrameController {
 
 
 	
-	public void closeLoadFrame() {
+	public void closeLoadFrame(GUImain parent) {
 		// TODO Auto-generated method stub
-		loadFrame.setVisible(false);
+		parent.closeLoadFrame();
 	}
 
 
-	public void lunchLoadFrame() {
+	public void lunchLoadFrame(GUImain parent) {
 		// TODO Auto-generated method stub
-		loadFrame.setVisible(true);
-
+		parent.lunchLoadFrame();
 	}
 
 }

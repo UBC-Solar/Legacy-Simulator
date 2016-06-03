@@ -60,6 +60,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private static final String CHART_TITLE = "Sim Results";
 	private JPanel contentPane; //the root content holder
 	private GlobalController mySession; 
+	private GUImain parent; //TODO for loading frame
 	private JFreeChart simResults; //the main chart model.
 	private final String X_AXIS_LABEL = "Distance (km)";
 	private final String Y_AXIS_LABEL = "speed (km/h)";
@@ -89,8 +90,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	 * Create the frame.
 	 * @param mySession 
 	 */
-	public SimulationAdvancedWindow(GlobalController mySession) {
-		
+	public SimulationAdvancedWindow(GlobalController mySession, GUImain main) { //TODO for loading frame
+		this.parent = main;// TODO for loading Frame
 		this.mySession = mySession;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 543);
@@ -114,7 +115,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		JButton btnNewSimulation = new JButton("New Simulation");
 		btnNewSimulation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
 				runSimultion();
+				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
 			}
 		});
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
@@ -124,7 +127,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		chckbxSpeed.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showSpeed = chckbxSpeed.isSelected();
+				mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
 				refreshChart();
+				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
 			}
 		});
 		chckbxSpeed.setSelected(true);
@@ -135,7 +140,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		chckbxSoc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showStateOfCharge = chckbxSoc.isSelected();
+				mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
 				refreshChart();
+				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
 			}
 		});
 		buttonPanel.add(chckbxSoc);
@@ -147,7 +154,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		chckbxCloud.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showCloud = chckbxCloud.isSelected();
+				mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
 				refreshChart();
+				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
 			}
 		});
 		buttonPanel.add(chckbxCloud);
@@ -157,7 +166,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		chckbxElevation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showElevation = chckbxElevation.isSelected();
+				mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
 				refreshChart();
+				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
 			}
 		});
 		buttonPanel.add(chckbxElevation);

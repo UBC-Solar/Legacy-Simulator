@@ -45,7 +45,8 @@ import java.awt.Insets;
 import javax.swing.SwingConstants;
 
 public class WeatherAdvancedWindow extends JFrame implements Listener{
-
+	
+	private GUImain parent;
 	private JPanel contentPane;
 	private GlobalController mySession;
 	private ChartPanel temperatureChart;
@@ -98,7 +99,9 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	 * Create the frame.
 	 * @param mySession 
 	 */
-	public WeatherAdvancedWindow(final GlobalController mySession) {
+	public WeatherAdvancedWindow(final GlobalController mySession, GUImain main) {
+		
+		parent = main;
 		setTitle("Advanced Weather");
 		this.mySession = mySession;
 		travelDistance = 0.0;
@@ -116,7 +119,9 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		JMenuItem mntmLoadForecastsFor = new JMenuItem("Load Forecasts for Route (48 hours)");
 		mntmLoadForecastsFor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
 				mySession.getMyWeatherController().downloadNewForecastsForRoute(100);
+				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
 			}
 		});
 		

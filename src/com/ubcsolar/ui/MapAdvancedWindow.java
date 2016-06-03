@@ -66,6 +66,7 @@ import javax.swing.SwingConstants;
 
 public class MapAdvancedWindow extends JFrame implements Listener {
 
+	protected GUImain parent;
 	private JPanel contentPane;
 	private GlobalController mySession;
 	private JLabel lblMapName;
@@ -120,8 +121,9 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	 * constructor
 	 * @param toAdd - the session to refer to for the controllers, and to register with
 	 */
-	public MapAdvancedWindow(GlobalController toAdd) {
+	public MapAdvancedWindow(GlobalController toAdd, GUImain main) {
 		mySession = toAdd;
+		parent = main;
 		register();
 		buildDefaultChart();
 		setTitleAndLogo();
@@ -157,9 +159,9 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 				 
 				 if (returnVal == JFileChooser.APPROVE_OPTION) {
 					 
-					 mySession.getMyLoadingFrameController().lunchLoadFrame();
+					 mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
 					 parentInstance.loadMap(fc.getSelectedFile());
-					 mySession.getMyLoadingFrameController().closeLoadFrame();
+					 mySession.getMyLoadingFrameController().closeLoadFrame(parent);
 			            
 			        } else {
 			            //cancelled by user, do nothing

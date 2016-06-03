@@ -27,7 +27,7 @@ public class LoadingWindow extends JFrame implements Listener {
 	    frame.getContentPane().add(new JLabel("Please wait for a moment... ", loading, JLabel.CENTER));
 
 	    frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-	    frame.setSize(363, 186);
+	    frame.setSize(555, 359);
 	    frame.setVisible(false);
 
 	}
