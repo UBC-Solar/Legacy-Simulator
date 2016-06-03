@@ -161,13 +161,13 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 				 
 				 if (returnVal == JFileChooser.APPROVE_OPTION) {
 					
-				//	 loadFrame
+				//	 loadFrame and change the cursor type to waiting cursor
+
 					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 					 mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
 					 parentInstance.loadMap(fc.getSelectedFile());
 					 mySession.getMyLoadingFrameController().closeLoadFrame(parent);
 					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-
 			            
 			        } else {
 			            //cancelled by user, do nothing

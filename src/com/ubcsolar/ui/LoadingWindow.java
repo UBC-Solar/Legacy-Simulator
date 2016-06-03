@@ -30,7 +30,7 @@ public  class LoadingWindow extends JFrame implements Listener {
 
 	    loadFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	    loadFrame.setSize(555, 359);
-	//    frame.setVisible(false);
+	//  loadFrame.setVisible(false);
 
 	}
 

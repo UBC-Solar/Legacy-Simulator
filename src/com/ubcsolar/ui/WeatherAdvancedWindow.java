@@ -120,11 +120,22 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		JMenuItem mntmLoadForecastsFor = new JMenuItem("Load Forecasts for Route (48 hours)");
 		mntmLoadForecastsFor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				//TODO, even with the code here, the jframe is empty! what's wrong? I'm not an expert.
+				JFrame loadFrame = new JFrame("Loading");
+
+				ImageIcon loading = new ImageIcon("C:/Users/Hooman/workspace/sim/ajax-loader.gif");
+				    
+				loadFrame.getContentPane().add(new JLabel("Loading. Please wait for a moment... ", loading, JLabel.CENTER));
+
+				loadFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+				loadFrame.setSize(555, 359);
+				loadFrame.setVisible(true);
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
-				mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
+		//TODO		mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
 				mySession.getMyWeatherController().downloadNewForecastsForRoute(100);
-				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
+		//		mySession.getMyLoadingFrameController().closeLoadFrame(parent);
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
+				loadFrame.setVisible(false);
 
 			}
 		});
