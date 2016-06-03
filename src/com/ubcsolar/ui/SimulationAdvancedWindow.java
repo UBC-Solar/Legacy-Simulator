@@ -2,6 +2,8 @@ package com.ubcsolar.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -89,6 +91,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	/**
 	 * Create the frame.
 	 * @param mySession 
+	 * @param main 
 	 */
 	public SimulationAdvancedWindow(GlobalController mySession, GUImain main) { //TODO for loading frame
 		this.parent = main;// TODO for loading Frame
@@ -115,9 +118,13 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		JButton btnNewSimulation = new JButton("New Simulation");
 		btnNewSimulation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
+				
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
+				mySession.getMyLoadingFrameController().lunchLoadFrame(parent); // loading window
 				runSimultion();
 				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
 			}
 		});
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
@@ -127,9 +134,11 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		chckbxSpeed.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showSpeed = chckbxSpeed.isSelected();
-				mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
+				mySession.getMyLoadingFrameController().lunchLoadFrame(parent); // loading window
 				refreshChart();
 				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 		chckbxSpeed.setSelected(true);
@@ -140,9 +149,11 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		chckbxSoc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showStateOfCharge = chckbxSoc.isSelected();
-				mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
+				mySession.getMyLoadingFrameController().lunchLoadFrame(parent); // loading window
 				refreshChart();
 				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 		buttonPanel.add(chckbxSoc);
@@ -154,9 +165,11 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		chckbxCloud.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showCloud = chckbxCloud.isSelected();
-				mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
+				mySession.getMyLoadingFrameController().lunchLoadFrame(parent); // loading window
 				refreshChart();
 				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 		buttonPanel.add(chckbxCloud);
@@ -166,9 +179,11 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		chckbxElevation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showElevation = chckbxElevation.isSelected();
-				mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
+				mySession.getMyLoadingFrameController().lunchLoadFrame(parent); // loading window
 				refreshChart();
 				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 		buttonPanel.add(chckbxElevation);

@@ -13,6 +13,7 @@ import com.ubcsolar.notification.Notification;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -124,6 +125,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	public MapAdvancedWindow(GlobalController toAdd, GUImain main) {
 		mySession = toAdd;
 		parent = main;
+	//	JFrame loadFrame = new LoadingWindow(this.mySession);
 		register();
 		buildDefaultChart();
 		setTitleAndLogo();
@@ -158,10 +160,14 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 				 int returnVal = fc.showOpenDialog(parentInstance);
 				 
 				 if (returnVal == JFileChooser.APPROVE_OPTION) {
-					 
+					
+				//	 loadFrame
+					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 					 mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
 					 parentInstance.loadMap(fc.getSelectedFile());
 					 mySession.getMyLoadingFrameController().closeLoadFrame(parent);
+					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
 			            
 			        } else {
 			            //cancelled by user, do nothing

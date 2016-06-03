@@ -1,6 +1,7 @@
 package com.ubcsolar.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -119,9 +120,12 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		JMenuItem mntmLoadForecastsFor = new JMenuItem("Load Forecasts for Route (48 hours)");
 		mntmLoadForecastsFor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
 				mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
 				mySession.getMyWeatherController().downloadNewForecastsForRoute(100);
 				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
+
 			}
 		});
 		
