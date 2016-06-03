@@ -156,7 +156,10 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 				 int returnVal = fc.showOpenDialog(parentInstance);
 				 
 				 if (returnVal == JFileChooser.APPROVE_OPTION) {
+					 
+					 mySession.getMyLoadingFrameController().lunchLoadFrame();
 					 parentInstance.loadMap(fc.getSelectedFile());
+					 mySession.getMyLoadingFrameController().closeLoadFrame();
 			            
 			        } else {
 			            //cancelled by user, do nothing

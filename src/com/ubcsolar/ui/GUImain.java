@@ -79,7 +79,7 @@ public class GUImain implements Listener{
 		this.weatherFrame = new WeatherAdvancedWindow(this.mySession); //Weather advanced window
 		}
 		if(this.loadFrame==null){
-		this.loadFrame = new LoadingWindow(this.mySession);
+			this.loadFrame = new LoadingWindow(this.mySession);
 		}
 	}
 	
@@ -473,4 +473,24 @@ public class GUImain implements Listener{
 		
 		mapFrame.setVisible(true);
 	}
+	
+	public void lunchLoadFrame(){
+		if(loadFrame == null){ //Shouldn't happen
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(),
+					"Tried to open the Loading window, but was null");
+			this.buildAllWindows();
+		}
+		
+		loadFrame.setVisible(true);
+	}
+	public void closeLoadFrame(){
+		if(loadFrame == null){ //Shouldn't happen
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(),
+					"Tried to open the Loading window, but was null");
+			this.buildAllWindows();
+		}
+		
+		loadFrame.setVisible(false);
+	}
+	
 }
