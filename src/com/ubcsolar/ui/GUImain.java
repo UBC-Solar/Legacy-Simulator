@@ -402,23 +402,13 @@ public class GUImain implements Listener{
 		gbc_panel_1.gridy = 0;
 		panel.add(panel_1, gbc_panel_1);
 		
-		mapPanel = new JPanel();
+		mapPanel = new MapPanel(this, mySession);
 		mainFrame.getContentPane().add(mapPanel, "1, 9, fill, fill");
-		mapPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-		
-		JLabel lblMap = new JLabel("Map");
-		mapPanel.add(lblMap);
-		
-		JButton btnAdvanced = new JButton("Advanced");
-		btnAdvanced.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				launchMap();
-			}
-		});
-
-		mapPanel.add(btnAdvanced);
-		register(); //do last, in case a notification is sent before we're done building.
-		
+		mapPanel.validate();
+		mapPanel.repaint();
+		mainFrame.getContentPane().validate();
+		mainFrame.getContentPane().repaint();
+		register();
 		
 		setTitleAndLogo();
 		mainFrame.repaint(); //sometimes the map window button doesn't pop up, hoping this fixes the glitch
@@ -474,13 +464,13 @@ public class GUImain implements Listener{
 	 * launches the Map window
 	 */
 	public void launchMap(){
-			if(mapFrame == null){ //Shouldn't happen
-				SolarLog.write(LogType.ERROR, System.currentTimeMillis(),
-						"Tried to open the Map advanced window, but was null");
-				this.buildAllWindows();
-			}
-			
-			mapFrame.setVisible(true);
+		if(mapFrame == null){ //Shouldn't happen
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(),
+					"Tried to open the Map advanced window, but was null");
+			this.buildAllWindows();
+		}
+		
+		mapFrame.setVisible(true);
 	}
 	
 }

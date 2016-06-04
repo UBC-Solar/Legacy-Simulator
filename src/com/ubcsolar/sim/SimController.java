@@ -5,6 +5,8 @@
  */
 
 package com.ubcsolar.sim;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +26,7 @@ import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.exception.NoLocationReportedException;
 import com.ubcsolar.notification.ExceptionNotification;
+import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.NewSimulationReportNotification;
 import com.ubcsolar.notification.Notification;
 
@@ -56,9 +59,8 @@ public class SimController extends ModuleController {
 		
 		double endTimeNanos = System.nanoTime();
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim completed in " + ((endTimeNanos -startTimeNanos)/1000000) + "ms");
-		SimulationReport toSend = new SimulationReport(simFrames, "some info");
+		SimulationReport toSend = new SimulationReport(simFrames,requestedSpeeds, "some info");
 		this.mySession.sendNotification(new NewSimulationReportNotification(toSend));
-	
 	}
 	
 	/**
@@ -68,7 +70,11 @@ public class SimController extends ModuleController {
 	@Override
 	public void notify(Notification n) {
 		//handle any notifications that were registered for here
-
+		if(n.getClass() == NewMapLoadedNotification.class){
+			SimulationReport toSend = new SimulationReport(new ArrayList<SimFrame>(),new HashMap<GeoCoord, Double>(), "Deleted");
+			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Deleted last run Sim because new route loaded");
+			this.mySession.sendNotification(new NewSimulationReportNotification(toSend));
+		}
 	}
 
 	/**
@@ -76,7 +82,7 @@ public class SimController extends ModuleController {
 	 */
 	@Override
 	public void register() {
-		// Do stuff here
+		this.mySession.register(this, NewMapLoadedNotification.class);
 
 	}
 }
