@@ -294,8 +294,13 @@ public class GUImain implements Listener{
 		JMenuItem mntmAddCustomForecast = new JMenuItem("Add Custom Forecast");
 		mntmAddCustomForecast.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){
-				JFrame frame = new FakeForecastAddWindow(mySession);
-				frame.setVisible(true);
+				if(mySession.getMapController().getAllPoints() == null){
+					JOptionPane.showMessageDialog(new WeatherAdvancedWindow(mySession),
+							"Must load route before adding forecasts.");
+				}else{
+					JFrame frame = new FakeForecastAddWindow(mySession);
+					frame.setVisible(true);
+				}
 			}
 		});
 		mnDebug.add(mntmAddCustomForecast);
@@ -477,4 +482,5 @@ public class GUImain implements Listener{
 			
 			mapFrame.setVisible(true);
 	}
+	
 }

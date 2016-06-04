@@ -447,27 +447,37 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				forecastPoints = new ArrayList<GeoCoord>();
 				
 				List<FIODataBlock> hourlyForecasts = new ArrayList<FIODataBlock>();
-				for(int i = 0; i < forecastsForChart.size(); i++){
-					forecastPoints.add(new GeoCoord(forecastsForChart.get(i).getLatitude(), 
-							forecastsForChart.get(i).getLongitude(), 0.0));//uses 0 for elevation cause it doesn't matter for our uses
-					hourlyForecasts.add(new FIODataBlock(forecastsForChart.get(i).getHourly()));
+				for(int i = 0; i < forecastsForChart.size()+1; i++){
+					//if statement adds duplicate point at the end
+					if (i == forecastsForChart.size()){
+						forecastPoints.add(new GeoCoord(forecastsForChart.get(i-1).getLatitude(), 
+								forecastsForChart.get(i-1).getLongitude(), 0.0));//uses 0 for elevation cause it doesn't matter for our uses
+						hourlyForecasts.add(new FIODataBlock(forecastsForChart.get(i-1).getHourly()));
+					}else{
+						forecastPoints.add(new GeoCoord(forecastsForChart.get(i).getLatitude(), 
+								forecastsForChart.get(i).getLongitude(), 0.0));//uses 0 for elevation cause it doesn't matter for our uses
+						hourlyForecasts.add(new FIODataBlock(forecastsForChart.get(i).getHourly()));
+					}
 				}
 				
-				distances = new double[forecastsForChart.size()];
+				distances = new double[forecastsForChart.size()+1];
 				List<GeoCoord> trailMarkers = mySession.getMapController().getAllPoints().getTrailMarkers();
 				int distanceIndex = 1;
 				int trailMarkerIndex = 1;
 				travelDistance = 0.0;
 				distances[0] = travelDistance;
-				while(distanceIndex < distances.length && trailMarkerIndex < trailMarkers.size()){
+				while(/*distanceIndex < distances.length &&*/ trailMarkerIndex < trailMarkers.size()){
 					travelDistance += trailMarkers.get(trailMarkerIndex-1).calculateDistance(
 							trailMarkers.get(trailMarkerIndex));
 					GeoCoord currentMarker = new GeoCoord(trailMarkers.get(trailMarkerIndex).getLat(),
 							trailMarkers.get(trailMarkerIndex).getLon(), 0.0);
 					if(currentMarker.equals(forecastPoints.get(distanceIndex))){
-						forecastPoints.set(distanceIndex, trailMarkers.get(trailMarkerIndex));
+						//forecastPoints.set(distanceIndex, trailMarkers.get(trailMarkerIndex));
 						//updates GeoCoord of forecasts to include elevation, will make comparing
 						//GeoCoords easier when calculating headwind
+						distances[distanceIndex] = travelDistance;
+						distanceIndex++;
+					}if(trailMarkerIndex == trailMarkers.size()-1){
 						distances[distanceIndex] = travelDistance;
 						distanceIndex++;
 					}
@@ -476,56 +486,24 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 
 				
 				int numHours = 0;
-				/*System.out.println(hourlyForecasts.size());
-				if(distances.length == 1){
-					double[] distances2 = new double[2];
-					distances2[0] = 0;
-					distances2[1] = mySession.getMapController().findTotalDistanceAlongLoadedRoute();
-					distances = distances2;
-				}
 				while((numHours < NUM_LINES) && ( numHours < hourlyForecasts.size()) ){
-					if(distances.length == 1){
-						distances = new double[1];
-						distances[0] = 0;
-						distances[1] = mySession.getMapController().findTotalDistanceAlongLoadedRoute();
-						double[][] data = new double[2][distances.length];
-						FIODataPoint currentHourForecast = hourlyForecasts.get(0).datapoint(numHours);
-						data[0][0] = distances[0];
-						data[0][1] = distances[1];
+					double[][] data = new double[2][distances.length];
+					for(int i = 0; i < hourlyForecasts.size(); i++){
+						data[0][i] = distances[i];
+						FIODataPoint currentHourForecast = hourlyForecasts.get(i).datapoint(numHours);
 						if(chartType.equals(WeatherChartType.TEMPERATURE)){
-							data[1][0] = currentHourForecast.temperature();
-							data[1][1] = currentHourForecast.temperature();
+							data[1][i] = currentHourForecast.temperature();
 						}else if(chartType.equals(WeatherChartType.CLOUD_COVER)){
-							data[1][0] = currentHourForecast.cloudCover()*100;
-							data[1][1] = currentHourForecast.cloudCover()*100;
+							data[1][i] = currentHourForecast.cloudCover()*100;
 						}else if(chartType.equals(WeatherChartType.PRECIPITATION)){
-							data[1][0] = currentHourForecast.precipProbability()*100;
-							data[1][1] = currentHourForecast.precipProbability()*100;
+							data[1][i] = currentHourForecast.precipProbability()*100;
 						}else if(chartType.equals(WeatherChartType.WIND_SPEED)){
-							data[1][0] = currentHourForecast.windSpeed();
-							data[1][1] = currentHourForecast.windSpeed();
+							data[1][i] = currentHourForecast.windSpeed();
 						}
-						dds.addSeries("Hour " + numHours, data);
-					}else{*/
-						double[][] data = new double[2][distances.length];
-						for(int i = 0; i < hourlyForecasts.size(); i++){
-							data[0][i] = distances[i];
-							FIODataPoint currentHourForecast = hourlyForecasts.get(i).datapoint(numHours);
-							if(chartType.equals(WeatherChartType.TEMPERATURE)){
-								data[1][i] = currentHourForecast.temperature();
-							}else if(chartType.equals(WeatherChartType.CLOUD_COVER)){
-								data[1][i] = currentHourForecast.cloudCover()*100;
-							}else if(chartType.equals(WeatherChartType.PRECIPITATION)){
-								data[1][i] = currentHourForecast.precipProbability()*100;
-							}else if(chartType.equals(WeatherChartType.WIND_SPEED)){
-								data[1][i] = currentHourForecast.windSpeed();
-							}
-						}
-						dds.addSeries("Hour " + numHours, data);
-					//}
-					//dds.addSeries("Hour " + numHours, data);
+					}
+					dds.addSeries("Hour " + numHours, data);
 					numHours++;
-				//}
+				}
 				
 				return dds;
 			}

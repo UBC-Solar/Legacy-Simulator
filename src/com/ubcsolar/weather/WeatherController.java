@@ -203,34 +203,62 @@ public class WeatherController extends ModuleController {
 	}
 	
 	private List<ForecastIO> addCustomForecasts(){
-		List<ForecastIO> comboForecasts = new ArrayList<ForecastIO>(retrievedForecasts);
+		List<ForecastIO> comboForecasts;
+		if(retrievedForecasts == null){
+			comboForecasts = new ArrayList<ForecastIO>();
+		}else{
+			comboForecasts = new ArrayList<ForecastIO>(retrievedForecasts);
+		}
 		for(int i = 0; i < customForecasts.size(); i++){
-			for(int j = 0; j < comboForecasts.size()-1; j++){
+			if(comboForecasts.size() > 1){
+				for(int j = 0; j < comboForecasts.size()-1; j++){
+					GeoCoord currCustom = new GeoCoord(customForecasts.get(i).getLatitude(), 
+							customForecasts.get(i).getLongitude(), 0.0);
+					GeoCoord currCombo = new GeoCoord(comboForecasts.get(j).getLatitude(), 
+							comboForecasts.get(j).getLongitude(), 0.0);
+					GeoCoord nextCombo = new GeoCoord(comboForecasts.get(j+1).getLatitude(), 
+							comboForecasts.get(j+1).getLongitude(), 0.0);
+					if(myMapController.findDistanceAlongLoadedRoute(currCustom) == 
+							myMapController.findDistanceAlongLoadedRoute(currCombo)){
+						comboForecasts.remove(j);
+						comboForecasts.add(j, customForecasts.get(i));
+						break;
+					}
+					if(myMapController.findDistanceAlongLoadedRoute(currCustom) > 
+							myMapController.findDistanceAlongLoadedRoute(currCombo) &&
+							myMapController.findDistanceAlongLoadedRoute(currCustom) < 
+							myMapController.findDistanceAlongLoadedRoute(nextCombo)){
+						comboForecasts.add(j+1, customForecasts.get(i));
+						break;
+					}
+					if(j == comboForecasts.size() - 2){
+						comboForecasts.add(customForecasts.get(i));
+					}
+				}
+			}else if(comboForecasts.size() == 1){
 				GeoCoord currCustom = new GeoCoord(customForecasts.get(i).getLatitude(), 
 						customForecasts.get(i).getLongitude(), 0.0);
-				GeoCoord currCombo = new GeoCoord(comboForecasts.get(j).getLatitude(), 
-						comboForecasts.get(j).getLongitude(), 0.0);
-				GeoCoord nextCombo = new GeoCoord(comboForecasts.get(j+1).getLatitude(), 
-						comboForecasts.get(j+1).getLongitude(), 0.0);
+				GeoCoord currCombo = new GeoCoord(comboForecasts.get(0).getLatitude(), 
+						comboForecasts.get(0).getLongitude(), 0.0);
 				if(myMapController.findDistanceAlongLoadedRoute(currCustom) == 
 						myMapController.findDistanceAlongLoadedRoute(currCombo)){
-					comboForecasts.remove(j);
-					comboForecasts.add(j, customForecasts.get(i));
-					break;
+					comboForecasts.remove(0);
+					comboForecasts.add(0, customForecasts.get(i));
 				}
-				if(myMapController.findDistanceAlongLoadedRoute(currCustom) > 
-						myMapController.findDistanceAlongLoadedRoute(currCombo) &&
-						myMapController.findDistanceAlongLoadedRoute(currCustom) < 
-						myMapController.findDistanceAlongLoadedRoute(nextCombo)){
-					comboForecasts.add(j+1, customForecasts.get(i));
-					break;
-				}
-				if(j == comboForecasts.size() - 2){
+				else if(myMapController.findDistanceAlongLoadedRoute(currCustom) > 
+						myMapController.findDistanceAlongLoadedRoute(currCombo)){ 
 					comboForecasts.add(customForecasts.get(i));
-				}
+					
+				}else{
+					comboForecasts.add(0, customForecasts.get(i));
+				}	
+			}else{
+				comboForecasts.add(customForecasts.get(i));
 			}
 		}
-		
+		if(comboForecasts.size() == 1){
+			
+		}
 		return comboForecasts;
 	
 	}
