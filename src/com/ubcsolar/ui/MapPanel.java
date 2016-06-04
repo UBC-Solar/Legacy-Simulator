@@ -19,6 +19,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.BorderLayout;
+import java.awt.Font;
 
 public class MapPanel extends JPanel implements Listener {
 	
@@ -64,15 +65,16 @@ public class MapPanel extends JPanel implements Listener {
 		panel_1.add(lblMapLoaded, gbc_lblMapLoaded);
 		
 		label_1 = new JLabel("");
+		label_1.setFont(new Font("Tahoma", Font.BOLD, 12));
 		GridBagConstraints gbc_label_1 = new GridBagConstraints();
 		gbc_label_1.insets = new Insets(0, 0, 0, 5);
 		gbc_label_1.gridx = 5;
 		gbc_label_1.gridy = 6;
 		panel_1.add(label_1, gbc_label_1);
 		
+		label_1.setText("NONE");
 		register(); //do last, in case a notification is sent before we're done building.
-		
-		updateMapLabel(mySession.getMapController().getLoadedMapName());
+	
 		
 	}
 
