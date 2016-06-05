@@ -69,14 +69,17 @@ public class WeatherController extends ModuleController {
 	}
 	
 	/**
-	 * Clears all custom forecasts and resends the most recent downloaded report
+	 * Clears all custom forecasts and resends the most recent downloaded report, provided it exists
 	 */
 	
 	public void clearCustomForecasts(){
 		customForecasts = new ArrayList<ForecastIO>();
-		this.mySession.sendNotification(new NewForecastReport(lastDownloadedReport));
+		if(lastDownloadedReport != null){
+			this.mySession.sendNotification(new NewForecastReport(lastDownloadedReport));
+		}else{
+			this.mySession.getGUIMain().clearWeather();
+		}
 	}
-	
 	
 	/*
 	 * returns a report with forecasts for every point in the route's breadcrumbs list, interprolating 
@@ -259,9 +262,6 @@ public class WeatherController extends ModuleController {
 			}else{
 				comboForecasts.add(customForecasts.get(i));
 			}
-		}
-		if(comboForecasts.size() == 1){
-			
 		}
 		return comboForecasts;
 	

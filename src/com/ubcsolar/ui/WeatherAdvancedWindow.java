@@ -537,5 +537,10 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		public double getTravelDistance(){
 			return travelDistance;
 		}
+		
+		public void clearWindow(){
+			this.currentForecastReport = null;
+			this.updateCharts();
+		}
 
 }

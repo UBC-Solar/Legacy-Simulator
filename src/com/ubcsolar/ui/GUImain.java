@@ -473,4 +473,9 @@ public class GUImain implements Listener{
 		mapFrame.setVisible(true);
 	}
 	
+	public void clearWeather(){
+		WeatherAdvancedWindow weatherWindow = (WeatherAdvancedWindow) weatherFrame;
+		weatherWindow.clearWindow();
+	}
+	
 }

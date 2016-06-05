@@ -193,6 +193,10 @@ public class GlobalController {
 		return this.myDatabaseController;
 	}
 	
+	public GUImain getGUIMain(){
+		return this.mainWindow;
+	}
+	
 	/**
 	 * allows for graceful shutdown
 	 */
