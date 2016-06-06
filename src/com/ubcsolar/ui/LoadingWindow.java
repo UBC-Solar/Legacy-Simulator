@@ -32,10 +32,6 @@ public  class LoadingWindow extends JFrame  {
 	    getContentPane().add(new JLabel("Loading. Please wait for a moment... ", loading, JLabel.CENTER));
 		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 	    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		//this.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
-		//this.setType(Type.POPUP);
-		//this.setEnabled(false);
-		setAlwaysOnTop(true);
 		setResizable(false);
 
 	}

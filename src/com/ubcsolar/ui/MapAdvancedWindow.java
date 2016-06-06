@@ -167,8 +167,8 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 					 frame.setVisible(true);
 					 parentInstance.loadMap(fc.getSelectedFile());
 					 frame.setVisible(false);
-					 Toolkit.getDefaultToolkit().beep();
 					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					 Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
 			            
 			        } else {
 			            //cancelled by user, do nothing

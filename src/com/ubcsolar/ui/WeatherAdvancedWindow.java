@@ -43,6 +43,8 @@ import java.util.List;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Toolkit;
+
 import javax.swing.SwingConstants;
 
 public class WeatherAdvancedWindow extends JFrame implements Listener{
@@ -127,6 +129,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				mySession.getMyWeatherController().downloadNewForecastsForRoute(100);
 				frame.setVisible(false);
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
+				Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
 
 			}
 		});
