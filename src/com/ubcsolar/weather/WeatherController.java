@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.eclipsesource.json.JsonObject;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.LogType;
@@ -270,8 +272,32 @@ public class WeatherController extends ModuleController {
 				comboForecasts.add(customForecasts.get(i));
 			}
 		}
+		GeoCoord firstPoint = new GeoCoord(comboForecasts.get(0).getLatitude(), 
+				comboForecasts.get(0).getLongitude(), 0.0);
+		if(myMapController.findDistanceAlongLoadedRoute(firstPoint) > 0){
+			ForecastIO forecast = copyAt0(comboForecasts.get(0));
+			comboForecasts.add(0,forecast);
+		}
 		return comboForecasts;
 	
+	}
+	
+	private ForecastIO copyAt0(ForecastIO initial){
+		
+		GeoCoord location = myMapController.getAllPoints().getTrailMarkers().get(0);
+		double latitude = location.getLat();
+		double longitude = location.getLon();
+		JsonObject forecastInfo = new JsonObject();
+		forecastInfo.add("latitude", latitude);
+		forecastInfo.add("longitude", longitude);
+		forecastInfo.add("currently", initial.getCurrently());
+		forecastInfo.add("hourly", initial.getHourly());
+		forecastInfo.add("daily", initial.getDaily());
+		forecastInfo.add("flags", initial.getFlags());
+		ForecastIO forecast = new ForecastIO(GlobalValues.WEATHER_KEY);
+		forecast.getForecast(forecastInfo);
+		
+		return forecast;
 	}
 
 }
