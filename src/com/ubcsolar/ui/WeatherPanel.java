@@ -15,64 +15,88 @@ import com.ubcsolar.notification.NewMetarReportLoadedNotification;
 import com.ubcsolar.notification.NewTafReportLoadedNotification;
 import com.ubcsolar.notification.Notification;
 import java.awt.Insets;
+import java.awt.BorderLayout;
 
 public class WeatherPanel extends JPanel implements Listener {
 	private GlobalController mySession;
 	private JLabel lblWeatherHeader;
-	private JLabel lblRain;
-	private JLabel lblCloud;
 	private GUImain parent;
+	private JPanel panel;
+	private JPanel panel_1;
+	private JPanel panel_2;
+	private JLabel lblCloud;
 	private JLabel lblWind;
+	private JLabel lblRain;
+	private JLabel CloudPercent;
+	private JLabel WindSpeed;
+	private JLabel Rainfall;
 	
 	
 	public WeatherPanel(GlobalController session, GUImain parent){
-		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[]{125, 0};
-		setLayout(gridBagLayout);
 		this.parent = parent;
-
-		lblWeatherHeader = new JLabel("Weather");
-		GridBagConstraints headerConstraints = new GridBagConstraints();
-		headerConstraints.insets = new Insets(0, 0, 5, 0);
-		headerConstraints.gridx = 1;
-		headerConstraints.gridy = 0;
-		headerConstraints.weighty = 1;
-		headerConstraints.anchor = GridBagConstraints.NORTH;
-		this.add(lblWeatherHeader, headerConstraints);
+		setLayout(new BorderLayout(0, 0));
 		
-		lblWind = new JLabel("Wind:");
-		GridBagConstraints gbc_lblWind = new GridBagConstraints();
-		gbc_lblWind.fill = GridBagConstraints.HORIZONTAL;
-		gbc_lblWind.insets = new Insets(0, 0, 5, 5);
-		gbc_lblWind.gridx = 0;
-		gbc_lblWind.gridy = 1;
-		add(lblWind, gbc_lblWind);
+		panel = new JPanel();
+		add(panel, BorderLayout.NORTH);
 		
-		lblRain = new JLabel("Precipitation: ");
-		GridBagConstraints gbc_lblRain = new GridBagConstraints();
-		gbc_lblRain.insets = new Insets(0, 0, 5, 5);
-		gbc_lblRain.gridx = 0;
-		gbc_lblRain.gridy = 2;
-		gbc_lblRain.weighty = 0.7;
-		gbc_lblRain.fill = GridBagConstraints.HORIZONTAL;
-		this.add(lblRain, gbc_lblRain);
-		
-		lblCloud = new JLabel("Cloud: ");
-		GridBagConstraints gbc_lblCloud = new GridBagConstraints();
-		gbc_lblCloud.insets = new Insets(0, 0, 5, 5);
-		gbc_lblCloud.gridx = 0;
-		gbc_lblCloud.gridy = 3;
-		gbc_lblCloud.weighty = 0.7;
-		gbc_lblCloud.fill = GridBagConstraints.HORIZONTAL;
-		this.add(lblCloud, gbc_lblCloud);
-		
-		JButton btnAdvanced = new JButton("Advanced");
-		GridBagConstraints buttonConstraints = new GridBagConstraints();
-		buttonConstraints.insets = new Insets(0, 0, 0, 5);
-		buttonConstraints.gridx = 0;
-		buttonConstraints.gridy = 4;
-		buttonConstraints.weighty = 0.7;
-		this.add(btnAdvanced, buttonConstraints);
+				lblWeatherHeader = new JLabel("Weather");
+				panel.add(lblWeatherHeader);
+				
+				panel_1 = new JPanel();
+				add(panel_1, BorderLayout.SOUTH);
+				
+				JButton btnAdvanced = new JButton("Advanced");
+				panel_1.add(btnAdvanced);
+				
+				panel_2 = new JPanel();
+				add(panel_2, BorderLayout.CENTER);
+				GridBagLayout gbl_panel_2 = new GridBagLayout();
+				gbl_panel_2.columnWidths = new int[]{0, 0, 0};
+				gbl_panel_2.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
+				gbl_panel_2.columnWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
+				gbl_panel_2.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+				panel_2.setLayout(gbl_panel_2);
+				
+				lblCloud = new JLabel("Cloud:");
+				GridBagConstraints gbc_lblCloud = new GridBagConstraints();
+				gbc_lblCloud.insets = new Insets(0, 0, 5, 5);
+				gbc_lblCloud.gridx = 0;
+				gbc_lblCloud.gridy = 1;
+				panel_2.add(lblCloud, gbc_lblCloud);
+				
+				CloudPercent = new JLabel("NONE");
+				GridBagConstraints gbc_CloudPercent = new GridBagConstraints();
+				gbc_CloudPercent.insets = new Insets(0, 0, 5, 0);
+				gbc_CloudPercent.gridx = 1;
+				gbc_CloudPercent.gridy = 1;
+				panel_2.add(CloudPercent, gbc_CloudPercent);
+				
+				lblWind = new JLabel("Wind:");
+				GridBagConstraints gbc_lblWind = new GridBagConstraints();
+				gbc_lblWind.insets = new Insets(0, 0, 5, 5);
+				gbc_lblWind.gridx = 0;
+				gbc_lblWind.gridy = 4;
+				panel_2.add(lblWind, gbc_lblWind);
+				
+				WindSpeed = new JLabel("NONE");
+				GridBagConstraints gbc_WindSpeed = new GridBagConstraints();
+				gbc_WindSpeed.insets = new Insets(0, 0, 5, 0);
+				gbc_WindSpeed.gridx = 1;
+				gbc_WindSpeed.gridy = 4;
+				panel_2.add(WindSpeed, gbc_WindSpeed);
+				
+				lblRain = new JLabel("Precipitation:");
+				GridBagConstraints gbc_lblRain = new GridBagConstraints();
+				gbc_lblRain.insets = new Insets(0, 0, 0, 5);
+				gbc_lblRain.gridx = 0;
+				gbc_lblRain.gridy = 7;
+				panel_2.add(lblRain, gbc_lblRain);
+				
+				Rainfall = new JLabel("NONE");
+				GridBagConstraints gbc_Rainfall = new GridBagConstraints();
+				gbc_Rainfall.gridx = 1;
+				gbc_Rainfall.gridy = 7;
+				panel_2.add(Rainfall, gbc_Rainfall);
 		btnAdvanced.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				launchWeather();
