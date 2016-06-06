@@ -134,15 +134,15 @@ public class MapController extends ModuleController{
 	
 	public double findDistanceAlongLoadedRoute(GeoCoord location){
 		List<GeoCoord> trailMarkers = getAllPoints().getTrailMarkers();
-		int distanceIndex = 1;
+		if(location.calculateDistance(trailMarkers.get(0))==0){
+			return 0.0;
+		}
 		int trailMarkerIndex = 1;
 		double travelDistance = 0.0;
 		while(trailMarkerIndex < trailMarkers.size() &&
 				location.calculateDistance(trailMarkers.get(trailMarkerIndex)) != 0){
 			travelDistance += trailMarkers.get(trailMarkerIndex-1).calculateDistance(
 					trailMarkers.get(trailMarkerIndex));
-			GeoCoord currentMarker = new GeoCoord(trailMarkers.get(trailMarkerIndex).getLat(),
-					trailMarkers.get(trailMarkerIndex).getLon(), 0.0);
 			trailMarkerIndex++;
 		}
 		return travelDistance;

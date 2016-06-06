@@ -209,6 +209,13 @@ public class WeatherController extends ModuleController {
 		
 	}
 	
+	/**
+	 * interpolates any currently loaded custom forecasts with previously downloaded forecasts.
+	 * If any of the custom forecasts are given the same location as previously downloaded
+	 * forecasts, they will overwrite the downloaded forecasts
+	 * 
+	 * @return the list of ForecastIOs that should be put in the ForecastReport
+	 */
 	private List<ForecastIO> addCustomForecasts(){
 		List<ForecastIO> comboForecasts;
 		if(retrievedForecasts == null){
