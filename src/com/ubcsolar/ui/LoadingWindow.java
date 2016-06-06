@@ -23,14 +23,17 @@ public  class LoadingWindow extends JFrame  {
 	
 
 	public LoadingWindow(GlobalController toAdd) {
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		
 		this.mySession = toAdd;
+		
 		setBounds(760, 390, 400, 300);
 		setTitleAndLogo();
-	    ImageIcon loading = new ImageIcon("C:/Users/Hooman/workspace/sim/ajax-loader.gif");
+		
+	    ImageIcon loading = new ImageIcon("res/ajax-loader.gif");
 
 	    getContentPane().add(new JLabel("Loading. Please wait for a moment... ", loading, JLabel.CENTER));
-		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		
+	    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 	    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setResizable(false);
 
