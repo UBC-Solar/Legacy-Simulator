@@ -73,7 +73,7 @@ public class GUImain implements Listener{
 		this.carFrame = new CarAdvancedWindow(this.mySession); //Car advanced window
 		}
 		if(this.mapFrame == null){
-		this.mapFrame = new MapAdvancedWindow(this.mySession, this); //Map advanced window
+		this.mapFrame = new MapAdvancedWindow(this.mySession); //Map advanced window
 		}
 		if(this.weatherFrame == null){
 		this.weatherFrame = new WeatherAdvancedWindow(this.mySession, this); //Weather advanced window

@@ -15,6 +15,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -67,7 +68,6 @@ import javax.swing.SwingConstants;
 
 public class MapAdvancedWindow extends JFrame implements Listener {
 
-	protected GUImain parent;
 	private JPanel contentPane;
 	private GlobalController mySession;
 	private JLabel lblMapName;
@@ -122,9 +122,8 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	 * constructor
 	 * @param toAdd - the session to refer to for the controllers, and to register with
 	 */
-	public MapAdvancedWindow(GlobalController toAdd, GUImain main) {
+	public MapAdvancedWindow(GlobalController toAdd) {
 		mySession = toAdd;
-		parent = main;
 	//	JFrame loadFrame = new LoadingWindow(this.mySession);
 		register();
 		buildDefaultChart();
@@ -162,11 +161,13 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 				 if (returnVal == JFileChooser.APPROVE_OPTION) {
 					
 				//	 loadFrame and change the cursor type to waiting cursor
-
+					 
 					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-					 mySession.getMyLoadingFrameController().lunchLoadFrame(parent);
+					 JFrame frame = new LoadingWindow(mySession);
+					 frame.setVisible(true);
 					 parentInstance.loadMap(fc.getSelectedFile());
-					 mySession.getMyLoadingFrameController().closeLoadFrame(parent);
+					 frame.setVisible(false);
+					 Toolkit.getDefaultToolkit().beep();
 					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			            
 			        } else {

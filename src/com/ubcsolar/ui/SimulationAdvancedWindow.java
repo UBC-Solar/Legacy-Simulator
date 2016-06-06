@@ -47,6 +47,8 @@ import java.util.Map;
 import java.util.Random;
 import java.awt.event.ActionEvent;
 import java.awt.Insets;
+import java.awt.Toolkit;
+
 import javax.swing.JCheckBox;
 import java.awt.FlowLayout;
 import javax.swing.JScrollPane;
@@ -120,10 +122,12 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			public void actionPerformed(ActionEvent arg0) {
 				
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
-				mySession.getMyLoadingFrameController().lunchLoadFrame(parent); // loading window
+				JFrame frame = new LoadingWindow(mySession);
+				frame.setVisible(true);
 				runSimultion();
-				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
+				frame.setVisible(false);
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
 
 			}
 		});
@@ -134,10 +138,12 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		chckbxSpeed.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showSpeed = chckbxSpeed.isSelected();
+				
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
-				mySession.getMyLoadingFrameController().lunchLoadFrame(parent); // loading window
+				JFrame frame = new LoadingWindow(mySession);
+				frame.setVisible(true);
 				refreshChart();
-				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
+				frame.setVisible(false);
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
@@ -149,10 +155,12 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		chckbxSoc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showStateOfCharge = chckbxSoc.isSelected();
+				
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
-				mySession.getMyLoadingFrameController().lunchLoadFrame(parent); // loading window
+				JFrame frame = new LoadingWindow(mySession);
+				frame.setVisible(true);
 				refreshChart();
-				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
+				frame.setVisible(false);
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
@@ -165,10 +173,12 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		chckbxCloud.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showCloud = chckbxCloud.isSelected();
+				
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
-				mySession.getMyLoadingFrameController().lunchLoadFrame(parent); // loading window
+				JFrame frame = new LoadingWindow(mySession);
+				frame.setVisible(true);
 				refreshChart();
-				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
+				frame.setVisible(false);
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
@@ -179,10 +189,12 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		chckbxElevation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showElevation = chckbxElevation.isSelected();
+
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
-				mySession.getMyLoadingFrameController().lunchLoadFrame(parent); // loading window
+				JFrame frame = new LoadingWindow(mySession);
+				frame.setVisible(true);
 				refreshChart();
-				mySession.getMyLoadingFrameController().closeLoadFrame(parent);
+				frame.setVisible(false);
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});

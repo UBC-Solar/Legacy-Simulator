@@ -11,59 +11,37 @@ import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.notification.Notification;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.HeadlessException;
+import java.awt.Window.Type;
+import java.awt.Dialog.ModalExclusionType;
 
 
-public  class LoadingWindow extends JFrame implements Listener {
+public  class LoadingWindow extends JFrame  {
 		
-	private JFrame loadFrame;//The Loading frame when loading a map or forecast or simulation to show a process is being done.
 	private GlobalController mySession ; 
 	
 
 	public LoadingWindow(GlobalController toAdd) {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		mySession = toAdd;
-		loadFrame = new JFrame("Loading");
-
+		this.mySession = toAdd;
+		setBounds(760, 390, 400, 300);
+		setTitleAndLogo();
 	    ImageIcon loading = new ImageIcon("C:/Users/Hooman/workspace/sim/ajax-loader.gif");
-	    
-	    loadFrame.getContentPane().add(new JLabel("Loading. Please wait for a moment... ", loading, JLabel.CENTER));
 
-	    loadFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-	    loadFrame.setSize(555, 359);
-	//  loadFrame.setVisible(false);
+	    getContentPane().add(new JLabel("Loading. Please wait for a moment... ", loading, JLabel.CENTER));
+		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+	    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		//this.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
+		//this.setType(Type.POPUP);
+		//this.setEnabled(false);
+		setAlwaysOnTop(true);
+		setResizable(false);
 
 	}
-
-	@Override
-	public void notify(Notification n) {
-	// TODO Auto-generated method stub
-			
+	
+	private void setTitleAndLogo() {
+		setIconImage(mySession.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
+		setTitle("Loading");
 	}
-
-	@Override
-	public void register() {
-	// TODO Auto-generated method stub
-			
-	}
-	public void lunchLoadFrame(){
-		if(loadFrame == null){ //Shouldn't happen
-			SolarLog.write(LogType.ERROR, System.currentTimeMillis(),
-					"Tried to open the Loading window, but was null");
-			this.loadFrame = new LoadingWindow(this.mySession);
-		}
-		
-		loadFrame.setVisible(true);
-	}
-	public void closeLoadFrame(){
-		if(loadFrame == null){ //Shouldn't happen
-			SolarLog.write(LogType.ERROR, System.currentTimeMillis(),
-					"Tried to open the Loading window, but was null");
-			this.loadFrame = new LoadingWindow(this.mySession);
-		}
-		
-		loadFrame.setVisible(false);
-	}
-
-		
-
 }
