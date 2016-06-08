@@ -1,6 +1,7 @@
 package com.ubcsolar.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,10 +43,13 @@ import java.util.List;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Toolkit;
+
 import javax.swing.SwingConstants;
 
 public class WeatherAdvancedWindow extends JFrame implements Listener{
-
+	
+	private GUImain parent;
 	private JPanel contentPane;
 	private GlobalController mySession;
 	private ChartPanel temperatureChart;
@@ -98,7 +102,9 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	 * Create the frame.
 	 * @param mySession 
 	 */
-	public WeatherAdvancedWindow(final GlobalController mySession) {
+	public WeatherAdvancedWindow(final GlobalController mySession, GUImain main) {
+		
+		parent = main;
 		setTitle("Advanced Weather");
 		this.mySession = mySession;
 		travelDistance = 0.0;
@@ -116,7 +122,17 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		JMenuItem mntmLoadForecastsFor = new JMenuItem("Load Forecasts for Route (48 hours)");
 		mntmLoadForecastsFor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				mySession.getMyWeatherController().downloadNewForecastsForRoute(100);
+				
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
+				JFrame frame = new LoadingWindow(mySession);
+				frame.setVisible(true);
+				
+				mySession.getMyWeatherController().downloadNewForecastsForRoute(100); //main Process
+				
+				frame.setVisible(false);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
+				Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
+
 			}
 		});
 		

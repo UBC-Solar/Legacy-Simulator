@@ -13,7 +13,9 @@ import com.ubcsolar.notification.Notification;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -60,6 +62,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import javax.swing.SwingConstants;
+import java.awt.FlowLayout;
  
 
 
@@ -122,11 +125,12 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	 */
 	public MapAdvancedWindow(GlobalController toAdd) {
 		mySession = toAdd;
+	//	JFrame loadFrame = new LoadingWindow(this.mySession);
 		register();
 		buildDefaultChart();
 		setTitleAndLogo();
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
-		setBounds(100, 100, 538, 395);
+		setBounds(100, 100, 880, 590);
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -156,7 +160,18 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 				 int returnVal = fc.showOpenDialog(parentInstance);
 				 
 				 if (returnVal == JFileChooser.APPROVE_OPTION) {
-					 parentInstance.loadMap(fc.getSelectedFile());
+					
+				//	 loadFrame and change the cursor type to waiting cursor
+					 
+					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					 JFrame frame = new LoadingWindow(mySession);
+					 frame.setVisible(true);
+					 
+					 parentInstance.loadMap(fc.getSelectedFile()); //main process
+					 
+					 frame.setVisible(false);
+					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					 Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
 			            
 			        } else {
 			            //cancelled by user, do nothing
@@ -261,7 +276,17 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 						ds,
 						PlotOrientation.VERTICAL, true, true, false);
 		
-		cp = new ChartPanel(elevationChart);
+		cp = new ChartPanel(elevationChart,true,true,true,true,true);
+		//cp.setAutoscrolls(true);
+		//cp.setRefreshBuffer(true);
+		cp.setMouseZoomable(true);
+		cp.setMouseWheelEnabled(true);
+		cp.setFillZoomRectangle(false);
+		cp.setHorizontalAxisTrace(true);
+		//cp.setVerticalAxisTrace(true);
+		//cp.setZoomAroundAnchor(true);
+
+
 	}
 	
 	/** this method is for testing, builds canned dataset. Code developed from 

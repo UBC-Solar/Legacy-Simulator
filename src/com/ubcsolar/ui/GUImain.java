@@ -53,7 +53,6 @@ public class GUImain implements Listener{
 	private JFrame simFrame; //The sim module's 'advanced' options menu
 	private JPanel loadStatusPanel; //Shows the loaded status of modules at a quick glance
 
-
 	/**
 	 * Constructor; Creates the application.
 	 */
@@ -67,7 +66,7 @@ public class GUImain implements Listener{
 	 */
 	private void buildAllWindows(){
 		if(this.simFrame == null){
-		this.simFrame = new SimulationAdvancedWindow(this.mySession); //Sim advanced window
+		this.simFrame = new SimulationAdvancedWindow(this.mySession, this); //Sim advanced window
 		}
 		if(this.carFrame == null){
 		this.carFrame = new CarAdvancedWindow(this.mySession); //Car advanced window
@@ -76,8 +75,9 @@ public class GUImain implements Listener{
 		this.mapFrame = new MapAdvancedWindow(this.mySession); //Map advanced window
 		}
 		if(this.weatherFrame == null){
-		this.weatherFrame = new WeatherAdvancedWindow(this.mySession); //Weather advanced window
+		this.weatherFrame = new WeatherAdvancedWindow(this.mySession, this); //Weather advanced window
 		}
+
 	}
 	
 	/**
@@ -91,6 +91,7 @@ public class GUImain implements Listener{
 			mySession.register(this, NewMapLoadedNotification.class);
 			mySession.register(this, NewLocationReportNotification.class);
 			mySession.register(this, NewForecastReport.class);
+			//mySession.register(this, ); TODO for loading frame
 	}
 	
 	/**
@@ -116,6 +117,8 @@ public class GUImain implements Listener{
 			NewForecastReport temp = (NewForecastReport) n;
 			mainPanel.addForecastsToMap(temp.getTheReport());
 		}
+		
+		//if(n.getClass() == ) //TODO for loadingFrame
 		
 	}
 	
@@ -467,4 +470,5 @@ public class GUImain implements Listener{
 		
 		mapFrame.setVisible(true);
 	}
+	
 }
