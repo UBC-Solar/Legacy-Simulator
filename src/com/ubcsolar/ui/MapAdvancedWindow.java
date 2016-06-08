@@ -62,6 +62,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import javax.swing.SwingConstants;
+import java.awt.FlowLayout;
  
 
 
@@ -129,7 +130,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		buildDefaultChart();
 		setTitleAndLogo();
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
-		setBounds(100, 100, 538, 395);
+		setBounds(100, 100, 880, 590);
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -165,7 +166,9 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 					 JFrame frame = new LoadingWindow(mySession);
 					 frame.setVisible(true);
-					 parentInstance.loadMap(fc.getSelectedFile());
+					 
+					 parentInstance.loadMap(fc.getSelectedFile()); //main process
+					 
 					 frame.setVisible(false);
 					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 					 Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
@@ -273,7 +276,17 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 						ds,
 						PlotOrientation.VERTICAL, true, true, false);
 		
-		cp = new ChartPanel(elevationChart);
+		cp = new ChartPanel(elevationChart,true,true,true,true,true);
+		//cp.setAutoscrolls(true);
+		//cp.setRefreshBuffer(true);
+		cp.setMouseZoomable(true);
+		cp.setMouseWheelEnabled(true);
+		cp.setFillZoomRectangle(false);
+		cp.setHorizontalAxisTrace(true);
+		//cp.setVerticalAxisTrace(true);
+		//cp.setZoomAroundAnchor(true);
+
+
 	}
 	
 	/** this method is for testing, builds canned dataset. Code developed from 

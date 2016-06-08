@@ -126,7 +126,9 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
 				JFrame frame = new LoadingWindow(mySession);
 				frame.setVisible(true);
-				mySession.getMyWeatherController().downloadNewForecastsForRoute(100);
+				
+				mySession.getMyWeatherController().downloadNewForecastsForRoute(100); //main Process
+				
 				frame.setVisible(false);
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
 				Toolkit.getDefaultToolkit().beep(); // simple alert for end of process

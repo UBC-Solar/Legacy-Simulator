@@ -1,4 +1,4 @@
-package com.ubcsolar.ui;
+			package com.ubcsolar.ui;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -17,7 +17,7 @@ import java.awt.Window.Type;
 import java.awt.Dialog.ModalExclusionType;
 
 
-public  class LoadingWindow extends JFrame  {
+public class LoadingWindow extends JFrame  {
 		
 	private GlobalController mySession ; 
 	
