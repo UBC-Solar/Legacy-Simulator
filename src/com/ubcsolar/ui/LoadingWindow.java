@@ -41,6 +41,6 @@ public class LoadingWindow extends JFrame  {
 	
 	private void setTitleAndLogo() {
 		setIconImage(mySession.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
-		setTitle("Loading");
+		setTitle("Loading. Please wait a moment...");
 	}
 }

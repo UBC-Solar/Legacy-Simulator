@@ -24,7 +24,6 @@ import com.ubcsolar.map.MapController;
 import com.ubcsolar.notification.*;
 import com.ubcsolar.sim.SimController;
 import com.ubcsolar.ui.GUImain;
-import com.ubcsolar.ui.LoadingFrameController;
 import com.ubcsolar.weather.WeatherController;
 
 public class GlobalController {
@@ -36,7 +35,6 @@ public class GlobalController {
 	private SimController mySimController; //the Sim controller
 	private DatabaseController myDatabaseController; //the database controller
 	private WeatherController myWeatherController; //the Weather controller.
-	private LoadingFrameController myLoadingFrameController; //loading frame controller
 	public final ImageIcon iconImage; //the icon for the program
 	private Map<Class<? extends Notification>, List<Listener>> triggerNotifyMap;
 		
@@ -57,8 +55,6 @@ public class GlobalController {
 		myCarController = new CarController(this);
 		mySimController = new SimController(this);
 		myWeatherController = new WeatherController(this);
-		myLoadingFrameController = new LoadingFrameController(this);
-		
 		
 		try {
 			myDatabaseController = new DatabaseController(this);
@@ -194,9 +190,6 @@ public class GlobalController {
 	}
 	public DatabaseController getMyDataBaseController(){
 		return this.myDatabaseController;
-	}
-	public LoadingFrameController getMyLoadingFrameController(){
-		return this.myLoadingFrameController;
 	}
 	
 	/**

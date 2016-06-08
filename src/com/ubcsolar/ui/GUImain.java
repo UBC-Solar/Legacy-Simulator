@@ -52,7 +52,6 @@ public class GUImain implements Listener{
 	private JFrame weatherFrame; //The weather module's 'advanced' options menu
 	private JFrame simFrame; //The sim module's 'advanced' options menu
 	private JPanel loadStatusPanel; //Shows the loaded status of modules at a quick glance
-	private JFrame loadFrame;//The Loading frame when loading a map or forecast or simulation to show a process is being done.
 
 	/**
 	 * Constructor; Creates the application.
@@ -78,9 +77,7 @@ public class GUImain implements Listener{
 		if(this.weatherFrame == null){
 		this.weatherFrame = new WeatherAdvancedWindow(this.mySession, this); //Weather advanced window
 		}
-		if(this.loadFrame==null){
-			this.loadFrame = new LoadingWindow(this.mySession);
-		}
+
 	}
 	
 	/**
@@ -472,25 +469,6 @@ public class GUImain implements Listener{
 		}
 		
 		mapFrame.setVisible(true);
-	}
-	
-	public void lunchLoadFrame(){
-		if(loadFrame == null){ //Shouldn't happen
-			SolarLog.write(LogType.ERROR, System.currentTimeMillis(),
-					"Tried to open the Loading window, but was null");
-			this.buildAllWindows();
-		}
-		
-		loadFrame.setVisible(true);
-	}
-	public void closeLoadFrame(){
-		if(loadFrame == null){ //Shouldn't happen
-			SolarLog.write(LogType.ERROR, System.currentTimeMillis(),
-					"Tried to open the Loading window, but was null");
-			this.buildAllWindows();
-		}
-		
-		loadFrame.setVisible(false);
 	}
 	
 }
