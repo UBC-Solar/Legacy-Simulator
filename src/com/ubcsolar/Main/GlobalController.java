@@ -56,7 +56,6 @@ public class GlobalController {
 		mySimController = new SimController(this);
 		myWeatherController = new WeatherController(this);
 		
-		
 		try {
 			myDatabaseController = new DatabaseController(this);
 		} catch (IOException e) {

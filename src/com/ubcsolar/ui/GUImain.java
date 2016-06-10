@@ -53,7 +53,6 @@ public class GUImain implements Listener{
 	private JFrame simFrame; //The sim module's 'advanced' options menu
 	private JPanel loadStatusPanel; //Shows the loaded status of modules at a quick glance
 
-
 	/**
 	 * Constructor; Creates the application.
 	 */
@@ -67,7 +66,7 @@ public class GUImain implements Listener{
 	 */
 	private void buildAllWindows(){
 		if(this.simFrame == null){
-		this.simFrame = new SimulationAdvancedWindow(this.mySession); //Sim advanced window
+		this.simFrame = new SimulationAdvancedWindow(this.mySession, this); //Sim advanced window
 		}
 		if(this.carFrame == null){
 		this.carFrame = new CarAdvancedWindow(this.mySession); //Car advanced window
@@ -76,8 +75,9 @@ public class GUImain implements Listener{
 		this.mapFrame = new MapAdvancedWindow(this.mySession); //Map advanced window
 		}
 		if(this.weatherFrame == null){
-		this.weatherFrame = new WeatherAdvancedWindow(this.mySession); //Weather advanced window
+		this.weatherFrame = new WeatherAdvancedWindow(this.mySession, this); //Weather advanced window
 		}
+
 	}
 	
 	/**
@@ -91,6 +91,7 @@ public class GUImain implements Listener{
 			mySession.register(this, NewMapLoadedNotification.class);
 			mySession.register(this, NewLocationReportNotification.class);
 			mySession.register(this, NewForecastReport.class);
+			//mySession.register(this, ); TODO for loading frame
 	}
 	
 	/**
@@ -116,6 +117,8 @@ public class GUImain implements Listener{
 			NewForecastReport temp = (NewForecastReport) n;
 			mainPanel.addForecastsToMap(temp.getTheReport());
 		}
+		
+		//if(n.getClass() == ) //TODO for loadingFrame
 		
 	}
 	
@@ -397,23 +400,13 @@ public class GUImain implements Listener{
 		gbc_panel_1.gridy = 0;
 		panel.add(panel_1, gbc_panel_1);
 		
-		mapPanel = new JPanel();
+		mapPanel = new MapPanel(this, mySession);
 		mainFrame.getContentPane().add(mapPanel, "1, 9, fill, fill");
-		mapPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-		
-		JLabel lblMap = new JLabel("Map");
-		mapPanel.add(lblMap);
-		
-		JButton btnAdvanced = new JButton("Advanced");
-		btnAdvanced.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				launchMap();
-			}
-		});
-
-		mapPanel.add(btnAdvanced);
-		register(); //do last, in case a notification is sent before we're done building.
-		
+		mapPanel.validate();
+		mapPanel.repaint();
+		mainFrame.getContentPane().validate();
+		mainFrame.getContentPane().repaint();
+		register();
 		
 		setTitleAndLogo();
 		mainFrame.repaint(); //sometimes the map window button doesn't pop up, hoping this fixes the glitch
@@ -469,12 +462,13 @@ public class GUImain implements Listener{
 	 * launches the Map window
 	 */
 	public void launchMap(){
-			if(mapFrame == null){ //Shouldn't happen
-				SolarLog.write(LogType.ERROR, System.currentTimeMillis(),
-						"Tried to open the Map advanced window, but was null");
-				this.buildAllWindows();
-			}
-			
-			mapFrame.setVisible(true);
+		if(mapFrame == null){ //Shouldn't happen
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(),
+					"Tried to open the Map advanced window, but was null");
+			this.buildAllWindows();
+		}
+		
+		mapFrame.setVisible(true);
 	}
+	
 }
