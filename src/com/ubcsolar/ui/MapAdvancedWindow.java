@@ -125,7 +125,6 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	 */
 	public MapAdvancedWindow(GlobalController toAdd) {
 		mySession = toAdd;
-	//	JFrame loadFrame = new LoadingWindow(this.mySession);
 		register();
 		buildDefaultChart();
 		setTitleAndLogo();

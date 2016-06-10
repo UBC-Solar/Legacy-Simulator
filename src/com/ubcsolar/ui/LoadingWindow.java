@@ -26,7 +26,7 @@ public class LoadingWindow extends JFrame  {
 		
 		this.mySession = toAdd;
 		
-		setBounds(760, 390, 400, 50);
+		setBounds(760, 390, 450, 50);
 		setLocationRelativeTo(null);
 		setTitleAndLogo();
 		
