@@ -2,6 +2,8 @@ package com.ubcsolar.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -45,6 +47,8 @@ import java.util.Map;
 import java.util.Random;
 import java.awt.event.ActionEvent;
 import java.awt.Insets;
+import java.awt.Toolkit;
+
 import javax.swing.JCheckBox;
 import java.awt.FlowLayout;
 import javax.swing.JScrollPane;
@@ -60,6 +64,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private static final String CHART_TITLE = "Sim Results";
 	private JPanel contentPane; //the root content holder
 	private GlobalController mySession; 
+	private GUImain parent; //TODO for loading frame
 	private JFreeChart simResults; //the main chart model.
 	private final String X_AXIS_LABEL = "Distance (km)";
 	private final String Y_AXIS_LABEL = "speed (km/h)";
@@ -88,9 +93,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	/**
 	 * Create the frame.
 	 * @param mySession 
+	 * @param main 
 	 */
-	public SimulationAdvancedWindow(GlobalController mySession) {
-		
+	public SimulationAdvancedWindow(GlobalController mySession, GUImain main) { //TODO for loading frame
+		this.parent = main;// TODO for loading Frame
 		this.mySession = mySession;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 543);
@@ -114,7 +120,15 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		JButton btnNewSimulation = new JButton("New Simulation");
 		btnNewSimulation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
+				JFrame frame = new LoadingWindow(mySession);
+				frame.setVisible(true);
 				runSimultion();
+				frame.setVisible(false);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
+
 			}
 		});
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
@@ -124,7 +138,13 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		chckbxSpeed.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showSpeed = chckbxSpeed.isSelected();
+				
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
+				JFrame frame = new LoadingWindow(mySession);
+				frame.setVisible(true);
 				refreshChart();
+				frame.setVisible(false);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 		chckbxSpeed.setSelected(true);
@@ -135,7 +155,13 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		chckbxSoc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showStateOfCharge = chckbxSoc.isSelected();
+				
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
+				JFrame frame = new LoadingWindow(mySession);
+				frame.setVisible(true);
 				refreshChart();
+				frame.setVisible(false);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 		buttonPanel.add(chckbxSoc);
@@ -147,7 +173,13 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		chckbxCloud.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showCloud = chckbxCloud.isSelected();
+				
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
+				JFrame frame = new LoadingWindow(mySession);
+				frame.setVisible(true);
 				refreshChart();
+				frame.setVisible(false);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 		buttonPanel.add(chckbxCloud);
@@ -157,7 +189,13 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		chckbxElevation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showElevation = chckbxElevation.isSelected();
+
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
+				JFrame frame = new LoadingWindow(mySession);
+				frame.setVisible(true);
 				refreshChart();
+				frame.setVisible(false);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 		buttonPanel.add(chckbxElevation);

@@ -13,7 +13,9 @@ import com.ubcsolar.notification.Notification;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -60,12 +62,20 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import javax.swing.SwingConstants;
+import java.awt.FlowLayout;
  
 
 
 
 public class MapAdvancedWindow extends JFrame implements Listener {
 
+	private int ShowMessageAgain = 0;
+	private static final String WelcomeInfoMessage = "To navigate the plot: \n"
+			+ "-You can zoom in/out using the mouse wheel  or  click and drage in the down-right direction" +"\n"
+			+ "to zoom in the rectangle created." +"\n"
+			+ "-You can move the plot around by holding down CTRL button while dragging around the chart." +"\n"
+			+ "-You can also zoom out to the original view by making the rectangle in direction of up-left." +"\n"
+			+ "\n" + "ENJOY !"; //TODO
 	private JPanel contentPane;
 	private GlobalController mySession;
 	private JLabel lblMapName;
@@ -87,6 +97,14 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	
 	private void handleError(String message){
 		JOptionPane.showMessageDialog(this, message);
+	}
+	
+	private void welcomeInfoDialog() {
+		Object[] options= { "Ok, Thanks" ,  "Don't show this message again" };
+		
+		ShowMessageAgain = JOptionPane.showOptionDialog(this, WelcomeInfoMessage , "Tutorial", JOptionPane.YES_NO_OPTION,
+				JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+
 	}
 	
 	/**
@@ -121,12 +139,14 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	 * @param toAdd - the session to refer to for the controllers, and to register with
 	 */
 	public MapAdvancedWindow(GlobalController toAdd) {
+		
+		
 		mySession = toAdd;
 		register();
 		buildDefaultChart();
 		setTitleAndLogo();
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
-		setBounds(100, 100, 538, 395);
+		setBounds(100, 100, 880, 590);
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -156,7 +176,23 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 				 int returnVal = fc.showOpenDialog(parentInstance);
 				 
 				 if (returnVal == JFileChooser.APPROVE_OPTION) {
-					 parentInstance.loadMap(fc.getSelectedFile());
+					
+				//	 loadFrame and change the cursor type to waiting cursor
+					 
+					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					 JFrame frame = new LoadingWindow(mySession);
+					 frame.setVisible(true);
+					 
+					 parentInstance.loadMap(fc.getSelectedFile()); //main process
+					 
+					 frame.setVisible(false);
+					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					 Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
+					 
+//if in the tutorial dialog box the button "don't show this" is pushed previously, the dialog won't pop up anymore  
+					 if (ShowMessageAgain != 1){
+						 welcomeInfoDialog();
+					 }
 			            
 			        } else {
 			            //cancelled by user, do nothing
@@ -210,6 +246,8 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		
 		}
 	
+
+
 	private void loadMap(File fileToLoad){
 
 		try {
@@ -261,7 +299,17 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 						ds,
 						PlotOrientation.VERTICAL, true, true, false);
 		
-		cp = new ChartPanel(elevationChart);
+		cp = new ChartPanel(elevationChart,true,true,true,true,true);
+		//cp.setAutoscrolls(true);
+		//cp.setRefreshBuffer(true);
+		cp.setMouseZoomable(true);
+		cp.setMouseWheelEnabled(true);
+		cp.setFillZoomRectangle(false);
+		cp.setHorizontalAxisTrace(true);
+		//cp.setVerticalAxisTrace(true);
+		//cp.setZoomAroundAnchor(true);
+
+
 	}
 	
 	/** this method is for testing, builds canned dataset. Code developed from 
@@ -354,7 +402,8 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		ValueAxis axis = plot.getRangeAxis();
 		axis.setLowerBound(minHeight - ((maxHeight - minHeight) * 0.1)); //pad by 10% of the difference
 		axis.setUpperBound(maxHeight + ((maxHeight - minHeight) *  0.1)); //pad by 10% for prettiness
-		
+		plot.setRangePannable(true);
+		plot.setDomainPannable(true);
 		
 		
 		cp.setChart(elevationChart);

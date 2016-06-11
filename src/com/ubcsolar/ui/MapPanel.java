@@ -38,14 +38,6 @@ public class MapPanel extends JPanel implements Listener {
 		
 		JLabel label = new JLabel("Map");
 		panel.add(label);
-		
-		JButton button = new JButton("Advanced");
-		button.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				parent.launchMap();
-			}
-		});
-		panel.add(button);
 
 		
 		JPanel panel_1 = new JPanel();
@@ -73,6 +65,17 @@ public class MapPanel extends JPanel implements Listener {
 		panel_1.add(label_1, gbc_label_1);
 		
 		label_1.setText("NONE");
+		
+		JPanel panel_2 = new JPanel();
+		add(panel_2, BorderLayout.SOUTH);
+		
+		JButton button = new JButton("Advanced");
+		panel_2.add(button);
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				parent.launchMap();
+			}
+		});
 		register(); //do last, in case a notification is sent before we're done building.
 	
 		
