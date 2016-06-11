@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.ubcsolar.common.DataUnit;
 import com.ubcsolar.common.GeoCoord;
@@ -106,7 +107,7 @@ public class CSVDatabase<V extends DataUnit>{
 		File file = new File(filename+".csv");
 		file.getParentFile().mkdirs(); //makes the folder path
 		myFileWriter = new FileWriter(file);
-		writingQueue = new PriorityQueue<String>();
+		writingQueue = new ConcurrentLinkedQueue<String>();
 		this.isDBConnected = true;
 	}
 	
@@ -257,7 +258,7 @@ public class CSVDatabase<V extends DataUnit>{
 	 */
 	public void store(V toStore) throws IOException {
 		if(this.columnTitles == null){ //means headers haven't been printed out yet
-			this.columnTitles = toStore.getCSVHeaderRow();
+			this.columnTitles = toStore.getCSVHeaderRow() + "\r\n";
 			this.writingQueue.add(this.columnTitles);
 		}
 		
