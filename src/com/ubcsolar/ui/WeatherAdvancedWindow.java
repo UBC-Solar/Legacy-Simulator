@@ -335,9 +335,13 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				}
 				
 				boolean stormWarning = false;
-				if(closestForecastNow.nearestStormDistance() < 100 && 
-						closestForecastNow.nearestStormDistance() >= 0){
-					stormWarning = true;
+				FIODataPoint closestCurrently = new FIODataPoint(closestForecast.getCurrently());
+				if(closestForecast.hasCurrently()){
+					
+					if(closestCurrently.nearestStormDistance() < 100 && 
+							closestCurrently.nearestStormDistance() >= 0){
+						stormWarning = true;
+					}
 				}
 				
 				windDirectionLabel.setText("Wind is blowing from: " + windDirection + " (" 
@@ -349,9 +353,9 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 					fogLabel.setText("No fog warning");
 				}
 				if(stormWarning){
-					double stormBearing = closestForecastNow.nearestStormBearing();
+					double stormBearing = closestCurrently.nearestStormBearing();
 					String stormDirection = findDirection(stormBearing);
-					stormLabel.setText("Warning: There's a storm " + closestForecastNow.nearestStormDistance()
+					stormLabel.setText("Warning: There's a storm " + closestCurrently.nearestStormDistance()
 							+ " km to the " + stormDirection + " (" + stormBearing + "°)");
 				}
 				

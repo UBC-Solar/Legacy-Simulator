@@ -204,8 +204,8 @@ public class ForecastIOFactory {
 			dataArrayEntry.add("humidity", humidity);
 			dataArrayEntry.add("windSpeed", windSpeed);
 			dataArrayEntry.add("windBearing", windBearing);
-			dataArrayEntry.add("stormdistance", stormDistance);
-			dataArrayEntry.add("stormBearing", stormBearing);
+			dataArrayEntry.add("nearestStormDistance", stormDistance);
+			dataArrayEntry.add("nearestStormBearing", stormBearing);
 			dataArrayEntry.add("visibility", visibility);
 			dataArrayEntry.add("cloudCover", cloudCover);
 			dataArrayEntry.add("pressure", pressure);
@@ -222,8 +222,8 @@ public class ForecastIOFactory {
 			dataArrayEntry.add("humidity", humidity);
 			dataArrayEntry.add("windSpeed", windSpeed);
 			dataArrayEntry.add("windBearing", windBearing);
-			dataArrayEntry.add("stormdistance", stormDistance);
-			dataArrayEntry.add("stormBearing", stormBearing);
+			dataArrayEntry.add("nearestStormDistance", stormDistance);
+			dataArrayEntry.add("nearestStormBearing", stormBearing);
 			dataArrayEntry.add("visibility", visibility);
 			dataArrayEntry.add("cloudCover", cloudCover);
 			dataArrayEntry.add("pressure", pressure);
@@ -239,8 +239,8 @@ public class ForecastIOFactory {
 			dataArrayEntry.add("humidity", humidity);
 			dataArrayEntry.add("windSpeed", windSpeed);
 			dataArrayEntry.add("windBearing", windBearing);
-			dataArrayEntry.add("stormdistance", stormDistance);
-			dataArrayEntry.add("stormBearing", stormBearing);
+			dataArrayEntry.add("nearestStormDistance", stormDistance);
+			dataArrayEntry.add("nearestStormBearing", stormBearing);
 			dataArrayEntry.add("visibility", visibility);
 			dataArrayEntry.add("cloudCover", cloudCover);
 			dataArrayEntry.add("pressure", pressure);
