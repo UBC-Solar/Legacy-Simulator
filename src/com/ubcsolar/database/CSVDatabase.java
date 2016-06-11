@@ -71,7 +71,7 @@ public class CSVDatabase<V extends DataUnit>{
 			setup(filename.substring(0, filename.length() - 4));
 		}
 		else{	
-		setup(filename);
+			setup(filename);
 		}
 	}
 	
@@ -102,7 +102,10 @@ public class CSVDatabase<V extends DataUnit>{
 		entryCounter = 0; 
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
 				"CSV Database created with name " + filename + ".csv");
-		myFileWriter = new FileWriter(filename + ".csv");
+		System.out.println("FILENAME : " + filename);
+		File file = new File(filename+".csv");
+		file.getParentFile().mkdirs(); //makes the folder path
+		myFileWriter = new FileWriter(file);
 		writingQueue = new PriorityQueue<String>();
 		this.isDBConnected = true;
 	}

@@ -16,7 +16,7 @@ public class ForecastReport extends DataUnit {
 	 */
 	public String getCSVEntry()
 	{
-		return null;
+		return "NOT IMPLEMENTED";
 	}
 	
 	/**

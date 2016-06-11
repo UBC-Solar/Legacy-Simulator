@@ -8,7 +8,9 @@ import com.ubcsolar.notification.DatabaseDisconnectedOrClosed;
 import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
+import com.ubcsolar.notification.NewSimulationReportNotification;
 import com.ubcsolar.notification.NewDataUnitNotification;
+import com.ubcsolar.notification.NewForecastReport;
 import com.ubcsolar.notification.Notification;
 
 import java.io.File;
@@ -37,25 +39,21 @@ public class DatabaseController extends ModuleController {
 	private final String DEFAULT_FOLDER_LOCATION = "Output\\"; //default place to create the database file. (CSVDatabase tries to save to 'output' by default).
 	private final String sessionFolder = "" + System.currentTimeMillis() + "\\";
 	
-	private final CSVDatabase<TelemDataPacket> myCarPacketDatabase;
-	private final CSVDatabase<LocationReport> myLocationUpdateDatabase;
-	private final String simResultsFolderName = DEFAULT_FOLDER_LOCATION + sessionFolder + "simulations";
-	private final List<CSVDatabase<SimulationReport>> mySimulationResultsDB;
-	private final String forecastFolderName = DEFAULT_FOLDER_LOCATION + sessionFolder + "forecasts";
-	private final List<CSVDatabase<ForecastReport>> forecastReportsDB;
-	private final String routesFolderName = DEFAULT_FOLDER_LOCATION + sessionFolder + "Routes";
-	private final List<CSVDatabase<Route>> loadedRoutesDB;
+	
+	String sessionFolderName = this.DEFAULT_FOLDER_LOCATION + this.sessionFolder;
+	private final CSVDatabase<TelemDataPacket> myCarPacketDatabase = new CSVDatabase<TelemDataPacket>(sessionFolderName + "TelemPackets");
+	private final CSVDatabase<LocationReport> myLocationUpdateDatabase = new CSVDatabase<LocationReport>(sessionFolderName + "Location Reports");
+	private final String simResultsFolderName = sessionFolderName + "simulations\\";
+	private final List<CSVDatabase<SimulationReport>> mySimulationResultsDB = new ArrayList<CSVDatabase<SimulationReport>>();
+	private final String forecastFolderName = sessionFolderName + "forecasts\\";
+	private final List<CSVDatabase<ForecastReport>> forecastReportsDB = new ArrayList<CSVDatabase<ForecastReport>>();
+	private final String routesFolderName = sessionFolderName + "Routes\\";
+	private final List<CSVDatabase<Route>> loadedRoutesDB = new ArrayList<CSVDatabase<Route>>();
 	
 
 	
 	public DatabaseController(GlobalController myGlobalController)throws IOException {
 		super(myGlobalController);
-		String sessionFolderName = this.DEFAULT_FOLDER_LOCATION + this.sessionFolder;
-		myCarPacketDatabase = new CSVDatabase<TelemDataPacket>(sessionFolderName);
-		myLocationUpdateDatabase = new CSVDatabase<LocationReport>(sessionFolderName);
-		mySimulationResultsDB = new ArrayList<CSVDatabase<SimulationReport>>();
-		forecastReportsDB = new ArrayList<CSVDatabase<ForecastReport>>();
-		loadedRoutesDB = new ArrayList<CSVDatabase<Route>>();
 	}
 	
   
@@ -101,6 +99,8 @@ public class DatabaseController extends ModuleController {
 		this.mySession.register(this, CarUpdateNotification.class);
 		this.mySession.register(this, NewLocationReportNotification.class);
 		this.mySession.register(this, NewMapLoadedNotification.class);
+		this.mySession.register(this, NewForecastReport.class);
+		this.mySession.register(this, NewSimulationReportNotification.class);
 	}
 	
 	@Override
@@ -108,11 +108,48 @@ public class DatabaseController extends ModuleController {
 		try{
 			if(n instanceof CarUpdateNotification){
 				CarUpdateNotification temp = (CarUpdateNotification) n;
-				
+				this.myCarPacketDatabase.store(temp.getDataPacket());
 			}
-		}
-		catch(Exception e){
+			else if(n instanceof NewLocationReportNotification){
+				NewLocationReportNotification temp = (NewLocationReportNotification) n;
+				this.myLocationUpdateDatabase.store(temp.getCarLocation());
+			}
+			else if(n instanceof NewMapLoadedNotification){
+				NewMapLoadedNotification temp = (NewMapLoadedNotification) n;
+				CSVDatabase<Route> toAdd;
+				toAdd = new CSVDatabase<Route>(this.routesFolderName+System.currentTimeMillis()); //name should be unique
+				toAdd.store(temp.getRoute());
+				this.loadedRoutesDB.add(toAdd);
+			}
+			else if(n instanceof NewMapLoadedNotification){
+				NewMapLoadedNotification temp = (NewMapLoadedNotification) n;
+				CSVDatabase<Route> toAdd;
+				toAdd = new CSVDatabase<Route>(this.routesFolderName+System.currentTimeMillis()); //name should be unique
+				toAdd.store(temp.getRoute());
+				this.loadedRoutesDB.add(toAdd);
+			}
+			else if(n instanceof NewForecastReport){
+				NewForecastReport temp = (NewForecastReport) n;
+				CSVDatabase<ForecastReport> toAdd;
+				toAdd = new CSVDatabase<ForecastReport>(this.forecastFolderName+System.currentTimeMillis()); //name should be unique
+				toAdd.store(temp.getTheReport());
+				this.forecastReportsDB.add(toAdd);
+			}
 			
+			else if(n instanceof NewSimulationReportNotification){
+				NewSimulationReportNotification temp = (NewSimulationReportNotification) n;
+				CSVDatabase<SimulationReport> toAdd;
+				toAdd = new CSVDatabase<SimulationReport>(this.simResultsFolderName+System.currentTimeMillis()); //name should be unique
+				toAdd.store(temp.getSimReport());
+				this.mySimulationResultsDB.add(toAdd);
+			}
+			
+			
+		}
+		catch(IllegalArgumentException e){
+			e.printStackTrace(); //TODO make it send an errornotification. 
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		
 		
