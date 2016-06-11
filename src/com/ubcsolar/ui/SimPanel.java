@@ -12,14 +12,19 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.notification.NewSimulationReportNotification;
 import com.ubcsolar.notification.Notification;
+import java.awt.Font;
 
 public class SimPanel extends JPanel implements Listener {
 
 	private JPanel panel;
+	private JLabel lblNoSim;
+	private JLabel lblTime;
 	
 	protected GUImain parent;
 	private GlobalController mySession;
@@ -69,6 +74,22 @@ public class SimPanel extends JPanel implements Listener {
 		gbl_panel_3.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel_3.setLayout(gbl_panel_3);
 		
+		lblTime = new JLabel("");
+		GridBagConstraints gbc_lblTime = new GridBagConstraints();
+		gbc_lblTime.insets = new Insets(0, 0, 5, 0);
+		gbc_lblTime.gridx = 0;
+		gbc_lblTime.gridy = 1;
+		panel_3.add(lblTime, gbc_lblTime);
+		
+		lblNoSim = new JLabel("No Simulation Has Run Yet");
+		lblNoSim.setFont(new Font("Tahoma", Font.ITALIC, 11));
+		GridBagConstraints gbc_lblNoSim = new GridBagConstraints();
+		gbc_lblNoSim.insets = new Insets(0, 0, 5, 0);
+		gbc_lblNoSim.gridx = 0;
+		gbc_lblNoSim.gridy = 3;
+		panel_3.add(lblNoSim, gbc_lblNoSim);
+		
+		
 		JButton btnAdvanced_1 = new JButton("Advanced");
 		GridBagConstraints gbc_btnAdvanced_1 = new GridBagConstraints();
 		gbc_btnAdvanced_1.gridx = 0;
@@ -86,16 +107,24 @@ public class SimPanel extends JPanel implements Listener {
 		parent.launchSim();
 	}
 
+	private void updateAllLabels(String string){
+		lblNoSim.setText("");
+		lblTime.setText("Last run at "+string+" (hr::min::sec)");
+		
+	}
+	
+	
 	@Override
 	public void notify(Notification n) {
-		// TODO Auto-generated method stub
-		
+		if(n.getClass()==NewSimulationReportNotification.class && ((NewSimulationReportNotification) n).getSimReport ().getSimFrames ().size ()>0){
+			updateAllLabels(GlobalValues.hourMinSec.format(n.getTimeCreated()));
+		}
 	}
 
 	@Override
 	public void register() {
-		// TODO Auto-generated method stub
-		
+
+		mySession.register(this, NewSimulationReportNotification.class);
 	}
 	
 }
