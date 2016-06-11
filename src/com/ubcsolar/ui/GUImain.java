@@ -358,53 +358,11 @@ public class GUImain implements Listener{
 		
 		JLabel lblMain = new JLabel("Main");
 		mainPanel.add(lblMain);
-		simPanel = new JPanel();
+		
+		simPanel = new SimPanel(this, mySession);
 		mainFrame.getContentPane().add(simPanel, "1, 7, fill, fill");
 		simPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-		simPanel.setLayout(new BorderLayout(0, 0));
 		
-		JPanel panel = new JPanel();
-		simPanel.add(panel, BorderLayout.NORTH);
-		GridBagLayout gbl_panel = new GridBagLayout();
-		gbl_panel.columnWidths = new int[]{0, 0, 0, 0, 0};
-		gbl_panel.rowHeights = new int[]{0, 0};
-		gbl_panel.columnWeights = new double[]{1.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
-		gbl_panel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
-		panel.setLayout(gbl_panel);
-		
-		JPanel panel_2 = new JPanel();
-		GridBagConstraints gbc_panel_2 = new GridBagConstraints();
-		gbc_panel_2.insets = new Insets(0, 0, 0, 5);
-		gbc_panel_2.fill = GridBagConstraints.BOTH;
-		gbc_panel_2.gridx = 0;
-		gbc_panel_2.gridy = 0;
-		panel.add(panel_2, gbc_panel_2);
-		
-		JLabel lblNewLabel = new JLabel("Sim");
-		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
-		gbc_lblNewLabel.insets = new Insets(0, 0, 0, 5);
-		gbc_lblNewLabel.gridx = 1;
-		gbc_lblNewLabel.gridy = 0;
-		panel.add(lblNewLabel, gbc_lblNewLabel);
-		
-		JButton btnAdvanced_1 = new JButton("Advanced");
-		btnAdvanced_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				launchSim();
-			}
-		});
-		GridBagConstraints gbc_btnAdvanced_1 = new GridBagConstraints();
-		gbc_btnAdvanced_1.insets = new Insets(0, 0, 0, 5);
-		gbc_btnAdvanced_1.gridx = 2;
-		gbc_btnAdvanced_1.gridy = 0;
-		panel.add(btnAdvanced_1, gbc_btnAdvanced_1);
-		
-		JPanel panel_1 = new JPanel();
-		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
-		gbc_panel_1.fill = GridBagConstraints.BOTH;
-		gbc_panel_1.gridx = 3;
-		gbc_panel_1.gridy = 0;
-		panel.add(panel_1, gbc_panel_1);
 		
 		mapPanel = new MapPanel(this, mySession);
 		mainFrame.getContentPane().add(mapPanel, "1, 9, fill, fill");
