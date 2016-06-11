@@ -19,6 +19,7 @@ import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.notification.NewSimulationReportNotification;
 import com.ubcsolar.notification.Notification;
 import java.awt.Font;
+import javax.swing.SwingConstants;
 
 public class SimPanel extends JPanel implements Listener {
 
@@ -69,9 +70,9 @@ public class SimPanel extends JPanel implements Listener {
 		add(panel_3, BorderLayout.CENTER);
 		GridBagLayout gbl_panel_3 = new GridBagLayout();
 		gbl_panel_3.columnWidths = new int[]{0, 0};
-		gbl_panel_3.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_panel_3.rowHeights = new int[]{0, 12, 0, 0, 0, 0, 0, 0, 0};
 		gbl_panel_3.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_panel_3.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_3.rowWeights = new double[]{0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel_3.setLayout(gbl_panel_3);
 		
 		lblTime = new JLabel("");
@@ -89,12 +90,16 @@ public class SimPanel extends JPanel implements Listener {
 		gbc_lblNoSim.gridy = 3;
 		panel_3.add(lblNoSim, gbc_lblNoSim);
 		
+		JPanel panel_4 = new JPanel();
+		GridBagConstraints gbc_panel_4 = new GridBagConstraints();
+		gbc_panel_4.fill = GridBagConstraints.BOTH;
+		gbc_panel_4.gridx = 0;
+		gbc_panel_4.gridy = 7;
+		panel_3.add(panel_4, gbc_panel_4);
+		
 		
 		JButton btnAdvanced_1 = new JButton("Advanced");
-		GridBagConstraints gbc_btnAdvanced_1 = new GridBagConstraints();
-		gbc_btnAdvanced_1.gridx = 0;
-		gbc_btnAdvanced_1.gridy = 7;
-		panel_3.add(btnAdvanced_1, gbc_btnAdvanced_1);
+		panel_4.add(btnAdvanced_1);
 		btnAdvanced_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				launchSim();
