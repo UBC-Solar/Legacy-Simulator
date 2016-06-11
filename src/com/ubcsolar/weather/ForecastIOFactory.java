@@ -21,6 +21,9 @@ public class ForecastIOFactory {
 	private double windSpeed = 0;
 	private double windBearing = 0;
 	private double cloudCover = 0;
+	private double stormBearing =0;
+	private double stormDistance =0;
+
 	
 	//fixed
 	private String timezone = "AMERICA";
@@ -59,6 +62,16 @@ public class ForecastIOFactory {
 	
 	public ForecastIOFactory humidity(double humidity){
 		this.humidity = humidity;
+		return this;
+	}
+	
+	public ForecastIOFactory stormDistance (double stormDistance ){
+		this.stormDistance = stormDistance;
+		return this;
+	}
+	
+	public ForecastIOFactory stormBearing (double stormBearing ){
+		this.stormBearing = stormBearing;
 		return this;
 	}
 	
@@ -114,7 +127,7 @@ public class ForecastIOFactory {
 		
 		JsonArray dailyArray = new JsonArray();
 		JsonObject dailyDataPoint = buildDataArrayEntry("daily");
-		for(int i = 0; i < NUM_HOURS_NEEDED; i++){
+		for(int i = 0; i < NUM_HOURS_NEEDED; i++){ // TODO, why is it no. of hours? why not days?
 			dailyArray.add(dailyDataPoint);
 		}
 		dailyForecast.add("data", dailyArray);
@@ -191,6 +204,8 @@ public class ForecastIOFactory {
 			dataArrayEntry.add("humidity", humidity);
 			dataArrayEntry.add("windSpeed", windSpeed);
 			dataArrayEntry.add("windBearing", windBearing);
+			dataArrayEntry.add("stormdistance", stormDistance);
+			dataArrayEntry.add("stormBearing", stormBearing);
 			dataArrayEntry.add("visibility", visibility);
 			dataArrayEntry.add("cloudCover", cloudCover);
 			dataArrayEntry.add("pressure", pressure);
@@ -207,6 +222,8 @@ public class ForecastIOFactory {
 			dataArrayEntry.add("humidity", humidity);
 			dataArrayEntry.add("windSpeed", windSpeed);
 			dataArrayEntry.add("windBearing", windBearing);
+			dataArrayEntry.add("stormdistance", stormDistance);
+			dataArrayEntry.add("stormBearing", stormBearing);
 			dataArrayEntry.add("visibility", visibility);
 			dataArrayEntry.add("cloudCover", cloudCover);
 			dataArrayEntry.add("pressure", pressure);
@@ -222,6 +239,8 @@ public class ForecastIOFactory {
 			dataArrayEntry.add("humidity", humidity);
 			dataArrayEntry.add("windSpeed", windSpeed);
 			dataArrayEntry.add("windBearing", windBearing);
+			dataArrayEntry.add("stormdistance", stormDistance);
+			dataArrayEntry.add("stormBearing", stormBearing);
 			dataArrayEntry.add("visibility", visibility);
 			dataArrayEntry.add("cloudCover", cloudCover);
 			dataArrayEntry.add("pressure", pressure);

@@ -409,7 +409,7 @@ public class FakeForecastAddWindow extends JFrame{
 		
 		factory.location(location).cloudCover(cldCover).dewPoint(dewPoint).humidity(humidity).
 			precipProb(precipProb).precipType(precipType).temperature(temp).windBearing(windBearing).
-			windSpeed(windSpeed);
+			windSpeed(windSpeed).stormBearing(strmBearing).stormDistance(strmDistance);
 		
 		ForecastIO forecast = factory.build();
 		return forecast;

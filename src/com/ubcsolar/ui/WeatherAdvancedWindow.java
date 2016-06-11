@@ -317,7 +317,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 					}					
 				}
 				FIODataBlock closestHourly = new FIODataBlock(closestForecast.getHourly());
-				FIODataPoint closestForecastNow = closestHourly.datapoint(0);
+				FIODataPoint closestForecastNow = closestHourly.datapoint(0); //TODO need to do something about the STORM because storm seems to be only in CURRENTLY forecast
 				FIODataBlock nextHourly;
 				if(nextForecastExists){
 					nextHourly = new FIODataBlock(nextForecast.getHourly());
