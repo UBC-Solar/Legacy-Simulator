@@ -378,7 +378,8 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		ValueAxis axis = plot.getRangeAxis();
 		axis.setLowerBound(minHeight - ((maxHeight - minHeight) * 0.1)); //pad by 10% of the difference
 		axis.setUpperBound(maxHeight + ((maxHeight - minHeight) *  0.1)); //pad by 10% for prettiness
-		
+		plot.setRangePannable(true);
+		plot.setDomainPannable(true);
 		
 		
 		cp.setChart(elevationChart);
