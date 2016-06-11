@@ -25,8 +25,8 @@ public class CSVDatabaseTest {
 	
 	//Also, the NULL telemdatapackets might fail if they get loaded back with empty maps instead 
 	//of null. Will have to update the tests when that happens. 
-	CSVDatabase toTest;
-	CSVDatabase toTestTwo;
+	CSVDatabase<TelemDataPacket> toTest;
+	CSVDatabase<TelemDataPacket> toTestTwo;
 	String defaultColumnTitles = "hi, test";
 	//======================SETTING UP THE TESTS=========================
 	
@@ -37,7 +37,7 @@ public class CSVDatabaseTest {
 			//force it to take at least one ms before creating next DB
 			//to guarantee a new DB name
 		}
-		toTest = new CSVDatabase();
+		toTest = new CSVDatabase<TelemDataPacket>();
 		
 		for(int i = 0; i<10000; i++){
 			//force it to take at least one ms before creating next DB
@@ -76,7 +76,7 @@ public class CSVDatabaseTest {
 	 */
 	@Test
 	public void constructorWithStringShouldMakeName() throws IOException{
-		CSVDatabase test = new CSVDatabase("Output\\hello", defaultColumnTitles);
+		CSVDatabase<TelemDataPacket> test = new CSVDatabase<TelemDataPacket>("Output\\hello");
 		File theFile = new File("Output\\hello.csv");
 		assertTrue(theFile.exists());
 	}
@@ -95,12 +95,12 @@ public class CSVDatabaseTest {
 		CSVDatabase smallToTest = null;
 		String name = ""+System.currentTimeMillis();
 		try {
-			smallToTest = new CSVDatabase(name, defaultColumnTitles);
+			smallToTest = new CSVDatabase(name);
 		} catch (IOException e) {fail("Should not have gotten exception here");}
 		
 		smallToTest.saveAndDisconnect();
 		
-		CSVDatabase two = new CSVDatabase(name, defaultColumnTitles); //should throw exception here; trying to create one with same name. 
+		CSVDatabase two = new CSVDatabase(name); //should throw exception here; trying to create one with same name. 
 		
 	}
 	/*
@@ -116,10 +116,10 @@ public class CSVDatabaseTest {
 		CSVDatabase smallToTest = null;
 		String name = ""+System.currentTimeMillis();
 		try {
-			smallToTest = new CSVDatabase(name, defaultColumnTitles);
+			smallToTest = new CSVDatabase(name);
 		} catch (IOException e) {fail("Should not have gotten exception here");}
 		
-		CSVDatabase two = new CSVDatabase(name, defaultColumnTitles); //should throw exception here; trying to create one with same name. 
+		CSVDatabase two = new CSVDatabase(name); //should throw exception here; trying to create one with same name. 
 		
 	}
 	/*
@@ -131,7 +131,7 @@ public class CSVDatabaseTest {
 		try{
 			tearDown();
 		}catch(IOException e){fail("Should not have gotten exception here");}
-		this.toTest = new CSVDatabase("", defaultColumnTitles);
+		this.toTest = new CSVDatabase("");
 	}
 	
 	/*
@@ -146,7 +146,7 @@ public class CSVDatabaseTest {
 			tearDown();
 		}catch(IOException e){fail("Should not have gotten exception here");}
 		File testFile = new File("null.csv");
-		try{this.toTest = new CSVDatabase(null, defaultColumnTitles);}
+		try{this.toTest = new CSVDatabase(null);}
 		catch(IOException e){
 			throw e;
 		}
@@ -164,7 +164,7 @@ public class CSVDatabaseTest {
 			tearDown();
 		}catch(IOException e){fail("Should not have gotten exception here");}
 		try {
-			this.toTest = new CSVDatabase("test.csv", defaultColumnTitles);
+			this.toTest = new CSVDatabase("test.csv");
 		} catch(IOException e){fail("Should not have gotten exception here");}
 		
 		File temp = new File("test.csv.csv");
@@ -181,7 +181,7 @@ public class CSVDatabaseTest {
 		try{
 			tearDown();
 		}catch(IOException e){fail("Should not have gotten exception here");}
-		this.toTest = new CSVDatabase("something*.csv", defaultColumnTitles);
+		this.toTest = new CSVDatabase("something*.csv");
 	}
 		
 	//================isConnected() tests ============================
@@ -326,11 +326,11 @@ public class CSVDatabaseTest {
 	 *  call it after they load in their test data.  
 	 */
 	private void testZeroAndNegativeInputsShouldGiveSizeZeroLists(CSVDatabase toCheck){
-		assertTrue(toCheck.getLastTelemDataPacket(-1) != null);
-		assertTrue(toCheck.getLastTelemDataPacket(-1).size() == 0);
-		assertTrue(toCheck.getLastTelemDataPacket(0) != null);
-		assertTrue(toCheck.getLastTelemDataPacket(0).size() == 0);
-		assertTrue(toCheck.getLastTelemDataPacket(1) != null);
+		assertTrue(toCheck.getLast(-1) != null);
+		assertTrue(toCheck.getLast(-1).size() == 0);
+		assertTrue(toCheck.getLast(0) != null);
+		assertTrue(toCheck.getLast(0).size() == 0);
+		assertTrue(toCheck.getLast(1) != null);
 		// we can't know what this result will be, commented out.
 		//assertTrue(toTest.getLastTelemDataPacket(0).size() == 0);
 	}
@@ -341,7 +341,7 @@ public class CSVDatabaseTest {
 	@Test
 	public void shouldNotGetErrorIfGiveNegatives(){
 		try{
-			toTest.getLastTelemDataPacket(-1);
+			toTest.getLast(-1);
 		}catch(Exception e){
 			fail("Threw " + e.getClass());
 		}
@@ -354,7 +354,7 @@ public class CSVDatabaseTest {
 	public void emptyDataBaseShouldGiveEmptyListNoMatterArgs(){
 		this.testZeroAndNegativeInputsShouldGiveSizeZeroLists(this.toTest);
 		ArrayList<TelemDataPacket> returnedList;
-		returnedList = this.toTest.getLastTelemDataPacket(25);
+		returnedList = this.toTest.getLast(25);
 		assertTrue(returnedList != null && returnedList.size() == 0);
 	}
 	
@@ -369,11 +369,11 @@ public class CSVDatabaseTest {
 		this.toTest.store(testingPacket);
 		this.testZeroAndNegativeInputsShouldGiveSizeZeroLists(toTest);
 		
-		assertTrue(this.toTest.getLastTelemDataPacket(1).size() == 1);
-		assertTrue(this.toTest.getLastTelemDataPacket(1).get(0).equals(testingPacket));
+		assertTrue(this.toTest.getLast(1).size() == 1);
+		assertTrue(this.toTest.getLast(1).get(0).equals(testingPacket));
 		//if asking for more, just return all
-		assertTrue(this.toTest.getLastTelemDataPacket(2).size() == 1);
-		assertTrue(this.toTest.getLastTelemDataPacket(2).get(0).equals(testingPacket));
+		assertTrue(this.toTest.getLast(2).size() == 1);
+		assertTrue(this.toTest.getLast(2).get(0).equals(testingPacket));
 	}
 	
 	/*
@@ -390,16 +390,16 @@ public class CSVDatabaseTest {
 		this.toTest.store(secondTestingPacket);
 		this.testZeroAndNegativeInputsShouldGiveSizeZeroLists(toTest);
 		
-		assertTrue(this.toTest.getLastTelemDataPacket(1).size() == 1);
-		assertTrue(this.toTest.getLastTelemDataPacket(1).get(0).equals(secondTestingPacket));
+		assertTrue(this.toTest.getLast(1).size() == 1);
+		assertTrue(this.toTest.getLast(1).get(0).equals(secondTestingPacket));
 		
-		assertTrue(this.toTest.getLastTelemDataPacket(2).size() == 2);
-		assertTrue(this.toTest.getLastTelemDataPacket(2).get(0).equals(testingPacket));
-		assertTrue(this.toTest.getLastTelemDataPacket(2).get(1).equals(secondTestingPacket));
+		assertTrue(this.toTest.getLast(2).size() == 2);
+		assertTrue(this.toTest.getLast(2).get(0).equals(testingPacket));
+		assertTrue(this.toTest.getLast(2).get(1).equals(secondTestingPacket));
 		
-		assertTrue(this.toTest.getLastTelemDataPacket(3).size() == 2);
-		assertTrue(this.toTest.getLastTelemDataPacket(3).get(0).equals(testingPacket));
-		assertTrue(this.toTest.getLastTelemDataPacket(3).get(1).equals(secondTestingPacket));
+		assertTrue(this.toTest.getLast(3).size() == 2);
+		assertTrue(this.toTest.getLast(3).get(0).equals(testingPacket));
+		assertTrue(this.toTest.getLast(3).get(1).equals(secondTestingPacket));
 	}
 	
 	/*
@@ -430,7 +430,7 @@ public class CSVDatabaseTest {
 		this.toTest.store(packets.get(5));
 		this.testZeroAndNegativeInputsShouldGiveSizeZeroLists(toTest);
 		
-		ArrayList<TelemDataPacket> returned = toTest.getLastTelemDataPacket(3);
+		ArrayList<TelemDataPacket> returned = toTest.getLast(3);
 		
 		assertTrue(returned.size() == 3);
 		assertTrue(returned.get(0).equals(packets.get(0)));
@@ -450,7 +450,7 @@ public class CSVDatabaseTest {
 		testZeroAndNegativeInputsShouldGiveSizeZeroLists(toTest);
 		
 		try{
-			ArrayList<TelemDataPacket> returned = toTest.getLastTelemDataPacket(3);
+			ArrayList<TelemDataPacket> returned = toTest.getLast(3);
 		}catch(Exception e){
 			fail("threw exception pulling out weird-value telemPackets");
 		}
@@ -465,8 +465,8 @@ public class CSVDatabaseTest {
 	 */
 	private void testFutureTimeShouldGiveSizeZeroLists(CSVDatabase toCheck){
 		double futureTime = System.currentTimeMillis() + 1000;
-		assertTrue(toCheck.getAllTelemDataPacketsSince(futureTime) != null);
-		assertTrue(toCheck.getAllTelemDataPacketsSince(futureTime).size() == 0);
+		assertTrue(toCheck.getAllSince(futureTime) != null);
+		assertTrue(toCheck.getAllSince(futureTime).size() == 0);
 	}
 
 	
@@ -478,7 +478,7 @@ public class CSVDatabaseTest {
 	@Test
 	public void getAllSinceNegativeValuesShouldNotThrowException(){
 		try{
-		toTest.getAllTelemDataPacketsSince(-1);
+		toTest.getAllSince(-1);
 		}
 		catch(Exception e){
 			fail("threw an exception");
@@ -492,7 +492,7 @@ public class CSVDatabaseTest {
 	public void getAllSinceEmptyDBShouldGiveNothing(){
 		this.testFutureTimeShouldGiveSizeZeroLists(toTest);
 		assertTrue(
-				this.toTest.getAllTelemDataPacketsSince(System.currentTimeMillis()).size() == 0);
+				this.toTest.getAllSince(System.currentTimeMillis()).size() == 0);
 	}
 	//adding a comment
 	/*
@@ -504,11 +504,11 @@ public class CSVDatabaseTest {
 		TelemDataPacket test = this.generateStandardTelemDataPacket(startTime);
 		toTest.store(test);
 		this.testFutureTimeShouldGiveSizeZeroLists(toTest);
-		ArrayList<TelemDataPacket> theList = toTest.getAllTelemDataPacketsSince(startTime-3);
+		ArrayList<TelemDataPacket> theList = toTest.getAllSince(startTime-3);
 		assertTrue(theList.size() == 1);
 		assertTrue(theList.get(0).equals(test));
 		
-		ArrayList<TelemDataPacket> theOtherList = toTest.getAllTelemDataPacketsSince(startTime + 3);
+		ArrayList<TelemDataPacket> theOtherList = toTest.getAllSince(startTime + 3);
 		assertTrue(theOtherList.size() == 0);
 	}
 	
@@ -524,16 +524,16 @@ public class CSVDatabaseTest {
 		toTest.store(testTwo);
 		toTest.store(testThree);
 		this.testFutureTimeShouldGiveSizeZeroLists(toTest);
-		ArrayList<TelemDataPacket> theList = toTest.getAllTelemDataPacketsSince(testThree.getTimeCreated()-1);
+		ArrayList<TelemDataPacket> theList = toTest.getAllSince(testThree.getTimeCreated()-1);
 		assertTrue("Should be size 1, is" + theList.size(),theList.size() == 1);
 		assertTrue(theList.get(0).equals(testThree));
 		
-		theList = toTest.getAllTelemDataPacketsSince(testTwo.getTimeCreated()-1);
+		theList = toTest.getAllSince(testTwo.getTimeCreated()-1);
 		assertTrue(theList.size() == 2);
 		assertTrue(theList.get(0).equals(testTwo));
 		assertTrue(theList.get(1).equals(testThree));
 		
-		theList = toTest.getAllTelemDataPacketsSince(testOne.getTimeCreated()-1);
+		theList = toTest.getAllSince(testOne.getTimeCreated()-1);
 		assertTrue(theList.size() == 3);
 		assertTrue(theList.get(0).equals(testOne));
 		assertTrue(theList.get(1).equals(testTwo));
@@ -556,16 +556,16 @@ public class CSVDatabaseTest {
 		toTest.store(testOne);
 		
 		this.testFutureTimeShouldGiveSizeZeroLists(toTest);
-		ArrayList<TelemDataPacket> theList = toTest.getAllTelemDataPacketsSince(testThree.getTimeCreated()-1);
+		ArrayList<TelemDataPacket> theList = toTest.getAllSince(testThree.getTimeCreated()-1);
 		assertTrue(theList.size() == 1);
 		assertTrue(theList.get(0).equals(testThree));
 		
-		theList = toTest.getAllTelemDataPacketsSince(testTwo.getTimeCreated()-1);
+		theList = toTest.getAllSince(testTwo.getTimeCreated()-1);
 		assertTrue(theList.size() == 2);
 		assertTrue(theList.get(0).equals(testTwo));
 		assertTrue(theList.get(1).equals(testThree));
 		
-		theList = toTest.getAllTelemDataPacketsSince(testOne.getTimeCreated()-1);
+		theList = toTest.getAllSince(testOne.getTimeCreated()-1);
 		assertTrue(theList.size() == 3);
 		assertTrue(theList.get(0).equals(testOne));
 		assertTrue(theList.get(1).equals(testTwo));
@@ -583,7 +583,7 @@ public class CSVDatabaseTest {
 		testZeroAndNegativeInputsShouldGiveSizeZeroLists(toTest);
 		
 		try{
-			ArrayList<TelemDataPacket> returned = toTest.getAllTelemDataPacketsSince(startTime);
+			ArrayList<TelemDataPacket> returned = toTest.getAllSince(startTime);
 		}catch(Exception e){
 			fail("threw exception pulling out weird-value telemPackets");
 		}
@@ -596,8 +596,8 @@ public class CSVDatabaseTest {
 	 */
 	@Test
 	public void emptyDBShouldGiveEmptyList(){
-		assertTrue(toTest.getAllTelemDataPacket() != null);
-		assertTrue(toTest.getAllTelemDataPacket().size() == 0);
+		assertTrue(toTest.getAll() != null);
+		assertTrue(toTest.getAll().size() == 0);
 	}
 	
 	/*
@@ -608,9 +608,9 @@ public class CSVDatabaseTest {
 	public void dbWithOneShouldGIveListSizeOne() throws IOException{
 		TelemDataPacket testPacket = this.generateStandardTelemDataPacket();
 		toTest.store(testPacket);
-		assertTrue(toTest.getAllTelemDataPacket() != null);
-		assertTrue(toTest.getAllTelemDataPacket().size() == 1);
-		assertTrue(toTest.getAllTelemDataPacket().get(0).equals(testPacket));
+		assertTrue(toTest.getAll() != null);
+		assertTrue(toTest.getAll().size() == 1);
+		assertTrue(toTest.getAll().get(0).equals(testPacket));
 	}
 	
 	/*
@@ -623,7 +623,7 @@ public class CSVDatabaseTest {
 			toTest.store(this.generateStandardTelemDataPacket());
 		}
 		
-		assertTrue(toTest.getAllTelemDataPacket().size() == number);
+		assertTrue(toTest.getAll().size() == number);
 		
 		
 	}
@@ -639,7 +639,7 @@ public class CSVDatabaseTest {
 		testZeroAndNegativeInputsShouldGiveSizeZeroLists(toTest);
 		
 		try{
-			ArrayList<TelemDataPacket> returned = toTest.getAllTelemDataPacket();
+			ArrayList<TelemDataPacket> returned = toTest.getAll();
 		}catch(Exception e){
 			fail("threw exception pulling out weird-value telemPackets");
 		}
@@ -667,7 +667,7 @@ public class CSVDatabaseTest {
 		toTest.store(testValues.get(1));
 		
 		
-		ArrayList<TelemDataPacket> returnedValues = toTest.getAllTelemDataPacket();
+		ArrayList<TelemDataPacket> returnedValues = toTest.getAll();
 		assertTrue(returnedValues.size() == 4);
 		assertTrue(returnedValues.get(0).equals(testValues.get(1)));
 		assertTrue(returnedValues.get(1).equals(testValues.get(2)));
@@ -681,23 +681,23 @@ public class CSVDatabaseTest {
 	public void givingCreatedTimeShouldGetBackProperPacket() throws IOException{
 		TelemDataPacket toStore = this.generateStandardTelemDataPacket();
 		toTest.store(toStore);
-		TelemDataPacket gotBack = (TelemDataPacket) toTest.getTelemDataPacket("" + toStore.getTimeCreated());
+		TelemDataPacket gotBack = (TelemDataPacket) toTest.getDataUnit("" + toStore.getTimeCreated());
 		assertTrue(gotBack.equals(toStore));
 	}
 	
 	@Test
 	public void givingNonexistentKeyShouldReturnNull(){
-		assertTrue(toTest.getTelemDataPacket("" + System.currentTimeMillis()) == null);
+		assertTrue(toTest.getDataUnit("" + System.currentTimeMillis()) == null);
 	}
 	
 	@Test
 	public void givingEmptyKeyShouldReturnNull(){
-		assertTrue(toTest.getTelemDataPacket("") == null);
+		assertTrue(toTest.getDataUnit("") == null);
 	}
 	@Test
 	public void givingBadlyFormattedKeyShouldReturnNull(){
 		try{
-		assertTrue(toTest.getTelemDataPacket("4dfNotADouble") == null);
+		assertTrue(toTest.getDataUnit("4dfNotADouble") == null);
 		}catch(NumberFormatException e){
 			fail("Threw a casting exception");
 		}

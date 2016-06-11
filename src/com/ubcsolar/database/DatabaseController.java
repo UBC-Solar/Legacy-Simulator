@@ -32,42 +32,33 @@ public class DatabaseController extends ModuleController {
  * 
  * I'll leave the more abstract ones commented out until we decide to implement them. 
  */
-	private final String carPacketColumnNames = TelemDataPacket.classCSVHeaderRow;
-	private final String locationUpdateColumnNames = LocationReport.classCSVHeaderRow;
-	private final String printingRouteColumnNames = Route.classCSVHeaderRow;
 	
-	//Added a queue to do asynchronous writes to the permanent storage. 
-	//NOTE: Currently string, but will probably change this
-	//when I actually implement a database (could be a SQL query). 
-	Database myCarPacketDatabase;
-	Database myLocationUpdateDatabase;
 	String databaseName;
-	private final String DEFAULT_FOLDER_LOCATION = "Output"; //default place to create the database file. (CSVDatabase tries to save to 'output' by default).
+	private final String DEFAULT_FOLDER_LOCATION = "Output\\"; //default place to create the database file. (CSVDatabase tries to save to 'output' by default).
+	private final String sessionFolder = "" + System.currentTimeMillis() + "\\";
+	
+	private final CSVDatabase<TelemDataPacket> myCarPacketDatabase;
+	private final CSVDatabase<LocationReport> myLocationUpdateDatabase;
+	private final String simResultsFolderName = DEFAULT_FOLDER_LOCATION + sessionFolder + "simulations";
+	private final List<CSVDatabase<SimulationReport>> mySimulationResultsDB;
+	private final String forecastFolderName = DEFAULT_FOLDER_LOCATION + sessionFolder + "forecasts";
+	private final List<CSVDatabase<ForecastReport>> forecastReportsDB;
+	private final String routesFolderName = DEFAULT_FOLDER_LOCATION + sessionFolder + "Routes";
+	private final List<CSVDatabase<Route>> loadedRoutesDB;
+	
+
 	
 	public DatabaseController(GlobalController myGlobalController)throws IOException {
 		super(myGlobalController);
-		buildNewDatabase();
+		String sessionFolderName = this.DEFAULT_FOLDER_LOCATION + this.sessionFolder;
+		myCarPacketDatabase = new CSVDatabase<TelemDataPacket>(sessionFolderName);
+		myLocationUpdateDatabase = new CSVDatabase<LocationReport>(sessionFolderName);
+		mySimulationResultsDB = new ArrayList<CSVDatabase<SimulationReport>>();
+		forecastReportsDB = new ArrayList<CSVDatabase<ForecastReport>>();
+		loadedRoutesDB = new ArrayList<CSVDatabase<Route>>();
 	}
 	
-  /**
-   * This method used to build the connection to the database.
-   * Could probably do some work here so that we could specify the database type. 
-   * @throws IOException
-   */
-	public void buildNewDatabase() throws IOException{
-		if(myCarPacketDatabase != null && myCarPacketDatabase.isConnected()){
-			myCarPacketDatabase.saveAndDisconnect();
-		}
-		File testForExistence = new File(DEFAULT_FOLDER_LOCATION);
-		if(!testForExistence.exists() || !testForExistence.isDirectory()){
-			testForExistence.mkdir();
-		}
-		String time = "" + System.currentTimeMillis();
-		myCarPacketDatabase = new CSVDatabase("Output\\" + time + "-CarPacketSystem", carPacketColumnNames);
-		myLocationUpdateDatabase = new CSVDatabase("Output\\" + time + "-locationUpdates", locationUpdateColumnNames);
-		databaseName = ".csv"; //Just want to identify the type of DB (i.e csv vs SQL, etc.) It will already have the time created. 
-		this.mySession.sendNotification(new DatabaseCreatedOrConnectedNotification(databaseName));
-	}
+  
 	
 	public boolean isDBConnected(){
 		if(myCarPacketDatabase == null){
@@ -110,91 +101,26 @@ public class DatabaseController extends ModuleController {
 		this.mySession.register(this, CarUpdateNotification.class);
 		this.mySession.register(this, NewLocationReportNotification.class);
 		this.mySession.register(this, NewMapLoadedNotification.class);
-
 	}
 	
 	@Override
 	public void notify(Notification n) {
-		try {
-		if(n.getClass() == CarUpdateNotification.class){
-			
-				store(((CarUpdateNotification) n).getDataUnit());
-				//TODO add 'store' methods that are more concrete. 
-				return; //otherwise we get double entries with the fail-safe data-unit catch. 
-			
-		}
-		//This was when the Register/Notify system could handle extended notifications. 
-		//(i.e would know that a newTelemDataPacket is also a NewDataUnitNotification)
-		//Left in here as a failsafe, but should be using only concrete classes. 
-		if(n instanceof NewDataUnitNotification){
-			store(((NewDataUnitNotification) n).getDataUnit());
-		}
-		
-		
-		} catch (IOException e) {
-			this.mySession.sendNotification(new ExceptionNotification(e, "Error storing lastest data unit"));
-			e.printStackTrace();
-		}
-		
-		if(n.getClass() == NewMapLoadedNotification.class){
-			n = (NewMapLoadedNotification) n;
-			try {
-				Database route = new CSVDatabase("Output\\" + "new_route - " + System.currentTimeMillis(), printingRouteColumnNames);
-				route.writeRoute(((NewMapLoadedNotification) n).getRoute());
-				route.flushAndSave();
-			} catch (IOException e) {
-				this.mySession.sendNotification(new ExceptionNotification(e, "failed at saving route"));
-				e.printStackTrace();
+		try{
+			if(n instanceof CarUpdateNotification){
+				CarUpdateNotification temp = (CarUpdateNotification) n;
+				
 			}
 		}
-
-	}
-	
-
-	public void store(DataUnit toStore) throws IOException{
-		//call stuff
-		if(toStore.getClass() == TelemDataPacket.class){
-			this.myCarPacketDatabase.store(toStore);
+		catch(Exception e){
+			
 		}
-		if(toStore.getClass() == LocationReport.class){
-			this.myLocationUpdateDatabase.store(toStore);
-		}
+		
+		
 	}
+
 	
-	public void store(TelemDataPacket toStore) throws IOException{
-		this.myCarPacketDatabase.store(toStore);
-	}
-	/* save until we implement LatLongs. 
-	public void store(LatLong toStore) throws IOException{
-		this.myDatabase.store(toStore);
-	}*/
-	
-	/**
-	 * Returns all current data units of type X. 
-	 *  
-	 * @return
-	 *//*
-	public <X> ArrayList<X> getAll(){
-		//TODO implement this
-		return null;
-	}*/
-	
-	
-	
-	/**
-	 * This list may be updated a new dataunits come in, but no guarantees 
-	 * made based on time.
-	 * @return
-	 *//*
-	public <X> ProtectedList<X> getAllUpdating(){
-		//TODO implement me. Should just be a case of building the protectedList. 
-		return null;
-	}*/
-	
-	public ArrayList<TelemDataPacket> getAllTelemDataPacket(){
-		//TODO implement me
-		return null;
-	}
+
+
 	
 	
 	/**

@@ -25,7 +25,7 @@ import com.ubcsolar.common.Route;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.TelemDataPacket;
 
-public class CSVDatabase extends Database {
+public class CSVDatabase<V extends DataUnit>{
 	private Queue<String> writingQueue; //will read from here and then write. 
 	private FileWriter myFileWriter; //used to write. 
 	private int entryCounter; //used to generate primary keys. 
@@ -35,28 +35,24 @@ public class CSVDatabase extends Database {
 	private DateFormat excelDateFormat = new SimpleDateFormat("HH:mm:ss"); //time format. ss = seconds, SSS = ms
 	private boolean isDBConnected = false; //FileWriter didn't seem to have a 'isConnected' or 'isOpen' method. 
 								//this is the workaround. 
-	
-	//This String provides the structure for the csv. 
-	//NOTE: If you change this, change the buildCSVEntryRow method to match.
-	private final String columnTitles;
+	private String columnTitles;
 	
 	//Using this as a kluge until I implement actually reading from the CSV instead of just writing to it. 
-	Map<Double,TelemDataPacket> recallStuff = new HashMap<Double, TelemDataPacket>();
+	private Map<Double,V> recallStuff = new HashMap<Double, V>();
 	//Also a little kludgy, but lets me do the 'last X' method. (not sure how to do that in a map)
-	ArrayList<TelemDataPacket> recallStuffList = new ArrayList<TelemDataPacket>();
+	private ArrayList<V> recallStuffList = new ArrayList<V>();
 	
 	/**
 	 * Constructor; Create and set up database. ALWAYS CREATES A NEW FILE.
 	 * @param filename - filename for the .csv
 	 * @throws IOException - if it can't create the file for some reason. 
 	 */
-	public CSVDatabase(String filename, String columnTitles) throws IOException {
+	public CSVDatabase(String filename) throws IOException {
 		//might as well set it to be "null". Can make a "null.csv". By setting the value
 		//we don't get null pointer exceptions. 
 		if(filename == null){
 			filename = "null";
-		}
-		this.columnTitles = columnTitles;		
+		}	
 		if(filename.length() == 0){
 			throw new IOException("Blank filename is Invalid filename");
 		}
@@ -86,7 +82,6 @@ public class CSVDatabase extends Database {
 	 */
 	public CSVDatabase() throws IOException {
 		File testForExistence = new File("Output");
-		columnTitles = "";//By default, won't have anything.
 		if(testForExistence.exists() && testForExistence.isDirectory()){
 			setup("Output\\"+System.nanoTime()); //pretty much guaranteed to be a unique filename. (unless you're making them faster than 1 per ns
 			//but that is unlikely. 
@@ -110,7 +105,6 @@ public class CSVDatabase extends Database {
 		myFileWriter = new FileWriter(filename + ".csv");
 		writingQueue = new PriorityQueue<String>();
 		this.isDBConnected = true;
-		setUpTables();
 	}
 	
 	/**
@@ -118,16 +112,16 @@ public class CSVDatabase extends Database {
 	 * @param num
 	 * @return
 	 */
-	public ArrayList<TelemDataPacket> getLastTelemDataPacket(int num){
+	public ArrayList<V> getLast(int num){
 		if(num <= 0){
-			return new ArrayList<TelemDataPacket>();
+			return new ArrayList<V>();
 		}
 		
 		if(num >= recallStuffList.size()){
 			num = recallStuffList.size();
 		}
 		
-		ArrayList<TelemDataPacket> temp = new ArrayList<TelemDataPacket>(num); //might as well make it the right size. 
+		ArrayList<V> temp = new ArrayList<V>(num); //might as well make it the right size. 
 		for(int i = (this.recallStuffList.size() - (num)); i<this.recallStuffList.size(); i++){
 			temp.add(this.recallStuffList.get(i));
 		}
@@ -140,14 +134,14 @@ public class CSVDatabase extends Database {
 	 * @param startTime
 	 * @return the ArrayList of all 
 	 */
-	public ArrayList<TelemDataPacket> getAllTelemDataPacketsSince(double startTime){
+	public ArrayList<V> getAllSince(double startTime){
 		
 		int start = findPosOfFirstPktPastTime(startTime, this.recallStuffList);
 		if(start == -1){
-			return new ArrayList<TelemDataPacket>();
+			return new ArrayList<V>();
 		}
 		
-		ArrayList<TelemDataPacket> toReturn = new ArrayList<TelemDataPacket>(this.recallStuffList.size() - start);
+		ArrayList<V> toReturn = new ArrayList<V>(this.recallStuffList.size() - start);
 		for(int i = start; i<this.recallStuffList.size(); i++){
 			toReturn.add(this.recallStuffList.get(i));
 		}
@@ -163,7 +157,7 @@ public class CSVDatabase extends Database {
 	 * @param toSearch
 	 * @return
 	 */
-	private int findPosOfFirstPktPastTime(double startTime, ArrayList<TelemDataPacket> toSearch){
+	private int findPosOfFirstPktPastTime(double startTime, ArrayList<V> toSearch){
 		if(toSearch.size()== 0){
 			return 0;
 		}
@@ -186,8 +180,8 @@ public class CSVDatabase extends Database {
 	 * Returns a COPY of a list of all TelemDataPackets received
 	 * @return
 	 */
-	public ArrayList<TelemDataPacket> getAllTelemDataPacket(){
-		ArrayList<TelemDataPacket> toReturn = new ArrayList<TelemDataPacket>(this.recallStuffList);
+	public ArrayList<V> getAll(){
+		ArrayList<V> toReturn = new ArrayList<V>(this.recallStuffList);
 		return toReturn;
 	}
 	
@@ -206,18 +200,6 @@ public class CSVDatabase extends Database {
 		return toReturn;
 	}
 	
-	/*
-	 * This method is used to generate the queries needed to set up the tables
-	 * in the Database. For this CSV it will just be the column headers. 
-	 */
-	private void setUpTables() throws IOException{
-		//Currently assuming a .csv file
-		writingQueue.add(columnTitles);
-		flushAndSave();
-	}
-	
-	
-
 	/* Commented out until LatLongs introduced
 	 private void store(metar toStore){
 	 }
@@ -253,148 +235,14 @@ public class CSVDatabase extends Database {
 	 * Saves all currently pending packets to the database and closes the fileStream and file. 
 	 * Call before closing the program to ensure proper disconnection. 
 	 */
-	@Override
 	public void saveAndDisconnect() throws IOException {
 		if(isDBConnected){ //gotta make sure we don't mess up the db connected state. 
-							//check is here so multiple calls to 'save and disconnected'
-							//don't throw errors. 
-		flushAndSave();
-		myFileWriter.close();
+			//check is here so multiple calls to 'save and disconnected'
+			//don't throw errors. 
+			flushAndSave();
+			myFileWriter.close();
 		}
 		this.isDBConnected = false; 
-	}
-	
-	/**
-	 * Parse a TelemDataPacket into String that can be written straight to the CSV. 
-	 * @param toStore - the TelemDataPacket to store
-	 * @throws IOException - if there are issues writing it. 
-	 */
-	private void store(TelemDataPacket toStore) throws IOException{
-		//"entry,Time,Speed,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,Pck0Vltg,Pck2Vltg,Pck3Vltg";
-		/*
-		 * right now in this basic implementation, the RAM and the csv
-		 * are two different things, and we don't actually have a way
-		 * of retrieving packets from the .csv, so this 'store' method
-		 * may need to be re-written to accommodate that when it's implemented. 
-		 */
-		TelemDataPacket sanitizedPacket = sanitizeInput(toStore);
-		putIntoRAM(sanitizedPacket);
-		String rowToPrint = sanitizedPacket.getCSVEntry();
-		this.writingQueue.add(rowToPrint);
-		this.flushAndSave();
-				
-	}
-	
-	private void store(LocationReport toStore) throws IOException{
-		//private final String locationUpdateColumnNames = "Time" + "Car" + "Source" + "latitude" + "longitude" + "elevation";
-		System.out.println("Got a location report");
-		String rowToPrint = toStore.getCSVEntry();
-		this.writingQueue.add(rowToPrint);
-		this.flushAndSave();
-	}
-	
-	
-	private String buildCSVEntryRow(LocationReport toStore) {
-		GeoCoord locToAdd = toStore.getLocation();
-		String toPrint = "";
-		toPrint += this.entryCounter + ",";
-		this.entryCounter++;
-		toPrint += actualDateFormat.format(toStore.getTimeCreated()) + ",";
-		toPrint += excelDateFormat.format(toStore.getTimeCreated()) + ",";
-		toPrint += toStore.getCarName() + ",";
-		toPrint += toStore.getSource() + ",";
-		toPrint += locToAdd.getLat() + ",";
-		toPrint += locToAdd.getLon() + ",";
-		toPrint += locToAdd.getElevation() + ",";
-		return toPrint;
-	}
-
-	/*
-	 * Sets up the row to be printed to the .csv. It's relatively static though,
-	 * so if the coloumn title change or number of entries change then this will have 
-	 * to be redone to print in the proper order. 
-	 */
-	private String buildCSVEntryRow(TelemDataPacket toStore) throws IOException {
-		HashMap<String, Integer> temperatures = toStore.getTemperatures();
-		HashMap<Integer, ArrayList<Float>> voltages = toStore.getCellVoltages();
-		String toPrint = "";
-		toPrint += this.entryCounter + ","; 
-		this.entryCounter++;
-		toPrint += actualDateFormat.format(toStore.getTimeCreated()) + ",";
-		toPrint += excelDateFormat.format(toStore.getTimeCreated()) + ",";
-		toPrint += toStore.getSpeed() + ",";
-		toPrint += temperatures.get("bms")  + ","; //if the temperature calls return 'null', so be it.
-												  // it can be written as such to the DB. 
-		toPrint += temperatures.get("motor") + ",";
-		toPrint += temperatures.get("pack0") + ",";
-		toPrint += temperatures.get("pack1") + ",";
-		toPrint += temperatures.get("pack2") + ",";
-		toPrint += temperatures.get("pack3") + ",";
-		toPrint += toStore.getTotalVoltage() + ",";
-		
-		//assumes that they have been loaded with the standard number of voltage entries
-		//NOTE: May need to modify this if you change the number of cells on the car, 
-		//or the amount per pack.
-		int expectedNumOfCells = 10;
-		
-		for(int i = 0; i<4; i++){
-			if(voltages.get(i) == null){ //will need to offset this so the rest are in position
-				toPrint += this.numberOfCommas(expectedNumOfCells);
-			}
-			else{
-				for(Float f : voltages.get(0)){
-					toPrint += f + ",";
-				}
-			}
-		}
-		
-		return toPrint;
-		
-		
-	}
-
-	/*
-	 * sanitizes the TelemDataPacket so that the DB can store properly
-	 * (mostly just replaces 'null' with empty maps).
-	 * 
-	 * The TelemDataPacket class will reject all nulls, but it's 
-	 * good to check for them anyway so we don't break the later 
-	 * parts of DB processing. (I made an extended DataPacket that 
-	 * returned nulls for the maps; it's possible.)
-	 */
-	private TelemDataPacket sanitizeInput(TelemDataPacket toStore) {
-		double creationTime = toStore.getTimeCreated();
-		double speed = toStore.getSpeed();
-		float totalVoltage = toStore.getTotalVoltage();
-		HashMap<String,Integer> temperatures = toStore.getTemperatures();
-		if(temperatures == null){
-			temperatures = new HashMap<String, Integer>();
-		}
-		
-		HashMap<Integer,ArrayList<Float>> cellVoltages = toStore.getCellVoltages();
-		if(cellVoltages == null){
-			cellVoltages = new HashMap<Integer, ArrayList<Float>>();
-		}
-		
-		if(cellVoltages.containsValue(null)){
-			for(Integer key : cellVoltages.keySet()){
-				if(cellVoltages.get(key) == null){
-					cellVoltages.replace(key, new ArrayList<Float>());
-				}
-			}
-		}
-		double stateOfCharge= toStore.getStateOfCharge();
-		return new TelemDataPacket(speed, (int) totalVoltage, temperatures, cellVoltages,stateOfCharge, creationTime);
-		
-		
-	}
-
-	//Puts the TelemDataPacket into the right place in the list
-	private void putIntoRAM(TelemDataPacket toStore) {
-		this.recallStuff.put(toStore.getTimeCreated(), toStore);
-		int storePos = this.findPosOfFirstPktPastTime(toStore.getTimeCreated(), this.recallStuffList);
-		this.recallStuffList.add(storePos, toStore);
-		
 	}
 
 	/*
@@ -404,35 +252,44 @@ public class CSVDatabase extends Database {
 	 * (non-Javadoc)
 	 * @see com.ubcsolar.database.Database#store(com.ubcsolar.common.DataUnit)
 	 */
-	@Override
-	public void store(DataUnit toStore) throws IOException {
-		if(toStore instanceof TelemDataPacket){
-			store((TelemDataPacket) toStore);
+	public void store(V toStore) throws IOException {
+		if(this.columnTitles == null){ //means headers haven't been printed out yet
+			this.columnTitles = toStore.getCSVHeaderRow();
+			this.writingQueue.add(this.columnTitles);
 		}
-		if(toStore instanceof LocationReport){
-			store((LocationReport) toStore);
-		}
-	}
-
-	private TelemDataPacket getTelemDataPacket(double key) {
-		return this.recallStuff.get(key);
-	}
-
-	@Override
-	public TelemDataPacket getTelemDataPacket(String key) {
-		double doubleKey;
-		try{
-			doubleKey = Double.parseDouble(key);
-		}catch(Exception e){
-			return null;
-		}
-		return this.getTelemDataPacket(doubleKey);
-	}
-
-	@Override
-	public void writeRoute(Route route) throws IOException {
 		
-		this.writingQueue.add(route.getCSVEntry());
+		if(toStore.returnsEntireTable()){
+			if(this.recallStuffList.size()>=1){ //can't store more than one
+				String exceptionError = "Tried to store 2 dataunits that are tables in the same CSV";
+				throw new IllegalArgumentException(exceptionError);
+			}
+		}
+		
+		putIntoRAM(toStore);
+		this.writingQueue.add(toStore.getCSVEntry());
 		this.flushAndSave();
+		 
 	}
+	
+	/**
+	 * Puts the DataUnit into the correct position in the list. 
+	 * @param toStore
+	 */
+	private void putIntoRAM(V toStore) {
+		this.recallStuff.put(toStore.getTimeCreated(), toStore);
+		int storePos = this.findPosOfFirstPktPastTime(toStore.getTimeCreated(), this.recallStuffList);
+		this.recallStuffList.add(storePos, toStore);
+
+	}
+
+	/**
+	 * returns the dataunit corresponding to the key.
+	 * @param string
+	 * @return
+	 */
+	public TelemDataPacket getDataUnit(String string) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
