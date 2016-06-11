@@ -305,7 +305,7 @@ public class ForecastIO {
 	public JsonObject getHourly(){
 		return this.hourly;
 	}
-
+	
 	/**
 	 * Returns the flags data 
 	 * @return JsonObject with the data

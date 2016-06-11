@@ -54,9 +54,22 @@ public class WeatherController extends ModuleController {
 		this.mySession.sendNotification(new NewForecastReport(theReport));
 	}
 	
+	public void downloadCurrentLocationForecast(GeoCoord location){
+		Route currentRoute = mySession.getMapController().getAllPoints();
+		List<GeoCoord> toGet = new ArrayList<GeoCoord>();
+		toGet.add(location);
+		ForecastFactory forecastGetter = new ForecastFactory();
+		ForecastIO currentForecast = forecastGetter.getForecasts(toGet).get(0);
+		ForecastIO forecastOnRoute = copyAtLocation(currentForecast,
+				currentRoute.getClosestPointOnRoute(location));
+		loadCustomForecast(forecastOnRoute);
+	}
+	
 	/**
 	 * Adds a new custom forecast to the list of custom forecasts. This can be done multiple
 	 * times by calling the method repeatedly. Will not overwrite legitimate downloaded reports
+	 * stored in retrievedForecasts, but will overwrite what is displayed in the WeatherAdvancedWindow.
+	 * Clearing will revert to the downloaded forecast
 	 * 
 	 * @param customForecast: the custom forecast report to be added to the list of custom forecasts.
 	 * Usually produced through the FakeForecastWindow.
@@ -272,19 +285,22 @@ public class WeatherController extends ModuleController {
 				comboForecasts.add(customForecasts.get(i));
 			}
 		}
+		//creates a duplicate of earliest point at 0 distance if there is no data
+		//for distance 0, because otherwise the WeatherAdvancedWindow breaks
 		GeoCoord firstPoint = new GeoCoord(comboForecasts.get(0).getLatitude(), 
 				comboForecasts.get(0).getLongitude(), 0.0);
 		if(myMapController.findDistanceAlongLoadedRoute(firstPoint) > 0){
-			ForecastIO forecast = copyAt0(comboForecasts.get(0));
+			ForecastIO forecast = copyAtLocation(comboForecasts.get(0),
+					myMapController.getAllPoints().getTrailMarkers().get(0));
 			comboForecasts.add(0,forecast);
 		}
 		return comboForecasts;
 	
 	}
 	
-	private ForecastIO copyAt0(ForecastIO initial){
+	private ForecastIO copyAtLocation(ForecastIO initial, GeoCoord location){
 		
-		GeoCoord location = myMapController.getAllPoints().getTrailMarkers().get(0);
+		//GeoCoord location = myMapController.getAllPoints().getTrailMarkers().get(0);
 		double latitude = location.getLat();
 		double longitude = location.getLon();
 		JsonObject forecastInfo = new JsonObject();

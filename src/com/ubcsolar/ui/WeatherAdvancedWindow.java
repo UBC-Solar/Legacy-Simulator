@@ -26,6 +26,7 @@ import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LocationReport;
+import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewForecastReport;
 import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
@@ -141,7 +142,17 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		JMenuItem mntmLoadForecastsFor_1 = new JMenuItem("Load Forecasts for current location");
 		mntmLoadForecastsFor_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Was asked currentLocation forecast");
+				if(currentLocation == null){
+					mySession.sendNotification(new ExceptionNotification(new NullPointerException(), 
+							"No location currently loaded."));
+				}else if(mySession.getMapController().getAllPoints() == null)
+					mySession.sendNotification(new ExceptionNotification(new NullPointerException(),
+							"Must load route before loading forecasts."));
+				
+				else{
+					mySession.getMyWeatherController().downloadCurrentLocationForecast(currentLocation);
+					System.out.println("Was asked currentLocation forecast");
+				}
 			}
 		});
 		
@@ -304,7 +315,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		}
 		
 		public void updateLabels(){
-			if(currentLocation != null &&currentForecastReport.getForecasts().size()>0){
+			if(currentLocation != null && currentForecastReport != null &&
+					currentForecastReport.getForecasts().size()>0){
 				//next block figures out which forecast is closest to the current car location
 				//and which one will be the next one in the sequence
 				List<ForecastIO> forecasts = currentForecastReport.getForecasts();
@@ -333,7 +345,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 					}					
 				}
 				FIODataBlock closestHourly = new FIODataBlock(closestForecast.getHourly());
-				FIODataPoint closestForecastNow = closestHourly.datapoint(0); //TODO need to do something about the STORM because storm seems to be only in CURRENTLY forecast
+				FIODataPoint closestForecastNow = closestHourly.datapoint(0);
 				FIODataBlock nextHourly;
 				if(nextForecastExists){
 					nextHourly = new FIODataBlock(nextForecast.getHourly());
@@ -359,6 +371,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 						stormWarning = true;
 					}
 				}
+				
 				
 				windDirectionLabel.setText("Wind is blowing from: " + windDirection + " (" 
 						+ windBearing + "°)");

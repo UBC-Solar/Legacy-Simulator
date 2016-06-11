@@ -295,12 +295,11 @@ public class GUImain implements Listener{
 		mnDebug.add(mntmAddWeatherReport);		
 		
 		JMenuItem mntmAddCustomForecast = new JMenuItem("Add Custom Forecast");
-		GUImain currentGUI = this;
 		mntmAddCustomForecast.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){
 				if(mySession.getMapController().getAllPoints() == null){
-					JOptionPane.showMessageDialog(new WeatherAdvancedWindow(mySession, currentGUI),
-							"Must load route before adding forecasts.");
+					mySession.sendNotification(new ExceptionNotification(new NullPointerException(), 
+							"Must load route before adding forecasts."));
 				}else{
 					JFrame frame = new FakeForecastAddWindow(mySession);
 					frame.setVisible(true);

@@ -45,5 +45,18 @@ public class Route extends DataUnit{
 		toReturn.put("Time Created", timeCreated);
 		return toReturn;
 	}
+	
+	public GeoCoord getClosestPointOnRoute(GeoCoord location){
+		double minimumDistance = location.calculateDistance(trailMarkers.get(0));
+		int minimumIndex = 0;
+		for(int i = 1; i < trailMarkers.size(); i++){
+			double currentDistance = location.calculateDistance(trailMarkers.get(i));
+			if(currentDistance < minimumDistance){
+				minimumDistance = currentDistance;
+				minimumIndex = i;
+			}
+		}
+		return trailMarkers.get(minimumIndex);
+	}
 
 }
