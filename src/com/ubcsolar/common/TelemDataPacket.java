@@ -31,21 +31,66 @@ public class TelemDataPacket extends DataUnit{
 		HashMap<Integer, ArrayList<Float>> voltages = this.getCellVoltages();
 		String toPrint = "";
 		
-	
-		toPrint += actualDateFormat.format(this.getTimeCreated()) + ",";
-		toPrint += excelDateFormat.format(this.getTimeCreated()) + ",";
+		if (actualDateFormat.format(this.getTimeCreated()) != null){
+			toPrint += actualDateFormat.format(this.getTimeCreated()) + ",";
+		}
+		else{
+			toPrint += "----,";
+		}
+		if (excelDateFormat.format(this.getTimeCreated())!= null){
+			toPrint += excelDateFormat.format(this.getTimeCreated()) + ",";
+		}
+		else{
+			toPrint += "----,";
+		}
 		
 		toPrint += this.getSpeed() + ",";
 		toPrint += this.getStateOfCharge() +",";
-		toPrint += temperatures.get("bms")  + ","; //if the temperature calls return 'null', so be it.
-												  // it can be written as such to the DB. 
-		toPrint += temperatures.get("motor") + ",";
-		toPrint += temperatures.get("pack0") + ",";
-		toPrint += temperatures.get("pack1") + ",";
-		toPrint += temperatures.get("pack2") + ",";
-		toPrint += temperatures.get("pack3") + ",";
-		toPrint += this.getTotalVoltage() + ",";
 		
+		if ( temperatures.get("bms")!= null){  //if the temperature calls return 'null', the DB will error
+			toPrint += temperatures.get("bms")  + ","; 
+		}
+		else{
+			toPrint += "----,";
+		}
+		
+		if (temperatures.get("motor")!= null){
+			toPrint += temperatures.get("motor") + ",";
+		}
+		else{
+			toPrint += "----,";
+		}
+		
+		if (temperatures.get("pack0")!= null){
+			toPrint += temperatures.get("pack0") + ",";
+		}
+		else{
+			toPrint += "----,";
+		}
+		
+		if (temperatures.get("pack1")!= null){
+			toPrint += temperatures.get("pack1") + ",";
+		}
+		else{
+			toPrint += "----,";
+		}
+		
+		if (temperatures.get("pack2")!= null){
+			toPrint += temperatures.get("pack2") + ",";
+		}
+		else{
+			toPrint += "----,";
+		}
+		
+		if (temperatures.get("pack3")!= null){
+			toPrint += temperatures.get("pack3") + ",";
+		}
+		else{
+			toPrint += "----,";
+		}
+				
+		toPrint += this.getTotalVoltage() + ",";
+
 		//assumes that they have been loaded with the standard number of voltage entries
 		//NOTE: May need to modify this if you change the number of cells on the car, 
 		//or the amount per pack.
