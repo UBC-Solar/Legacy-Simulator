@@ -211,6 +211,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		
 		setDefaultChart();
 		mainDisplay = new ChartPanel(simResults);
+		mainDisplay.setMouseZoomable(true);
+		mainDisplay.setMouseWheelEnabled(true);
 		GridBagConstraints gbc_mainDisplay = new GridBagConstraints();
 		gbc_mainDisplay.weighty = 1.0;
 		gbc_mainDisplay.weightx = 1.0;
@@ -495,6 +497,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 							null, //we'll add in all the values below so we can map to custom axis
 							PlotOrientation.VERTICAL, true, true, false);
 			final XYPlot plot = simResults.getXYPlot();
+			plot.setRangePannable(true);
+			plot.setDomainPannable(true);
 			
 			if(this.showSpeed){
 				DefaultXYDataset speedDataset = new DefaultXYDataset();

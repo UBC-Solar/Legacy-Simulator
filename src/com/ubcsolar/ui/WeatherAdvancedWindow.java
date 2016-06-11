@@ -159,6 +159,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				
 		buildTemperatureChart(createBlankDataset());
 		temperatureChart = new ChartPanel(temperatureChartJFree);
+		temperatureChart.setMouseWheelEnabled(true);
+		temperatureChart.setMouseZoomable(true);
 		GridBagConstraints gbc_temperatureChart = new GridBagConstraints();
 		gbc_temperatureChart.weighty = 10.0;
 		gbc_temperatureChart.insets = new Insets(0, 0, 5, 5);
@@ -169,6 +171,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		
 		buildCloudCoverChart(createBlankDataset());
 		cloudCoverChart = new ChartPanel(cloudCoverChartJFree);
+		cloudCoverChart.setMouseZoomable(true);
+		cloudCoverChart.setMouseWheelEnabled(true);
 		GridBagConstraints gbc_cloudCoverChart = new GridBagConstraints();
 		gbc_cloudCoverChart.insets = new Insets(0, 0, 5, 0);
 		gbc_cloudCoverChart.fill = GridBagConstraints.BOTH;
@@ -178,6 +182,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		
 		buildPrecipitationChart(createBlankDataset());
 		precipitationChart = new ChartPanel(precipitationChartJFree);
+		precipitationChart.setMouseZoomable(true);
+		precipitationChart.setMouseWheelEnabled(true);
 		GridBagConstraints gbc_precipitationChart = new GridBagConstraints();
 		gbc_precipitationChart.weighty = 10.0;
 		gbc_precipitationChart.insets = new Insets(0, 0, 5, 5);
@@ -188,6 +194,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		
 		buildWindSpeedChart(createBlankDataset());
 		windSpeedChart = new ChartPanel(windSpeedChartJFree);
+		windSpeedChart.setMouseZoomable(true);
+		windSpeedChart.setMouseWheelEnabled(true);
 		GridBagConstraints gbc_windSpeedChart = new GridBagConstraints();
 		gbc_windSpeedChart.insets = new Insets(0, 0, 5, 0);
 		gbc_windSpeedChart.fill = GridBagConstraints.BOTH;
@@ -422,6 +430,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							ds,
 							PlotOrientation.VERTICAL, true, true, false);
 			temperatureChartJFree = elevationChart;
+			
+			
 		}
 		
 		private void buildTemperatureChart(XYDataset ds){
@@ -433,6 +443,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							ds,
 							PlotOrientation.VERTICAL, true, true, false);
 			temperatureChartJFree = temperatureChart;
+			
 		}
 		
 		private void buildCloudCoverChart(XYDataset ds){
