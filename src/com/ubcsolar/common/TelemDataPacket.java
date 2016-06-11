@@ -1,10 +1,142 @@
 package com.ubcsolar.common;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class TelemDataPacket extends DataUnit{
+
+	private DateFormat actualDateFormat = new SimpleDateFormat("HH:mm:ss.SSS"); //time format. ss = seconds, SSS = ms
+	//couldn't manage to format milliseconds in a way that Excel can handle as time
+	//so just generated a second column to be able to graph it properly. 
+	private DateFormat excelDateFormat = new SimpleDateFormat("HH:mm:ss"); //time format. ss = seconds, SSS = ms
+	
+	// the whole thing is so wired. :D TODO ask Noah
+	public final static String classCSVHeaderRow = "RealTime,ExcelTime,Speed,StateOfCharge,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,"
+			+ "Pck0Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
+			+ "Pck1Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
+			+ "Pck2Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
+			+ "Pck3Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg";
+
+	/**
+	 * turns the class fields into an entry for a csv file
+	 * see returnsEntireTable for info on row versus table
+	 * @return the row as a string
+	 */
+	public String getCSVEntry()
+	{
+		HashMap<String, Integer> temperatures = this.getTemperatures();
+		HashMap<Integer, ArrayList<Float>> voltages = this.getCellVoltages();
+		String toPrint = "";
+		
+		if (actualDateFormat.format(this.getTimeCreated()) != null){
+			toPrint += actualDateFormat.format(this.getTimeCreated()) + ",";
+		}
+		else{
+			toPrint += "----,";
+		}
+		if (excelDateFormat.format(this.getTimeCreated())!= null){
+			toPrint += excelDateFormat.format(this.getTimeCreated()) + ",";
+		}
+		else{
+			toPrint += "----,";
+		}
+		
+		toPrint += this.getSpeed() + ",";
+		toPrint += this.getStateOfCharge() +",";
+		
+		if ( temperatures.get("bms")!= null){  //if the temperature calls return 'null', the DB will error
+			toPrint += temperatures.get("bms")  + ","; 
+		}
+		else{
+			toPrint += "----,";
+		}
+		
+		if (temperatures.get("motor")!= null){
+			toPrint += temperatures.get("motor") + ",";
+		}
+		else{
+			toPrint += "----,";
+		}
+		
+		if (temperatures.get("pack0")!= null){
+			toPrint += temperatures.get("pack0") + ",";
+		}
+		else{
+			toPrint += "----,";
+		}
+		
+		if (temperatures.get("pack1")!= null){
+			toPrint += temperatures.get("pack1") + ",";
+		}
+		else{
+			toPrint += "----,";
+		}
+		
+		if (temperatures.get("pack2")!= null){
+			toPrint += temperatures.get("pack2") + ",";
+		}
+		else{
+			toPrint += "----,";
+		}
+		
+		if (temperatures.get("pack3")!= null){
+			toPrint += temperatures.get("pack3") + ",";
+		}
+		else{
+			toPrint += "----,";
+		}
+				
+		toPrint += this.getTotalVoltage() + ",";
+
+		//assumes that they have been loaded with the standard number of voltage entries
+		//NOTE: May need to modify this if you change the number of cells on the car, 
+		//or the amount per pack.
+		int expectedNumOfCells = 10;
+				
+		for(int i = 0; i<4; i++){ 
+			if(voltages.get(i) == null){ //will need to offset this so the rest are in position
+				toPrint += this.numberOfCommas(expectedNumOfCells);
+			}
+			else{
+				for(Float f : voltages.get(0)){
+					toPrint += f + ",";
+				}
+			}
+		}
+				
+				return toPrint;
+	}
+	
+	private String numberOfCommas(int numberOfCommas){
+		String toReturn = "";
+		for(int i=0; i<numberOfCommas; i++){
+			toReturn += ',';
+		}
+		
+		return toReturn;
+	}
+	
+
+	/**
+	 * gets the column headings as a csv row
+	 * @return the row as a string
+	 */
+	public String getCSVHeaderRow()
+	{
+		return classCSVHeaderRow;
+	}
+	
+	/**
+	 * if the CSV output is multiline rather than a single line
+	 * @return 
+	 */
+	public boolean returnsEntireTable ()
+	{
+		return false;
+	}
 
 @Override
 public Map<String, Object> getAllValues() {

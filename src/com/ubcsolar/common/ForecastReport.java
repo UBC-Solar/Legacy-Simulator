@@ -8,6 +8,36 @@ import com.github.dvdme.ForecastIOLib.ForecastIO;
 
 public class ForecastReport extends DataUnit {
 	
+	public final static String classCSVHeaderRow =""; //TODO
+	/**
+	 * turns the class fields into an entry for a csv file
+	 * see returnsEntireTable for info on row versus table
+	 * @return the row as a string
+	 */
+	public String getCSVEntry()
+	{
+		return "NOT IMPLEMENTED";
+	}
+	
+	/**
+	 * gets the column headings as a csv row
+	 * @return the row as a string
+	 */
+	public String getCSVHeaderRow()
+	{
+		return classCSVHeaderRow;
+	}
+	
+	/**
+	 * if the CSV output is multiline rather than a single line
+	 * @return 
+	 */
+	public boolean returnsEntireTable ()
+	{
+		return false;
+	}
+
+	
 	private final List<ForecastIO> forecasts;
 	private final long timeCreated;
 	private final String routeForecastsWereCreatedFor;
