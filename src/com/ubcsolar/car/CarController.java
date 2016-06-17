@@ -107,9 +107,7 @@ public class CarController extends ModuleController {
 			myDataReceiver = null; //Otherwise looks like it's connected. 
 			this.sendNotification(new NewCarLoadedNotification("DISCONNECTED")); 
 		}	
-		if(this.lastReceived != null){
-			this.lastReceived = null;
-		}
+		
 	}
 	
 	/**
