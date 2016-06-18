@@ -89,7 +89,7 @@ public class TelemDataPacket extends DataUnit{
 			toPrint += "----,";
 		}
 				
-		toPrint += this.getTotalVoltage() + ",";
+		toPrint += this.getTotalVoltage() ;
 
 		//assumes that they have been loaded with the standard number of voltage entries
 		//NOTE: May need to modify this if you change the number of cells on the car, 
@@ -102,7 +102,7 @@ public class TelemDataPacket extends DataUnit{
 			}
 			else{
 				for(Float f : voltages.get(0)){
-					toPrint += f + ",";
+					toPrint +=  ","+f ;
 				}
 			}
 		}
