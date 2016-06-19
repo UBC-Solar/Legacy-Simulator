@@ -12,6 +12,7 @@ package com.ubcsolar.map;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -33,6 +34,7 @@ public class MapController extends ModuleController{
 	JdomkmlInterface myJDOMMap;
 	GPSFromPhoneReceiver gpsBlueToothConnection;
 	LocationReport lastReported;
+	Map<GeoCoord, Double> distanceAlongRoute;
 
 	public MapController(GlobalController toAdd) throws IOException{
 		super(toAdd);	
@@ -146,6 +148,28 @@ public class MapController extends ModuleController{
 			trailMarkerIndex++;
 		}
 		return travelDistance;
+	}
+	
+	/**
+	 * Finds the closest point (breadcrumb) on the currently loaded map. 
+	 * @param target
+	 * @return
+	 */
+	public GeoCoord findClosestPointOnRoute(GeoCoord target){
+		List<GeoCoord> breadcrumbs = myJDOMMap.getRoute().getTrailMarkers();
+		int closestPointIndex = -1;
+		double minDistance = Double.MAX_VALUE;
+		
+		for(int i = 0; i<breadcrumbs.size(); i++){
+			if(target.calculateDistance(breadcrumbs.get(i))<minDistance){
+				closestPointIndex = i;
+				minDistance = target.calculateDistance(breadcrumbs.get(i));
+			}
+		}
+		
+		return breadcrumbs.get(closestPointIndex);
+		
+		
 	}
 	
 	public double findTotalDistanceAlongLoadedRoute(){
