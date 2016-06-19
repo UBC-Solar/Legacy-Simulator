@@ -1,5 +1,6 @@
 package com.ubcsolar.weather;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -117,6 +118,23 @@ public class WeatherController extends ModuleController {
 		
 	}
 	
+	
+	private ForecastIO interprolateForecast(GeoCoord target) throws NoForecastReportException{
+		if(retrievedForecasts == null){
+			throw new NoForecastReportException();
+		}
+		int startIndex = this.getIndexOfStartForecast(retrievedForecasts, target);
+		int secondIndex;
+		if(startIndex >= retrievedForecasts.size()-1){
+			return this.retrievedForecasts.get(startIndex); //can't interprolate past the end of the forecasts. 
+		}
+		
+		ForecastIO start = this.retrievedForecasts.get(startIndex);
+		ForecastIO second = this.retrievedForecasts.get(startIndex + 1 );
+		
+		return this.interpolateForecast(start, second, target);
+		
+	}
 	/*
 	 * Supposed to interpolate between the start forecast and next forecast. Currently just returns the closest. 
 	 */
@@ -135,6 +153,8 @@ public class WeatherController extends ModuleController {
 		}
 	}
 
+	
+	
 	private int getIndexOfStartForecast(List<ForecastIO> toSearch, GeoCoord g){
 		int lowestIndex = -1;
 		double minDistance = 999999999999999.0;
@@ -299,5 +319,35 @@ public class WeatherController extends ModuleController {
 		
 		return forecast;
 	}
+	
+	
+	
+	/**
+	 * Returns the ForecastIO for the requested location. If doInterprolation is true,
+	 * interprolates based on the two closes forecasts. If false, will attempt
+	 * to download a brand new forecastIO. 
+	 * @param target
+	 * @param doInterprolation
+	 * @return the forecastIO for the requested location. 
+	 * 
+	 * @throws IOException if no internet available
+	 * @throws NoForecastReportException if no forecasts have been downloaded/added
+	 */
+	public ForecastIO getForecastForSpecificPoint(GeoCoord target, Boolean doInterprolation) throws IOException, NoForecastReportException{
+		if(!doInterprolation){
+			return new ForecastIO("" + target.getLat(), "" + target.getLon(), GlobalValues.WEATHER_KEY);
+		}
+		
+		if(this.lastCustomReport == null || this.lastCustomReport.getForecasts().size() == 0){
+			throw new NoForecastReportException();
+		}
+		
+		
+		return this.interprolateForecast(target);
+		
+		
+	}
+	
+	
 
 }
