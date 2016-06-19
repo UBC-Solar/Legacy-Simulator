@@ -119,21 +119,53 @@ public class WeatherController extends ModuleController {
 	}
 	
 	
+	/**
+	 * interprolates a forecast based on the two closest forecasts. 
+	 * @param target
+	 * @return
+	 * @throws NoForecastReportException
+	 */
 	private ForecastIO interprolateForecast(GeoCoord target) throws NoForecastReportException{
 		if(retrievedForecasts == null){
 			throw new NoForecastReportException();
 		}
 		int startIndex = this.getIndexOfStartForecast(retrievedForecasts, target);
-		int secondIndex;
-		if(startIndex >= retrievedForecasts.size()-1){
-			return this.retrievedForecasts.get(startIndex); //can't interprolate past the end of the forecasts. 
+		ForecastIO startForecast = this.retrievedForecasts.get(startIndex);
+		
+		//check to see if the target point is off the end of the forecast list. 
+		if((startIndex >= retrievedForecasts.size()-1) || (startIndex<= 0)){
+			GeoCoord firstSpot = new GeoCoord(startForecast.getLatitude(),startForecast.getLongitude(),0.0);
+			ForecastIO secondForecast;
+			if(startIndex>= retrievedForecasts.size()-1){
+				secondForecast = this.retrievedForecasts.get(startIndex - 1);
+			}else{ //i.e is 0
+				secondForecast = this.retrievedForecasts.get(startIndex + 1);
+			}
+			GeoCoord scndSpot = new GeoCoord(secondForecast.getLatitude(),secondForecast.getLongitude(),0.0);
+			double distanceBetweenFCs = firstSpot.calculateDistance(scndSpot);
+			double distanceBetweenTargetAndSecond = scndSpot.calculateDistance(target);
+			
+			
+			//can't interprolate past the end of the forecasts.
+			if(distanceBetweenTargetAndSecond > distanceBetweenFCs){
+				return this.retrievedForecasts.get(startIndex);  
+			}
+			else{
+				return this.interpolateForecast(startForecast, secondForecast, target);
+			}			
 		}
-		
-		ForecastIO start = this.retrievedForecasts.get(startIndex);
-		ForecastIO second = this.retrievedForecasts.get(startIndex + 1 );
-		
-		return this.interpolateForecast(start, second, target);
-		
+		//determine which point is next (one left or one right?)
+		ForecastIO oneLeft = this.retrievedForecasts.get(startIndex - 1);
+		GeoCoord oneLeftSpot = new GeoCoord(oneLeft.getLatitude(), oneLeft.getLongitude(), 0.0);
+		ForecastIO oneRight = this.retrievedForecasts.get(startIndex + 1);
+		GeoCoord oneRightSpot = new GeoCoord(oneRight.getLatitude(), oneRight.getLongitude(),0.0); 
+		if(target.calculateDistance(oneLeftSpot) < target.calculateDistance(oneRightSpot)){
+			return this.interpolateForecast(startForecast, oneLeft, target);
+		}
+		else{
+			return this.interpolateForecast(startForecast, oneRight, target);
+		}
+				
 	}
 	/*
 	 * Supposed to interpolate between the start forecast and next forecast. Currently just returns the closest. 
@@ -154,7 +186,12 @@ public class WeatherController extends ModuleController {
 	}
 
 	
-	
+	/**
+	 * Returns the forecast tha is closest to the given point 
+	 * @param toSearch
+	 * @param g
+	 * @return
+	 */
 	private int getIndexOfStartForecast(List<ForecastIO> toSearch, GeoCoord g){
 		int lowestIndex = -1;
 		double minDistance = 999999999999999.0;
