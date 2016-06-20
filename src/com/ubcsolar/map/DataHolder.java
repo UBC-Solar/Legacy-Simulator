@@ -11,19 +11,14 @@ package com.ubcsolar.map;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.ubcsolar.common.GeoCoord;
 
 public class DataHolder {
+	@SuppressWarnings("unused") //have to keep reference to parent
 	private MapController myMapController;
 	private String filename;
 	private ArrayList<GeoCoord> theDataList;
@@ -68,7 +63,7 @@ public class DataHolder {
 	private void pureLoad(String filename) throws IOException, SAXException, ParserConfigurationException{
 		theDataList = new ArrayList<GeoCoord>();
 		SaxKmlParser parser = new SaxKmlParser();
-		ArrayList<GeoCoord> allPoints = new ArrayList<GeoCoord>();
+		//ArrayList<GeoCoord> allPoints = new ArrayList<GeoCoord>();
 		parser.parseToPoints(theDataList, filename);
 		
 		// for testing, print out the points that were just loaded

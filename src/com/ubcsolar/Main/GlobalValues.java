@@ -1,5 +1,6 @@
 package com.ubcsolar.Main;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 public class GlobalValues {
@@ -24,5 +25,8 @@ public class GlobalValues {
 	
 	//hooman.vaseli@ubcsolar.com's key
 //	public final static String WEATHER_KEY= "26b799961238234d81780b220bb1d7b5";
-
+	
+	public final DateFormat dateFormatWithMillis = new SimpleDateFormat("HH:mm:ss.SSS"); //time format. ss = seconds, SSS = ms
+	//couldn't manage to format milliseconds in a way that Excel can handle as time
+	//so just generated a second column to be able to graph it properly.
 }

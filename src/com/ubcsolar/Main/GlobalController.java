@@ -28,7 +28,6 @@ import com.ubcsolar.weather.WeatherController;
 
 public class GlobalController {
 								//listener in pos. 1 is waiting for the trigger in pos. 1, etc. 
-	@SuppressWarnings("unused")
 	private GUImain mainWindow; //the root panel for the UI
 	private MapController myMapController; //the Map controller
 	private CarController myCarController; //the Car controller

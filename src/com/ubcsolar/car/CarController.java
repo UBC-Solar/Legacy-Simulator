@@ -11,14 +11,11 @@ import com.ubcsolar.Main.GlobalController;
 //import org.jfree.util.Log;
 
 import com.ubcsolar.common.*;
-import com.ubcsolar.database.DatabaseController;
 import com.ubcsolar.notification.*;
 
 import jssc.SerialPortException;
 
 public class CarController extends ModuleController {
-	//test
-	private DatabaseController myDatabase; //references to the data warehouse. Want to store the car's broadcasts
 	private DataProcessor myDataProcessor; //where to send the car's broadcasts for processing. 
 	private AbstractDataReceiver myDataReceiver; //what will capture the car's raw broadcasts
 	private TelemDataPacket lastReceived; //last datapacket received. 
@@ -31,7 +28,6 @@ public class CarController extends ModuleController {
 	 */
 	public CarController(GlobalController myGlobalController) {
 		super(myGlobalController);
-		myDatabase = mySession.getMyDataBaseController();
 		myDataProcessor = new DataProcessor(this);
 	}
 	

@@ -2,18 +2,9 @@ package com.ubcsolar.database;
 
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.*;
-import com.ubcsolar.notification.CarUpdateNotification;
-import com.ubcsolar.notification.DatabaseCreatedOrConnectedNotification;
-import com.ubcsolar.notification.DatabaseDisconnectedOrClosed;
-import com.ubcsolar.notification.ExceptionNotification;
-import com.ubcsolar.notification.NewLocationReportNotification;
-import com.ubcsolar.notification.NewMapLoadedNotification;
-import com.ubcsolar.notification.NewSimulationReportNotification;
-import com.ubcsolar.notification.NewDataUnitNotification;
-import com.ubcsolar.notification.NewForecastReport;
-import com.ubcsolar.notification.Notification;
+import com.ubcsolar.notification.*;
 
-import java.io.File;
+
 import java.io.IOException;
 import java.util.*;
 
