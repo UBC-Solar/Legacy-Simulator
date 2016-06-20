@@ -156,9 +156,25 @@ public class MapController extends ModuleController{
 	 * @return
 	 */
 	public GeoCoord findClosestPointOnRoute(GeoCoord target){
+		/*
+		 * Noah note: June 20 2016, This algo needs optimization (runs in O(n) currently)
+		 * but we'll need to build an index to do something like binary search.
+		 * The problem is that to do binary search, you need to be able to split
+		 * the list into two around an arbitrary point. If you pick
+		 * two index points that are side-by-side, you could almost check to see which 
+		 * one is closer to the target point, and then take that side of the list. 
+		 * 
+		 * However, it'd be possible to have a route (shaped like a lightbulb) where
+		 * the wrong side would be selected (target point would be 
+		 * closer to the incorrect pivot point)
+		 * 
+		 * Might be doable if you index/sort the list with distance from start point.
+		 * 
+		 */
+		
 		List<GeoCoord> breadcrumbs = myJDOMMap.getRoute().getTrailMarkers();
 		int closestPointIndex = -1;
-		double minDistance = Double.MAX_VALUE;
+		double minDistance = Double.MAX_VALUE; //anything is guaranteed to be less
 		
 		for(int i = 0; i<breadcrumbs.size(); i++){
 			if(target.calculateDistance(breadcrumbs.get(i))<minDistance){
@@ -172,6 +188,11 @@ public class MapController extends ModuleController{
 		
 	}
 	
+	/**
+	 * Calculates the total distance of the route as driven, as opposed to an 
+	 * 'as-the-crow-flies' calculation from start to end. 
+	 * @return
+	 */
 	public double findTotalDistanceAlongLoadedRoute(){
 		List<GeoCoord> trailMarkers = getAllPoints().getTrailMarkers();
 		int distanceIndex = 1;
