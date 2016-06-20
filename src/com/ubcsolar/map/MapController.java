@@ -24,6 +24,7 @@ import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.Route;
+import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
@@ -66,6 +67,10 @@ public class MapController extends ModuleController{
 		//getAllPoints();
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public Route getAllPoints(){
 		if(this.myJDOMMap == null){
 			return null;
@@ -132,10 +137,16 @@ public class MapController extends ModuleController{
 	 * along the route in order for the following method to work correctly. Otherwise, the method
 	 * will give you the total distance along the route.
 	 * @return distance along route from start of route to location
+	 * @throws NoLoadedRouteException 
 	 */
 	
-	public double findDistanceAlongLoadedRoute(GeoCoord location){
-		List<GeoCoord> trailMarkers = getAllPoints().getTrailMarkers();
+	public double findDistanceAlongLoadedRoute(GeoCoord location) throws NoLoadedRouteException{
+		
+		Route currentRoute = getAllPoints();
+		if(currentRoute == null){
+			throw new NoLoadedRouteException();
+		}
+		List<GeoCoord> trailMarkers = currentRoute.getTrailMarkers();
 		if(location.calculateDistance(trailMarkers.get(0))==0){
 			return 0.0;
 		}
@@ -205,4 +216,8 @@ public class MapController extends ModuleController{
 		return travelDistance;
 	}
 
+	
+	public boolean hasMapLoaded(){
+		return this.myJDOMMap == null;
+	}
 }

@@ -8,10 +8,15 @@ package com.ubcsolar.ui;
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
+import com.ubcsolar.common.LogType;
+import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.exception.NoLoadedRouteException;
+import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.EventQueue;
@@ -53,6 +58,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
@@ -122,8 +128,16 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		//	JOptionPane.showMessageDialog(this, "New map: " + (((NewMapLoadedNotification) n).getMapLoadedName()));
 			
 		}
+		
+		if(n.getClass() == NewLocationReportNotification.class){
+			NewLocationReportNotification n2 = (NewLocationReportNotification) n;
+			GeoCoord currentLocation = n2.getCarLocation().getLocation();
+			this.updateCarPositionBar(currentLocation);
+		}
 
 	}
+
+
 
 	/**
 	 * register for any notifications that this class needs to
@@ -413,11 +427,33 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		contentPane.repaint();
 		
 		//initialize ds, elevationChart, and cp
-	
-		
 	}
 
 
 
+	private void updateCarPositionBar(double kilometerMark){
+		
+		ValueMarker marker = new ValueMarker(kilometerMark);  // position is the value on the axis
+		marker.setPaint(Color.black);
+		//marker.setLabel("here"); // see JavaDoc for labels, colors, strokes
+
+		XYPlot plot = (XYPlot) elevationChart.getPlot();
+		plot.addDomainMarker(marker);
+		
+		cp.repaint();
+		cp.revalidate();
+		contentPane.revalidate();
+		contentPane.repaint();
+	}
 	
+	private void updateCarPositionBar(GeoCoord currentLocation) {
+		if(this.mySession.getMapController().hasMapLoaded()){
+			try {
+				this.updateCarPositionBar(this.mySession.getMapController().findDistanceAlongLoadedRoute(currentLocation));
+			} catch (NoLoadedRouteException e) {
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to get Car location on Map Controller, but no route loaded");
+			}
+		}
+		
+	}
 }

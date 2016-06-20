@@ -61,9 +61,10 @@ public class WeatherController extends ModuleController {
 	 * 
 	 * @param customForecast: the custom forecast report to be added to the list of custom forecasts.
 	 * Usually produced through the FakeForecastWindow.
+	 * @throws NoLoadedRouteException 
 	 */
 	
-	public void loadCustomForecast(ForecastIO customForecast){
+	public void loadCustomForecast(ForecastIO customForecast) throws NoLoadedRouteException{
 		customForecasts.add(customForecast);
 		List<ForecastIO> comboForecasts = addCustomForecasts();
 		ForecastReport theReport = new ForecastReport(comboForecasts, this.mySession.getMapController().getLoadedMapName());
@@ -275,7 +276,7 @@ public class WeatherController extends ModuleController {
 	 * 
 	 * @return the list of ForecastIOs that should be put in the ForecastReport
 	 */
-	private List<ForecastIO> addCustomForecasts(){
+	private List<ForecastIO> addCustomForecasts() throws NoLoadedRouteException{
 		List<ForecastIO> comboForecasts;
 		if(retrievedForecasts == null){
 			comboForecasts = new ArrayList<ForecastIO>();

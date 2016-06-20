@@ -9,7 +9,10 @@ import com.github.dvdme.ForecastIOLib.FIODataPoint;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.GeoCoord;
+import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.Route;
+import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.map.MapController;
 import com.ubcsolar.weather.ForecastIOFactory;
 import com.ubcsolar.weather.WeatherController;
@@ -75,7 +78,7 @@ public class FakeForecastAddWindow extends JFrame{
 		getContentPane().add(lblDistanceAlongRoute, gbc_lblDistanceAlongRoute);
 		
 		distanceSpinner = new JSpinner();
-		distanceSpinner.setModel(new SpinnerNumberModel(0, 0, findTotalDistance(), 1));
+		distanceSpinner.setModel(new SpinnerNumberModel(0, 0, myMap.findTotalDistanceAlongLoadedRoute(), 1));
 		GridBagConstraints gbc_distanceSpinner = new GridBagConstraints();
 		gbc_distanceSpinner.insets = new Insets(0, 0, 5, 5);
 		gbc_distanceSpinner.gridx = 1;
@@ -301,7 +304,13 @@ public class FakeForecastAddWindow extends JFrame{
 		if(customForecast == null){
 			return;
 		}else{
-			myWeather.loadCustomForecast(customForecast);
+			try {
+				myWeather.loadCustomForecast(customForecast);
+			} catch (NoLoadedRouteException e) {
+				// TODO Auto-generated catch block
+				this.handleError("No Route Loaded, unable to add custom forecast");
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to load custom forecast, but no route loaded");
+			}
 			closeWindow();
 		}
 	}
@@ -427,10 +436,5 @@ public class FakeForecastAddWindow extends JFrame{
 		return trailMarkers.get(trailMarkerIndex-1);
 	}
 	
-	private double findTotalDistance(){
-		List<GeoCoord> trailMarkers = myMap.getAllPoints().getTrailMarkers();
-		GeoCoord finalPoint = trailMarkers.get(trailMarkers.size()-1);
-		return myMap.findDistanceAlongLoadedRoute(finalPoint);
-	}
 
 }
