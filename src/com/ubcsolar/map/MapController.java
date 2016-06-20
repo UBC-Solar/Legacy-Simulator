@@ -236,6 +236,6 @@ public class MapController extends ModuleController{
 
 	
 	public boolean hasMapLoaded(){
-		return this.myJDOMMap == null;
+		return this.myJDOMMap != null;
 	}
 }

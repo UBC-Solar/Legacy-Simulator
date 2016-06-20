@@ -146,6 +146,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	public void register(){
 		mySession.register(this, NewMapLoadedNotification.class); //need this for the map label and tool bar.
 		//add any notifications you need to listen for here. 
+		mySession.register(this, NewLocationReportNotification.class);
 	}
 	
 	/**
@@ -432,7 +433,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 
 
 	private void updateCarPositionBar(double kilometerMark){
-		
+		System.out.println("DRAWING LINE FOR KM: " + kilometerMark);
 		ValueMarker marker = new ValueMarker(kilometerMark);  // position is the value on the axis
 		marker.setPaint(Color.black);
 		//marker.setLabel("here"); // see JavaDoc for labels, colors, strokes
@@ -447,6 +448,8 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	}
 	
 	private void updateCarPositionBar(GeoCoord currentLocation) {
+		System.out.println("TRYING TO UPDATE CAR BAR");
+		System.out.println(mySession.getMapController().hasMapLoaded());
 		if(this.mySession.getMapController().hasMapLoaded()){
 			try {
 				this.updateCarPositionBar(this.mySession.getMapController().findDistanceAlongLoadedRoute(currentLocation));
