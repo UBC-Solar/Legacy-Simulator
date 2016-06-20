@@ -130,6 +130,24 @@ public class MapController extends ModuleController{
 		sendNotification(new NewLocationReportNotification(carLocationReported));
 	}
 	
+	/** 
+	 *  Finds the distance along the route (NOT as the crow flies) from the start of the
+	 * route to the breadcrumb point closest to the requested location. 
+	 * Ignores the distance from breadcrumb to target. This assumes the breadcrumbs 
+	 * are numerous enough not to cause a significant issue. (i.e more than 1 per km)
+	 * i.e if you load a Toronto->Halifax route and target is Vancouver, method will return 
+	 * km '0.0' aka Toronto (instead of -3000km).
+	 * i.e if you load a Vancouver->Toronto map and target is calgary, method will return
+	 * the km for a point somewhere in southern Alberta (along the route).   
+	 * @param location
+	 * @return
+	 * @throws NoLoadedRouteException
+	 */
+	public double findDistanceAlongLoadedRoute(GeoCoord location) throws NoLoadedRouteException{
+		GeoCoord newTarget = this.findClosestPointOnRoute(location);
+		return this.findDistanceAlongLoadedRouteExact(newTarget);
+		
+	}
 	/**
 	 * Finds the distance along the route (NOT as the crow flies) from the start of the
 	 * route to the given location. 
@@ -140,7 +158,7 @@ public class MapController extends ModuleController{
 	 * @throws NoLoadedRouteException 
 	 */
 	
-	public double findDistanceAlongLoadedRoute(GeoCoord location) throws NoLoadedRouteException{
+	private double findDistanceAlongLoadedRouteExact(GeoCoord location) throws NoLoadedRouteException{
 		
 		Route currentRoute = getAllPoints();
 		if(currentRoute == null){
