@@ -319,11 +319,6 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		//cp.setRefreshBuffer(true);
 		cp.setMouseZoomable(true);
 		cp.setMouseWheelEnabled(true);
-		cp.setFillZoomRectangle(false);
-		cp.setHorizontalAxisTrace(true);
-		//cp.setVerticalAxisTrace(true);
-		//cp.setZoomAroundAnchor(true);
-
 
 	}
 	
