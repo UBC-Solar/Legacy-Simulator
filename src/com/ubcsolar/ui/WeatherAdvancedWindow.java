@@ -1,6 +1,7 @@
 package com.ubcsolar.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -15,6 +16,8 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.ValueMarker;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
 
@@ -27,6 +30,9 @@ import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LocationReport;
+import com.ubcsolar.common.LogType;
+import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.notification.NewForecastReport;
 import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
@@ -282,6 +288,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			if(n.getClass() == NewLocationReportNotification.class){
 				NewLocationReportNotification n2 = (NewLocationReportNotification) n;
 				currentLocation = n2.getCarLocation().getLocation();
+				this.updateCarPositionBar(currentLocation);
+
 				
 			}
 			updateCharts();
@@ -289,6 +297,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 
 		}
 		
+
 		/**
 		 * register for any notifications that this class needs to
 		 */
@@ -443,6 +452,10 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							PlotOrientation.VERTICAL, true, true, false);
 			temperatureChartJFree = elevationChart;
 			
+			XYPlot plot = (XYPlot) temperatureChartJFree.getPlot();		
+			plot.setRangePannable(true);
+			plot.setDomainPannable(true);
+			
 			
 		}
 		
@@ -456,6 +469,10 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							PlotOrientation.VERTICAL, true, true, false);
 			temperatureChartJFree = temperatureChart;
 			
+			XYPlot plot = (XYPlot) temperatureChartJFree.getPlot();		
+			plot.setRangePannable(true);
+			plot.setDomainPannable(true);
+			
 		}
 		
 		private void buildCloudCoverChart(XYDataset ds){
@@ -467,6 +484,10 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							ds,
 							PlotOrientation.VERTICAL, true, true, false);
 			cloudCoverChartJFree = cloudCoverChart;
+			
+			XYPlot plot = (XYPlot) cloudCoverChartJFree.getPlot();		
+			plot.setRangePannable(true);
+			plot.setDomainPannable(true);
 		}
 		
 		private void buildPrecipitationChart(XYDataset ds){
@@ -478,6 +499,10 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							ds,
 							PlotOrientation.VERTICAL, true, true, false);
 			precipitationChartJFree = precipitationChart;
+			
+			XYPlot plot = (XYPlot) precipitationChartJFree.getPlot();		
+			plot.setRangePannable(true);
+			plot.setDomainPannable(true);
 		}
 		
 		private void buildWindSpeedChart(XYDataset ds){
@@ -489,6 +514,10 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							ds,
 							PlotOrientation.VERTICAL, true, true, false);
 			windSpeedChartJFree = headwindChart;
+			
+			XYPlot plot = (XYPlot) windSpeedChartJFree.getPlot();		
+			plot.setRangePannable(true);
+			plot.setDomainPannable(true);
 		}
 		
 		private XYDataset createChartDataset(WeatherChartType chartType){
@@ -600,5 +629,51 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		    super.toFront();
 		    super.requestFocus();
 		    super.setAlwaysOnTop(false);
+		}
+		
+		private void updateCarPositionBar(GeoCoord currentLocation) {
+			System.out.println("TRYING TO UPDATE CAR BAR IN WEATHER CHARTS");
+			System.out.println(mySession.getMapController().hasMapLoaded());
+			if(this.mySession.getMapController().hasMapLoaded()){
+				try {
+					this.updateCarPositionBar(this.mySession.getMapController().findDistanceAlongLoadedRoute(currentLocation));
+				} catch (NoLoadedRouteException e) {
+					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to get Car location on Map Controller, but no route loaded");
+				}
+			}
+			
+		}
+		private void updateCarPositionBar(double kilometerMark){
+			System.out.println("DRAWING LINE FOR KM: " + kilometerMark);
+			ValueMarker marker = new ValueMarker(kilometerMark);  // position is the value on the axis
+			marker.setPaint(Color.black);
+			//marker.setLabel("here"); // see JavaDoc for labels, colors, strokes
+
+			XYPlot plotTemperature = (XYPlot) temperatureChartJFree.getPlot();
+			plotTemperature.addDomainMarker(marker);
+			
+			XYPlot plotCloudCover = (XYPlot) cloudCoverChartJFree.getPlot();
+			plotCloudCover.addDomainMarker(marker);
+
+			XYPlot plotPrecipitation = (XYPlot) precipitationChartJFree.getPlot();
+			plotPrecipitation.addDomainMarker(marker);
+			
+			XYPlot plotWindSpeed = (XYPlot) windSpeedChartJFree.getPlot();
+			plotWindSpeed.addDomainMarker(marker);
+			
+			temperatureChart.repaint();
+			temperatureChart.revalidate();
+			
+			cloudCoverChart.repaint();
+			cloudCoverChart.revalidate();
+			
+			precipitationChart.repaint();
+			precipitationChart.revalidate();
+			
+			windSpeedChart.repaint();
+			windSpeedChart.revalidate();
+			
+			contentPane.revalidate();
+			contentPane.repaint();
 		}
 }
