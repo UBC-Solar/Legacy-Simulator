@@ -195,7 +195,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		}
 		
 		else if(n.getClass() == NewSimulationReportNotification.class){
-			this.updateSimulation("Started @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
+			this.updateSimulation("Last Run@ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
 		}
 		/*//TODO implement these
 		else if(n.getClass() == NewWeatherLoadedNotification.class){ //to update the weather label
