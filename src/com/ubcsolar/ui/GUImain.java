@@ -185,12 +185,7 @@ public class GUImain implements Listener{
 		mainFrame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-		        if (JOptionPane.showConfirmDialog(mainFrame, 
-		            "Are you sure to close this window?", "Really Closing?", 
-		            JOptionPane.YES_NO_OPTION,
-		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
-		            mySession.exit(); //do the graceful exit code. 
-		        }
+		        tryCloseProgram();
 		    }
 		});
 		
@@ -212,7 +207,7 @@ public class GUImain implements Listener{
 		mntmExit.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent arg0) {
-				mySession.exit();
+				tryCloseProgram();
 			}
 		});
 		mnFile.add(mntmExit); //add it to the File menu
@@ -438,6 +433,14 @@ public class GUImain implements Listener{
 		mapFrame.setVisible(true);
 	}
 	
+	public void tryCloseProgram() {
+		if (JOptionPane.showConfirmDialog(mainFrame, 
+            "Are you sure you want to quit?", "Quit Program?", 
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+            mySession.exit(); //do the graceful exit code. 
+        }
+	}
 
 	public void clearWeather(){
 		WeatherAdvancedWindow weatherWindow = (WeatherAdvancedWindow) weatherFrame;
