@@ -142,6 +142,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				}catch(IOException e){
 					frame.setVisible(false); //no need to show the loading screen now.
 					handleError("IOException, check internet connection");
+					e.printStackTrace();
 				}
 				
 				frame.setVisible(false);
