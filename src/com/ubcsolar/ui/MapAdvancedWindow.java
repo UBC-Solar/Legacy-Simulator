@@ -125,7 +125,11 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 			NewMapLoadedNotification n2 = (NewMapLoadedNotification) n; 
 			labelUpdate(n2.getMapLoadedName());
 			updateMap(n2.getRoute().getTrailMarkers(), -1);
+			if(mySession.getMapController().getLastReportedLocation() != null){
+				this.updateCarPositionBar(mySession.getMapController().getLastReportedLocation().getLocation());
+			}
 		//	JOptionPane.showMessageDialog(this, "New map: " + (((NewMapLoadedNotification) n).getMapLoadedName()));
+				
 			
 		}
 		
