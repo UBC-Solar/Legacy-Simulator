@@ -5,6 +5,7 @@ package com.ubcsolar.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Frame;
 import java.awt.Point;
 
 import javax.swing.BorderFactory;
@@ -408,7 +409,9 @@ public class GUImain implements Listener{
 			this.buildAllWindows();
 		}
 		weatherFrame.setVisible(true);
-		
+		//if(weatherFrame.getState()!=Frame.NORMAL) { weatherFrame.setState(Frame.NORMAL); }
+		weatherFrame.toFront();
+		weatherFrame.repaint();
 	}
 	/**
 	 * launches the Car window

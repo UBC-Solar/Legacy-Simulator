@@ -573,5 +573,20 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			this.currentForecastReport = null;
 			this.updateCharts();
 		}
+		
+		/**
+		 * Needed so that the window always pops up when requested. 
+		 * See http://stackoverflow.com/questions/309023/how-to-bring-a-window-to-the-front 
+		 * for reasoning
+		 */
+		@Override
+		public void toFront() {
+		   // int sta = super.getExtendedState() & ~JFrame.ICONIFIED & JFrame.NORMAL;
 
+		   // super.setExtendedState(sta);
+		    super.setAlwaysOnTop(true);
+		    super.toFront();
+		    super.requestFocus();
+		    super.setAlwaysOnTop(false);
+		}
 }
