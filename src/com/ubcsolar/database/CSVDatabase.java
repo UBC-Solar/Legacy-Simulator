@@ -95,7 +95,9 @@ public class CSVDatabase<V extends DataUnit>{
 				"CSV Database created with name " + filename + ".csv");
 		System.out.println("FILENAME : " + filename);
 		File file = new File(filename+".csv");
-		file.getParentFile().mkdirs(); //makes the folder path
+		if (file.getParentFile() != null){
+			file.getParentFile().mkdirs(); //makes the folder path
+		}
 		myFileWriter = new FileWriter(file);
 		writingQueue = new ConcurrentLinkedQueue<String>();
 		this.isDBConnected = true;
@@ -248,6 +250,8 @@ public class CSVDatabase<V extends DataUnit>{
 	 * @see com.ubcsolar.database.Database#store(com.ubcsolar.common.DataUnit)
 	 */
 	public void store(V toStore) throws IOException {
+		if(toStore==null)
+			return;
 		if(this.columnTitles == null){ //means headers haven't been printed out yet
 			this.columnTitles = toStore.getCSVHeaderRow() + "\r\n";
 			this.writingQueue.add(this.columnTitles);
