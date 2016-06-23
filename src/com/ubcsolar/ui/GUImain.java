@@ -17,6 +17,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.LogType;
@@ -170,8 +171,10 @@ public class GUImain implements Listener{
 	 * @param parent 
 	 */
 	private void initialize(GlobalController parent) {
+
 		mySession = parent; //adds parent 
 		mainFrame = new JFrame(); //
+		setTitleAndLogo();
 		//public void setBounds(int x, int y, int width, int height)
 		mainFrame.setBounds(150, 50, 1000, 600); //main window size on opening
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -368,7 +371,7 @@ public class GUImain implements Listener{
 		mainFrame.getContentPane().repaint();
 		register();
 		
-		setTitleAndLogo();
+
 		mainFrame.repaint(); //sometimes the map window button doesn't pop up, hoping this fixes the glitch
 	}
 	
@@ -376,7 +379,7 @@ public class GUImain implements Listener{
 	 * Sets the window title and logo. Currently just what I came up with 
 	 */
 	private void setTitleAndLogo(){
-		mainFrame.setIconImage(mySession.iconImage.getImage());
+		mainFrame.setIconImage(GlobalValues.iconImage.getImage());
 		mainFrame.setTitle("TITUS-Main");
 	}
 	

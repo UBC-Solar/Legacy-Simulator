@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 
 import java.awt.GridBagLayout;
 
@@ -104,7 +105,7 @@ public class CarAdvancedWindow extends JFrame {
 	}
 	
 	private void setTitleAndLogo(){
-		this.setIconImage(mySession.iconImage.getImage());
+		this.setIconImage(GlobalValues.iconImage.getImage());
 		this.setTitle("Performance");
 	}
 	private void stopRealCar(){

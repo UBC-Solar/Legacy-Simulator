@@ -34,7 +34,6 @@ public class GlobalController {
 	private SimController mySimController; //the Sim controller
 	private DatabaseController myDatabaseController; //the database controller
 	private WeatherController myWeatherController; //the Weather controller.
-	public final ImageIcon iconImage; //the icon for the program
 	private Map<Class<? extends Notification>, List<Listener>> triggerNotifyMap;
 		
 	/**
@@ -44,7 +43,7 @@ public class GlobalController {
 	 * @throws IOException 
 	 */
 	public GlobalController(boolean doBuildUI) throws IOException{
-		iconImage = new ImageIcon("res/windowIcon.png");
+
 		
 		triggerNotifyMap = new HashMap<Class<? extends Notification>, List<Listener>>();		
 		

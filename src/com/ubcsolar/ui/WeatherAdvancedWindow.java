@@ -22,6 +22,7 @@ import com.github.dvdme.ForecastIOLib.FIODataBlock;
 import com.github.dvdme.ForecastIOLib.FIODataPoint;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
@@ -259,7 +260,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		}
 		private void setTitleAndLogo(){
 			
-			this.setIconImage(mySession.iconImage.getImage());
+			this.setIconImage(GlobalValues.iconImage.getImage());
 			this.setTitle("Weather");
 		}
 		

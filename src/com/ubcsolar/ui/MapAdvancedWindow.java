@@ -6,6 +6,7 @@
 package com.ubcsolar.ui;
 
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LogType;
@@ -301,7 +302,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	 * set the title and icon for this window. 
 	 */
 	private void setTitleAndLogo(){
-			this.setIconImage(mySession.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
+			this.setIconImage(GlobalValues.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
 			this.setTitle("Advanced Map"); //possible "advanced map"?
 	}
 	

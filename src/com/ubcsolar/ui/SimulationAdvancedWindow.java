@@ -19,6 +19,7 @@ import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
 
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.SimFrame;
@@ -448,7 +449,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		}
 		
 		private void setTitleAndLogo(){
-			this.setIconImage(mySession.iconImage.getImage());
+			this.setIconImage(GlobalValues.iconImage.getImage());
 			this.setTitle("Simulation");
 		}
 		@Override

@@ -8,6 +8,7 @@ import javax.swing.JOptionPane;
 import com.github.dvdme.ForecastIOLib.FIODataPoint;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.Route;
@@ -324,7 +325,7 @@ public class FakeForecastAddWindow extends JFrame{
 	}
 	
 	private void setTitleAndLogo() {
-		this.setIconImage(mySession.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
+		this.setIconImage(GlobalValues.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
 		this.setTitle("Custom Forecast Report");
 	}
 	

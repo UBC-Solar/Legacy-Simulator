@@ -8,6 +8,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.TelemDataPacket;
@@ -442,7 +443,7 @@ public class CarTelemPacketWindow extends JFrame {
 		this.dispose();
 	}
 	private void setTitleAndLogo() {
-		this.setIconImage(mySession.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
+		this.setIconImage(GlobalValues.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
 		this.setTitle("Custom Location Report");
 	}
 //-------------------------------------------------------------------------------------------------------------	

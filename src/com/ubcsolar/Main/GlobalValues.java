@@ -3,6 +3,8 @@ package com.ubcsolar.Main;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import javax.swing.ImageIcon;
+
 public class GlobalValues {
 	
 	//Hooman's key
@@ -37,5 +39,7 @@ public class GlobalValues {
 
 	//what should be considered a timeout
 	public static final int MAX_TIME_MS_WAIT_FOR_URL = 1000;
+	
+	public static final ImageIcon iconImage = new ImageIcon("res/windowIcon.png"); //the icon for the program
 }
 
