@@ -35,8 +35,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +130,12 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				JFrame frame = new LoadingWindow(mySession);
 				frame.setVisible(true);
 				
-				mySession.getMyWeatherController().downloadNewForecastsForRoute(100); //main Process
+				try{
+					mySession.getMyWeatherController().downloadNewForecastsForRoute(100); //main Process
+				}catch(IOException e){
+					frame.setVisible(false); //no need to show the loading screen now.
+					handleError("IOException, check internet connection");
+				}
 				
 				frame.setVisible(false);
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
@@ -246,6 +254,9 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		setTitleAndLogo();
 		}
 		
+		protected void handleError(String string) {
+			JOptionPane.showMessageDialog(this, string);
+		}
 		private void setTitleAndLogo(){
 			
 			this.setIconImage(mySession.iconImage.getImage());

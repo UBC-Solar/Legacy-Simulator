@@ -39,8 +39,9 @@ public class WeatherController extends ModuleController {
 	 * 
 	 * @param numOfKMBetweenForecasts - we only have 1000 calls, so we probably can't get a forecast for every point
 	 * in the Route. 
+	 * @throws IOException 
 	 */
-	public void downloadNewForecastsForRoute(int numOfKMBetweenForecasts){
+	public void downloadNewForecastsForRoute(int numOfKMBetweenForecasts) throws IOException{
 		Route currentlyLoadedRoute = this.mySession.getMapController().getAllPoints();
 		if(currentlyLoadedRoute == null){
 			mySession.sendNotification(new ExceptionNotification(new NullPointerException(), "Tried to get forecast but route was null"));
@@ -49,10 +50,17 @@ public class WeatherController extends ModuleController {
 		List<GeoCoord> toGet = this.calculatePointsForForecast(numOfKMBetweenForecasts, currentlyLoadedRoute.getTrailMarkers());
 		
 		ForecastFactory forecastGetter = new ForecastFactory();
-		retrievedForecasts = forecastGetter.getForecasts(toGet);
-		ForecastReport theReport = new ForecastReport(retrievedForecasts, this.mySession.getMapController().getLoadedMapName());
-		lastDownloadedReport = theReport;
-		this.mySession.sendNotification(new NewForecastReport(theReport));
+		try{
+			retrievedForecasts = forecastGetter.getForecasts(toGet);
+			ForecastReport theReport = new ForecastReport(retrievedForecasts, this.mySession.getMapController().getLoadedMapName());
+			lastDownloadedReport = theReport;
+			this.mySession.sendNotification(new NewForecastReport(theReport));
+		}
+		catch(IOException e){
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to load Forecasts, but IOException thrown (bad internet likely)");
+			throw e;
+		}
+
 	}
 	
 	/**
