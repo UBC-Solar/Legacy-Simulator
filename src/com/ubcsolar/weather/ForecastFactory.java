@@ -34,6 +34,14 @@ public class ForecastFactory {
 		return toReturn;
 	}
 
+	
+	/**
+	 * Method to use to check for network connection. 
+	 * For documentation/reasoning, see http://stackoverflow.com/questions/1139547/detect-internet-connection-using-java
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
 	 private boolean isInternetReachable() throws IOException{
            
 
@@ -41,7 +49,9 @@ public class ForecastFactory {
              URL url = new URL(GlobalValues.URL_TO_CHECK_INTERNET_WITH);
 
              //open a connection to that source
+             
              HttpURLConnection urlConnect = (HttpURLConnection)url.openConnection();
+             urlConnect.setConnectTimeout(GlobalValues.MAX_TIME_MS_WAIT_FOR_URL);
  		 	try{
              //trying to retrieve data from the source. If there
              //is no connection, this line will fail

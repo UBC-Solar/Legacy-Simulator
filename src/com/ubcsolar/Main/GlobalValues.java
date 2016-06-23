@@ -34,5 +34,8 @@ public class GlobalValues {
 	//If can connect to URL, internet connection is good. Else assume internet is down.
 	//much more likely than Google being down...
 	public final static String URL_TO_CHECK_INTERNET_WITH = "www.google.com";
+
+	//what should be considered a timeout
+	public static final int MAX_TIME_MS_WAIT_FOR_URL = 1000;
 }
 
