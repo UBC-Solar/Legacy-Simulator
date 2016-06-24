@@ -52,6 +52,7 @@ public class CustomDisplayMap extends JMapViewer {
 		
 		//this.setTileSource(new OfflineOsmTileSource("File:///Users/Noah/Desktop/testMapFiles/",1,2));
 		JCheckBox chckbxForecasts = new JCheckBox("Forecasts");
+		chckbxForecasts.setOpaque(false);
 		chckbxForecasts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showForecasts = chckbxForecasts.isSelected();
@@ -64,6 +65,8 @@ public class CustomDisplayMap extends JMapViewer {
 		add(chckbxForecasts);
 		
 		JCheckBox chckbxCities = new JCheckBox("Cities");
+		chckbxCities.setOpaque(false);
+		chckbxCities.setOpaque(false);
 		chckbxCities.setSelected(true);
 		showPOIs = chckbxCities.isSelected();
 		chckbxCities.addActionListener(new ActionListener() {
@@ -72,10 +75,11 @@ public class CustomDisplayMap extends JMapViewer {
 				refreshMap();
 			}
 		});
-		chckbxCities.setBounds(62, 10, 52, 23);
+		chckbxCities.setBounds(62, 10, 72, 23);
 		add(chckbxCities);
 		
 		JCheckBox chckbxCarLocation = new JCheckBox("Car Location");
+		chckbxCarLocation.setOpaque(false);
 		chckbxCarLocation.setSelected(true);
 		showCarLocation = chckbxCarLocation.isSelected();
 		chckbxCarLocation.addActionListener(new ActionListener() {
@@ -84,10 +88,11 @@ public class CustomDisplayMap extends JMapViewer {
 				refreshMap();
 			}
 		});
-		chckbxCarLocation.setBounds(136, 10, 96, 23);
+		chckbxCarLocation.setBounds(136, 10, 116, 23);
 		add(chckbxCarLocation);
 		
 		JCheckBox chckbxRoute = new JCheckBox("Route");
+		chckbxRoute.setOpaque(false);
 		chckbxRoute.setSelected(true);
 		showRouteBreadcrumbs = chckbxRoute.isSelected();
 		chckbxRoute.addActionListener(new ActionListener() {
@@ -96,23 +101,27 @@ public class CustomDisplayMap extends JMapViewer {
 				refreshMap();
 			}
 		});
-		chckbxRoute.setBounds(254, 10, 63, 23);
+		chckbxRoute.setBounds(254, 10, 83, 23);
 		add(chckbxRoute);
 		
 		JRadioButton rdbtnSattelite = new JRadioButton("Satellite");
+		rdbtnSattelite.setOpaque(false);
 		rdbtnSattelite.setBounds(10, 259, 82, 23);
 		add(rdbtnSattelite);
 		
 		JRadioButton rdbtnMap = new JRadioButton("Map (offline)");
-		rdbtnMap.setBounds(10, 233, 96, 23);
+		rdbtnMap.setOpaque(false);
+		rdbtnMap.setBounds(10, 233, 97, 23);
 		add(rdbtnMap);
 		
 		JRadioButton rdbtnMap_1 = new JRadioButton("Map");
+		rdbtnMap_1.setOpaque(false);
 		rdbtnMap_1.setBounds(10, 207, 52, 23);
 		add(rdbtnMap_1);
 		
 		JRadioButton rdbtnSateliteoffline = new JRadioButton("Satellite (offline)");
-		rdbtnSateliteoffline.setBounds(10, 285, 109, 23);
+		rdbtnSateliteoffline.setOpaque(false);
+		rdbtnSateliteoffline.setBounds(10, 285, 124, 23);
 		add(rdbtnSateliteoffline);
 		
 		JLabel lblTileSoure = new JLabel("Tile Soure");
