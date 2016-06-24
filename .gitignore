@@ -5,3 +5,6 @@ bin/
 # OSX
 .DS_Store
 /Output/
+
+# TileCache
+res/tileCache/
