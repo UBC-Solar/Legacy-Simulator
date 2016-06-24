@@ -53,7 +53,9 @@ public class CustomDisplayMap extends JMapViewer {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
+	private final Color defaultColorForThings = new Color(204, 0, 204);
+	private final Font defaultFontForThings = new Font("Tahoma", Font.BOLD, 13);
+	
 	private MapMarker carCurrentLocation; //car's current location
 	private boolean showCarLocation; //initial value set to equal checkbox
 	private List<MapMarker> forecasts; //route forecasts
@@ -73,8 +75,9 @@ public class CustomDisplayMap extends JMapViewer {
 		//super();
 		//this.setTileSource(new OfflineOsmTileSource("File:///Users/Noah/Desktop/testMapFiles/",1,2));
 		JCheckBox chckbxForecasts = new JCheckBox("Forecasts");
-		chckbxForecasts.setForeground(new Color(204, 0, 204));
-		chckbxForecasts.setFont(new Font("Tahoma", Font.BOLD, 13));
+		
+		chckbxForecasts.setForeground(defaultColorForThings);
+		chckbxForecasts.setFont(defaultFontForThings);
 		chckbxForecasts.setOpaque(false);
 		chckbxForecasts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -96,16 +99,16 @@ public class CustomDisplayMap extends JMapViewer {
 				refreshMap();
 			}
 		});
-		chckbxCities.setForeground(new Color(204, 0, 204));
-		chckbxCities.setFont(new Font("Tahoma", Font.BOLD, 13));
+		chckbxCities.setForeground(defaultColorForThings);
+		chckbxCities.setFont(defaultFontForThings);
 		chckbxCities.setOpaque(false);
 		
 		chckbxCities.setBounds(62, 10, 72, 23);
 		add(chckbxCities);
 		
 		JCheckBox chckbxCarLocation = new JCheckBox("Car Location");
-		chckbxCarLocation.setForeground(new Color(204, 0, 204));
-		chckbxCarLocation.setFont(new Font("Tahoma", Font.BOLD, 13));
+		chckbxCarLocation.setForeground(defaultColorForThings);
+		chckbxCarLocation.setFont(defaultFontForThings);
 		chckbxCarLocation.setOpaque(false);
 		chckbxCarLocation.setSelected(true);
 		showCarLocation = chckbxCarLocation.isSelected();
@@ -119,8 +122,8 @@ public class CustomDisplayMap extends JMapViewer {
 		add(chckbxCarLocation);
 		
 		JCheckBox chckbxRoute = new JCheckBox("Route");
-		chckbxRoute.setForeground(new Color(204, 0, 204));
-		chckbxRoute.setFont(new Font("Tahoma", Font.BOLD, 13));
+		chckbxRoute.setForeground(defaultColorForThings);
+		chckbxRoute.setFont(defaultFontForThings);
 		chckbxRoute.setOpaque(false);
 		chckbxRoute.setSelected(true);
 		showRouteBreadcrumbs = chckbxRoute.isSelected();
@@ -139,8 +142,8 @@ public class CustomDisplayMap extends JMapViewer {
 				updateTileSource(MapSource.MAPQUEST_SAT);
 			}
 		});
-		rdbtnSattelite.setForeground(new Color(204, 0, 204));
-		rdbtnSattelite.setFont(new Font("Tahoma", Font.BOLD, 13));
+		rdbtnSattelite.setForeground(defaultColorForThings);
+		rdbtnSattelite.setFont(defaultFontForThings);
 		rdbtnSattelite.setOpaque(false);
 		rdbtnSattelite.setBounds(10, 259, 82, 23);
 		add(rdbtnSattelite);
@@ -151,8 +154,8 @@ public class CustomDisplayMap extends JMapViewer {
 				updateTileSource(MapSource.OSM_MAP_OFFLINE);
 			}
 		});
-		rdbtnDefaultMapOffline.setForeground(new Color(204, 0, 204));
-		rdbtnDefaultMapOffline.setFont(new Font("Tahoma", Font.BOLD, 13));
+		rdbtnDefaultMapOffline.setForeground(defaultColorForThings);
+		rdbtnDefaultMapOffline.setFont(defaultFontForThings);
 		rdbtnDefaultMapOffline.setOpaque(false);
 		rdbtnDefaultMapOffline.setBounds(10, 233, 124, 23);
 		add(rdbtnDefaultMapOffline);
@@ -163,8 +166,8 @@ public class CustomDisplayMap extends JMapViewer {
 				updateTileSource(MapSource.OSM_MAP);
 			}
 		});
-		rdbtnDefaultMap.setForeground(new Color(204, 0, 204));
-		rdbtnDefaultMap.setFont(new Font("Tahoma", Font.BOLD, 13));
+		rdbtnDefaultMap.setForeground(defaultColorForThings);
+		rdbtnDefaultMap.setFont(defaultFontForThings);
 		rdbtnDefaultMap.setOpaque(false);
 		rdbtnDefaultMap.setBounds(10, 207, 52, 23);
 		add(rdbtnDefaultMap);
@@ -175,14 +178,15 @@ public class CustomDisplayMap extends JMapViewer {
 				updateTileSource(MapSource.MAPQUEST_SAT_OFFLINE);
 			}
 		});
-		rdbtnSateliteoffline.setForeground(new Color(204, 0, 204));
-		rdbtnSateliteoffline.setFont(new Font("Tahoma", Font.BOLD, 13));
+		rdbtnSateliteoffline.setForeground(defaultColorForThings);
+		rdbtnSateliteoffline.setFont(defaultFontForThings);
 		rdbtnSateliteoffline.setOpaque(false);
 		rdbtnSateliteoffline.setBounds(10, 285, 140, 23);
 		add(rdbtnSateliteoffline);
 		
 		JLabel lblTileSoure = new JLabel("Tile Soure");
-		lblTileSoure.setFont(new Font("Tahoma", Font.BOLD, 14));
+		lblTileSoure.setForeground(defaultColorForThings);
+		lblTileSoure.setFont(defaultFontForThings);
 		lblTileSoure.setBounds(10, 184, 82, 20);
 		add(lblTileSoure);
 		this.updateTileSource(MapSource.OSM_MAP); //default tiles
@@ -196,7 +200,7 @@ public class CustomDisplayMap extends JMapViewer {
 	
 	public void addNewCarLocationToMap(LocationReport newLocation){
 		this.removeMapMarker(carCurrentLocation); //not sure if this should be here if we repaint anyway
-		Style testStyle = new Style(Color.BLACK, Color.RED, null, MapObjectImpl.getDefaultFont());
+		Style testStyle = new Style(Color.BLACK, Color.RED, null, this.defaultFontForThings);
 		MapMarkerDot newLocationDot = new MapMarkerDot(null,"THE CAR", new Coordinate(newLocation.getLocation().getLat(), newLocation.getLocation().getLon()), testStyle);
 		this.carCurrentLocation = newLocationDot; //so we can remove it next time. 
 		this.refreshMap();
@@ -237,7 +241,8 @@ public class CustomDisplayMap extends JMapViewer {
 	}
 	
 	public void addForecastsToMap(ForecastReport theReport){
-		Style forecastStyle = new Style(Color.BLACK, Color.GREEN, null, MapObjectImpl.getDefaultFont());
+		Style forecastStyle = new Style(this.defaultColorForThings, Color.GREEN, null, this.defaultFontForThings);
+		
 		
 		if(this.forecasts != null){
 			for(MapMarker m : forecasts){
