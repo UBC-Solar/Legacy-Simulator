@@ -42,6 +42,7 @@ public class GlobalValues {
 	
 	public static final ImageIcon iconImage = new ImageIcon("res/windowIcon.png"); //the icon for the program
 	
-	public static final String DEFAULT_TILE_SAVE_LOCATION = "res/tileCache/";
+	
+	public static final String DEFAULT_TILE_SAVE_LOCATION = System.getProperty("user.dir")+"/"+"res/tileCache/";
 }
 
