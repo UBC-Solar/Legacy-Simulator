@@ -241,7 +241,7 @@ public class CustomDisplayMap extends JMapViewer {
 	}
 	
 	public void addForecastsToMap(ForecastReport theReport){
-		Style forecastStyle = new Style(this.defaultColorForThings, Color.GREEN, null, this.defaultFontForThings);
+		Style forecastStyle = new Style(Color.black, Color.GREEN, null, this.defaultFontForThings);
 		
 		
 		if(this.forecasts != null){
