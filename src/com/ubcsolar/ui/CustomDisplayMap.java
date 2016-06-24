@@ -17,16 +17,22 @@ import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
 import org.openstreetmap.gui.jmapviewer.Style;
 import org.openstreetmap.gui.jmapviewer.interfaces.MapMarker;
 import org.openstreetmap.gui.jmapviewer.interfaces.MapPolygon;
+import org.openstreetmap.gui.jmapviewer.tilesources.BingAerialTileSource;
+import org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource;
 
 import com.ubcsolar.common.LocationReport;
+import com.ubcsolar.common.LogType;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.PointOfInterest;
 import com.ubcsolar.common.Route;
+import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import javax.swing.JCheckBox;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JRadioButton;
 import javax.swing.JLabel;
@@ -46,6 +52,10 @@ public class CustomDisplayMap extends JMapViewer {
 	private boolean showPOIs; //initial value set to equal checkbox
 	private MapPolygon routeBreadcrumbs; //the line that shows the trail
 	private boolean showRouteBreadcrumbs; //initial value set to equal checkbox
+	private JRadioButton rdbtnSateliteoffline;
+	private JRadioButton rdbtnSattelite;
+	private JRadioButton rdbtnDefaultMapOffline;
+	private JRadioButton rdbtnDefaultMap;
 	
 	public CustomDisplayMap() {
 		super();
@@ -104,22 +114,42 @@ public class CustomDisplayMap extends JMapViewer {
 		chckbxRoute.setBounds(254, 10, 83, 23);
 		add(chckbxRoute);
 		
-		JRadioButton rdbtnSattelite = new JRadioButton("Satellite");
+		rdbtnSattelite = new JRadioButton("Satellite");
+		rdbtnSattelite.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				updateTileSource(MapSource.MAPQUEST_SAT);
+			}
+		});
 		rdbtnSattelite.setOpaque(false);
 		rdbtnSattelite.setBounds(10, 259, 82, 23);
 		add(rdbtnSattelite);
 		
-		JRadioButton rdbtnMap = new JRadioButton("Map (offline)");
-		rdbtnMap.setOpaque(false);
-		rdbtnMap.setBounds(10, 233, 97, 23);
-		add(rdbtnMap);
+		rdbtnDefaultMapOffline = new JRadioButton("Map (offline)");
+		rdbtnDefaultMapOffline.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				updateTileSource(MapSource.OSM_MAP_OFFLINE);
+			}
+		});
+		rdbtnDefaultMapOffline.setOpaque(false);
+		rdbtnDefaultMapOffline.setBounds(10, 233, 97, 23);
+		add(rdbtnDefaultMapOffline);
 		
-		JRadioButton rdbtnMap_1 = new JRadioButton("Map");
-		rdbtnMap_1.setOpaque(false);
-		rdbtnMap_1.setBounds(10, 207, 52, 23);
-		add(rdbtnMap_1);
+		rdbtnDefaultMap = new JRadioButton("Map");
+		rdbtnDefaultMap.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				updateTileSource(MapSource.OSM_MAP);
+			}
+		});
+		rdbtnDefaultMap.setOpaque(false);
+		rdbtnDefaultMap.setBounds(10, 207, 52, 23);
+		add(rdbtnDefaultMap);
 		
-		JRadioButton rdbtnSateliteoffline = new JRadioButton("Satellite (offline)");
+		rdbtnSateliteoffline = new JRadioButton("Satellite (offline)");
+		rdbtnSateliteoffline.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				updateTileSource(MapSource.MAPQUEST_SAT_OFFLINE);
+			}
+		});
 		rdbtnSateliteoffline.setOpaque(false);
 		rdbtnSateliteoffline.setBounds(10, 285, 124, 23);
 		add(rdbtnSateliteoffline);
@@ -128,6 +158,7 @@ public class CustomDisplayMap extends JMapViewer {
 		lblTileSoure.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblTileSoure.setBounds(10, 184, 82, 20);
 		add(lblTileSoure);
+		this.updateTileSource(MapSource.OSM_MAP); //default tiles
 	}
 
 	public void changeDrawnRoute(Route newRouteToLoad){
@@ -232,4 +263,49 @@ public class CustomDisplayMap extends JMapViewer {
 			this.addMapMarker(carCurrentLocation);
 		}
 	}
+	
+	private void deselectAllComboBoxes(){
+		this.rdbtnDefaultMapOffline.setSelected(false);
+		this.rdbtnDefaultMap.setSelected(false);
+		this.rdbtnSateliteoffline.setSelected(false);
+		this.rdbtnSattelite.setSelected(false);
+		}
+	
+	private void updateTileSource(MapSource newSource){
+		switch(newSource){
+		case OSM_MAP: 
+			this.deselectAllComboBoxes();
+			this.rdbtnDefaultMap.setSelected(true);
+			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Tile source changed to standard map tiles");
+			this.setTileSource(new OsmTileSource.Mapnik());
+			break;
+		case OSM_MAP_OFFLINE:
+			this.deselectAllComboBoxes();
+			rdbtnDefaultMapOffline.setSelected(true);
+			System.out.println("OFFLINE OSM MAP SELECTED");
+			break;
+		case MAPQUEST_SAT:
+			this.deselectAllComboBoxes();
+			this.rdbtnSattelite.setSelected(true);
+			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Tile source changed to BING Ariel tiles");
+			this.setTileSource(new BingAerialTileSource());
+			System.out.println("MAPQUEST SELECTED");
+			break;
+		case MAPQUEST_SAT_OFFLINE:
+			this.deselectAllComboBoxes();
+			this.rdbtnSateliteoffline.setSelected(true);
+			System.out.println("OFFLINE MAPQUEST SELECTED");
+			break;
+		}
+	}
+	
+	private enum MapSource{
+		OSM_MAP,
+		OSM_MAP_OFFLINE,
+		MAPQUEST_SAT,
+		MAPQUEST_SAT_OFFLINE
+	}
 }
+
+
+
