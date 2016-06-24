@@ -63,6 +63,7 @@ import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
+import org.jfree.ui.TextAnchor;
 import org.xml.sax.SAXException;
 
 import com.jgoodies.forms.layout.FormLayout;
@@ -324,6 +325,10 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		//cp.setRefreshBuffer(true);
 		cp.setMouseZoomable(true);
 		cp.setMouseWheelEnabled(true);
+		
+		XYPlot plot = (XYPlot) elevationChart.getPlot();
+		plot.setRangePannable(true);
+		plot.setDomainPannable(true);
 
 	}
 	
@@ -417,8 +422,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		ValueAxis axis = plot.getRangeAxis();
 		axis.setLowerBound(minHeight - ((maxHeight - minHeight) * 0.1)); //pad by 10% of the difference
 		axis.setUpperBound(maxHeight + ((maxHeight - minHeight) *  0.1)); //pad by 10% for prettiness
-		plot.setRangePannable(true);
-		plot.setDomainPannable(true);
+
 		
 		
 		cp.setChart(elevationChart);
@@ -436,8 +440,8 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		System.out.println("DRAWING LINE FOR KM: " + kilometerMark);
 		ValueMarker marker = new ValueMarker(kilometerMark);  // position is the value on the axis
 		marker.setPaint(Color.black);
-		//marker.setLabel("here"); // see JavaDoc for labels, colors, strokes
-
+		//marker.setLabel("here"); // see JavaDoc for labels, colors, strokes TODO
+		
 		XYPlot plot = (XYPlot) elevationChart.getPlot();
 		plot.addDomainMarker(marker);
 		

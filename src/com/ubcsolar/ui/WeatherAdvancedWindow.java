@@ -662,17 +662,17 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			XYPlot plotWindSpeed = (XYPlot) windSpeedChartJFree.getPlot();
 			plotWindSpeed.addDomainMarker(marker);
 			
-			temperatureChart.repaint();
 			temperatureChart.revalidate();
+			temperatureChart.repaint();
 			
-			cloudCoverChart.repaint();
 			cloudCoverChart.revalidate();
+			cloudCoverChart.repaint();
 			
-			precipitationChart.repaint();
 			precipitationChart.revalidate();
+			precipitationChart.repaint();
 			
-			windSpeedChart.repaint();
 			windSpeedChart.revalidate();
+			windSpeedChart.repaint();
 			
 			contentPane.revalidate();
 			contentPane.repaint();
