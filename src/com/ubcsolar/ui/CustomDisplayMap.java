@@ -307,6 +307,8 @@ public class CustomDisplayMap extends JMapViewer {
 		case MAPQUEST_SAT_OFFLINE:
 			this.deselectAllComboBoxes();
 			this.rdbtnSateliteoffline.setSelected(true);
+			String absolutePath2 = "C:/Users/Noah/Documents/My School Stuff/UBC Solar/eclipse-standard-kepler-NEW/workspace/Simulator/";
+			this.setTileSource(new OfflineOsmTileSource("File:///" + absolutePath2 + GlobalValues.DEFAULT_TILE_SAVE_LOCATION + "Bing Aerial Maps/",1,19));
 			System.out.println("OFFLINE MAPQUEST SELECTED");
 			break;
 		}
