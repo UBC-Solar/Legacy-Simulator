@@ -26,63 +26,63 @@ import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.TelemDataPacket;
 
 public class SimEngine {
-private final double RECHARGE_TIME_MS= 3*1000;
-	
+	private final double RECHARGE_TIME_MS= 3*1000;
+
 	public SimEngine() {
-		
+
 	}
 
 	private CarModel inUseCarModel;
-	
-	public List<SimFrame> runSimulation(Route toTraverse, LocationReport startLocation, ForecastReport weatherReports, TelemDataPacket carStartingCondition, Map<GeoCoord,Double> requestedSpeeds){
-	inUseCarModel = new DefaultCarModel();
-	SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "simulation starting");
-	List<SimFrame> listOfFrames = new ArrayList<SimFrame>(toTraverse.getTrailMarkers().size());
-	
-	int startPos = getStartPos(toTraverse.getTrailMarkers(), startLocation.getLocation());
-	ForecastIO weather = weatherReports.getForecasts().get(startPos); //assumes that the number of forecasts in weatherReports = number in Route.
-	GeoCoord start = toTraverse.getTrailMarkers().get(startPos);
-	GeoCoord next = toTraverse.getTrailMarkers().get(startPos + 1);
-	Double reqSpeed = requestedSpeeds.get(start);
-	TelemDataPacket startCondition = carStartingCondition;
-	FIODataPoint startWeather = new FIODataBlock(weather.getHourly()).datapoint(0);
-	
-	SimFrame startFrame = new SimFrame(startWeather, startCondition, startLocation, System.currentTimeMillis()); //starting frame is current.
-	listOfFrames.add(startFrame);
-	
-	SimFrame lastFrame = startFrame;
-	for(int i = startPos; i<toTraverse.getTrailMarkers().size(); i++){ 
-		/*
-		 * By starting at startPos, we calculate the jump from car's current location to the next breadcrumb, rather
-		 * than just assuming that it's actually at the last breadcrumb. 
-		 * This way may produce errors if the car is actually far off the trail, but the alternative is to advance the car
-		 * magically to next breadcrumb, and if the gap between breadcrumbs is big, it may produce an error.  
-		 */
+
+	public List<SimFrame> runSimulation(Route toTraverse, int startLocationIndex, ForecastReport weatherReports, TelemDataPacket carStartingCondition, Map<GeoCoord,Double> requestedSpeeds){
+		inUseCarModel = new DefaultCarModel();
+		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "simulation starting");
+		List<SimFrame> listOfFrames = new ArrayList<SimFrame>(toTraverse.getTrailMarkers().size());
+
 		
-		ForecastIO nextWeather;
-		GeoCoord nextPoint;
-		if (lastFrame.getCarStatus().getSpeed()<=0){
-			i--; //if the speed is zero then we need to redo the frame because the car is not moving, and thus is in the same place
-			if(i<0){
-				nextWeather = weatherReports.getForecasts().get(startPos);
+		ForecastIO weather = weatherReports.getForecasts().get(startLocationIndex); //assumes that the number of forecasts in weatherReports = number in Route.
+		GeoCoord start = toTraverse.getTrailMarkers().get(startLocationIndex);
+		GeoCoord next = toTraverse.getTrailMarkers().get(startLocationIndex + 1);
+		Double reqSpeed = requestedSpeeds.get(start);
+		TelemDataPacket startCondition = carStartingCondition;
+		FIODataPoint startWeather = new FIODataBlock(weather.getHourly()).datapoint(0);
+		LocationReport simmedStartPoint = new LocationReport(toTraverse.getTrailMarkers().get(startLocationIndex), "Raven", "Simmed");
+		SimFrame startFrame = new SimFrame(startWeather, startCondition, simmedStartPoint, System.currentTimeMillis()); //starting frame is current.
+		listOfFrames.add(startFrame);
+
+		SimFrame lastFrame = startFrame;
+		for(int i = startLocationIndex+1; i<toTraverse.getTrailMarkers().size(); i++){ 
+			/*
+			 * By starting at startPos, we calculate the jump from car's current location to the next breadcrumb, rather
+			 * than just assuming that it's actually at the last breadcrumb. 
+			 * This way may produce errors if the car is actually far off the trail, but the alternative is to advance the car
+			 * magically to next breadcrumb, and if the gap between breadcrumbs is big, it may produce an error.  
+			 */
+
+			ForecastIO nextWeather;
+			GeoCoord nextPoint;
+			if (lastFrame.getCarStatus().getSpeed()<=0){
+				i--; //if the speed is zero then we need to redo the frame because the car is not moving, and thus is in the same place
+				if(i<0){
+					nextWeather = weatherReports.getForecasts().get(startLocationIndex);
+				}
+				else{
+					nextWeather = weatherReports.getForecasts().get(i);
+				}
+
+				nextPoint = lastFrame.getGPSReport().getLocation();
 			}
 			else{
 				nextWeather = weatherReports.getForecasts().get(i);
+				nextPoint = toTraverse.getTrailMarkers().get(i);
 			}
-			
-			nextPoint = lastFrame.getGPSReport().getLocation();
-		}
-		else{
-			nextWeather = weatherReports.getForecasts().get(i);
-			nextPoint = toTraverse.getTrailMarkers().get(i);
-		}
 
-		SimFrame nextFrame = this.generateNextFrame(lastFrame, nextPoint, nextWeather, requestedSpeeds.get(nextPoint));
-		lastFrame = nextFrame;
-		listOfFrames.add(nextFrame);
-	}	
-	
-	return listOfFrames;
+			SimFrame nextFrame = this.generateNextFrame(lastFrame, nextPoint, nextWeather, requestedSpeeds.get(nextPoint));
+			lastFrame = nextFrame;
+			listOfFrames.add(nextFrame);
+		}	
+
+		return listOfFrames;
 	}
 
 
@@ -93,9 +93,9 @@ private final double RECHARGE_TIME_MS= 3*1000;
 		GeoCoord lastPosition = lastFrame.getGPSReport().getLocation();
 		double lastSpeed = lastCarStatus.getSpeed();
 		long lastTimeStamp = lastFrame.getRepresentedTime();
-		
+
 		double elevationChange = nextPoint.getElevation() - lastPosition.getElevation();
-		
+
 		double speedToDrive;
 		if(requestedSpeed == null){
 			speedToDrive = calculateBestSpeed(lastCarStatus.getSpeed(), elevationChange, lastCarStatus.getStateOfCharge()); //stubMethod. Also this is a greedy algo.
@@ -104,19 +104,19 @@ private final double RECHARGE_TIME_MS= 3*1000;
 		else{
 			speedToDrive = requestedSpeed;
 		}
-		
+
 		//not sure if calculateDistance() takes elevation into account....
 		double distanceCovered = lastPosition.calculateDistance(nextPoint)*1000; 
 		long nextSimFrameTime;
 		long timeSinceLastFrame;
 		double timeSinceLastFrameInHr;
-		
+
 		if (speedToDrive >= .001){
 			double tempTime = (distanceCovered/(speedToDrive * 1000.0))*60.0*1000.0*60.0; //double check units. km/h and m?? distanceCovered is in meters
 			timeSinceLastFrame = (long) tempTime;		
 			nextSimFrameTime = lastTimeStamp + timeSinceLastFrame;
 			timeSinceLastFrameInHr = timeSinceLastFrame/(60.0*1000.0*60.0);
-			
+
 			System.out.println(distanceCovered);
 		}
 		else{
@@ -128,23 +128,23 @@ private final double RECHARGE_TIME_MS= 3*1000;
 			System.out.println(timeSinceLastFrameInHr);
 			System.out.println(distanceCovered);
 		}
-		
-		
-		
+
+
+
 		FIODataPoint forecastForPoint = chooseReport(nextWeather, nextSimFrameTime);
 		double squareMetersOfPanel = inUseCarModel.getSolarPanelArea();
 		double sunPowerInWatts = calculateSunPower(nextPoint, forecastForPoint, (lastTimeStamp + (timeSinceLastFrame/2)), squareMetersOfPanel, lastFrame);
 
-		
+
 		double SunCharge = (sunPowerInWatts*timeSinceLastFrameInHr)/(inUseCarModel.getMaxBatteryCap()); //divide watt hrs from the sun by max watt hrs to get the percentage of charge from the sun
 		if(SunCharge>2000000){
 			System.out.println("" + distanceCovered + " " +  timeSinceLastFrameInHr + " Speed: " + speedToDrive);
 		}
-		
+
 		TelemDataPacket newCarStatus;
 		newCarStatus = calculateNewCarStatus(lastCarStatus, distanceCovered, elevationChange, forecastForPoint, speedToDrive, SunCharge);
 		LocationReport nextLocationReport = generateLocationReport(lastFrame.getGPSReport(), nextPoint);
-		
+
 		SimFrame toReturn = new SimFrame(forecastForPoint, newCarStatus, nextLocationReport, nextSimFrameTime);
 
 		try {
@@ -153,12 +153,12 @@ private final double RECHARGE_TIME_MS= 3*1000;
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
+
 		return toReturn; 
 	}
 
-	
+
 	private LocationReport generateLocationReport(LocationReport oldReport, GeoCoord nextPoint) {
 		// TODO Auto-generated method stub
 		LocationReport toReturn = new LocationReport(nextPoint, oldReport.getCarName(), "Simulated");
@@ -181,14 +181,14 @@ private final double RECHARGE_TIME_MS= 3*1000;
 		//TODO actually calculate the car...
 		//TODO review the state of charge
 
-		 double generateSoC = generateSoC(lastCarStatus.getStateOfCharge(), elevationChange, speedToDrive, SunCharge);
-		 TelemDataPacket toReturn = new TelemDataPacket(speedToDrive,
+		double generateSoC = generateSoC(lastCarStatus.getStateOfCharge(), elevationChange, speedToDrive, SunCharge);
+		TelemDataPacket toReturn = new TelemDataPacket(speedToDrive,
 				lastCarStatus.getTotalVoltage(), 
 				lastCarStatus.getTemperatures(), 
 				lastCarStatus.getCellVoltages(), 
 				generateSoC, 
 				(distanceCovered/(speedToDrive*1000)*60*60*1000));
-		
+
 		return toReturn;
 	}
 
@@ -199,7 +199,7 @@ private final double RECHARGE_TIME_MS= 3*1000;
 	 * @param lastSoC
 	 * @return
 	 */
-	
+
 	private double generateSoC(double lastSoC, double elevationChange, double speed, double SoCFromSun) {
 		if (elevationChange < 0){
 			if (lastSoC+2+SoCFromSun>=100){
@@ -208,7 +208,7 @@ private final double RECHARGE_TIME_MS= 3*1000;
 			}
 			else{
 				return lastSoC+2+SoCFromSun;
-				}
+			}
 		}
 		else if(elevationChange >0){
 			if(lastSoC-speed/50.0+SoCFromSun<=0){
@@ -217,7 +217,7 @@ private final double RECHARGE_TIME_MS= 3*1000;
 			}
 			else{
 				return lastSoC-speed/50.0+SoCFromSun;
-				}
+			}
 		}
 		else if(speed == 0){
 			if (lastSoC+1.5+SoCFromSun>=100){
@@ -226,7 +226,7 @@ private final double RECHARGE_TIME_MS= 3*1000;
 			}
 			else{
 				return lastSoC+1.5+SoCFromSun;
-				}
+			}
 		}
 		else{
 			if(lastSoC-speed/100.0+SoCFromSun<=0){
@@ -235,13 +235,13 @@ private final double RECHARGE_TIME_MS= 3*1000;
 			}
 			else{
 				return lastSoC-speed/100.0+SoCFromSun;
-				}
+			}
 		}
 	}
-		
-		
-		
-		/*
+
+
+
+	/*
 	private double generateRandomSoC(double lastSoC) {
 		Random rng = new Random();
 		int change = rng.nextInt(5); //up or down max 2% in a frame.
@@ -255,7 +255,7 @@ private final double RECHARGE_TIME_MS= 3*1000;
 			return lastSoC + change - 2; 
 		}
 	}
-*/
+	 */
 
 	/**
 	 * Helper function; calculate the amount of solar power falling on the car during the frame. 
@@ -264,49 +264,49 @@ private final double RECHARGE_TIME_MS= 3*1000;
 	 * @param squareMetersOfPanel - the total collection area of solar panels
 	 * @return
 	 */
-   private double calculateSunPower(GeoCoord nextPoint, FIODataPoint forecastForPoint, double timeOfDay, double squareMetersOfPanel, SimFrame lastFrame) {
-	   Calendar rightNow = Calendar.getInstance();
-	   rightNow.setTimeInMillis((long) timeOfDay);
-	   
-	   int hour= rightNow.HOUR_OF_DAY;
-	   // TODO Auto-generated method stub
-	   
-	   //Get the sun elevation given the time of day and the latitude and longitude. 
-	   
-	   double cloudCover = lastFrame.getForecast().cloudCover();
-	   
-	   
-	   
-	   //assume 100 watts per square foot. (thanks random forum guy)
-	   //10.7639 sq feet per sq. meter. 
-	   double timeFactor=1;
-	   
-	   //replace with sunrise equation later
-	   if (hour<12 && hour>6){
-		   timeFactor=(4-24/hour)/2; //calculations just meant to get a 0-1 scale
-	   }
-	   if (hour>12 && hour<21){
-		   timeFactor=(1-hour/21)/.4286; //.4286 is a conversion factor to get on a scale of 0-1
-	   }
-	   
-	   double watts = 100*10.7639 * squareMetersOfPanel* timeFactor* cloudCover;
-	   
-	   //calculate how much sun there is given the weather (cloudy? Probably not much). 
-	   //I think there's actually a parameter in FIODataPoint for sun exposure. If not, use the cloudyness measurement. 
-	   
-	   //assuming no weather at all right now. 
-	   
-	   //because watts, don't need to include time. 
+	private double calculateSunPower(GeoCoord nextPoint, FIODataPoint forecastForPoint, double timeOfDay, double squareMetersOfPanel, SimFrame lastFrame) {
+		Calendar rightNow = Calendar.getInstance();
+		rightNow.setTimeInMillis((long) timeOfDay);
+
+		int hour= rightNow.HOUR_OF_DAY;
+		// TODO Auto-generated method stub
+
+		//Get the sun elevation given the time of day and the latitude and longitude. 
+
+		double cloudCover = lastFrame.getForecast().cloudCover();
+
+
+
+		//assume 100 watts per square foot. (thanks random forum guy)
+		//10.7639 sq feet per sq. meter. 
+		double timeFactor=1;
+
+		//replace with sunrise equation later
+		if (hour<12 && hour>6){
+			timeFactor=(4-24/hour)/2; //calculations just meant to get a 0-1 scale
+		}
+		if (hour>12 && hour<21){
+			timeFactor=(1-hour/21)/.4286; //.4286 is a conversion factor to get on a scale of 0-1
+		}
+
+		double watts = 100*10.7639 * squareMetersOfPanel* timeFactor* cloudCover;
+
+		//calculate how much sun there is given the weather (cloudy? Probably not much). 
+		//I think there's actually a parameter in FIODataPoint for sun exposure. If not, use the cloudyness measurement. 
+
+		//assuming no weather at all right now. 
+
+		//because watts, don't need to include time. 
 		return watts; 
 	}
 
 
-/**
-    * Helper function, picks the right report from a list of hourly reports and a time. 
-    * @param weather
-    * @param timeFrame ms since jan1 1970 (see System.currentTimeMillis)
-    * @return
-    */
+	/**
+	 * Helper function, picks the right report from a list of hourly reports and a time. 
+	 * @param weather
+	 * @param timeFrame ms since jan1 1970 (see System.currentTimeMillis)
+	 * @return
+	 */
 	private FIODataPoint chooseReport(ForecastIO weather, double timeFrame) {
 		//TODO actually make this choose something. 
 		FIODataPoint toReturn  = new FIODataBlock(weather.getHourly()).datapoint(0);
@@ -318,7 +318,7 @@ private final double RECHARGE_TIME_MS= 3*1000;
 	private double calculateBestSpeed(double lastCarSpeed, double elevationChange, double SoC) {
 		double SpeedReturn;
 		double MaxCarSpeed=110;
-		
+
 		if (SoC<=0){
 			if(lastCarSpeed-2<0){
 				return 0;
@@ -342,10 +342,10 @@ private final double RECHARGE_TIME_MS= 3*1000;
 				return SpeedReturn;
 			}
 		}
-		
+
 		//return 22.0; // Chosen by fair dice roll, guaranteed to be random. https://xkcd.com/221/ 
-		
-		
+
+
 		/*
 		Random rng = new Random();
 		if(rng.nextInt(4)<=2){
@@ -362,17 +362,17 @@ private final double RECHARGE_TIME_MS= 3*1000;
 		else{
 			speedToReturn += (deltaV - 3); //to generate some negatives. 
 		}
-		
+
 		return speedToReturn;
 		//TODO put real algo here. 
-		*/
+		 */
 	}
 
 
-	
+
 	private int getStartPos(ArrayList<GeoCoord> trailMarkers, GeoCoord location) {
 		// find the closest point and return the position number. 
-		//TODO actually calculate start position. 
+		
 		return 0;
 	}
 }
