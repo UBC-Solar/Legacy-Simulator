@@ -437,12 +437,12 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 
 
 	private void updateCarPositionBar(double kilometerMark){
-		System.out.println("DRAWING LINE FOR KM: " + kilometerMark);
 		ValueMarker marker = new ValueMarker(kilometerMark);  // position is the value on the axis
 		marker.setPaint(Color.black);
 		//marker.setLabel("here"); // see JavaDoc for labels, colors, strokes TODO
 		
 		XYPlot plot = (XYPlot) elevationChart.getPlot();
+		plot.clearDomainMarkers();
 		plot.addDomainMarker(marker);
 		
 		cp.repaint();
@@ -452,8 +452,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	}
 	
 	private void updateCarPositionBar(GeoCoord currentLocation) {
-		System.out.println("TRYING TO UPDATE CAR BAR");
-		System.out.println(mySession.getMapController().hasMapLoaded());
+
 		if(this.mySession.getMapController().hasMapLoaded()){
 			try {
 				this.updateCarPositionBar(this.mySession.getMapController().findDistanceAlongLoadedRoute(currentLocation));
