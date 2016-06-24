@@ -73,6 +73,8 @@ public class CustomDisplayMap extends JMapViewer {
 		//super();
 		//this.setTileSource(new OfflineOsmTileSource("File:///Users/Noah/Desktop/testMapFiles/",1,2));
 		JCheckBox chckbxForecasts = new JCheckBox("Forecasts");
+		chckbxForecasts.setForeground(new Color(204, 0, 204));
+		chckbxForecasts.setFont(new Font("Tahoma", Font.BOLD, 13));
 		chckbxForecasts.setOpaque(false);
 		chckbxForecasts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -82,11 +84,10 @@ public class CustomDisplayMap extends JMapViewer {
 		});
 		chckbxForecasts.setSelected(true);
 		showForecasts = chckbxForecasts.isSelected();
-		chckbxForecasts.setBounds(339, 10, 82, 23);
+		chckbxForecasts.setBounds(339, 10, 97, 23);
 		add(chckbxForecasts);
 		
 		JCheckBox chckbxCities = new JCheckBox("Cities");
-		chckbxCities.setOpaque(false);
 		chckbxCities.setSelected(true);
 		showPOIs = chckbxCities.isSelected();
 		chckbxCities.addActionListener(new ActionListener() {
@@ -95,10 +96,16 @@ public class CustomDisplayMap extends JMapViewer {
 				refreshMap();
 			}
 		});
+		chckbxCities.setForeground(new Color(204, 0, 204));
+		chckbxCities.setFont(new Font("Tahoma", Font.BOLD, 13));
+		chckbxCities.setOpaque(false);
+		
 		chckbxCities.setBounds(62, 10, 72, 23);
 		add(chckbxCities);
 		
 		JCheckBox chckbxCarLocation = new JCheckBox("Car Location");
+		chckbxCarLocation.setForeground(new Color(204, 0, 204));
+		chckbxCarLocation.setFont(new Font("Tahoma", Font.BOLD, 13));
 		chckbxCarLocation.setOpaque(false);
 		chckbxCarLocation.setSelected(true);
 		showCarLocation = chckbxCarLocation.isSelected();
@@ -112,6 +119,8 @@ public class CustomDisplayMap extends JMapViewer {
 		add(chckbxCarLocation);
 		
 		JCheckBox chckbxRoute = new JCheckBox("Route");
+		chckbxRoute.setForeground(new Color(204, 0, 204));
+		chckbxRoute.setFont(new Font("Tahoma", Font.BOLD, 13));
 		chckbxRoute.setOpaque(false);
 		chckbxRoute.setSelected(true);
 		showRouteBreadcrumbs = chckbxRoute.isSelected();
@@ -130,6 +139,8 @@ public class CustomDisplayMap extends JMapViewer {
 				updateTileSource(MapSource.MAPQUEST_SAT);
 			}
 		});
+		rdbtnSattelite.setForeground(new Color(204, 0, 204));
+		rdbtnSattelite.setFont(new Font("Tahoma", Font.BOLD, 13));
 		rdbtnSattelite.setOpaque(false);
 		rdbtnSattelite.setBounds(10, 259, 82, 23);
 		add(rdbtnSattelite);
@@ -140,8 +151,10 @@ public class CustomDisplayMap extends JMapViewer {
 				updateTileSource(MapSource.OSM_MAP_OFFLINE);
 			}
 		});
+		rdbtnDefaultMapOffline.setForeground(new Color(204, 0, 204));
+		rdbtnDefaultMapOffline.setFont(new Font("Tahoma", Font.BOLD, 13));
 		rdbtnDefaultMapOffline.setOpaque(false);
-		rdbtnDefaultMapOffline.setBounds(10, 233, 97, 23);
+		rdbtnDefaultMapOffline.setBounds(10, 233, 124, 23);
 		add(rdbtnDefaultMapOffline);
 		
 		rdbtnDefaultMap = new JRadioButton("Map");
@@ -150,6 +163,8 @@ public class CustomDisplayMap extends JMapViewer {
 				updateTileSource(MapSource.OSM_MAP);
 			}
 		});
+		rdbtnDefaultMap.setForeground(new Color(204, 0, 204));
+		rdbtnDefaultMap.setFont(new Font("Tahoma", Font.BOLD, 13));
 		rdbtnDefaultMap.setOpaque(false);
 		rdbtnDefaultMap.setBounds(10, 207, 52, 23);
 		add(rdbtnDefaultMap);
@@ -160,8 +175,10 @@ public class CustomDisplayMap extends JMapViewer {
 				updateTileSource(MapSource.MAPQUEST_SAT_OFFLINE);
 			}
 		});
+		rdbtnSateliteoffline.setForeground(new Color(204, 0, 204));
+		rdbtnSateliteoffline.setFont(new Font("Tahoma", Font.BOLD, 13));
 		rdbtnSateliteoffline.setOpaque(false);
-		rdbtnSateliteoffline.setBounds(10, 285, 124, 23);
+		rdbtnSateliteoffline.setBounds(10, 285, 140, 23);
 		add(rdbtnSateliteoffline);
 		
 		JLabel lblTileSoure = new JLabel("Tile Soure");
