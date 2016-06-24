@@ -10,11 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openstreetmap.gui.jmapviewer.Coordinate;
+import org.openstreetmap.gui.jmapviewer.DefaultMapController;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
 import org.openstreetmap.gui.jmapviewer.MapObjectImpl;
 import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
+import org.openstreetmap.gui.jmapviewer.MemoryTileCache;
 import org.openstreetmap.gui.jmapviewer.Style;
+import org.openstreetmap.gui.jmapviewer.Tile;
 import org.openstreetmap.gui.jmapviewer.interfaces.MapMarker;
 import org.openstreetmap.gui.jmapviewer.interfaces.MapPolygon;
 import org.openstreetmap.gui.jmapviewer.tilesources.BingAerialTileSource;
@@ -23,16 +26,22 @@ import org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource;
 import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.LogType;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.PointOfInterest;
 import com.ubcsolar.common.Route;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.notification.NewMapLoadedNotification;
+
+import javax.imageio.ImageIO;
 import javax.swing.JCheckBox;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.JRadioButton;
 import javax.swing.JLabel;
@@ -58,8 +67,9 @@ public class CustomDisplayMap extends JMapViewer {
 	private JRadioButton rdbtnDefaultMap;
 	
 	public CustomDisplayMap() {
-		super();
-		
+		super(new saveToDiskCache(),8); //8 is used in the default constructor
+		new  DefaultMapController(this); //not called in the second constructor... must be a bug?
+		//super();
 		//this.setTileSource(new OfflineOsmTileSource("File:///Users/Noah/Desktop/testMapFiles/",1,2));
 		JCheckBox chckbxForecasts = new JCheckBox("Forecasts");
 		chckbxForecasts.setOpaque(false);
@@ -75,7 +85,6 @@ public class CustomDisplayMap extends JMapViewer {
 		add(chckbxForecasts);
 		
 		JCheckBox chckbxCities = new JCheckBox("Cities");
-		chckbxCities.setOpaque(false);
 		chckbxCities.setOpaque(false);
 		chckbxCities.setSelected(true);
 		showPOIs = chckbxCities.isSelected();
@@ -282,6 +291,9 @@ public class CustomDisplayMap extends JMapViewer {
 		case OSM_MAP_OFFLINE:
 			this.deselectAllComboBoxes();
 			rdbtnDefaultMapOffline.setSelected(true);
+			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Tile Source switched to offline standard map tiles");
+			String absolutePath = "Users/Noah/Documents/My School Stuff/UBC Solar/eclipse-standard-kepler-NEW/workspace/Simulator/";
+			this.setTileSource(new OfflineOsmTileSource("File://" + absolutePath + GlobalValues.DEFAULT_TILE_SAVE_LOCATION + "mapnik/",1,12));
 			System.out.println("OFFLINE OSM MAP SELECTED");
 			break;
 		case MAPQUEST_SAT:
@@ -296,6 +308,34 @@ public class CustomDisplayMap extends JMapViewer {
 			this.rdbtnSateliteoffline.setSelected(true);
 			System.out.println("OFFLINE MAPQUEST SELECTED");
 			break;
+		}
+	}
+	
+	
+	private static class saveToDiskCache extends MemoryTileCache{
+		@Override
+		public void addTile(Tile tile){
+			String placeToSave = tile.getSource().getName() + "/";
+			placeToSave += tile.getZoom() + "/";
+			placeToSave += tile.getXtile() + "/";
+			//placeToSave += tile.getYtile() + "/"; //this is the tile name I think
+			String totalFilePath = GlobalValues.DEFAULT_TILE_SAVE_LOCATION + placeToSave;
+			File saveSpot = new File(totalFilePath);
+			if(!saveSpot.exists()){
+				saveSpot.mkdirs();
+			}
+			String filename = totalFilePath + tile.getYtile() + ".png";
+			File outputfile = new File(filename);
+			if(!outputfile.exists()){
+				try {
+					// retrieve image
+					BufferedImage bi = tile.getImage();
+					ImageIO.write(bi, "png", outputfile);
+				} catch (IOException e) {
+					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Unable to save tile image, IOException thrown");
+				}
+			}
+			super.addTile(tile);
 		}
 	}
 	

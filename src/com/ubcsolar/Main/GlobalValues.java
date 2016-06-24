@@ -41,5 +41,7 @@ public class GlobalValues {
 	public static final int MAX_TIME_MS_WAIT_FOR_URL = 1000;
 	
 	public static final ImageIcon iconImage = new ImageIcon("res/windowIcon.png"); //the icon for the program
+	
+	public static final String DEFAULT_TILE_SAVE_LOCATION = "res/tileCache/";
 }
 
