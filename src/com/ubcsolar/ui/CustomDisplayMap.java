@@ -20,6 +20,7 @@ import org.openstreetmap.gui.jmapviewer.Style;
 import org.openstreetmap.gui.jmapviewer.Tile;
 import org.openstreetmap.gui.jmapviewer.interfaces.MapMarker;
 import org.openstreetmap.gui.jmapviewer.interfaces.MapPolygon;
+import org.openstreetmap.gui.jmapviewer.interfaces.TileSource;
 import org.openstreetmap.gui.jmapviewer.tilesources.BingAerialTileSource;
 import org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource;
 
@@ -292,8 +293,8 @@ public class CustomDisplayMap extends JMapViewer {
 			this.deselectAllComboBoxes();
 			rdbtnDefaultMapOffline.setSelected(true);
 			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Tile Source switched to offline standard map tiles");
-			String absolutePath = "Users/Noah/Documents/My School Stuff/UBC Solar/eclipse-standard-kepler-NEW/workspace/Simulator/";
-			this.setTileSource(new OfflineOsmTileSource("File://" + absolutePath + GlobalValues.DEFAULT_TILE_SAVE_LOCATION + "mapnik/",1,12));
+			String absolutePath = "C:/Users/Noah/Documents/My School Stuff/UBC Solar/eclipse-standard-kepler-NEW/workspace/Simulator/";
+			this.setTileSource(new OfflineOsmTileSource("File:///" + absolutePath + GlobalValues.DEFAULT_TILE_SAVE_LOCATION + "mapnik/",1,19));
 			System.out.println("OFFLINE OSM MAP SELECTED");
 			break;
 		case MAPQUEST_SAT:
@@ -314,31 +315,37 @@ public class CustomDisplayMap extends JMapViewer {
 	
 	private static class saveToDiskCache extends MemoryTileCache{
 		@Override
-		public void addTile(Tile tile){
-			String placeToSave = tile.getSource().getName() + "/";
-			placeToSave += tile.getZoom() + "/";
-			placeToSave += tile.getXtile() + "/";
+		public Tile getTile(TileSource source, int x, int y, int z){
+			Tile justGotten = super.getTile(source, x, y, z);
+			if(justGotten == null){
+				return null;
+			}
+			if(justGotten.getSource().getName().equalsIgnoreCase("offline")){
+				return justGotten;
+			}
+			String placeToSave = justGotten.getSource().getName() + "/";
+			placeToSave += justGotten.getZoom() + "/";
+			placeToSave += justGotten.getXtile() + "/";
 			//placeToSave += tile.getYtile() + "/"; //this is the tile name I think
 			String totalFilePath = GlobalValues.DEFAULT_TILE_SAVE_LOCATION + placeToSave;
 			File saveSpot = new File(totalFilePath);
 			if(!saveSpot.exists()){
 				saveSpot.mkdirs();
 			}
-			String filename = totalFilePath + tile.getYtile() + ".png";
+			String filename = totalFilePath + justGotten.getYtile() + ".png";
 			File outputfile = new File(filename);
-			if(!outputfile.exists()){
+			if(!outputfile.exists() && justGotten.isLoaded()){
 				try {
 					// retrieve image
-					BufferedImage bi = tile.getImage();
+					BufferedImage bi = justGotten.getImage();
 					ImageIO.write(bi, "png", outputfile);
 				} catch (IOException e) {
 					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Unable to save tile image, IOException thrown");
 				}
 			}
-			super.addTile(tile);
+			return justGotten;
 		}
 	}
-	
 	private enum MapSource{
 		OSM_MAP,
 		OSM_MAP_OFFLINE,
