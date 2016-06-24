@@ -334,7 +334,10 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		}
 		
 		public void updateLabels(){
-			if(currentLocation != null &&currentForecastReport.getForecasts().size()>0){
+			
+			if(currentLocation != null &&
+					currentForecastReport != null &&
+					currentForecastReport.getForecasts().size()>0){
 				//next block figures out which forecast is closest to the current car location
 				//and which one will be the next one in the sequence
 				List<ForecastIO> forecasts = currentForecastReport.getForecasts();
