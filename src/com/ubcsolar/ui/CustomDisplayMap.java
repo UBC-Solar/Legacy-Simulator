@@ -5,6 +5,7 @@
 package com.ubcsolar.ui;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,9 @@ import com.ubcsolar.notification.NewMapLoadedNotification;
 import javax.swing.JCheckBox;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JRadioButton;
+import javax.swing.JLabel;
+import java.awt.Font;
 
 public class CustomDisplayMap extends JMapViewer {
 	/**
@@ -45,6 +49,8 @@ public class CustomDisplayMap extends JMapViewer {
 	
 	public CustomDisplayMap() {
 		super();
+		
+		//this.setTileSource(new OfflineOsmTileSource("File:///Users/Noah/Desktop/testMapFiles/",1,2));
 		JCheckBox chckbxForecasts = new JCheckBox("Forecasts");
 		chckbxForecasts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -54,7 +60,7 @@ public class CustomDisplayMap extends JMapViewer {
 		});
 		chckbxForecasts.setSelected(true);
 		showForecasts = chckbxForecasts.isSelected();
-		chckbxForecasts.setBounds(46, 7, 82, 23);
+		chckbxForecasts.setBounds(339, 10, 82, 23);
 		add(chckbxForecasts);
 		
 		JCheckBox chckbxCities = new JCheckBox("Cities");
@@ -66,7 +72,7 @@ public class CustomDisplayMap extends JMapViewer {
 				refreshMap();
 			}
 		});
-		chckbxCities.setBounds(134, 7, 73, 23);
+		chckbxCities.setBounds(62, 10, 52, 23);
 		add(chckbxCities);
 		
 		JCheckBox chckbxCarLocation = new JCheckBox("Car Location");
@@ -78,7 +84,7 @@ public class CustomDisplayMap extends JMapViewer {
 				refreshMap();
 			}
 		});
-		chckbxCarLocation.setBounds(209, 7, 120, 23);
+		chckbxCarLocation.setBounds(136, 10, 96, 23);
 		add(chckbxCarLocation);
 		
 		JCheckBox chckbxRoute = new JCheckBox("Route");
@@ -90,8 +96,29 @@ public class CustomDisplayMap extends JMapViewer {
 				refreshMap();
 			}
 		});
-		chckbxRoute.setBounds(331, 7, 63, 23);
+		chckbxRoute.setBounds(254, 10, 63, 23);
 		add(chckbxRoute);
+		
+		JRadioButton rdbtnSattelite = new JRadioButton("Satellite");
+		rdbtnSattelite.setBounds(10, 259, 82, 23);
+		add(rdbtnSattelite);
+		
+		JRadioButton rdbtnMap = new JRadioButton("Map (offline)");
+		rdbtnMap.setBounds(10, 233, 96, 23);
+		add(rdbtnMap);
+		
+		JRadioButton rdbtnMap_1 = new JRadioButton("Map");
+		rdbtnMap_1.setBounds(10, 207, 52, 23);
+		add(rdbtnMap_1);
+		
+		JRadioButton rdbtnSateliteoffline = new JRadioButton("Satellite (offline)");
+		rdbtnSateliteoffline.setBounds(10, 285, 109, 23);
+		add(rdbtnSateliteoffline);
+		
+		JLabel lblTileSoure = new JLabel("Tile Soure");
+		lblTileSoure.setFont(new Font("Tahoma", Font.BOLD, 14));
+		lblTileSoure.setBounds(10, 184, 82, 20);
+		add(lblTileSoure);
 	}
 
 	public void changeDrawnRoute(Route newRouteToLoad){
@@ -196,5 +223,4 @@ public class CustomDisplayMap extends JMapViewer {
 			this.addMapMarker(carCurrentLocation);
 		}
 	}
-	
 }
