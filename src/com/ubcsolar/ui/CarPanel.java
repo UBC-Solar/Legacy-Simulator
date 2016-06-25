@@ -376,7 +376,7 @@ public class CarPanel extends JPanel implements Listener {
 		lblTempitem1.setForeground(Color.orange);
 	}
 	else{
-		lblTempitem1.setForeground(Color.green);
+		lblTempitem1.setForeground(car.getGreen());
 	}
 	
 	
@@ -387,7 +387,7 @@ public class CarPanel extends JPanel implements Listener {
 		lblTempitem_2_1.setForeground(Color.orange);
 	}
 	else{
-		lblTempitem_2_1.setForeground(Color.green);
+		lblTempitem_2_1.setForeground(car.getGreen());
 	}
 	
 	
@@ -398,7 +398,7 @@ public class CarPanel extends JPanel implements Listener {
 		lblTempitem_3_1.setForeground(Color.orange);
 	}
 	else{
-		lblTempitem_3_1.setForeground(Color.green);
+		lblTempitem_3_1.setForeground(car.getGreen());
 	}
 	
 	if (pack1Temp > car.getMaxTempTreshold()){
@@ -408,7 +408,7 @@ public class CarPanel extends JPanel implements Listener {
 		lblTempitem_4.setForeground(Color.orange);
 	}
 	else{
-		lblTempitem_4.setForeground(Color.green);
+		lblTempitem_4.setForeground(car.getGreen());
 	}
 	
 	
@@ -419,7 +419,7 @@ public class CarPanel extends JPanel implements Listener {
 		lblTempitem_5.setForeground(Color.orange);
 	}
 	else{
-		lblTempitem_5.setForeground(Color.green);
+		lblTempitem_5.setForeground(car.getGreen());
 	}
 	
 	
@@ -430,7 +430,7 @@ public class CarPanel extends JPanel implements Listener {
 		lblTempitem_6.setForeground(Color.orange);
 	}
 	else{
-		lblTempitem_6.setForeground(Color.green);
+		lblTempitem_6.setForeground(car.getGreen());
 	}
 	
 	//Calculate and display the average value of each pack voltage. 

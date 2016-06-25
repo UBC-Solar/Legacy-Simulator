@@ -9,8 +9,14 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.Listener;
+import com.ubcsolar.common.TelemDataPacket;
+import com.ubcsolar.notification.CarUpdateNotification;
+import com.ubcsolar.notification.NewForecastReport;
+import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewMetarReportLoadedNotification;
 import com.ubcsolar.notification.NewTafReportLoadedNotification;
 import com.ubcsolar.notification.Notification;
@@ -114,9 +120,21 @@ public class WeatherPanel extends JPanel implements Listener {
 		
 	}
 
+	private void updateKeyLabels(){
+		
+		
+	}
+	
 
 	@Override
 	public void notify(Notification n) {
+		
+		if(n.getClass() == NewForecastReport.class){
+			//double cloud_cover = ForecastIO.getFIOhourly.get(0).getcloud;
+			updateKeyLabels();
+			
+		}
+		
 		if(n.getClass() == NewMetarReportLoadedNotification.class){
 			updateMetarLabel("" + n.getTimeCreated());
 		}
@@ -142,6 +160,8 @@ public class WeatherPanel extends JPanel implements Listener {
 	public void register() {
 		mySession.register(this, NewMetarReportLoadedNotification.class);
 		mySession.register(this, NewTafReportLoadedNotification.class);
+		mySession.register(this, NewForecastReport.class);
+		mySession.register(this, NewLocationReportNotification.class);
 	}
 
 }
