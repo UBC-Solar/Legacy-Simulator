@@ -187,7 +187,11 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							"Must load route before loading forecasts."));
 				
 				else{
-					mySession.getMyWeatherController().downloadCurrentLocationForecast(currentLocation);
+					try {
+						mySession.getMyWeatherController().downloadCurrentLocationForecast(currentLocation);
+					} catch (NoLoadedRouteException e1) {
+						SolarLog.write(LogType.ERROR, System.currentTimeMillis(), e1.getMessage());
+					}
 					System.out.println("Was asked currentLocation forecast");
 				}
 			}

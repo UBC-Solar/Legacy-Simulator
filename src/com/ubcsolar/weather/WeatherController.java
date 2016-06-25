@@ -27,7 +27,8 @@ public class WeatherController extends ModuleController {
 	private ForecastReport lastDownloadedReport = null;
 	private ForecastReport lastCustomReport = null;
 	private List<ForecastIO> retrievedForecasts;
-	private List<ForecastIO> customForecasts = new ArrayList<ForecastIO>();
+	private List<ForecastIO> customForecasts;
+	private List<ForecastIO> comboForecasts = new ArrayList<ForecastIO>();
 	private MapController myMapController;
 	
 	public WeatherController(GlobalController toAdd) {
@@ -63,15 +64,20 @@ public class WeatherController extends ModuleController {
 
 	}
 	
-	public void downloadCurrentLocationForecast(GeoCoord location){
+	public void downloadCurrentLocationForecast(GeoCoord location) throws NoLoadedRouteException{
 		Route currentRoute = mySession.getMapController().getAllPoints();
 		List<GeoCoord> toGet = new ArrayList<GeoCoord>();
 		toGet.add(location);
 		ForecastFactory forecastGetter = new ForecastFactory();
-		ForecastIO currentForecast = forecastGetter.getForecasts(toGet).get(0);
-		ForecastIO forecastOnRoute = copyAtLocation(currentForecast,
-				currentRoute.getClosestPointOnRoute(location));
-		loadCustomForecast(forecastOnRoute);
+		ForecastIO currentForecast;
+		try {
+			currentForecast = forecastGetter.getForecasts(toGet).get(0);
+			ForecastIO forecastOnRoute = copyAtLocation(currentForecast,
+					currentRoute.getClosestPointOnRoute(location));
+			loadCustomForecast(forecastOnRoute);
+		} catch (IOException e) {
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), e.getMessage());
+		}
 	}
 	
 	/**
@@ -87,7 +93,7 @@ public class WeatherController extends ModuleController {
 	
 	public void loadCustomForecast(ForecastIO customForecast) throws NoLoadedRouteException{
 		customForecasts.add(customForecast);
-		List<ForecastIO> comboForecasts = addCustomForecasts();
+		addCustomForecasts();
 		ForecastReport theReport = new ForecastReport(comboForecasts, this.mySession.getMapController().getLoadedMapName());
 		lastCustomReport = theReport;
 		this.mySession.sendNotification(new NewForecastReport(theReport));
@@ -99,6 +105,11 @@ public class WeatherController extends ModuleController {
 	
 	public void clearCustomForecasts(){
 		customForecasts = new ArrayList<ForecastIO>();
+		if(retrievedForecasts == null){
+			comboForecasts = new ArrayList<ForecastIO>();
+		}else{
+			comboForecasts = new ArrayList<ForecastIO>(retrievedForecasts);
+		}
 		if(lastDownloadedReport != null){
 			this.mySession.sendNotification(new NewForecastReport(lastDownloadedReport));
 		}else{
@@ -142,44 +153,44 @@ public class WeatherController extends ModuleController {
 	
 	
 	/**
-	 * interprolates a forecast based on the two closest forecasts. 
+	 * interpolates a forecast based on the two closest forecasts. 
 	 * @param target
 	 * @return
 	 * @throws NoForecastReportException
 	 */
 	private ForecastIO interprolateForecast(GeoCoord target) throws NoForecastReportException{
-		if(retrievedForecasts == null){
+		if(comboForecasts == null){
 			throw new NoForecastReportException();
 		}
-		int startIndex = this.getIndexOfStartForecast(retrievedForecasts, target);
-		ForecastIO startForecast = this.retrievedForecasts.get(startIndex);
+		int startIndex = this.getIndexOfStartForecast(comboForecasts, target);
+		ForecastIO startForecast = this.comboForecasts.get(startIndex);
 		
 		//check to see if the target point is off the end of the forecast list. 
-		if((startIndex >= retrievedForecasts.size()-1) || (startIndex<= 0)){
+		if((startIndex >= comboForecasts.size()-1) || (startIndex<= 0)){
 			GeoCoord firstSpot = new GeoCoord(startForecast.getLatitude(),startForecast.getLongitude(),0.0);
 			ForecastIO secondForecast;
-			if(startIndex>= retrievedForecasts.size()-1){
-				secondForecast = this.retrievedForecasts.get(startIndex - 1);
+			if(startIndex>= comboForecasts.size()-1){
+				secondForecast = this.comboForecasts.get(startIndex - 1);
 			}else{ //i.e is 0
-				secondForecast = this.retrievedForecasts.get(startIndex + 1);
+				secondForecast = this.comboForecasts.get(startIndex + 1);
 			}
 			GeoCoord scndSpot = new GeoCoord(secondForecast.getLatitude(),secondForecast.getLongitude(),0.0);
 			double distanceBetweenFCs = firstSpot.calculateDistance(scndSpot);
 			double distanceBetweenTargetAndSecond = scndSpot.calculateDistance(target);
 			
 			
-			//can't interprolate past the end of the forecasts.
+			//can't interpolate past the end of the forecasts.
 			if(distanceBetweenTargetAndSecond > distanceBetweenFCs){
-				return this.retrievedForecasts.get(startIndex);  
+				return this.comboForecasts.get(startIndex);  
 			}
 			else{
 				return this.interpolateForecast(startForecast, secondForecast, target);
 			}			
 		}
 		//determine which point is next (one left or one right?)
-		ForecastIO oneLeft = this.retrievedForecasts.get(startIndex - 1);
+		ForecastIO oneLeft = this.comboForecasts.get(startIndex - 1);
 		GeoCoord oneLeftSpot = new GeoCoord(oneLeft.getLatitude(), oneLeft.getLongitude(), 0.0);
-		ForecastIO oneRight = this.retrievedForecasts.get(startIndex + 1);
+		ForecastIO oneRight = this.comboForecasts.get(startIndex + 1);
 		GeoCoord oneRightSpot = new GeoCoord(oneRight.getLatitude(), oneRight.getLongitude(),0.0); 
 		if(target.calculateDistance(oneLeftSpot) < target.calculateDistance(oneRightSpot)){
 			return this.interpolateForecast(startForecast, oneLeft, target);
@@ -297,8 +308,7 @@ public class WeatherController extends ModuleController {
 	 * 
 	 * @return the list of ForecastIOs that should be put in the ForecastReport
 	 */
-	private List<ForecastIO> addCustomForecasts() throws NoLoadedRouteException{
-		List<ForecastIO> comboForecasts;
+	private void addCustomForecasts() throws NoLoadedRouteException{
 		if(retrievedForecasts == null){
 			comboForecasts = new ArrayList<ForecastIO>();
 		}else{
@@ -360,8 +370,6 @@ public class WeatherController extends ModuleController {
 					myMapController.getAllPoints().getTrailMarkers().get(0));
 			comboForecasts.add(0,forecast);
 		}
-		return comboForecasts;
-	
 	}
 	
 	private ForecastIO copyAtLocation(ForecastIO initial, GeoCoord location){
