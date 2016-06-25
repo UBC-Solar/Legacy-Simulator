@@ -8,18 +8,26 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
+import com.github.dvdme.ForecastIOLib.FIODataBlock;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.ForecastReport;
+import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
+import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.TelemDataPacket;
+import com.ubcsolar.exception.NoForecastReportException;
+import com.ubcsolar.map.MapController;
 import com.ubcsolar.notification.CarUpdateNotification;
 import com.ubcsolar.notification.NewForecastReport;
 import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewMetarReportLoadedNotification;
 import com.ubcsolar.notification.NewTafReportLoadedNotification;
 import com.ubcsolar.notification.Notification;
+import com.ubcsolar.weather.WeatherController;
+
 import java.awt.Insets;
 import java.awt.BorderLayout;
 
@@ -63,7 +71,7 @@ public class WeatherPanel extends JPanel implements Listener {
 				gbl_panel_2.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 				panel_2.setLayout(gbl_panel_2);
 				
-				lblCloud = new JLabel("Cloud:");
+				lblCloud = new JLabel("Amount of Cloud Cover:");
 				GridBagConstraints gbc_lblCloud = new GridBagConstraints();
 				gbc_lblCloud.insets = new Insets(0, 0, 5, 5);
 				gbc_lblCloud.gridx = 0;
@@ -77,7 +85,7 @@ public class WeatherPanel extends JPanel implements Listener {
 				gbc_CloudPercent.gridy = 1;
 				panel_2.add(CloudPercent, gbc_CloudPercent);
 				
-				lblWind = new JLabel("Wind:");
+				lblWind = new JLabel("Wind Speed:");
 				GridBagConstraints gbc_lblWind = new GridBagConstraints();
 				gbc_lblWind.insets = new Insets(0, 0, 5, 5);
 				gbc_lblWind.gridx = 0;
@@ -91,7 +99,7 @@ public class WeatherPanel extends JPanel implements Listener {
 				gbc_WindSpeed.gridy = 4;
 				panel_2.add(WindSpeed, gbc_WindSpeed);
 				
-				lblRain = new JLabel("Precipitation:");
+				lblRain = new JLabel("Precipitation Intensity:");
 				GridBagConstraints gbc_lblRain = new GridBagConstraints();
 				gbc_lblRain.insets = new Insets(0, 0, 0, 5);
 				gbc_lblRain.gridx = 0;
@@ -120,18 +128,47 @@ public class WeatherPanel extends JPanel implements Listener {
 		
 	}
 
-	private void updateKeyLabels(){
-		
+	private void updateKeyLabels(LocationReport location){
+		GeoCoord actual_location = location.getLocation();
+		try {
+			ForecastIO temp_forecast = mySession.getMyWeatherController().getForecastForSpecificPoint(actual_location, false);
+			FIODataBlock temp_forecast_block = new FIODataBlock(temp_forecast.getHourly());
+			Double cloud = temp_forecast_block.datapoint(0).cloudCover();
+			double cloud_percent = cloud*100;
+			String cloud_percent_word = String.valueOf(cloud_percent);
+			Double wind = temp_forecast_block.datapoint(0).windSpeed(); //units m/s?
+			Double weather = temp_forecast_block.datapoint(0).precipIntensity();
+			String weather_string = String.valueOf(weather);
+			
+			WindSpeed.setText(wind + " m/s");
+			CloudPercent.setText(cloud_percent_word + "%");
+			Rainfall.setText(weather_string);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoForecastReportException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		
 	}
+	
+	
 	
 
 	@Override
 	public void notify(Notification n) {
 		
 		if(n.getClass() == NewForecastReport.class){
-			//double cloud_cover = ForecastIO.getFIOhourly.get(0).getcloud;
-			updateKeyLabels();
+			if (mySession.getMapController().getLastReportedLocation() != null){
+				//System.out.println("here");
+				updateKeyLabels(mySession.getMapController().getLastReportedLocation());
+			}
+		}
+		else if(n.getClass() == NewLocationReportNotification.class){
+			updateKeyLabels(((NewLocationReportNotification) n).getCarLocation());
 			
 		}
 		
