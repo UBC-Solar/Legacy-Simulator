@@ -323,7 +323,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		this.displayedSpeedSliderSpinners = new ArrayList<SliderSpinnerFrame>();
 		double runningTotalDistance= startDistance;
 		int lastAddedPointIndex = 0;
-		double lastAddedPointDistance = 0.0;
+		double lastAddedPointDistance = startDistance;
 		
 		//can't set the first speed anyway. 
 		for(int i = 1; i<simResultValues.size(); i++){
@@ -521,7 +521,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 					ChartFactory.createXYLineChart(
 							CHART_TITLE,
 							X_AXIS_LABEL,
-							Y_AXIS_LABEL, 
+							//Y_AXIS_LABEL,
+							null,
 							null, //we'll add in all the values below so we can map to custom axis
 							PlotOrientation.VERTICAL, true, true, false);
 			final XYPlot plot = simResults.getXYPlot();
