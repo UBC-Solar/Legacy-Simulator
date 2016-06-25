@@ -172,12 +172,6 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		
-		JMenu mnNewMenu = new JMenu("View Map");
-		menuBar.add(mnNewMenu);
-		
-		JMenuItem mntmCoordinates = new JMenuItem("Coordinates");
-		mnNewMenu.add(mntmCoordinates);
-		
 		JMenu mnLoadMap = new JMenu("Load Map");
 		menuBar.add(mnLoadMap);
 		

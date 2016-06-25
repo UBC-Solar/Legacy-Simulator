@@ -101,16 +101,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		this.parent = main;// TODO for loading Frame
 		this.mySession = mySession;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 450, 543);
-		
-		JMenuBar menuBar = new JMenuBar();
-		setJMenuBar(menuBar);
-		
-		JMenu mnNewMenu = new JMenu("File");
-		menuBar.add(mnNewMenu);
-		
-		JMenu mnNewMenu_1 = new JMenu("Results");
-		menuBar.add(mnNewMenu_1);
+		setBounds(100, 100, 974, 780);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);

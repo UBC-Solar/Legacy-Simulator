@@ -247,16 +247,6 @@ public class GUImain implements Listener{
 		mnModules.add(mntmPerformance);
 		mnModules.add(mntmSimulator);
 		
-		//Make entry to open Strategy (aka 'performance') advanced options
-		//NOTE: This is where we should adjust the driving profile in the future
-		JMenuItem mntmStrategy = new JMenuItem("Strategy");
-		mntmStrategy.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JFrame frame = new Strategy();
-				frame.setVisible(true);
-			}
-		});
-		
 		//Make entry to open Map advanced options
 		JMenuItem mntmMap = new JMenuItem("Map");
 		mntmMap.addActionListener(new ActionListener() {
@@ -267,7 +257,6 @@ public class GUImain implements Listener{
 			}
 		});
 		mnModules.add(mntmMap);
-		mnModules.add(mntmStrategy);
 		
 		JMenu mnDebug = new JMenu("Debug");
 		menuBar.add(mnDebug);

@@ -50,15 +50,6 @@ public class CarAdvancedWindow extends JFrame {
 		this.mySession = mySession;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
-		
-		JMenuBar menuBar = new JMenuBar();
-		setJMenuBar(menuBar);
-		
-		JMenu mnFiles = new JMenu("Files");
-		menuBar.add(mnFiles);
-		
-		JMenu mnOther = new JMenu("Other");
-		menuBar.add(mnOther);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
