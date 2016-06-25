@@ -310,26 +310,27 @@ public class CustomDisplayMap extends JMapViewer {
 			this.rdbtnDefaultMap.setSelected(true);
 			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Tile source changed to standard map tiles");
 			this.setTileSource(new OsmTileSource.Mapnik());
+			this.getTileCache().clear();
 			break;
 		case OSM_MAP_OFFLINE:
 			this.deselectAllComboBoxes();
 			rdbtnDefaultMapOffline.setSelected(true);
 			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Tile Source switched to offline standard map tiles");
 			this.setTileSource(new OfflineOsmTileSource("File:///"+ GlobalValues.DEFAULT_TILE_SAVE_LOCATION + "mapnik/",1,19));
-			System.out.println("OFFLINE OSM MAP SELECTED");
+			this.getTileCache().clear();
 			break;
 		case MAPQUEST_SAT:
 			this.deselectAllComboBoxes();
 			this.rdbtnSattelite.setSelected(true);
 			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Tile source changed to BING Ariel tiles");
 			this.setTileSource(new BingAerialTileSource());
-			System.out.println("MAPQUEST SELECTED");
+			this.getTileCache().clear();
 			break;
 		case MAPQUEST_SAT_OFFLINE:
 			this.deselectAllComboBoxes();
 			this.rdbtnSateliteoffline.setSelected(true);
 			this.setTileSource(new OfflineOsmTileSource("File:///" + GlobalValues.DEFAULT_TILE_SAVE_LOCATION + "Bing Aerial Maps/",1,19));
-			System.out.println("OFFLINE MAPQUEST SELECTED");
+			this.getTileCache().clear();
 			break;
 		}
 	}
