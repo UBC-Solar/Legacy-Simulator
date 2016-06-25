@@ -593,7 +593,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 
 				
 				int numHours = 0;
-				while((numHours < NUM_LINES) && ( numHours < hourlyForecasts.size()) ){
+				while((numHours < NUM_LINES) && ( numHours < hourlyForecasts.get(numHours).datablockSize()) ){
 					double[][] data = new double[2][distances.length];
 					for(int i = 0; i < hourlyForecasts.size(); i++){
 						data[0][i] = distances[i];
