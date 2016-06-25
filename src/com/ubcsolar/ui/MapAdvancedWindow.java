@@ -79,13 +79,7 @@ import java.awt.FlowLayout;
 
 public class MapAdvancedWindow extends JFrame implements Listener {
 
-	private boolean showChartNavigationTutorialAgain = true;
-	private static final String ChartTutorialMessage = "To navigate the plot: \n\n"
-			+ "-zoom in/out with mouse wheel" +"\n\n"
-			+ "-click and drage down-right to zoom in specific area" +"\n\n"
-			+ "-CTRL+drag to move the plot" +"\n\n"
-			+ "-click and drage up-left to reset the zoom" +"\n\n"
-			+ "\n" + "ENJOY !"; //TODO
+
 	private JPanel contentPane;
 	private GlobalController mySession;
 	private JLabel lblMapName;
@@ -115,16 +109,16 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	private void mapChartNavigationTutorialDialog() {
 		Object[] options= { "Ok, Thanks" ,  "Don't show this message again" };
 		
-		if (showChartNavigationTutorialAgain == true)
+		if (GlobalValues.showChartNavigationTutorialAgain == true)
 		{
-			int chosenOption= JOptionPane.showOptionDialog(this, ChartTutorialMessage , "Tutorial", JOptionPane.YES_NO_OPTION,
+			int chosenOption= JOptionPane.showOptionDialog(this, GlobalValues.CHART_TUT_MESSAGE , "Tutorial", JOptionPane.YES_NO_OPTION,
 				JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
 		
 			if (chosenOption == 1){
-				showChartNavigationTutorialAgain = false;
+				GlobalValues.showChartNavigationTutorialAgain = false;
 			}
 			else{
-				showChartNavigationTutorialAgain = true;
+				GlobalValues.showChartNavigationTutorialAgain = true;
 			}
 		}
 	}

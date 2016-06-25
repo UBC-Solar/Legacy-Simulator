@@ -44,5 +44,22 @@ public class GlobalValues {
 	
 	
 	public static final String DEFAULT_TILE_SAVE_LOCATION = System.getProperty("user.dir")+"/"+"res/tileCache/";
+	
+	
+	/**
+	 * The message shown on any 'advanced' window with a graph, to explain how to navigate
+	 * the charts. 
+	 */
+	public static final String CHART_TUT_MESSAGE = "To navigate the plot: \n\n"
+			+ "-zoom in/out with mouse wheel" +"\n\n"
+			+ "-click and drage down-right to zoom in specific area" +"\n\n"
+			+ "-CTRL+drag to move the plot" +"\n\n"
+			+ "-click and drage up-left to reset the zoom" +"\n\n"
+			+ "\n" + "ENJOY !"; //TODO
+	
+	/**
+	 * Whether the user has hit 'don't show me again'
+	 */
+	public static boolean showChartNavigationTutorialAgain = true;
 }
 
