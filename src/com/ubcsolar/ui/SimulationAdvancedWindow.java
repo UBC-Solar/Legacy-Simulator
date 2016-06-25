@@ -69,7 +69,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private GUImain parent; //TODO for loading frame
 	private JFreeChart simResults; //the main chart model.
 	private final String X_AXIS_LABEL = "Distance (km)";
-	private final String Y_AXIS_LABEL = "speed (km/h)";
+	private final String Y_AXIS_LABEL = null;//"speed (km/h)"; // everything is in secondary axis
 	private final int xValues = 0; //for the Double[][] dataset
 	private final int yValues = 1; //for the Double[][] dataset
 	private JPanel buttonPanel; 
@@ -446,6 +446,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 							Y_AXIS_LABEL, 
 							ds,
 							PlotOrientation.VERTICAL, true, true, false);
+			
+			XYPlot temp = simResults.getXYPlot();
+			temp.clearRangeAxes();
 		}
 		
 		
@@ -521,13 +524,13 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 					ChartFactory.createXYLineChart(
 							CHART_TITLE,
 							X_AXIS_LABEL,
-							//Y_AXIS_LABEL,
-							null,
+							Y_AXIS_LABEL,
 							null, //we'll add in all the values below so we can map to custom axis
 							PlotOrientation.VERTICAL, true, true, false);
 			final XYPlot plot = simResults.getXYPlot();
 			plot.setRangePannable(true);
 			plot.setDomainPannable(true);
+			plot.clearRangeAxes();
 			
 			if(this.showSpeed){
 				DefaultXYDataset speedDataset = new DefaultXYDataset();
