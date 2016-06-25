@@ -84,6 +84,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private final int DEW_POINT_DIFF = 7;
 	private double travelDistance;
 	private double[] distances;
+	private double kilometerMark;
 	private List<GeoCoord> forecastPoints;
 
 	/**
@@ -320,6 +321,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			buildWindSpeedChart(createChartDataset(WeatherChartType.WIND_SPEED));
 			windSpeedChart.setChart(windSpeedChartJFree);
 			
+
+
 			temperatureChart.repaint();
 			temperatureChart.revalidate();
 			cloudCoverChart.repaint();
@@ -330,6 +333,10 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			windSpeedChart.revalidate();
 			contentPane.repaint();
 			contentPane.revalidate();
+			
+			if (kilometerMark != -1){
+				this.updateCarPositionBar(kilometerMark);
+			}
 			
 		}
 		
@@ -636,11 +643,11 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		}
 		
 		private void updateCarPositionBar(GeoCoord currentLocation) {
-			System.out.println("TRYING TO UPDATE CAR BAR IN WEATHER CHARTS");
-			System.out.println(mySession.getMapController().hasMapLoaded());
+			//System.out.println("TRYING TO UPDATE CAR BAR IN WEATHER CHARTS");
+			//System.out.println(mySession.getMapController().hasMapLoaded());
 			if(this.mySession.getMapController().hasMapLoaded()){
 				try {
-					this.updateCarPositionBar(this.mySession.getMapController().findDistanceAlongLoadedRoute(currentLocation));
+					kilometerMark=(this.mySession.getMapController().findDistanceAlongLoadedRoute(currentLocation));
 				} catch (NoLoadedRouteException e) {
 					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to get Car location on Map Controller, but no route loaded");
 				}
@@ -654,15 +661,19 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			//marker.setLabel("here"); // see JavaDoc for labels, colors, strokes
 
 			XYPlot plotTemperature = (XYPlot) temperatureChartJFree.getPlot();
+		//	plotTemperature.clearDomainMarkers();
 			plotTemperature.addDomainMarker(marker);
 			
 			XYPlot plotCloudCover = (XYPlot) cloudCoverChartJFree.getPlot();
+		//	plotCloudCover.clearDomainMarkers();
 			plotCloudCover.addDomainMarker(marker);
 
 			XYPlot plotPrecipitation = (XYPlot) precipitationChartJFree.getPlot();
+		//	plotPrecipitation.clearDomainMarkers();
 			plotPrecipitation.addDomainMarker(marker);
 			
 			XYPlot plotWindSpeed = (XYPlot) windSpeedChartJFree.getPlot();
+		//	plotWindSpeed.clearDomainMarkers();
 			plotWindSpeed.addDomainMarker(marker);
 			
 			temperatureChart.revalidate();
