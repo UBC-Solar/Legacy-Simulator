@@ -90,8 +90,57 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private List<SliderSpinnerFrame> displayedSpeedSliderSpinners = new ArrayList<SliderSpinnerFrame>();
 
 	
+	private boolean showWelcomeMessageAgain = true;
+	private boolean showChartNavigationTutorialAgain = true;
+	private static final String WelcomeInfoMessage = "use \"Load Forecasts for Route(48 hours)\" under the \"Forecasts\" menu to get the weather information."
+			+"\n\n"+ "Note: You should Load the route before this.";
+	private static final String ChartTutorialMessage = "To navigate the plot: \n\n"
+		+ "-zoom in/out with mouse wheel" +"\n\n"
+		+ "-click and drage down-right to zoom in specific area" +"\n\n"
+		+ "-CTRL+drag to move the plot" +"\n\n"
+		+ "-click and drage up-left to reset the zoom" +"\n\n"
+		+ "\n" + "ENJOY !"; //TODO
+
 	private void handleError(String message){
 		JOptionPane.showMessageDialog(this, message);
+	}
+	
+	private void mapChartNavigationTutorialDialog() {
+		Object[] options= { "Ok, Thanks" ,  "Don't show this message again" };
+		
+		if (showChartNavigationTutorialAgain == true)
+		{
+			int chosenOption= JOptionPane.showOptionDialog(this, ChartTutorialMessage , "Tutorial", JOptionPane.YES_NO_OPTION,
+				JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+		
+			if (chosenOption == 1){
+				showChartNavigationTutorialAgain = false;
+			}
+			else{
+				showChartNavigationTutorialAgain = true;
+			}
+		}
+	}
+	
+	
+	/**
+	 * pops up a tutorial dialog 
+	 */
+	public void welcomeInfoDialog() {
+		Object[] options= { "Ok, Thanks" ,  "Don't show this message again" };
+		
+		if (showWelcomeMessageAgain == true)
+		{
+			int chosenOption= JOptionPane.showOptionDialog(this, WelcomeInfoMessage , "Tutorial", JOptionPane.YES_NO_OPTION,
+				JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+		
+			if (chosenOption == 1){
+				showWelcomeMessageAgain = false;
+			}
+			else{
+				showWelcomeMessageAgain = true;
+			}
+		}
 	}
 	
 	/**
@@ -119,10 +168,14 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
 				JFrame frame = new LoadingWindow(mySession);
 				frame.setVisible(true);
+				
 				runSimultion();
+				
 				frame.setVisible(false);
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
+			
+				mapChartNavigationTutorialDialog();
 
 			}
 		});
