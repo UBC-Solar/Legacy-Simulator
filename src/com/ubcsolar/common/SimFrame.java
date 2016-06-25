@@ -4,10 +4,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
-import com.github.dvdme.ForecastIOLib.FIOCurrently;
-import com.github.dvdme.ForecastIOLib.FIODataBlock;
 import com.github.dvdme.ForecastIOLib.FIODataPoint;
-import com.github.dvdme.ForecastIOLib.ForecastIO;
 
 public class SimFrame extends DataUnit {
 	

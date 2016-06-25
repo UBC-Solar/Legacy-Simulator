@@ -130,7 +130,7 @@ public class SaxKmlParser extends DefaultHandler{
 		
 		String delim = "[\n\\s]+"; //use whitespace or newlines as the delim. 
 		String[] allPoints = aBigStringOfCoordinates.split(delim);
-		int pointCount = 0; //to count the number of points added
+		//int pointCount = 0; //to count the number of points added
 							//(may not be equal to length of allPoints, due to extra '\n's or whitepace)
 		for(int i = 0; i<allPoints.length; i++){
 			if(allPoints[i].length()>2){ //eliminates blank rows. Must have at least 2 commas to be a valid coordinate. 
@@ -158,7 +158,7 @@ public class SaxKmlParser extends DefaultHandler{
 													//first (and only) in a point will be the city name.
 				}*/
 				toFill.add(temp); //add to end of the toFill list. 
-				pointCount++; //because the number of points may be different than array position (blanks, etc). 
+				//pointCount++; //because the number of points may be different than array position (blanks, etc). 
 			
 				
 				//for testing: print out the point I just added.

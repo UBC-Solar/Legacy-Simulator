@@ -6,7 +6,6 @@ package com.ubcsolar.notification;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ubcsolar.weather.METAR;
 import com.ubcsolar.weather.Taf;
 
 /**

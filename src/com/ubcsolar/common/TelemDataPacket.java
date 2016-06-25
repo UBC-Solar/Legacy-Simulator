@@ -46,67 +46,72 @@ public class TelemDataPacket extends DataUnit{
 		
 		toPrint += this.getSpeed() + ",";
 		toPrint += this.getStateOfCharge() +",";
-		
-		if ( temperatures.get("bms")!= null){  //if the temperature calls return 'null', the DB will error
-			toPrint += temperatures.get("bms")  + ","; 
+		if( temperatures != null )
+		{
+			
+			if ( temperatures.get("bms")!= null){  //if the temperature calls return 'null', the DB will error
+				toPrint += temperatures.get("bms")  + ","; 
+			}
+			else{
+				toPrint += "----,";
+			}
+			
+			if (temperatures.get("motor")!= null){
+				toPrint += temperatures.get("motor") + ",";
+			}
+			else{
+				toPrint += "----,";
+			}
+			
+			if (temperatures.get("pack0")!= null){
+				toPrint += temperatures.get("pack0") + ",";
+			}
+			else{
+				toPrint += "----,";
+			}
+			
+			if (temperatures.get("pack1")!= null){
+				toPrint += temperatures.get("pack1") + ",";
+			}
+			else{
+				toPrint += "----,";
+			}
+			
+			if (temperatures.get("pack2")!= null){
+				toPrint += temperatures.get("pack2") + ",";
+			}
+			else{
+				toPrint += "----,";
+			}
+			
+			if (temperatures.get("pack3")!= null){
+				toPrint += temperatures.get("pack3") + ",";
+			}
+			else{
+				toPrint += "----,";
+			}
 		}
-		else{
-			toPrint += "----,";
-		}
-		
-		if (temperatures.get("motor")!= null){
-			toPrint += temperatures.get("motor") + ",";
-		}
-		else{
-			toPrint += "----,";
-		}
-		
-		if (temperatures.get("pack0")!= null){
-			toPrint += temperatures.get("pack0") + ",";
-		}
-		else{
-			toPrint += "----,";
-		}
-		
-		if (temperatures.get("pack1")!= null){
-			toPrint += temperatures.get("pack1") + ",";
-		}
-		else{
-			toPrint += "----,";
-		}
-		
-		if (temperatures.get("pack2")!= null){
-			toPrint += temperatures.get("pack2") + ",";
-		}
-		else{
-			toPrint += "----,";
-		}
-		
-		if (temperatures.get("pack3")!= null){
-			toPrint += temperatures.get("pack3") + ",";
-		}
-		else{
-			toPrint += "----,";
-		}
-				
+					
 		toPrint += this.getTotalVoltage() ;
 
 		//assumes that they have been loaded with the standard number of voltage entries
 		//NOTE: May need to modify this if you change the number of cells on the car, 
 		//or the amount per pack.
 		int expectedNumOfCells = 10;
-				
-		for(int i = 0; i<4; i++){ 
-			if(voltages.get(i) == null){ //will need to offset this so the rest are in position
-				toPrint += this.numberOfCommas(expectedNumOfCells);
-			}
-			else{
-				for(Float f : voltages.get(0)){
-					toPrint +=  ","+f ;
+			
+		if (voltages !=null)
+		{
+			for(int i = 0; i<4; i++){ 
+				if(voltages.get(i) == null){ //will need to offset this so the rest are in position
+					toPrint += this.numberOfCommas(expectedNumOfCells);
+				}
+				else{
+					for(Float f : voltages.get(0)){
+						toPrint +=  ","+f ;
+					}
 				}
 			}
 		}
-				
 				return toPrint;
 	}
 	

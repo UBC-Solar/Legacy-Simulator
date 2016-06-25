@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SolarLog;
@@ -41,7 +42,7 @@ public class LoadingWindow extends JFrame  {
 	}
 	
 	private void setTitleAndLogo() {
-		setIconImage(mySession.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
+		setIconImage(GlobalValues.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
 		setTitle("Loading. Please wait a moment...");
 	}
 }

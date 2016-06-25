@@ -7,15 +7,7 @@ package com.ubcsolar.car;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.ubcsolar.common.LogType;
-import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.TelemDataPacket;
-import com.ubcsolar.sim.Log;
-
 import jssc.*;
 
 public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runnable,SerialPortEventListener{ //needs to be threaded so it can listen for a response

@@ -19,6 +19,7 @@ import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
 
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.SimFrame;
@@ -27,6 +28,7 @@ import com.ubcsolar.exception.NoCarStatusException;
 import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.exception.NoLocationReportedException;
+import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewSimulationReportNotification;
 import com.ubcsolar.notification.Notification;
 
@@ -67,7 +69,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private GUImain parent; //TODO for loading frame
 	private JFreeChart simResults; //the main chart model.
 	private final String X_AXIS_LABEL = "Distance (km)";
-	private final String Y_AXIS_LABEL = "speed (km/h)";
+	private final String Y_AXIS_LABEL = null;//"speed (km/h)"; // everything is in secondary axis
 	private final int xValues = 0; //for the Double[][] dataset
 	private final int yValues = 1; //for the Double[][] dataset
 	private JPanel buttonPanel; 
@@ -99,16 +101,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		this.parent = main;// TODO for loading Frame
 		this.mySession = mySession;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 450, 543);
-		
-		JMenuBar menuBar = new JMenuBar();
-		setJMenuBar(menuBar);
-		
-		JMenu mnNewMenu = new JMenu("File");
-		menuBar.add(mnNewMenu);
-		
-		JMenu mnNewMenu_1 = new JMenu("Results");
-		menuBar.add(mnNewMenu_1);
+		setBounds(100, 100, 974, 780);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -281,10 +274,22 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	 * To clear the manual speed settings. 
 	 */
 	protected void clearManualSpeedSettings() {
-		this.clearAndLoadSpeedSliders(this.lastSimReport.getSimFrames(), KM_PER_SLIDER, new HashMap<GeoCoord, Double>());
+		if(this.lastSimReport.getSimFrames().size() == 0){
+			this.clearAndLoadSpeedSliders(this.lastSimReport.getSimFrames(), KM_PER_SLIDER, new HashMap<GeoCoord, Double>(), 0.0);
+			return;
+		}
+		double startDistance;
+		try {
+			startDistance = mySession.getMapController().findDistanceAlongLoadedRoute(this.lastSimReport.getSimFrames().get(0).getGPSReport().getLocation());
+		} catch (NoLoadedRouteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			startDistance = 0.0;
+		}
+		this.clearAndLoadSpeedSliders(this.lastSimReport.getSimFrames(), KM_PER_SLIDER, new HashMap<GeoCoord, Double>(), startDistance );
 	}
 
-	private void clearAndLoadSpeedSliders(List<SimFrame> simResultValues, int KM_PER_SLIDER, Map<GeoCoord, Double> lastManuallyReqSpeeds) {
+	private void clearAndLoadSpeedSliders(List<SimFrame> simResultValues, int KM_PER_SLIDER, Map<GeoCoord, Double> lastManuallyReqSpeeds, double startDistance) {
 	
 		SliderHoldingPanel.removeAll();
 		SliderHoldingPanel.validate();
@@ -307,9 +312,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		
 		//add the panels dynamically
 		this.displayedSpeedSliderSpinners = new ArrayList<SliderSpinnerFrame>();
-		double runningTotalDistance = 0;
+		double runningTotalDistance= startDistance;
 		int lastAddedPointIndex = 0;
-		double lastAddedPointDistance = 0.0;
+		double lastAddedPointDistance = startDistance;
 		
 		//can't set the first speed anyway. 
 		for(int i = 1; i<simResultValues.size(); i++){
@@ -432,6 +437,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 							Y_AXIS_LABEL, 
 							ds,
 							PlotOrientation.VERTICAL, true, true, false);
+			
+			XYPlot temp = simResults.getXYPlot();
+			temp.clearRangeAxes();
 		}
 		
 		
@@ -448,7 +456,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		}
 		
 		private void setTitleAndLogo(){
-			this.setIconImage(mySession.iconImage.getImage());
+			this.setIconImage(GlobalValues.iconImage.getImage());
 			this.setTitle("Simulation");
 		}
 		@Override
@@ -456,27 +464,41 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			if(n.getClass() == NewSimulationReportNotification.class){
 				NewSimulationReportNotification test = (NewSimulationReportNotification) n;
 				this.lastSimReport = test.getSimReport();
-				updateChart(test.getSimReport());
-				this.clearAndLoadSpeedSliders(lastSimReport.getSimFrames(), KM_PER_SLIDER, lastSimReport.getManuallyRequestedSpeeds());
+				
+				double startDistance = 0.0;
+				if(test.getSimReport().getSimFrames().size() > 0){
+					try {
+						startDistance = this.mySession.getMapController().findDistanceAlongLoadedRoute(test.getSimReport().getSimFrames().get(0).getGPSReport().getLocation());
+					} catch (NoLoadedRouteException e) {
+						mySession.sendNotification(new ExceptionNotification(e, "No loaded map when updating simulation"));
+						e.printStackTrace();
+						return;
+					}
+				}
+				updateChart(test.getSimReport(), startDistance);
+				this.clearAndLoadSpeedSliders(lastSimReport.getSimFrames(), KM_PER_SLIDER, lastSimReport.getManuallyRequestedSpeeds(), startDistance);
 				this.repaint();
 			}
 			
 		}
 		
 		private void refreshChart(){
-			updateChart(this.lastSimReport);
+			double startDistance = 0.0;
+			this.mySession.getMapController().findClosestPointOnRoute(this.lastSimReport.getSimFrames().get(0).getGPSReport().getLocation());
+			updateChart(this.lastSimReport, startDistance);
 		}
 		
 		/**
 		 * parses a simulation into the graph. 
 		 * @param simReport - to display
+		 * @param startDistance 
 		 */
-		private void updateChart(SimulationReport simReport) {
+		private void updateChart(SimulationReport simReport, double startDistance) {
 			this.lastSimReport = simReport;
 			if(simReport.getSimFrames().size() == 0){
 				this.setDefaultChart(); //last sim was deleted.
 				this.mainDisplay.setChart(this.simResults);
-				clearAndLoadSpeedSliders(new ArrayList<SimFrame>(),KM_PER_SLIDER,new HashMap<GeoCoord, Double>());
+				clearAndLoadSpeedSliders(new ArrayList<SimFrame>(),KM_PER_SLIDER,new HashMap<GeoCoord, Double>(), startDistance);
 				
 				contentPane.repaint();
 				contentPane.validate();
@@ -493,16 +515,17 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 					ChartFactory.createXYLineChart(
 							CHART_TITLE,
 							X_AXIS_LABEL,
-							Y_AXIS_LABEL, 
+							Y_AXIS_LABEL,
 							null, //we'll add in all the values below so we can map to custom axis
 							PlotOrientation.VERTICAL, true, true, false);
 			final XYPlot plot = simResults.getXYPlot();
 			plot.setRangePannable(true);
 			plot.setDomainPannable(true);
+			plot.clearRangeAxes();
 			
 			if(this.showSpeed){
 				DefaultXYDataset speedDataset = new DefaultXYDataset();
-				speedDataset.addSeries("Speed", generateSpeedSeries(simReport.getSimFrames()));
+				speedDataset.addSeries("Speed", generateSpeedSeries(simReport.getSimFrames(), startDistance));
 				final NumberAxis axis2 = new NumberAxis("speed (km/h)");
 				axis2.setAutoRangeIncludesZero(false);
 				plot.setRangeAxis(1, axis2);
@@ -516,7 +539,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			
 			if(this.showStateOfCharge){
 				DefaultXYDataset stateOfChargeDataSet = new DefaultXYDataset();
-				stateOfChargeDataSet.addSeries("State Of Charge", generateStateOfChargeSeries(simReport.getSimFrames()));
+				stateOfChargeDataSet.addSeries("State Of Charge", generateStateOfChargeSeries(simReport.getSimFrames(),startDistance));
 				final NumberAxis axis3 = new NumberAxis("SoC (%)");
 				axis3.setAutoRangeIncludesZero(false);
 				plot.setRangeAxis(2, axis3);
@@ -530,7 +553,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			
 			if(this.showElevation){
 				DefaultXYDataset terrainHeight = new DefaultXYDataset();
-				terrainHeight.addSeries("Elevation", generateElevationProfile(simReport.getSimFrames()));
+				terrainHeight.addSeries("Elevation", generateElevationProfile(simReport.getSimFrames(), startDistance));
 				final NumberAxis axis4 = new NumberAxis("height (m)");
 				axis4.setAutoRangeIncludesZero(false);
 				plot.setRangeAxis(3, axis4);
@@ -544,7 +567,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			
 			if(this.showCloud){
 				DefaultXYDataset cloudiness = new DefaultXYDataset();
-				cloudiness.addSeries("Cloud", generateCloudinessSeries(simReport.getSimFrames()));
+				cloudiness.addSeries("Cloud", generateCloudinessSeries(simReport.getSimFrames(), startDistance));
 				final NumberAxis axis5 = new NumberAxis("cloudiness (%)");
 				axis5.setAutoRangeIncludesZero(false);
 				plot.setRangeAxis(4, axis5);
@@ -567,13 +590,13 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		}
 		
 		
-		private double[][] generateStateOfChargeSeries(List<SimFrame> simFrames) {
+		private double[][] generateStateOfChargeSeries(List<SimFrame> simFrames, double startDistance) {
 			double[][] toReturn= new double[2][simFrames.size()];
 			//[0] is distance, [1] is speed
-			toReturn[xValues][0] = 0;
+			toReturn[xValues][0] = startDistance;
 			toReturn[yValues][0] = simFrames.get(0).getCarStatus().getStateOfCharge();
 			
-			double runningTotalDistance = 0;
+			double runningTotalDistance = startDistance;
 			
 			for(int i = 1; i<simFrames.size(); i++){
 				SimFrame temp = simFrames.get(i);
@@ -586,13 +609,13 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			
 			return toReturn;
 		}
-		private double[][] generateSpeedSeries(List<SimFrame> simFrames) {
+		private double[][] generateSpeedSeries(List<SimFrame> simFrames, double startDistance) {
 			double[][] toReturn= new double[2][simFrames.size()];
 			//[0] is distance, [1] is speed
-			toReturn[xValues][0] = 0;
+			toReturn[xValues][0] = startDistance;
 			toReturn[yValues][0] = simFrames.get(0).getCarStatus().getSpeed();
 			
-			double runningTotalDistance = 0;
+			double runningTotalDistance = startDistance;
 			
 			for(int i = 1; i<simFrames.size(); i++){
 				SimFrame temp = simFrames.get(i);
@@ -606,13 +629,13 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			return toReturn;
 		}
 		
-		private double[][] generateElevationProfile(List<SimFrame> simFrames) {
+		private double[][] generateElevationProfile(List<SimFrame> simFrames, double startDistance) {
 			double[][] toReturn= new double[2][simFrames.size()];
 			//[0] is distance, [1] is speed
-			toReturn[xValues][0] = 0;
+			toReturn[xValues][0] = startDistance;
 			toReturn[yValues][0] = simFrames.get(0).getGPSReport().getLocation().getElevation();
 			
-			double runningTotalDistance = 0;
+			double runningTotalDistance = startDistance;
 			
 			for(int i = 1; i<simFrames.size(); i++){
 				SimFrame temp = simFrames.get(i);
@@ -626,13 +649,13 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			return toReturn;
 		}
 		
-		private double[][] generateCloudinessSeries(List<SimFrame> simFrames) {
+		private double[][] generateCloudinessSeries(List<SimFrame> simFrames, double startDistance) {
 			double[][] toReturn= new double[2][simFrames.size()];
 			//[0] is distance, [1] is speed
-			toReturn[xValues][0] = 0;
+			toReturn[xValues][0] = startDistance;
 			toReturn[yValues][0] = simFrames.get(0).getForecast().cloudCover();
 			
-			double runningTotalDistance = 0;
+			double runningTotalDistance = startDistance;
 			
 			for(int i = 1; i<simFrames.size(); i++){
 				SimFrame temp = simFrames.get(i);

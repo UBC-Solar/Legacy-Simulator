@@ -1,10 +1,7 @@
 package com.ubcsolar.map;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.NoSuchElementException;
-import java.util.Set;
-
 import net.sf.marineapi.nmea.event.SentenceEvent;
 import net.sf.marineapi.nmea.event.SentenceListener;
 import net.sf.marineapi.nmea.io.SentenceReader;

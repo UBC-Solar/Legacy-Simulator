@@ -5,6 +5,7 @@ package com.ubcsolar.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Frame;
 import java.awt.Point;
 
 import javax.swing.BorderFactory;
@@ -16,6 +17,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.LogType;
@@ -169,8 +171,10 @@ public class GUImain implements Listener{
 	 * @param parent 
 	 */
 	private void initialize(GlobalController parent) {
+
 		mySession = parent; //adds parent 
 		mainFrame = new JFrame(); //
+		setTitleAndLogo();
 		//public void setBounds(int x, int y, int width, int height)
 		mainFrame.setBounds(150, 50, 1000, 600); //main window size on opening
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -184,12 +188,7 @@ public class GUImain implements Listener{
 		mainFrame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-		        if (JOptionPane.showConfirmDialog(mainFrame, 
-		            "Are you sure to close this window?", "Really Closing?", 
-		            JOptionPane.YES_NO_OPTION,
-		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
-		            mySession.exit(); //do the graceful exit code. 
-		        }
+		        tryCloseProgram();
 		    }
 		});
 		
@@ -211,7 +210,7 @@ public class GUImain implements Listener{
 		mntmExit.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent arg0) {
-				mySession.exit();
+				tryCloseProgram();
 			}
 		});
 		mnFile.add(mntmExit); //add it to the File menu
@@ -220,17 +219,6 @@ public class GUImain implements Listener{
 		//Make and add the 'Modules' drop down menu to the main menu bar
 		JMenu mnModules = new JMenu("Modules");
 		menuBar.add(mnModules);
-		
-		//Make entry to open Map advanced options
-		JMenuItem mntmMap = new JMenuItem("Map");
-		mntmMap.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent arg0) {
-				//Should launch the map advanced window when clicked on
-				launchMap();
-			}
-		});
-		mnModules.add(mntmMap);
 		
 		//Make entry to open Sim advanced options
 		JMenuItem mntmSimulator = new JMenuItem("Simulation");
@@ -248,7 +236,6 @@ public class GUImain implements Listener{
 			}
 		});
 		mnModules.add(mntmWeather);
-		mnModules.add(mntmSimulator);
 		
 		//Make entry to open Car (aka 'performance') advanced options
 		JMenuItem mntmPerformance = new JMenuItem("Car Advanced");
@@ -258,17 +245,18 @@ public class GUImain implements Listener{
 			}
 		});
 		mnModules.add(mntmPerformance);
+		mnModules.add(mntmSimulator);
 		
-		//Make entry to open Strategy (aka 'performance') advanced options
-		//NOTE: This is where we should adjust the driving profile in the future
-		JMenuItem mntmStrategy = new JMenuItem("Strategy");
-		mntmStrategy.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JFrame frame = new Strategy();
-				frame.setVisible(true);
+		//Make entry to open Map advanced options
+		JMenuItem mntmMap = new JMenuItem("Map");
+		mntmMap.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent arg0) {
+				//Should launch the map advanced window when clicked on
+				launchMap();
 			}
 		});
-		mnModules.add(mntmStrategy);
+		mnModules.add(mntmMap);
 		
 		JMenu mnDebug = new JMenu("Debug");
 		menuBar.add(mnDebug);
@@ -372,7 +360,7 @@ public class GUImain implements Listener{
 		mainFrame.getContentPane().repaint();
 		register();
 		
-		setTitleAndLogo();
+
 		mainFrame.repaint(); //sometimes the map window button doesn't pop up, hoping this fixes the glitch
 	}
 	
@@ -380,7 +368,7 @@ public class GUImain implements Listener{
 	 * Sets the window title and logo. Currently just what I came up with 
 	 */
 	private void setTitleAndLogo(){
-		mainFrame.setIconImage(mySession.iconImage.getImage());
+		mainFrame.setIconImage(GlobalValues.iconImage.getImage());
 		mainFrame.setTitle("TITUS-Main");
 	}
 	
@@ -408,7 +396,9 @@ public class GUImain implements Listener{
 			this.buildAllWindows();
 		}
 		weatherFrame.setVisible(true);
-		
+		//if(weatherFrame.getState()!=Frame.NORMAL) { weatherFrame.setState(Frame.NORMAL); }
+		weatherFrame.toFront();
+		weatherFrame.repaint();
 	}
 	/**
 	 * launches the Car window
@@ -435,6 +425,14 @@ public class GUImain implements Listener{
 		mapFrame.setVisible(true);
 	}
 	
+	public void tryCloseProgram() {
+		if (JOptionPane.showConfirmDialog(mainFrame, 
+            "Are you sure you want to quit?", "Quit Program?", 
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+            mySession.exit(); //do the graceful exit code. 
+        }
+	}
 
 	public void clearWeather(){
 		WeatherAdvancedWindow weatherWindow = (WeatherAdvancedWindow) weatherFrame;

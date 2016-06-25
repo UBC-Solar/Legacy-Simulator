@@ -1,5 +1,9 @@
 package com.ubcsolar.weather;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,14 +20,48 @@ import com.ubcsolar.Main.GlobalValues;
 public class ForecastFactory {
 	private final String API_KEY = GlobalValues.WEATHER_KEY;
 
-	public ArrayList<ForecastIO> getForecasts(List<GeoCoord> spots){
+	public ArrayList<ForecastIO> getForecasts(List<GeoCoord> spots) throws IOException{
+		isInternetReachable(); //will throw an exception if it's not.
 		ArrayList<ForecastIO> toReturn = new ArrayList<ForecastIO>(spots.size());
 		for(GeoCoord g : spots){
 			ForecastIO forecastIOCurr = new ForecastIO("" + g.getLat(), "" + g.getLon(), ForecastIO.UNITS_SI, ForecastIO.LANG_ENGLISH, API_KEY);
+			if(forecastIOCurr.getLatitude() == null){
+				throw new IOException("Latitude was null, implies bad network conection");
+			}
 			toReturn.add(forecastIOCurr);
 		}
 		System.out.println("Factory - Spots in: " + spots.size() + " forecasts: " + toReturn.size());
 		return toReturn;
 	}
 
+	
+	/**
+	 * Method to use to check for network connection. 
+	 * For documentation/reasoning, see http://stackoverflow.com/questions/1139547/detect-internet-connection-using-java
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	 private boolean isInternetReachable() throws IOException{
+           
+
+            	//make a URL to a known source
+             URL url = new URL(GlobalValues.URL_TO_CHECK_INTERNET_WITH);
+
+             //open a connection to that source
+             
+             HttpURLConnection urlConnect = (HttpURLConnection)url.openConnection();
+             urlConnect.setConnectTimeout(GlobalValues.MAX_TIME_MS_WAIT_FOR_URL);
+ 		 	try{
+             //trying to retrieve data from the source. If there
+             //is no connection, this line will fail
+             Object objData = urlConnect.getContent();   
+            }
+            catch(IOException e){throw e;}
+            finally{
+            	urlConnect.disconnect();
+            }
+         return true;
+     }
+	
 }

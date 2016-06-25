@@ -172,6 +172,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		else if(n.getClass() == NewLocationReportNotification.class){
 			this.updateLocationLabel("rcv'd @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
 		}
+		
 		/*//TODO implement these
 		else if(n.getClass() == NewWeatherLoadedNotification.class){ //to update the weather label
 			updateWeatherLabel(n.getNameOfWeather());

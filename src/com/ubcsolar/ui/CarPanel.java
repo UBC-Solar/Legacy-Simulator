@@ -116,13 +116,6 @@ public class CarPanel extends JPanel implements Listener {
 		gbc_lblCarTitle.gridy = 0;
 		titleAndMenuPanel.add(lblCarTitle, gbc_lblCarTitle);
 		
-		JButton btnDash = new JButton("Dash");
-		GridBagConstraints gbc_btnDash = new GridBagConstraints();
-		gbc_btnDash.insets = new Insets(0, 0, 0, 5);
-		gbc_btnDash.gridx = 3;
-		gbc_btnDash.gridy = 0;
-		titleAndMenuPanel.add(btnDash, gbc_btnDash);
-		
 		JPanel statusPanel = new JPanel();
 		GridBagConstraints gbc_statusPanel = new GridBagConstraints();
 		gbc_statusPanel.insets = new Insets(0, 0, 5, 0);

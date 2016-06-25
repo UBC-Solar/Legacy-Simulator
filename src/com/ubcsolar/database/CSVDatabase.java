@@ -9,31 +9,22 @@ package com.ubcsolar.database;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.ubcsolar.common.DataUnit;
-import com.ubcsolar.common.GeoCoord;
-import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.LogType;
-import com.ubcsolar.common.Route;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.TelemDataPacket;
 
 public class CSVDatabase<V extends DataUnit>{
 	private Queue<String> writingQueue; //will read from here and then write. 
 	private FileWriter myFileWriter; //used to write. 
-	private int entryCounter; //used to generate primary keys. 
-	private DateFormat actualDateFormat = new SimpleDateFormat("HH:mm:ss.SSS"); //time format. ss = seconds, SSS = ms
-	//couldn't manage to format milliseconds in a way that Excel can handle as time
-	//so just generated a second column to be able to graph it properly. 
-	private DateFormat excelDateFormat = new SimpleDateFormat("HH:mm:ss"); //time format. ss = seconds, SSS = ms
+	
+	 
 	private boolean isDBConnected = false; //FileWriter didn't seem to have a 'isConnected' or 'isOpen' method. 
 								//this is the workaround. 
 	private String columnTitles;
@@ -100,12 +91,13 @@ public class CSVDatabase<V extends DataUnit>{
 	 * @throws IOException
 	 */
 	private void setup(String filename) throws IOException{
-		entryCounter = 0; 
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
 				"CSV Database created with name " + filename + ".csv");
 		System.out.println("FILENAME : " + filename);
 		File file = new File(filename+".csv");
-		file.getParentFile().mkdirs(); //makes the folder path
+		if (file.getParentFile() != null){
+			file.getParentFile().mkdirs(); //makes the folder path
+		}
 		myFileWriter = new FileWriter(file);
 		writingQueue = new ConcurrentLinkedQueue<String>();
 		this.isDBConnected = true;
@@ -195,6 +187,7 @@ public class CSVDatabase<V extends DataUnit>{
 	 * @param numberOfCommas
 	 * @return a String consisting solely of commas. 
 	 */
+	@SuppressWarnings("unused") //might be useful if refactoring. 
 	private String numberOfCommas(int numberOfCommas){
 		String toReturn = "";
 		for(int i=0; i<numberOfCommas; i++){
@@ -257,6 +250,8 @@ public class CSVDatabase<V extends DataUnit>{
 	 * @see com.ubcsolar.database.Database#store(com.ubcsolar.common.DataUnit)
 	 */
 	public void store(V toStore) throws IOException {
+		if(toStore==null)
+			return;
 		if(this.columnTitles == null){ //means headers haven't been printed out yet
 			this.columnTitles = toStore.getCSVHeaderRow() + "\r\n";
 			this.writingQueue.add(this.columnTitles);

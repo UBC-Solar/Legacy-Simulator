@@ -13,6 +13,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 
 import jssc.SerialPortList;
 
@@ -102,7 +103,7 @@ public class BTCarSelectDialog extends JFrame {
 	}
 
 	private void setTitleAndLogo() {
-		this.setIconImage(mySession.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
+		this.setIconImage(GlobalValues.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
 		this.setTitle("Connect to BT GPS?");	
 	}
 	private void closeWindow(){
