@@ -26,6 +26,7 @@ import org.openstreetmap.gui.jmapviewer.tilesources.OsmTileSource;
 
 import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.LogType;
+import com.github.dvdme.ForecastIOLib.FIODataBlock;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.ForecastReport;
@@ -254,9 +255,9 @@ public class CustomDisplayMap extends JMapViewer {
 		for(int i= 0; i<theReport.getForecasts().size(); i++){
 			ForecastIO fc = theReport.getForecasts().get(i);
 			Coordinate location = new Coordinate(fc.getLatitude(), fc.getLongitude());
-			String name = "" + i;
+			String name = new FIODataBlock(fc.getHourly()).icon();
 			MapMarkerDot newLocationDot = new MapMarkerDot(null,name,location, forecastStyle);
-			
+			//newLocationDot.
 			forecasts.add(newLocationDot);
 		}
 		this.refreshMap();
