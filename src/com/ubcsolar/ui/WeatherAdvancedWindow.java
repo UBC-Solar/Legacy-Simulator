@@ -87,9 +87,10 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private double travelDistance;
 	private double[] distances;
 	private double kilometerMark;
-	private boolean ShowMessageAgain = false;
+	private boolean showWelcomeMessageAgain = true;
 	private boolean showChartNavigationTutorialAgain = true;
-	private static final String WelcomeInfoMessage = "";
+	private static final String WelcomeInfoMessage = "use \"Load Forecasts for Route(48 hours)\" under the \"Forecasts\" menu to get the weather information."
+				+"\n\n"+ "Note: You should Load the route before this.";
 	private static final String ChartTutorialMessage = "To navigate the plot: \n\n"
 			+ "-zoom in/out with mouse wheel" +"\n\n"
 			+ "-click and drage down-right to zoom in specific area" +"\n\n"
@@ -311,16 +312,16 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		public void welcomeInfoDialog() {
 			Object[] options= { "Ok, Thanks" ,  "Don't show this message again" };
 			
-			if (ShowMessageAgain == true)
+			if (showWelcomeMessageAgain == true)
 			{
 				int chosenOption= JOptionPane.showOptionDialog(this, WelcomeInfoMessage , "Tutorial", JOptionPane.YES_NO_OPTION,
 					JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
 			
 				if (chosenOption == 1){
-					ShowMessageAgain = false;
+					showWelcomeMessageAgain = false;
 				}
 				else{
-					ShowMessageAgain = true;
+					showWelcomeMessageAgain = true;
 				}
 			}
 		}

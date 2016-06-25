@@ -176,7 +176,7 @@ public class GUImain implements Listener{
 		mainFrame = new JFrame(); //
 		setTitleAndLogo();
 		//public void setBounds(int x, int y, int width, int height)
-		mainFrame.setBounds(150, 50, 1000, 600); //main window size on opening
+		mainFrame.setBounds(150, 50, 1200, 800); //main window size on opening
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.setVisible(true);
 		//NOTE: Could consider not building all the windows at once in case of performance issues.
@@ -261,27 +261,6 @@ public class GUImain implements Listener{
 		JMenu mnDebug = new JMenu("Debug");
 		menuBar.add(mnDebug);
 		
-		JMenuItem mntmAddLocationReport = new JMenuItem("Add Location Report");
-		mntmAddLocationReport.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JFrame frame = new CustomLocationAddWindow(mySession);
-				frame.setVisible(true);
-			}
-		});
-		mnDebug.add(mntmAddLocationReport);
-		
-		JMenuItem mntmAddCarTelempacket = new JMenuItem("Add Car TelemPacket");
-		mntmAddCarTelempacket.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JFrame frame = new CarTelemPacketWindow(mySession);
-				frame.setVisible(true);
-			}
-		});
-		mnDebug.add(mntmAddCarTelempacket);
-		
-		JMenuItem mntmAddWeatherReport = new JMenuItem("Add Weather Report");
-		mnDebug.add(mntmAddWeatherReport);		
-		
 		JMenuItem mntmAddCustomForecast = new JMenuItem("Add Custom Forecast");
 		GUImain currentGUI = this;
 		mntmAddCustomForecast.addActionListener(new ActionListener() {
@@ -304,6 +283,24 @@ public class GUImain implements Listener{
 			}
 		});
 		mnDebug.add(mntmClearCustomForecasts);
+		
+		JMenuItem mntmAddLocationReport = new JMenuItem("Add Location Report");
+		mntmAddLocationReport.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFrame frame = new CustomLocationAddWindow(mySession);
+				frame.setVisible(true);
+			}
+		});
+		
+		JMenuItem mntmAddCarTelempacket = new JMenuItem("Add Car TelemPacket");
+		mntmAddCarTelempacket.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFrame frame = new CarTelemPacketWindow(mySession);
+				frame.setVisible(true);
+			}
+		});
+		mnDebug.add(mntmAddCarTelempacket);
+		mnDebug.add(mntmAddLocationReport);
 		
 		//This sets up the layout for the main window
 		mainFrame.getContentPane().setLayout(new FormLayout(new ColumnSpec[] {
@@ -399,6 +396,7 @@ public class GUImain implements Listener{
 		//if(weatherFrame.getState()!=Frame.NORMAL) { weatherFrame.setState(Frame.NORMAL); }
 		weatherFrame.toFront();
 		weatherFrame.repaint();
+		
 	}
 	/**
 	 * launches the Car window
