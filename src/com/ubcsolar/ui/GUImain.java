@@ -220,17 +220,6 @@ public class GUImain implements Listener{
 		JMenu mnModules = new JMenu("Modules");
 		menuBar.add(mnModules);
 		
-		//Make entry to open Map advanced options
-		JMenuItem mntmMap = new JMenuItem("Map");
-		mntmMap.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent arg0) {
-				//Should launch the map advanced window when clicked on
-				launchMap();
-			}
-		});
-		mnModules.add(mntmMap);
-		
 		//Make entry to open Sim advanced options
 		JMenuItem mntmSimulator = new JMenuItem("Simulation");
 		mntmSimulator.addActionListener(new ActionListener() {
@@ -247,7 +236,6 @@ public class GUImain implements Listener{
 			}
 		});
 		mnModules.add(mntmWeather);
-		mnModules.add(mntmSimulator);
 		
 		//Make entry to open Car (aka 'performance') advanced options
 		JMenuItem mntmPerformance = new JMenuItem("Car Advanced");
@@ -257,6 +245,7 @@ public class GUImain implements Listener{
 			}
 		});
 		mnModules.add(mntmPerformance);
+		mnModules.add(mntmSimulator);
 		
 		//Make entry to open Strategy (aka 'performance') advanced options
 		//NOTE: This is where we should adjust the driving profile in the future
@@ -267,6 +256,17 @@ public class GUImain implements Listener{
 				frame.setVisible(true);
 			}
 		});
+		
+		//Make entry to open Map advanced options
+		JMenuItem mntmMap = new JMenuItem("Map");
+		mntmMap.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent arg0) {
+				//Should launch the map advanced window when clicked on
+				launchMap();
+			}
+		});
+		mnModules.add(mntmMap);
 		mnModules.add(mntmStrategy);
 		
 		JMenu mnDebug = new JMenu("Debug");
