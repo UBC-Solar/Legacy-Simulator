@@ -1,5 +1,6 @@
 package com.ubcsolar.ui;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -15,6 +16,7 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
 
@@ -533,6 +535,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				plot.mapDatasetToRangeAxis(1, 1);
 				final StandardXYItemRenderer renderer2 = new StandardXYItemRenderer();
 				renderer2.setSeriesPaint(0, Color.black);
+				//renderer.setBaseLegendTextFont(new Font("Helvetica", Font.BOLD, 11));
+				renderer2.setSeriesStroke(0, new BasicStroke(2));
 				//renderer2.setPlotShapes(true);
 				plot.setRenderer(1, renderer2);
 			}
@@ -547,6 +551,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				plot.mapDatasetToRangeAxis(2,2);
 				final StandardXYItemRenderer renderer3 = new StandardXYItemRenderer();
 				renderer3.setSeriesPaint(0, Color.blue);
+				renderer3.setSeriesStroke(0, new BasicStroke(2));
 				//renderer2.setPlotShapes(true);
 				plot.setRenderer(2, renderer3);
 			}
@@ -561,6 +566,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				plot.mapDatasetToRangeAxis(3,3);
 				final StandardXYItemRenderer renderer4 = new StandardXYItemRenderer();
 				renderer4.setSeriesPaint(0, Color.green);
+				renderer4.setSeriesStroke(0, new BasicStroke(2));
 				//renderer2.setPlotShapes(true);
 				plot.setRenderer(3, renderer4);
 			}
@@ -575,6 +581,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				plot.mapDatasetToRangeAxis(4,4);
 				final StandardXYItemRenderer renderer5 = new StandardXYItemRenderer();
 				renderer5.setSeriesPaint(0, Color.RED);
+				renderer5.setSeriesStroke(0, new BasicStroke(2));
 				//renderer2.setPlotShapes(true);
 				plot.setRenderer(4, renderer5);
 			}

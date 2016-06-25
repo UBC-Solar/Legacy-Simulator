@@ -1,5 +1,6 @@
 package com.ubcsolar.ui;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -18,6 +19,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
 
@@ -533,9 +535,15 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							PlotOrientation.VERTICAL, true, true, false);
 			temperatureChartJFree = temperatureChart;
 			
-			XYPlot plot = (XYPlot) temperatureChartJFree.getPlot();		
+			XYPlot plot = (XYPlot) temperatureChartJFree.getPlot();
+			for(int i = 0; i<ds.getSeriesCount(); i++){
+				final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(0);
+				//renderer.setBaseLegendTextFont(new Font("Helvetica", Font.BOLD, 11));
+				renderer.setSeriesStroke(i, new BasicStroke(2));
+			}
 			plot.setRangePannable(true);
 			plot.setDomainPannable(true);
+			
 			
 		}
 		
@@ -549,7 +557,12 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							PlotOrientation.VERTICAL, true, true, false);
 			cloudCoverChartJFree = cloudCoverChart;
 			
-			XYPlot plot = (XYPlot) cloudCoverChartJFree.getPlot();		
+			XYPlot plot = (XYPlot) cloudCoverChartJFree.getPlot();	
+			for(int i = 0; i<ds.getSeriesCount(); i++){
+				final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(0);
+				//renderer.setBaseLegendTextFont(new Font("Helvetica", Font.BOLD, 11));
+				renderer.setSeriesStroke(i, new BasicStroke(2));
+			}
 			plot.setRangePannable(true);
 			plot.setDomainPannable(true);
 		}
@@ -564,7 +577,12 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							PlotOrientation.VERTICAL, true, true, false);
 			precipitationChartJFree = precipitationChart;
 			
-			XYPlot plot = (XYPlot) precipitationChartJFree.getPlot();		
+			XYPlot plot = (XYPlot) precipitationChartJFree.getPlot();
+			for(int i = 0; i<ds.getSeriesCount(); i++){
+				final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(0);
+				//renderer.setBaseLegendTextFont(new Font("Helvetica", Font.BOLD, 11));
+				renderer.setSeriesStroke(i, new BasicStroke(2));
+			}
 			plot.setRangePannable(true);
 			plot.setDomainPannable(true);
 		}
@@ -580,6 +598,11 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			windSpeedChartJFree = headwindChart;
 			
 			XYPlot plot = (XYPlot) windSpeedChartJFree.getPlot();		
+			for(int i = 0; i<ds.getSeriesCount(); i++){
+				final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(0);
+				//renderer.setBaseLegendTextFont(new Font("Helvetica", Font.BOLD, 11));
+				renderer.setSeriesStroke(i, new BasicStroke(2));
+			}
 			plot.setRangePannable(true);
 			plot.setDomainPannable(true);
 		}
