@@ -77,12 +77,12 @@ import java.awt.FlowLayout;
 
 public class MapAdvancedWindow extends JFrame implements Listener {
 
-	private int ShowMessageAgain = 0;
-	private static final String WelcomeInfoMessage = "To navigate the plot: \n"
-			+ "-You can zoom in/out using the mouse wheel  or  click and drage in the down-right direction" +"\n"
-			+ "to zoom in the rectangle created." +"\n"
-			+ "-You can move the plot around by holding down CTRL button while dragging around the chart." +"\n"
-			+ "-You can also zoom out to the original view by making the rectangle in direction of up-left." +"\n"
+	private boolean showChartNavigationTutorialAgain = true;
+	private static final String ChartTutorialMessage = "To navigate the plot: \n\n"
+			+ "-zoom in/out with mouse wheel" +"\n\n"
+			+ "-click and drage down-right to zoom in specific area" +"\n\n"
+			+ "-CTRL+drag to move the plot" +"\n\n"
+			+ "-click and drage up-left to reset the zoom" +"\n\n"
 			+ "\n" + "ENJOY !"; //TODO
 	private JPanel contentPane;
 	private GlobalController mySession;
@@ -107,12 +107,24 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		JOptionPane.showMessageDialog(this, message);
 	}
 	
-	private void welcomeInfoDialog() {
+	/**
+	 * pops up a tutorial dialog 
+	 */
+	private void mapChartNavigationTutorialDialog() {
 		Object[] options= { "Ok, Thanks" ,  "Don't show this message again" };
 		
-		ShowMessageAgain = JOptionPane.showOptionDialog(this, WelcomeInfoMessage , "Tutorial", JOptionPane.YES_NO_OPTION,
+		if (showChartNavigationTutorialAgain == true)
+		{
+			int chosenOption= JOptionPane.showOptionDialog(this, ChartTutorialMessage , "Tutorial", JOptionPane.YES_NO_OPTION,
 				JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
-
+		
+			if (chosenOption == 1){
+				showChartNavigationTutorialAgain = false;
+			}
+			else{
+				showChartNavigationTutorialAgain = true;
+			}
+		}
 	}
 	
 	/**
@@ -203,13 +215,12 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 					 frame.setVisible(false);
 					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 					 Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
-					 
-//if in the tutorial dialog box the button "don't show this" is pushed previously, the dialog won't pop up anymore  
-					 if (ShowMessageAgain != 1){
-						 welcomeInfoDialog();
-					 }
+					
+					 mapChartNavigationTutorialDialog();
 			            
-			        } else {
+			        }
+				 
+				 else {
 			            //cancelled by user, do nothing
 			        	return;
 			        }

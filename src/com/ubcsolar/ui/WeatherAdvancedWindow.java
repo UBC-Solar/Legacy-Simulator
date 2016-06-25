@@ -85,6 +85,17 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private double travelDistance;
 	private double[] distances;
 	private double kilometerMark;
+	private boolean ShowMessageAgain = false;
+	private boolean showChartNavigationTutorialAgain = true;
+	private static final String WelcomeInfoMessage = "";
+	private static final String ChartTutorialMessage = "To navigate the plot: \n\n"
+			+ "-zoom in/out with mouse wheel" +"\n\n"
+			+ "-click and drage down-right to zoom in specific area" +"\n\n"
+			+ "-CTRL+drag to move the plot" +"\n\n"
+			+ "-click and drage up-left to reset the zoom" +"\n\n"
+			+ "\n" + "ENJOY !"; //TODO
+
+	
 	private List<GeoCoord> forecastPoints;
 
 	/**
@@ -115,6 +126,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	 */
 	public WeatherAdvancedWindow(final GlobalController mySession, GUImain main) {
 		
+		
 		parent = main;
 		setTitle("Advanced Weather");
 		this.mySession = mySession;
@@ -140,15 +152,22 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				
 				try{
 					mySession.getMyWeatherController().downloadNewForecastsForRoute(100); //main Process
+					
+					frame.setVisible(false);
+					contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
+					Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
+					
+					mapChartNavigationTutorialDialog();
 				}catch(IOException e){
 					frame.setVisible(false); //no need to show the loading screen now.
+					contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
 					handleError("IOException, check internet connection");
+					Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
 					e.printStackTrace();
 				}
 				
-				frame.setVisible(false);
-				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
-				Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
+
+				
 
 			}
 		});
@@ -264,6 +283,49 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		}
 		
 		/**
+		 * pops up a tutorial dialog 
+		 */
+		private void mapChartNavigationTutorialDialog() {
+			Object[] options= { "Ok, Thanks" ,  "Don't show this message again" };
+			
+			if (showChartNavigationTutorialAgain == true)
+			{
+				int chosenOption= JOptionPane.showOptionDialog(this, ChartTutorialMessage , "Tutorial", JOptionPane.YES_NO_OPTION,
+					JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+			
+				if (chosenOption == 1){
+					showChartNavigationTutorialAgain = false;
+				}
+				else{
+					showChartNavigationTutorialAgain = true;
+				}
+			}
+		}
+		
+		
+		/**
+		 * pops up a tutorial dialog 
+		 */
+		public void welcomeInfoDialog() {
+			Object[] options= { "Ok, Thanks" ,  "Don't show this message again" };
+			
+			if (ShowMessageAgain == true)
+			{
+				int chosenOption= JOptionPane.showOptionDialog(this, WelcomeInfoMessage , "Tutorial", JOptionPane.YES_NO_OPTION,
+					JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+			
+				if (chosenOption == 1){
+					ShowMessageAgain = false;
+				}
+				else{
+					ShowMessageAgain = true;
+				}
+			}
+		}
+		
+		
+		
+		/**
 		 * All notifications that this class has registered for will come here
 		 */
 		@Override
@@ -325,7 +387,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			contentPane.repaint();
 			contentPane.revalidate();
 			
-			if (kilometerMark != -1){
+			if (currentLocation != null){ //a duct tape way to avoid having vertical bar on 0KM. 
 				this.updateCarPositionBar(kilometerMark);
 			}
 			
