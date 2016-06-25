@@ -176,7 +176,7 @@ public class GUImain implements Listener{
 		mainFrame = new JFrame(); //
 		setTitleAndLogo();
 		//public void setBounds(int x, int y, int width, int height)
-		mainFrame.setBounds(150, 50, 1200, 800); //main window size on opening
+		mainFrame.setBounds(110, 20, 1200, 700); //main window size on opening
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.setVisible(true);
 		//NOTE: Could consider not building all the windows at once in case of performance issues.
