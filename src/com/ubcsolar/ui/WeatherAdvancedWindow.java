@@ -1,6 +1,8 @@
 package com.ubcsolar.ui;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -15,6 +17,9 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.ValueMarker;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
 
@@ -22,11 +27,18 @@ import com.github.dvdme.ForecastIOLib.FIODataBlock;
 import com.github.dvdme.ForecastIOLib.FIODataPoint;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LocationReport;
+
 import com.ubcsolar.notification.ExceptionNotification;
+
+import com.ubcsolar.common.LogType;
+import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.exception.NoLoadedRouteException;
+
 import com.ubcsolar.notification.NewForecastReport;
 import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
@@ -36,8 +48,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +90,14 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private final int DEW_POINT_DIFF = 7;
 	private double travelDistance;
 	private double[] distances;
+	private double kilometerMark;
+	private boolean showWelcomeMessageAgain = true;
+	
+	private static final String WelcomeInfoMessage = "use \"Load Forecasts for Route(48 hours)\" under the \"Forecasts\" menu to get the weather information."
+				+"\n\n"+ "Note: You should Load the route before this.";
+
+
+	
 	private List<GeoCoord> forecastPoints;
 
 	/**
@@ -105,6 +128,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	 */
 	public WeatherAdvancedWindow(final GlobalController mySession, GUImain main) {
 		
+		
 		parent = main;
 		setTitle("Advanced Weather");
 		this.mySession = mySession;
@@ -128,17 +152,30 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				JFrame frame = new LoadingWindow(mySession);
 				frame.setVisible(true);
 				
-				mySession.getMyWeatherController().downloadNewForecastsForRoute(100); //main Process
+				try{
+					mySession.getMyWeatherController().downloadNewForecastsForRoute(100); //main Process
+					
+					frame.setVisible(false);
+					contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
+					Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
+					
+					mapChartNavigationTutorialDialog();
+				}catch(IOException e){
+					frame.setVisible(false); //no need to show the loading screen now.
+					contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
+					handleError("IOException, check internet connection");
+					Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
+					e.printStackTrace();
+				}
 				
-				frame.setVisible(false);
-				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
-				Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
+
+				
 
 			}
 		});
 		
 		mnForecasts.add(mntmLoadForecastsFor);
-		
+
 		JMenuItem mntmLoadForecastsFor_1 = new JMenuItem("Load Forecasts for current location");
 		mntmLoadForecastsFor_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -170,6 +207,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				
 		buildTemperatureChart(createBlankDataset());
 		temperatureChart = new ChartPanel(temperatureChartJFree);
+		temperatureChart.setMouseWheelEnabled(true);
+		temperatureChart.setMouseZoomable(true);
 		GridBagConstraints gbc_temperatureChart = new GridBagConstraints();
 		gbc_temperatureChart.weighty = 10.0;
 		gbc_temperatureChart.insets = new Insets(0, 0, 5, 5);
@@ -180,6 +219,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		
 		buildCloudCoverChart(createBlankDataset());
 		cloudCoverChart = new ChartPanel(cloudCoverChartJFree);
+		cloudCoverChart.setMouseZoomable(true);
+		cloudCoverChart.setMouseWheelEnabled(true);
 		GridBagConstraints gbc_cloudCoverChart = new GridBagConstraints();
 		gbc_cloudCoverChart.insets = new Insets(0, 0, 5, 0);
 		gbc_cloudCoverChart.fill = GridBagConstraints.BOTH;
@@ -189,6 +230,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		
 		buildPrecipitationChart(createBlankDataset());
 		precipitationChart = new ChartPanel(precipitationChartJFree);
+		precipitationChart.setMouseZoomable(true);
+		precipitationChart.setMouseWheelEnabled(true);
 		GridBagConstraints gbc_precipitationChart = new GridBagConstraints();
 		gbc_precipitationChart.weighty = 10.0;
 		gbc_precipitationChart.insets = new Insets(0, 0, 5, 5);
@@ -199,6 +242,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		
 		buildWindSpeedChart(createBlankDataset());
 		windSpeedChart = new ChartPanel(windSpeedChartJFree);
+		windSpeedChart.setMouseZoomable(true);
+		windSpeedChart.setMouseWheelEnabled(true);
 		GridBagConstraints gbc_windSpeedChart = new GridBagConstraints();
 		gbc_windSpeedChart.insets = new Insets(0, 0, 5, 0);
 		gbc_windSpeedChart.fill = GridBagConstraints.BOTH;
@@ -249,11 +294,57 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		setTitleAndLogo();
 		}
 		
+		protected void handleError(String string) {
+			JOptionPane.showMessageDialog(this, string);
+		}
 		private void setTitleAndLogo(){
 			
-			this.setIconImage(mySession.iconImage.getImage());
+			this.setIconImage(GlobalValues.iconImage.getImage());
 			this.setTitle("Weather");
 		}
+		
+		/**
+		 * pops up a tutorial dialog 
+		 */
+		private void mapChartNavigationTutorialDialog() {
+			Object[] options= { "Ok, Thanks" ,  "Don't show this message again" };
+			
+			if (GlobalValues.showChartNavigationTutorialAgain == true)
+			{
+				int chosenOption= JOptionPane.showOptionDialog(this, GlobalValues.CHART_TUT_MESSAGE , "Tutorial", JOptionPane.YES_NO_OPTION,
+					JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+			
+				if (chosenOption == 1){
+					GlobalValues.showChartNavigationTutorialAgain = false;
+				}
+				else{
+					GlobalValues.showChartNavigationTutorialAgain = true;
+				}
+			}
+		}
+		
+		
+		/**
+		 * pops up a tutorial dialog 
+		 */
+		public void welcomeInfoDialog() {
+			Object[] options= { "Ok, Thanks" ,  "Don't show this message again" };
+			
+			if (showWelcomeMessageAgain == true)
+			{
+				int chosenOption= JOptionPane.showOptionDialog(this, WelcomeInfoMessage , "Tutorial", JOptionPane.YES_NO_OPTION,
+					JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+			
+				if (chosenOption == 1){
+					showWelcomeMessageAgain = false;
+				}
+				else{
+					showWelcomeMessageAgain = true;
+				}
+			}
+		}
+		
+		
 		
 		/**
 		 * All notifications that this class has registered for will come here
@@ -273,6 +364,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			if(n.getClass() == NewLocationReportNotification.class){
 				NewLocationReportNotification n2 = (NewLocationReportNotification) n;
 				currentLocation = n2.getCarLocation().getLocation();
+				this.updateCarPositionBar(currentLocation);
+
 				
 			}
 			updateCharts();
@@ -280,6 +373,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 
 		}
 		
+
 		/**
 		 * register for any notifications that this class needs to
 		 */
@@ -301,6 +395,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			buildWindSpeedChart(createChartDataset(WeatherChartType.WIND_SPEED));
 			windSpeedChart.setChart(windSpeedChartJFree);
 			
+
+
 			temperatureChart.repaint();
 			temperatureChart.revalidate();
 			cloudCoverChart.repaint();
@@ -312,10 +408,16 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			contentPane.repaint();
 			contentPane.revalidate();
 			
+			if (currentLocation != null){ //a duct tape way to avoid having vertical bar on 0KM. 
+				this.updateCarPositionBar(kilometerMark);
+			}
+			
 		}
 		
 		public void updateLabels(){
-			if(currentLocation != null && currentForecastReport != null &&
+	
+			if(currentLocation != null &&
+					currentForecastReport != null &&
 					currentForecastReport.getForecasts().size()>0){
 				//next block figures out which forecast is closest to the current car location
 				//and which one will be the next one in the sequence
@@ -435,6 +537,12 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							ds,
 							PlotOrientation.VERTICAL, true, true, false);
 			temperatureChartJFree = elevationChart;
+			
+			XYPlot plot = (XYPlot) temperatureChartJFree.getPlot();		
+			plot.setRangePannable(true);
+			plot.setDomainPannable(true);
+			
+			
 		}
 		
 		private void buildTemperatureChart(XYDataset ds){
@@ -446,6 +554,17 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							ds,
 							PlotOrientation.VERTICAL, true, true, false);
 			temperatureChartJFree = temperatureChart;
+			
+			XYPlot plot = (XYPlot) temperatureChartJFree.getPlot();
+			for(int i = 0; i<ds.getSeriesCount(); i++){
+				final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(0);
+				//renderer.setBaseLegendTextFont(new Font("Helvetica", Font.BOLD, 11));
+				renderer.setSeriesStroke(i, new BasicStroke(2));
+			}
+			plot.setRangePannable(true);
+			plot.setDomainPannable(true);
+			
+			
 		}
 		
 		private void buildCloudCoverChart(XYDataset ds){
@@ -457,6 +576,15 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							ds,
 							PlotOrientation.VERTICAL, true, true, false);
 			cloudCoverChartJFree = cloudCoverChart;
+			
+			XYPlot plot = (XYPlot) cloudCoverChartJFree.getPlot();	
+			for(int i = 0; i<ds.getSeriesCount(); i++){
+				final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(0);
+				//renderer.setBaseLegendTextFont(new Font("Helvetica", Font.BOLD, 11));
+				renderer.setSeriesStroke(i, new BasicStroke(2));
+			}
+			plot.setRangePannable(true);
+			plot.setDomainPannable(true);
 		}
 		
 		private void buildPrecipitationChart(XYDataset ds){
@@ -468,6 +596,15 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							ds,
 							PlotOrientation.VERTICAL, true, true, false);
 			precipitationChartJFree = precipitationChart;
+			
+			XYPlot plot = (XYPlot) precipitationChartJFree.getPlot();
+			for(int i = 0; i<ds.getSeriesCount(); i++){
+				final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(0);
+				//renderer.setBaseLegendTextFont(new Font("Helvetica", Font.BOLD, 11));
+				renderer.setSeriesStroke(i, new BasicStroke(2));
+			}
+			plot.setRangePannable(true);
+			plot.setDomainPannable(true);
 		}
 		
 		private void buildWindSpeedChart(XYDataset ds){
@@ -479,6 +616,15 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							ds,
 							PlotOrientation.VERTICAL, true, true, false);
 			windSpeedChartJFree = headwindChart;
+			
+			XYPlot plot = (XYPlot) windSpeedChartJFree.getPlot();		
+			for(int i = 0; i<ds.getSeriesCount(); i++){
+				final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(0);
+				//renderer.setBaseLegendTextFont(new Font("Helvetica", Font.BOLD, 11));
+				renderer.setSeriesStroke(i, new BasicStroke(2));
+			}
+			plot.setRangePannable(true);
+			plot.setDomainPannable(true);
 		}
 		
 		private XYDataset createChartDataset(WeatherChartType chartType){
@@ -529,7 +675,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 
 				
 				int numHours = 0;
-				while((numHours < NUM_LINES) && ( numHours < hourlyForecasts.size()) ){
+				while((numHours < NUM_LINES) && ( numHours < hourlyForecasts.get(0).datablockSize()) ){
 					double[][] data = new double[2][distances.length];
 					for(int i = 0; i < hourlyForecasts.size(); i++){
 						data[0][i] = distances[i];
@@ -575,5 +721,70 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			this.currentForecastReport = null;
 			this.updateCharts();
 		}
+		
+		/**
+		 * Needed so that the window always pops up when requested. 
+		 * See http://stackoverflow.com/questions/309023/how-to-bring-a-window-to-the-front 
+		 * for reasoning
+		 */
+		@Override
+		public void toFront() {
+		   // int sta = super.getExtendedState() & ~JFrame.ICONIFIED & JFrame.NORMAL;
 
+		   // super.setExtendedState(sta);
+		    super.setAlwaysOnTop(true);
+		    super.toFront();
+		    super.requestFocus();
+		    super.setAlwaysOnTop(false);
+		}
+		
+		private void updateCarPositionBar(GeoCoord currentLocation) {
+			//System.out.println("TRYING TO UPDATE CAR BAR IN WEATHER CHARTS");
+			//System.out.println(mySession.getMapController().hasMapLoaded());
+			if(this.mySession.getMapController().hasMapLoaded()){
+				try {
+					kilometerMark=(this.mySession.getMapController().findDistanceAlongLoadedRoute(currentLocation));
+				} catch (NoLoadedRouteException e) {
+					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to get Car location on Map Controller, but no route loaded");
+				}
+			}
+			
+		}
+		private void updateCarPositionBar(double kilometerMark){
+			System.out.println("DRAWING LINE FOR KM: " + kilometerMark);
+			ValueMarker marker = new ValueMarker(kilometerMark);  // position is the value on the axis
+			marker.setPaint(Color.black);
+			//marker.setLabel("here"); // see JavaDoc for labels, colors, strokes
+
+			XYPlot plotTemperature = (XYPlot) temperatureChartJFree.getPlot();
+		//	plotTemperature.clearDomainMarkers();
+			plotTemperature.addDomainMarker(marker);
+			
+			XYPlot plotCloudCover = (XYPlot) cloudCoverChartJFree.getPlot();
+		//	plotCloudCover.clearDomainMarkers();
+			plotCloudCover.addDomainMarker(marker);
+
+			XYPlot plotPrecipitation = (XYPlot) precipitationChartJFree.getPlot();
+		//	plotPrecipitation.clearDomainMarkers();
+			plotPrecipitation.addDomainMarker(marker);
+			
+			XYPlot plotWindSpeed = (XYPlot) windSpeedChartJFree.getPlot();
+		//	plotWindSpeed.clearDomainMarkers();
+			plotWindSpeed.addDomainMarker(marker);
+			
+			temperatureChart.revalidate();
+			temperatureChart.repaint();
+			
+			cloudCoverChart.revalidate();
+			cloudCoverChart.repaint();
+			
+			precipitationChart.revalidate();
+			precipitationChart.repaint();
+			
+			windSpeedChart.revalidate();
+			windSpeedChart.repaint();
+			
+			contentPane.revalidate();
+			contentPane.repaint();
+		}
 }

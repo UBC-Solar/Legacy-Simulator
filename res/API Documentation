@@ -24,6 +24,14 @@ Finally using ElevationScript.java add elevations to the file.
 
 http://www.scribblemaps.com/
 
+5)To download/cache map tiles, there are two options. The first is to simply view the tiles in the
+program and CustomDisplayMap will automatically save them to res/tileCache. 
+Option 2 is to use a program to download tiles (useful to ensure you have a complete set) from a tile source.
+One program is http://wiki.openstreetmap.org/wiki/JTileDownloader, however 2 caveats:
+ a) it can't be used to get OSM tiles directly (they blocked it for technical reasons...) so you need a URL of a different
+ map provider. which leads to...
+ b) I haven't figured out the URL for Bing Aerial Maps or another OSM tile provider yet.  
+
 WEATHER
 1) Forecast.io seems to do everything we need (gathers info from NASA and NOAA DB's in the back end)
 (https://developer.forecast.io/)
@@ -37,3 +45,5 @@ Registered under: hooman.vaseli@ubcsolar.com
 Has all of the automated weather reports and forecasts (METARS and TAFs) from airports around the 'states.
 There's a lot of them
 Program Key/registered under: Don't seem to need one. 
+
+

@@ -101,8 +101,6 @@ public class BasicSimulatedDataReceiver extends AbstractDataReceiver {
  *
  */
 private class generateNewThings extends TimerTask{
-	int iterations = 0; //I put this in to calculate new values from. Simplistic algo
-						//could (almost definitely) probably be improved.
 	
 	/**
 	 * This method is what the timer calls. Calls the method in parent class to handle the new packet. 
@@ -147,13 +145,11 @@ private class generateNewThings extends TimerTask{
 			cellVoltages.put(i, generatePackVoltages(totalV));
 		}
 		TelemDataPacket tempPacket = new TelemDataPacket(speed, (int)totalV, temperatures, cellVoltages, stateOfCharge);
-		iterations++;
 		return tempPacket;
 	}
 	
 	private ArrayList<Float> generatePackVoltages(double totalV){
 		ArrayList<Float> cell1 = new ArrayList<Float>();
-		Random rng = new Random();
 		
 		putPackVoltages(10, totalV, cell1);
 		return cell1;

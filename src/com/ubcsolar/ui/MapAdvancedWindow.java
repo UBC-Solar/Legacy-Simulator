@@ -6,12 +6,19 @@
 package com.ubcsolar.ui;
 
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
+import com.ubcsolar.common.LogType;
+import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.exception.NoLoadedRouteException;
+import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.EventQueue;
@@ -53,9 +60,12 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
+import org.jfree.ui.TextAnchor;
 import org.xml.sax.SAXException;
 
 import com.jgoodies.forms.layout.FormLayout;
@@ -69,13 +79,7 @@ import java.awt.FlowLayout;
 
 public class MapAdvancedWindow extends JFrame implements Listener {
 
-	private int ShowMessageAgain = 0;
-	private static final String WelcomeInfoMessage = "To navigate the plot: \n"
-			+ "-You can zoom in/out using the mouse wheel  or  click and drage in the down-right direction" +"\n"
-			+ "to zoom in the rectangle created." +"\n"
-			+ "-You can move the plot around by holding down CTRL button while dragging around the chart." +"\n"
-			+ "-You can also zoom out to the original view by making the rectangle in direction of up-left." +"\n"
-			+ "\n" + "ENJOY !"; //TODO
+
 	private JPanel contentPane;
 	private GlobalController mySession;
 	private JLabel lblMapName;
@@ -99,12 +103,24 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		JOptionPane.showMessageDialog(this, message);
 	}
 	
-	private void welcomeInfoDialog() {
+	/**
+	 * pops up a tutorial dialog 
+	 */
+	private void mapChartNavigationTutorialDialog() {
 		Object[] options= { "Ok, Thanks" ,  "Don't show this message again" };
 		
-		ShowMessageAgain = JOptionPane.showOptionDialog(this, WelcomeInfoMessage , "Tutorial", JOptionPane.YES_NO_OPTION,
+		if (GlobalValues.showChartNavigationTutorialAgain == true)
+		{
+			int chosenOption= JOptionPane.showOptionDialog(this, GlobalValues.CHART_TUT_MESSAGE , "Tutorial", JOptionPane.YES_NO_OPTION,
 				JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
-
+		
+			if (chosenOption == 1){
+				GlobalValues.showChartNavigationTutorialAgain = false;
+			}
+			else{
+				GlobalValues.showChartNavigationTutorialAgain = true;
+			}
+		}
 	}
 	
 	/**
@@ -119,11 +135,23 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 			NewMapLoadedNotification n2 = (NewMapLoadedNotification) n; 
 			labelUpdate(n2.getMapLoadedName());
 			updateMap(n2.getRoute().getTrailMarkers(), -1);
+			if(mySession.getMapController().getLastReportedLocation() != null){
+				this.updateCarPositionBar(mySession.getMapController().getLastReportedLocation().getLocation());
+			}
 		//	JOptionPane.showMessageDialog(this, "New map: " + (((NewMapLoadedNotification) n).getMapLoadedName()));
+				
 			
+		}
+		
+		if(n.getClass() == NewLocationReportNotification.class){
+			NewLocationReportNotification n2 = (NewLocationReportNotification) n;
+			GeoCoord currentLocation = n2.getCarLocation().getLocation();
+			this.updateCarPositionBar(currentLocation);
 		}
 
 	}
+
+
 
 	/**
 	 * register for any notifications that this class needs to
@@ -132,6 +160,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	public void register(){
 		mySession.register(this, NewMapLoadedNotification.class); //need this for the map label and tool bar.
 		//add any notifications you need to listen for here. 
+		mySession.register(this, NewLocationReportNotification.class);
 	}
 	
 	/**
@@ -150,12 +179,6 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
-		
-		JMenu mnNewMenu = new JMenu("View Map");
-		menuBar.add(mnNewMenu);
-		
-		JMenuItem mntmCoordinates = new JMenuItem("Coordinates");
-		mnNewMenu.add(mntmCoordinates);
 		
 		JMenu mnLoadMap = new JMenu("Load Map");
 		menuBar.add(mnLoadMap);
@@ -188,13 +211,12 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 					 frame.setVisible(false);
 					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 					 Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
-					 
-//if in the tutorial dialog box the button "don't show this" is pushed previously, the dialog won't pop up anymore  
-					 if (ShowMessageAgain != 1){
-						 welcomeInfoDialog();
-					 }
+					
+					 mapChartNavigationTutorialDialog();
 			            
-			        } else {
+			        }
+				 
+				 else {
 			            //cancelled by user, do nothing
 			        	return;
 			        }
@@ -282,7 +304,7 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 	 * set the title and icon for this window. 
 	 */
 	private void setTitleAndLogo(){
-			this.setIconImage(mySession.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
+			this.setIconImage(GlobalValues.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
 			this.setTitle("Advanced Map"); //possible "advanced map"?
 	}
 	
@@ -304,11 +326,10 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		//cp.setRefreshBuffer(true);
 		cp.setMouseZoomable(true);
 		cp.setMouseWheelEnabled(true);
-		cp.setFillZoomRectangle(false);
-		cp.setHorizontalAxisTrace(true);
-		//cp.setVerticalAxisTrace(true);
-		//cp.setZoomAroundAnchor(true);
-
+		
+		XYPlot plot = (XYPlot) elevationChart.getPlot();
+		plot.setRangePannable(true);
+		plot.setDomainPannable(true);
 
 	}
 	
@@ -402,8 +423,9 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		ValueAxis axis = plot.getRangeAxis();
 		axis.setLowerBound(minHeight - ((maxHeight - minHeight) * 0.1)); //pad by 10% of the difference
 		axis.setUpperBound(maxHeight + ((maxHeight - minHeight) *  0.1)); //pad by 10% for prettiness
-		plot.setRangePannable(true);
-		plot.setDomainPannable(true);
+		final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(0);
+		//renderer.setBaseLegendTextFont(new Font("Helvetica", Font.BOLD, 11));
+		renderer.setSeriesStroke(0, new BasicStroke(3));
 		
 		
 		cp.setChart(elevationChart);
@@ -413,11 +435,34 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 		contentPane.repaint();
 		
 		//initialize ds, elevationChart, and cp
-	
-		
 	}
 
 
 
+	private void updateCarPositionBar(double kilometerMark){
+		ValueMarker marker = new ValueMarker(kilometerMark);  // position is the value on the axis
+		marker.setPaint(Color.black);
+		//marker.setLabel("here"); // see JavaDoc for labels, colors, strokes TODO
+		
+		XYPlot plot = (XYPlot) elevationChart.getPlot();
+		plot.clearDomainMarkers();
+		plot.addDomainMarker(marker);
+		
+		cp.repaint();
+		cp.revalidate();
+		contentPane.revalidate();
+		contentPane.repaint();
+	}
 	
+	private void updateCarPositionBar(GeoCoord currentLocation) {
+
+		if(this.mySession.getMapController().hasMapLoaded()){
+			try {
+				this.updateCarPositionBar(this.mySession.getMapController().findDistanceAlongLoadedRoute(currentLocation));
+			} catch (NoLoadedRouteException e) {
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to get Car location on Map Controller, but no route loaded");
+			}
+		}
+		
+	}
 }

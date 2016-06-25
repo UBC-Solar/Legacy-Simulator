@@ -28,14 +28,12 @@ import com.ubcsolar.weather.WeatherController;
 
 public class GlobalController {
 								//listener in pos. 1 is waiting for the trigger in pos. 1, etc. 
-	@SuppressWarnings("unused")
 	private GUImain mainWindow; //the root panel for the UI
 	private MapController myMapController; //the Map controller
 	private CarController myCarController; //the Car controller
 	private SimController mySimController; //the Sim controller
 	private DatabaseController myDatabaseController; //the database controller
 	private WeatherController myWeatherController; //the Weather controller.
-	public final ImageIcon iconImage; //the icon for the program
 	private Map<Class<? extends Notification>, List<Listener>> triggerNotifyMap;
 		
 	/**
@@ -45,7 +43,7 @@ public class GlobalController {
 	 * @throws IOException 
 	 */
 	public GlobalController(boolean doBuildUI) throws IOException{
-		iconImage = new ImageIcon("res/windowIcon.png");
+
 		
 		triggerNotifyMap = new HashMap<Class<? extends Notification>, List<Listener>>();		
 		

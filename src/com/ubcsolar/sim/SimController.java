@@ -55,7 +55,17 @@ public class SimController extends ModuleController {
 		
 		double startTimeNanos = System.nanoTime();
 		//run the sim! 
-		List<SimFrame> simFrames = new SimEngine().runSimulation(routeToTraverse, lastReported, simmedForecastReport, lastCarReported, requestedSpeeds);
+		GeoCoord startPoint = this.mySession.getMapController().findClosestPointOnRoute(lastReported.getLocation());
+		int targetIndex = -1;
+		for(int i=0; i<routeToTraverse.getTrailMarkers().size(); i++){
+			if(routeToTraverse.getTrailMarkers().get(i).equals(startPoint)){
+				targetIndex = i;
+			}
+		}
+		if(targetIndex == -1){
+			throw new IllegalArgumentException();
+		}
+		List<SimFrame> simFrames = new SimEngine().runSimulation(routeToTraverse, targetIndex, simmedForecastReport, lastCarReported, requestedSpeeds);
 		
 		double endTimeNanos = System.nanoTime();
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim completed in " + ((endTimeNanos -startTimeNanos)/1000000) + "ms");

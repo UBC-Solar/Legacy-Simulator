@@ -1,5 +1,6 @@
 package com.ubcsolar.weather;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,8 +39,9 @@ public class WeatherController extends ModuleController {
 	 * 
 	 * @param numOfKMBetweenForecasts - we only have 1000 calls, so we probably can't get a forecast for every point
 	 * in the Route. 
+	 * @throws IOException 
 	 */
-	public void downloadNewForecastsForRoute(int numOfKMBetweenForecasts){
+	public void downloadNewForecastsForRoute(int numOfKMBetweenForecasts) throws IOException{
 		Route currentlyLoadedRoute = this.mySession.getMapController().getAllPoints();
 		if(currentlyLoadedRoute == null){
 			mySession.sendNotification(new ExceptionNotification(new NullPointerException(), "Tried to get forecast but route was null"));
@@ -48,10 +50,17 @@ public class WeatherController extends ModuleController {
 		List<GeoCoord> toGet = this.calculatePointsForForecast(numOfKMBetweenForecasts, currentlyLoadedRoute.getTrailMarkers());
 		
 		ForecastFactory forecastGetter = new ForecastFactory();
-		retrievedForecasts = forecastGetter.getForecasts(toGet);
-		ForecastReport theReport = new ForecastReport(retrievedForecasts, this.mySession.getMapController().getLoadedMapName());
-		lastDownloadedReport = theReport;
-		this.mySession.sendNotification(new NewForecastReport(theReport));
+		try{
+			retrievedForecasts = forecastGetter.getForecasts(toGet);
+			ForecastReport theReport = new ForecastReport(retrievedForecasts, this.mySession.getMapController().getLoadedMapName());
+			lastDownloadedReport = theReport;
+			this.mySession.sendNotification(new NewForecastReport(theReport));
+		}
+		catch(IOException e){
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to load Forecasts, but IOException thrown (bad internet likely)");
+			throw e;
+		}
+
 	}
 	
 	public void downloadCurrentLocationForecast(GeoCoord location){
@@ -73,9 +82,10 @@ public class WeatherController extends ModuleController {
 	 * 
 	 * @param customForecast: the custom forecast report to be added to the list of custom forecasts.
 	 * Usually produced through the FakeForecastWindow.
+	 * @throws NoLoadedRouteException 
 	 */
 	
-	public void loadCustomForecast(ForecastIO customForecast){
+	public void loadCustomForecast(ForecastIO customForecast) throws NoLoadedRouteException{
 		customForecasts.add(customForecast);
 		List<ForecastIO> comboForecasts = addCustomForecasts();
 		ForecastReport theReport = new ForecastReport(comboForecasts, this.mySession.getMapController().getLoadedMapName());
@@ -130,6 +140,55 @@ public class WeatherController extends ModuleController {
 		
 	}
 	
+	
+	/**
+	 * interprolates a forecast based on the two closest forecasts. 
+	 * @param target
+	 * @return
+	 * @throws NoForecastReportException
+	 */
+	private ForecastIO interprolateForecast(GeoCoord target) throws NoForecastReportException{
+		if(retrievedForecasts == null){
+			throw new NoForecastReportException();
+		}
+		int startIndex = this.getIndexOfStartForecast(retrievedForecasts, target);
+		ForecastIO startForecast = this.retrievedForecasts.get(startIndex);
+		
+		//check to see if the target point is off the end of the forecast list. 
+		if((startIndex >= retrievedForecasts.size()-1) || (startIndex<= 0)){
+			GeoCoord firstSpot = new GeoCoord(startForecast.getLatitude(),startForecast.getLongitude(),0.0);
+			ForecastIO secondForecast;
+			if(startIndex>= retrievedForecasts.size()-1){
+				secondForecast = this.retrievedForecasts.get(startIndex - 1);
+			}else{ //i.e is 0
+				secondForecast = this.retrievedForecasts.get(startIndex + 1);
+			}
+			GeoCoord scndSpot = new GeoCoord(secondForecast.getLatitude(),secondForecast.getLongitude(),0.0);
+			double distanceBetweenFCs = firstSpot.calculateDistance(scndSpot);
+			double distanceBetweenTargetAndSecond = scndSpot.calculateDistance(target);
+			
+			
+			//can't interprolate past the end of the forecasts.
+			if(distanceBetweenTargetAndSecond > distanceBetweenFCs){
+				return this.retrievedForecasts.get(startIndex);  
+			}
+			else{
+				return this.interpolateForecast(startForecast, secondForecast, target);
+			}			
+		}
+		//determine which point is next (one left or one right?)
+		ForecastIO oneLeft = this.retrievedForecasts.get(startIndex - 1);
+		GeoCoord oneLeftSpot = new GeoCoord(oneLeft.getLatitude(), oneLeft.getLongitude(), 0.0);
+		ForecastIO oneRight = this.retrievedForecasts.get(startIndex + 1);
+		GeoCoord oneRightSpot = new GeoCoord(oneRight.getLatitude(), oneRight.getLongitude(),0.0); 
+		if(target.calculateDistance(oneLeftSpot) < target.calculateDistance(oneRightSpot)){
+			return this.interpolateForecast(startForecast, oneLeft, target);
+		}
+		else{
+			return this.interpolateForecast(startForecast, oneRight, target);
+		}
+				
+	}
 	/*
 	 * Supposed to interpolate between the start forecast and next forecast. Currently just returns the closest. 
 	 */
@@ -148,6 +207,13 @@ public class WeatherController extends ModuleController {
 		}
 	}
 
+	
+	/**
+	 * Returns the forecast tha is closest to the given point 
+	 * @param toSearch
+	 * @param g
+	 * @return
+	 */
 	private int getIndexOfStartForecast(List<ForecastIO> toSearch, GeoCoord g){
 		int lowestIndex = -1;
 		double minDistance = 999999999999999.0;
@@ -231,7 +297,7 @@ public class WeatherController extends ModuleController {
 	 * 
 	 * @return the list of ForecastIOs that should be put in the ForecastReport
 	 */
-	private List<ForecastIO> addCustomForecasts(){
+	private List<ForecastIO> addCustomForecasts() throws NoLoadedRouteException{
 		List<ForecastIO> comboForecasts;
 		if(retrievedForecasts == null){
 			comboForecasts = new ArrayList<ForecastIO>();
@@ -315,5 +381,35 @@ public class WeatherController extends ModuleController {
 		
 		return forecast;
 	}
+	
+	
+	
+	/**
+	 * Returns the ForecastIO for the requested location. If doInterprolation is true,
+	 * interprolates based on the two closes forecasts. If false, will attempt
+	 * to download a brand new forecastIO. 
+	 * @param target
+	 * @param doInterprolation
+	 * @return the forecastIO for the requested location. 
+	 * 
+	 * @throws IOException if no internet available
+	 * @throws NoForecastReportException if no forecasts have been downloaded/added
+	 */
+	public ForecastIO getForecastForSpecificPoint(GeoCoord target, Boolean doInterprolation) throws IOException, NoForecastReportException{
+		if(!doInterprolation){
+			return new ForecastIO("" + target.getLat(), "" + target.getLon(), GlobalValues.WEATHER_KEY);
+		}
+		
+		if(this.lastCustomReport == null || this.lastCustomReport.getForecasts().size() == 0){
+			throw new NoForecastReportException();
+		}
+		
+		
+		return this.interprolateForecast(target);
+		
+		
+	}
+	
+	
 
 }

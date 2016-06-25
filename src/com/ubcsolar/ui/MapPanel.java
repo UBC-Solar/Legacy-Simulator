@@ -10,9 +10,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.exception.NoLoadedRouteException;
+import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 import java.awt.GridBagLayout;
@@ -26,7 +29,11 @@ public class MapPanel extends JPanel implements Listener {
 	protected GUImain parent;
 	private GlobalController mySession;
 	private JLabel label_1;
+	private JLabel label_position;
+	private GeoCoord currentLocation;
+	private double kilometerMark;
 
+	
 	public MapPanel(GUImain main, GlobalController session) {
 	mySession = session;
 	parent = main;
@@ -48,6 +55,23 @@ public class MapPanel extends JPanel implements Listener {
 		gbl_panel_1.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
 		gbl_panel_1.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 		panel_1.setLayout(gbl_panel_1);
+		
+		JLabel lblCar = new JLabel("Car's Current Position on Route:");
+		GridBagConstraints gbc_lblCar = new GridBagConstraints();
+		gbc_lblCar.insets = new Insets(0, 0, 5, 5);
+		gbc_lblCar.gridx = 3;
+		gbc_lblCar.gridy = 1;
+		panel_1.add(lblCar, gbc_lblCar);
+		
+		label_position = new JLabel("");
+		label_position.setFont(new Font("Tahoma", Font.BOLD, 12));
+		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
+		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNewLabel.gridx = 5;
+		gbc_lblNewLabel.gridy = 1;
+		panel_1.add(label_position, gbc_lblNewLabel);
+		
+		label_position.setText("N/A");
 		
 		JLabel lblMapLoaded = new JLabel("Map Loaded: ");
 		GridBagConstraints gbc_lblMapLoaded = new GridBagConstraints();
@@ -82,7 +106,7 @@ public class MapPanel extends JPanel implements Listener {
 	}
 
 	private void updateMapLabel(String mapName){
-		label_1.setText(mapName);
+		label_1.setText(mapName);		
 	}
 	
 	@Override
@@ -91,12 +115,25 @@ public class MapPanel extends JPanel implements Listener {
 		if(n.getClass() == NewMapLoadedNotification.class){
 		updateMapLabel(((NewMapLoadedNotification) n).getMapLoadedName());
 		}
+		
+		if(n.getClass() == NewLocationReportNotification.class){
+			NewLocationReportNotification n2 = (NewLocationReportNotification) n;
+			currentLocation = n2.getCarLocation().getLocation();
+			if(this.mySession.getMapController().hasMapLoaded()){
+				try {
+					kilometerMark=(this.mySession.getMapController().findDistanceAlongLoadedRoute(currentLocation));
+					label_position.setText((int)kilometerMark +" km");
+				} catch (NoLoadedRouteException e) {
+					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to get Car location on Map Controller, but no route loaded");
+				}
+			}
+		}
 	}
 	@Override
 	public void register() {
 		// TODO Auto-generated method stub
 		mySession.register(this,  NewMapLoadedNotification.class);
-		
+		mySession.register(this,  NewLocationReportNotification.class);
 	}
 }
 

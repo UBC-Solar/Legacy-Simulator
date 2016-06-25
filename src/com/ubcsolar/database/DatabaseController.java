@@ -2,16 +2,9 @@ package com.ubcsolar.database;
 
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.*;
-import com.ubcsolar.notification.CarUpdateNotification;
-import com.ubcsolar.notification.DatabaseCreatedOrConnectedNotification;
-import com.ubcsolar.notification.DatabaseDisconnectedOrClosed;
-import com.ubcsolar.notification.ExceptionNotification;
-import com.ubcsolar.notification.NewLocationReportNotification;
-import com.ubcsolar.notification.NewMapLoadedNotification;
-import com.ubcsolar.notification.NewDataUnitNotification;
-import com.ubcsolar.notification.Notification;
+import com.ubcsolar.notification.*;
 
-import java.io.File;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -33,45 +26,28 @@ public class DatabaseController extends ModuleController {
  * I'll leave the more abstract ones commented out until we decide to implement them. 
  */
 	
-	private final String carPacketColumnNames = "entry,RealTime,ExcelTime,Speed,BMSTmp,MotorTmp,Pck0Tmp,Pck1Tmp,Pck2Tmp,Pck3Tmp,TtlVltg,"
-			+ "Pck0Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
-			+ "Pck1Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
-			+ "Pck2Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg,"
-			+ "Pck3Cl1Vltg,Cl2Vltg,Cl3Vltg,Cl4Vltg,Cl5Vltg,C62Vltg,Cl7Vltg,Cl8Vltg,Cl9Vltg,Cl10Vltg";
-	private final String locationUpdateColumnNames = "entry, RealTime, ExcelTime, Car, Source, latitude, longitude, elevation";
-	private final String printingRouteColumnNames = "pointNum, latitude, longitude, elevation, distanceFromPrevious";
-	//Added a queue to do asynchronous writes to the permanent storage. 
-	//NOTE: Currently string, but will probably change this
-	//when I actually implement a database (could be a SQL query). 
-	Database myCarPacketDatabase;
-	Database myLocationUpdateDatabase;
 	String databaseName;
-	private final String DEFAULT_FOLDER_LOCATION = "Output"; //default place to create the database file. (CSVDatabase tries to save to 'output' by default).
+	private final String DEFAULT_FOLDER_LOCATION = "Output\\"; //default place to create the database file. (CSVDatabase tries to save to 'output' by default).
+	private final String sessionFolder = "" + System.currentTimeMillis() + "\\";
+	
+	
+	String sessionFolderName = this.DEFAULT_FOLDER_LOCATION + this.sessionFolder;
+	private final CSVDatabase<TelemDataPacket> myCarPacketDatabase = new CSVDatabase<TelemDataPacket>(sessionFolderName + "TelemPackets");
+	private final CSVDatabase<LocationReport> myLocationUpdateDatabase = new CSVDatabase<LocationReport>(sessionFolderName + "Location Reports");
+	private final String simResultsFolderName = sessionFolderName + "simulations\\";
+	private final List<CSVDatabase<SimulationReport>> mySimulationResultsDB = new ArrayList<CSVDatabase<SimulationReport>>();
+	private final String forecastFolderName = sessionFolderName + "forecasts\\";
+	private final List<CSVDatabase<ForecastReport>> forecastReportsDB = new ArrayList<CSVDatabase<ForecastReport>>();
+	private final String routesFolderName = sessionFolderName + "Routes\\";
+	private final List<CSVDatabase<Route>> loadedRoutesDB = new ArrayList<CSVDatabase<Route>>();
+	
+
 	
 	public DatabaseController(GlobalController myGlobalController)throws IOException {
 		super(myGlobalController);
-		buildNewDatabase();
 	}
 	
-  /**
-   * This method used to build the connection to the database.
-   * Could probably do some work here so that we could specify the database type. 
-   * @throws IOException
-   */
-	public void buildNewDatabase() throws IOException{
-		if(myCarPacketDatabase != null && myCarPacketDatabase.isConnected()){
-			myCarPacketDatabase.saveAndDisconnect();
-		}
-		File testForExistence = new File(DEFAULT_FOLDER_LOCATION);
-		if(!testForExistence.exists() || !testForExistence.isDirectory()){
-			testForExistence.mkdir();
-		}
-		String time = "" + System.currentTimeMillis();
-		myCarPacketDatabase = new CSVDatabase("Output\\" + time + "-CarPacketSystem", carPacketColumnNames);
-		myLocationUpdateDatabase = new CSVDatabase("Output\\" + time + "-locationUpdates", locationUpdateColumnNames);
-		databaseName = ".csv"; //Just want to identify the type of DB (i.e csv vs SQL, etc.) It will already have the time created. 
-		this.mySession.sendNotification(new DatabaseCreatedOrConnectedNotification(databaseName));
-	}
+  
 	
 	public boolean isDBConnected(){
 		if(myCarPacketDatabase == null){
@@ -114,90 +90,65 @@ public class DatabaseController extends ModuleController {
 		this.mySession.register(this, CarUpdateNotification.class);
 		this.mySession.register(this, NewLocationReportNotification.class);
 		this.mySession.register(this, NewMapLoadedNotification.class);
-
+		this.mySession.register(this, NewForecastReport.class);
+		this.mySession.register(this, NewSimulationReportNotification.class);
 	}
 	
 	@Override
 	public void notify(Notification n) {
-		try {
-		if(n.getClass() == CarUpdateNotification.class){
+		try{
+			if(n instanceof CarUpdateNotification){
+				CarUpdateNotification temp = (CarUpdateNotification) n;
+				this.myCarPacketDatabase.store(temp.getDataPacket());
+			}
+			else if(n instanceof NewLocationReportNotification){
+				NewLocationReportNotification temp = (NewLocationReportNotification) n;
+				this.myLocationUpdateDatabase.store(temp.getCarLocation());
+			}
+			else if(n instanceof NewMapLoadedNotification){
+				NewMapLoadedNotification temp = (NewMapLoadedNotification) n;
+				CSVDatabase<Route> toAdd;
+				toAdd = new CSVDatabase<Route>(this.routesFolderName+System.currentTimeMillis()); //name should be unique
+				toAdd.store(temp.getRoute());
+				this.loadedRoutesDB.add(toAdd);
+			}
+			else if(n instanceof NewMapLoadedNotification){
+				NewMapLoadedNotification temp = (NewMapLoadedNotification) n;
+				CSVDatabase<Route> toAdd;
+				toAdd = new CSVDatabase<Route>(this.routesFolderName+System.currentTimeMillis()); //name should be unique
+				toAdd.store(temp.getRoute());
+				this.loadedRoutesDB.add(toAdd);
+			}
+			else if(n instanceof NewForecastReport){
+				NewForecastReport temp = (NewForecastReport) n;
+				CSVDatabase<ForecastReport> toAdd;
+				toAdd = new CSVDatabase<ForecastReport>(this.forecastFolderName+System.currentTimeMillis()); //name should be unique
+				toAdd.store(temp.getTheReport());
+				this.forecastReportsDB.add(toAdd);
+			}
 			
-				store(((CarUpdateNotification) n).getDataUnit());
-				//TODO add 'store' methods that are more concrete. 
-				return; //otherwise we get double entries with the fail-safe data-unit catch. 
+			else if(n instanceof NewSimulationReportNotification){
+				NewSimulationReportNotification temp = (NewSimulationReportNotification) n;
+				CSVDatabase<SimulationReport> toAdd;
+				toAdd = new CSVDatabase<SimulationReport>(this.simResultsFolderName+System.currentTimeMillis()); //name should be unique
+				toAdd.store(temp.getSimReport());
+				this.mySimulationResultsDB.add(toAdd);
+			}
+			
 			
 		}
-		//This was when the Register/Notify system could handle extended notifications. 
-		//(i.e would know that a newTelemDataPacket is also a NewDataUnitNotification)
-		//Left in here as a failsafe, but should be using only concrete classes. 
-		if(n instanceof NewDataUnitNotification){
-			store(((NewDataUnitNotification) n).getDataUnit());
-		}
-		
-		
+		catch(IllegalArgumentException e){
+			e.printStackTrace(); //TODO make it send an errornotification. 
 		} catch (IOException e) {
-			this.mySession.sendNotification(new ExceptionNotification(e, "Error storing lastest data unit"));
 			e.printStackTrace();
 		}
 		
-		if(n.getClass() == NewMapLoadedNotification.class){
-			n = (NewMapLoadedNotification) n;
-			try {
-				Database route = new CSVDatabase("Output\\" + "new_route - " + System.currentTimeMillis(), printingRouteColumnNames);
-				route.writeRoute(((NewMapLoadedNotification) n).getRoute());
-				route.flushAndSave();
-			} catch (IOException e) {
-				this.mySession.sendNotification(new ExceptionNotification(e, "failed at saving route"));
-				e.printStackTrace();
-			}
-		}
-
+		
 	}
+
 	
 
-	public void store(DataUnit toStore) throws IOException{
-		if(toStore.getClass() == TelemDataPacket.class){
-			this.myCarPacketDatabase.store(toStore);
-		}
-		if(toStore.getClass() == LocationReport.class){
-			this.myLocationUpdateDatabase.store(toStore);
-		}
-	}
-	
-	public void store(TelemDataPacket toStore) throws IOException{
-		this.myCarPacketDatabase.store(toStore);
-	}
-	/* save until we implement LatLongs. 
-	public void store(LatLong toStore) throws IOException{
-		this.myDatabase.store(toStore);
-	}*/
-	
-	/**
-	 * Returns all current data units of type X. 
-	 *  
-	 * @return
-	 *//*
-	public <X> ArrayList<X> getAll(){
-		//TODO implement this
-		return null;
-	}*/
-	
-	
-	
-	/**
-	 * This list may be updated a new dataunits come in, but no guarantees 
-	 * made based on time.
-	 * @return
-	 *//*
-	public <X> ProtectedList<X> getAllUpdating(){
-		//TODO implement me. Should just be a case of building the protectedList. 
-		return null;
-	}*/
-	
-	public ArrayList<TelemDataPacket> getAllTelemDataPacket(){
-		//TODO implement me
-		return null;
-	}
+
 	
 	
 	/**
