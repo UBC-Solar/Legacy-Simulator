@@ -15,10 +15,10 @@ public class SimulationReport extends DataUnit {
 	{
 		int frame=0;
 		String simTable="";
-		simTable += frame;
 		for (SimFrame f : this.getSimFrames())
 		{
-			simTable += ","+ f.getCSVEntry() +"\r\n";
+			simTable += frame+ ","+ f.getCSVEntry() +"\r\n";
+			frame++;
 		}
 		return simTable;
 	}
