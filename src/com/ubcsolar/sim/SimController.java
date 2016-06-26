@@ -56,12 +56,15 @@ public class SimController extends ModuleController {
 		double startTimeNanos = System.nanoTime();
 		//run the sim! 
 		GeoCoord startPoint = this.mySession.getMapController().findClosestPointOnRoute(lastReported.getLocation());
-		int targetIndex = -1;
-		for(int i=0; i<routeToTraverse.getTrailMarkers().size(); i++){
+		
+		/*int targetIndex = -1;
+		for(int i=0; i<routeToTraverse.getTrailMarkers().size(); i++){ //TODO , in the findClosestPointOnRoute, u find the index on route. can't u use it here as well? instead of finding it again!!!!!
 			if(routeToTraverse.getTrailMarkers().get(i).equals(startPoint)){
 				targetIndex = i;
 			}
-		}
+		}*/
+		int targetIndex= this.mySession.getMapController().getClosestPointIndex();
+		
 		if(targetIndex == -1){
 			throw new IllegalArgumentException();
 		}
