@@ -6,6 +6,7 @@ package com.ubcsolar.car;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.zip.CRC32;
 
 import com.ubcsolar.common.TelemDataPacket;
 import jssc.*;
@@ -13,7 +14,7 @@ import jssc.*;
 public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runnable,SerialPortEventListener{ //needs to be threaded so it can listen for a response
 
 	public final static byte BINMSG_SEPARATOR = (byte) 0xFF;
-	public final static int BINMSG_LENGTH = 58;
+	public final static int BINMSG_LENGTH = 65;
 	public final static int SERIAL_READ_BUF_SIZE = 100;
 	
 	// values from the last received data are cached in here...
@@ -33,7 +34,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 		System.out.println(serialPortName);
 		serialPort = new SerialPort(serialPortName);
 		serialPort.openPort();
-		serialPort.setParams(115200, 8, 1, 0); //where did these numbers come from?
+		serialPort.setParams(57600, 8, 1, 0);
 		serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
 	}
 	
@@ -74,19 +75,29 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 				13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
 				25, 26, 27, 27, 29, 30, 31, 32, 33, 34, 35, 36,
 				37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, /* cell V divided by 50: pack4 */
-				(byte) 0x83 /* checksum for example data */
+				'E', '0', 'D', '5', '2', 'D', 'F', '4' /* checksum for example data */
 		};
+
+		CRC32 crc32 = new CRC32();
+		crc32.update(exampleData, 0, 57);
 		
-		int i = 0;
-		int checksum = 0;
-		for(i = 0; i < BINMSG_LENGTH; i++)
-			checksum += inData[i];
-		if((checksum & 0xFF)!= 0xFF){
+		long crc32FromData = 0;
+		for(int i=0; i<8; i++){
+			crc32FromData = crc32FromData << 4;
+			if(inData[57+i] >= '0' && inData[57+i] <= '9')
+				crc32FromData += inData[57+i] - '0';
+			else
+				crc32FromData += inData[57+i] - 'A' + 10;
+		}
+		
+		if(crc32.getValue() != crc32FromData){
 			System.out.println("Received a Corrupt Packet");
-			//ignore corrupt packets for now
+			System.out.printf("Expected checksum: 0x%08x Got checksum 0x%08x\n", crc32.getValue(), crc32FromData);
+			// ignore corrupt packet
 			return;
 		}
-		i = 0;
+		
+		int i = 0;
 		double speed = (double) inData[i++];
 		int totalVoltage = (int) inData[i++];
 		int stateOfCharge  = (int) inData[i++];
