@@ -108,14 +108,7 @@ public class DatabaseController extends ModuleController {
 			else if(n instanceof NewMapLoadedNotification){
 				NewMapLoadedNotification temp = (NewMapLoadedNotification) n;
 				CSVDatabase<Route> toAdd;
-				toAdd = new CSVDatabase<Route>(this.routesFolderName+System.currentTimeMillis()); //name should be unique
-				toAdd.store(temp.getRoute());
-				this.loadedRoutesDB.add(toAdd);
-			}
-			else if(n instanceof NewMapLoadedNotification){
-				NewMapLoadedNotification temp = (NewMapLoadedNotification) n;
-				CSVDatabase<Route> toAdd;
-				toAdd = new CSVDatabase<Route>(this.routesFolderName+System.currentTimeMillis()); //name should be unique
+				toAdd = new CSVDatabase<Route>(this.routesFolderName+System.currentTimeMillis()+"_"+temp.getMapLoadedName()); //name should be unique
 				toAdd.store(temp.getRoute());
 				this.loadedRoutesDB.add(toAdd);
 			}
