@@ -6,10 +6,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.common.GeoCoord;
-
+import com.ubcsolar.common.LogType;
+import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.Main.GlobalValues;
 /*
  * Made this it's own class in case there are config settings we need to play with when we create the 
@@ -24,20 +28,33 @@ public class ForecastFactory {
 		isInternetReachable(); //will throw an exception if it's not.
 		ArrayList<ForecastIO> toReturn = new ArrayList<ForecastIO>(spots.size());
 		List<GetForecastTask> forecasts = new ArrayList<GetForecastTask>();
+		
+		ExecutorService es = Executors.newCachedThreadPool();   
+
+		// all tasks have finished or the time has been reached.
 		for(GeoCoord g : spots){
 			GetForecastTask tempTask = new GetForecastTask(g);
 			forecasts.add(tempTask);
-			Thread temp = new Thread(tempTask);
-			temp.start();
+			 es.execute(tempTask);
 		}
+		es.shutdown(); //stops accepting new ones, but will execute given ones. 
+		
+		try {
+			boolean finshed = es.awaitTermination(2, TimeUnit.MINUTES);
+		} catch (InterruptedException e) {
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Timed out while getting forecasts");
+			e.printStackTrace();
+			return new ArrayList<ForecastIO>(); //return empty list, don't trust anything
+		}
+		//when it gets here every task will be done.
 		
 		for(GetForecastTask g : forecasts){
 			while(g.getTheForecast() == null){
-				System.out.println("WAAAITTTINGFORFORECAST");
+				System.out.println("WAAAITTTINGFORFORECAST"); //shouldn't do this (executorService should block until this)
 			}
 			toReturn.add(g.getTheForecast());
 		}
-		System.out.println("Factory - Spots in: " + spots.size() + " forecasts: " + toReturn.size());
+		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Factory - Spots in: " + spots.size() + " forecasts: " + toReturn.size());
 		return toReturn;
 	}
 
