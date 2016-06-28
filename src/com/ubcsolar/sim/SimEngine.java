@@ -38,7 +38,9 @@ public class SimEngine {
 		inUseCarModel = new DefaultCarModel();
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "simulation starting");
 		List<SimFrame> listOfFrames = new ArrayList<SimFrame>(toTraverse.getTrailMarkers().size());
-
+		if(startLocationIndex == toTraverse.getTrailMarkers().size()-1){
+			return new ArrayList<SimFrame>(); //can't simulate if at end of race.
+		}
 		
 		ForecastIO weather = weatherReports.getForecasts().get(startLocationIndex); //assumes that the number of forecasts in weatherReports = number in Route.
 		GeoCoord start = toTraverse.getTrailMarkers().get(startLocationIndex);
