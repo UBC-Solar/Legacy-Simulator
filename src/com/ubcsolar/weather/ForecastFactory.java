@@ -2,7 +2,6 @@ package com.ubcsolar.weather;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +21,6 @@ import com.ubcsolar.Main.GlobalValues;
  * Also so that we can set it to run in it's own thread. 
  */
 public class ForecastFactory {
-	private final String API_KEY = GlobalValues.WEATHER_KEY;
-
 	public ArrayList<ForecastIO> getForecasts(List<GeoCoord> spots) throws IOException{
 		isInternetReachable(); //will throw an exception if it's not.
 		ArrayList<ForecastIO> toReturn = new ArrayList<ForecastIO>(spots.size());
@@ -38,19 +35,27 @@ public class ForecastFactory {
 			 es.execute(tempTask);
 		}
 		es.shutdown(); //stops accepting new ones, but will execute given ones. 
-		
+		boolean finshed =true;
 		try {
-			boolean finshed = es.awaitTermination(2, TimeUnit.MINUTES);
+			finshed = es.awaitTermination(2, TimeUnit.MINUTES);
 		} catch (InterruptedException e) {
-			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Timed out while getting forecasts");
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Error in Threadpool while getting forecasts");
 			e.printStackTrace();
 			return new ArrayList<ForecastIO>(); //return empty list, don't trust anything
 		}
+		
+		if(finshed == false){
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "threadpool timed out while getting forecasts");
+			return new ArrayList<ForecastIO>();//don't trust anything, return empty list
+		}
 		//when it gets here every task will be done.
+		
+		
 		
 		for(GetForecastTask g : forecasts){
 			while(g.getTheForecast() == null){
-				System.out.println("WAAAITTTINGFORFORECAST"); //shouldn't do this (executorService should block until this)
+				 //shouldn't do this (executorService should block until this)
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast not proplerly loaded in the ThreadPool(all of them are supposed to be done)");
 			}
 			toReturn.add(g.getTheForecast());
 		}
@@ -79,7 +84,7 @@ public class ForecastFactory {
  		 	try{
              //trying to retrieve data from the source. If there
              //is no connection, this line will fail
-             Object objData = urlConnect.getContent();   
+ 		 		urlConnect.getContent();   
             }
             catch(IOException e){throw e;}
             finally{
