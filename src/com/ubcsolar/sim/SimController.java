@@ -68,6 +68,10 @@ public class SimController extends ModuleController {
 		if(targetIndex == -1){
 			throw new IllegalArgumentException();
 		}
+		if(targetIndex >= routeToTraverse.getTrailMarkers().size()-1){
+			this.mySession.sendNotification(new ExceptionNotification(new IndexOutOfBoundsException(), "ERROR: Simulation started at last point"));
+			//can still let it go through and calculate an empty simulation.
+		}
 		List<SimFrame> simFrames = new SimEngine().runSimulation(routeToTraverse, targetIndex, simmedForecastReport, lastCarReported, requestedSpeeds);
 		
 		double endTimeNanos = System.nanoTime();
