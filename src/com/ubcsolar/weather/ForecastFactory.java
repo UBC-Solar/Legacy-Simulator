@@ -23,12 +23,19 @@ public class ForecastFactory {
 	public ArrayList<ForecastIO> getForecasts(List<GeoCoord> spots) throws IOException{
 		isInternetReachable(); //will throw an exception if it's not.
 		ArrayList<ForecastIO> toReturn = new ArrayList<ForecastIO>(spots.size());
+		List<GetForecastTask> forecasts = new ArrayList<GetForecastTask>();
 		for(GeoCoord g : spots){
-			ForecastIO forecastIOCurr = new ForecastIO("" + g.getLat(), "" + g.getLon(), ForecastIO.UNITS_SI, ForecastIO.LANG_ENGLISH, API_KEY);
-			if(forecastIOCurr.getLatitude() == null){
-				throw new IOException("Latitude was null, implies bad network conection");
+			GetForecastTask tempTask = new GetForecastTask(g);
+			forecasts.add(tempTask);
+			Thread temp = new Thread(tempTask);
+			temp.start();
+		}
+		
+		for(GetForecastTask g : forecasts){
+			while(g.getTheForecast() == null){
+				System.out.println("WAAAITTTINGFORFORECAST");
 			}
-			toReturn.add(forecastIOCurr);
+			toReturn.add(g.getTheForecast());
 		}
 		System.out.println("Factory - Spots in: " + spots.size() + " forecasts: " + toReturn.size());
 		return toReturn;
@@ -64,4 +71,23 @@ public class ForecastFactory {
          return true;
      }
 	
+	 private class GetForecastTask implements Runnable{
+		 private ForecastIO myForecast = null;
+		 private GeoCoord target;
+		 
+		 public GetForecastTask(GeoCoord target){
+			 super();
+			 this.target = target;
+		 }
+		 
+		 @Override
+		public void run() {
+			myForecast = new ForecastIO("" + target.getLat(), "" + target.getLon(), GlobalValues.WEATHER_KEY);
+		}
+		 
+		public ForecastIO getTheForecast(){
+			return myForecast;
+		}
+		 
+	 }
 }
