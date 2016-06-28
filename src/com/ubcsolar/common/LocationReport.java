@@ -21,15 +21,15 @@ public class LocationReport extends DataUnit {
 	public String getCSVEntry()
 	{
 		GeoCoord locToAdd = this.getLocation();
-		String toPrint = "";
-		toPrint += actualDateFormat.format(this.getTimeCreated()) + ",";
-		toPrint += excelDateFormat.format(this.getTimeCreated()) + ",";
-		toPrint += this.getCarName() + ",";
-		toPrint += this.getSource() + ",";
-		toPrint += locToAdd.getLat() + ",";
-		toPrint += locToAdd.getLon() + ",";
-		toPrint += locToAdd.getElevation() + ",";
-		return toPrint;
+		StringBuilder toPrint = new StringBuilder("");
+		toPrint.append(actualDateFormat.format(this.getTimeCreated()) + ",");
+		toPrint.append(excelDateFormat.format(this.getTimeCreated()) + ",");
+		toPrint.append(this.getCarName() + ",");
+		toPrint.append(this.getSource() + ",");
+		toPrint.append(locToAdd.getLat() + ",");
+		toPrint.append(locToAdd.getLon() + ",");
+		toPrint.append(locToAdd.getElevation() + ",");
+		return toPrint.toString();
 	}
 	
 	/**

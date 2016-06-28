@@ -28,7 +28,7 @@ public class ForecastReport extends DataUnit {
 	 */
 	public String getCSVEntry()
 	{
-		String toReturn = "";
+		StringBuilder toReturn =new StringBuilder( "");
 		int entryNum = 0;
 		double tempDistance=0;
 		GeoCoord lastPoint = null;
@@ -43,36 +43,36 @@ public class ForecastReport extends DataUnit {
 				for ( ForecastIO forecast : forecasts){
 					FIODataBlock temp = new FIODataBlock(forecast.getHourly());
 					
-					toReturn += entryNum +",";
+					toReturn.append(entryNum +",");
 					
 					for (int i=0;i<numOfHours;i++){
-						toReturn += temp.datapoint(i).temperature() +",";
+						toReturn.append(temp.datapoint(i).temperature() +",");
 						System.out.println("temperature is :" +temp.datapoint(i).temperature());
 					}
 					
 					for (int i=0;i<numOfHours;i++){
-						toReturn += (int) (temp.datapoint(i).cloudCover()*100) + "%" +",";
+						toReturn.append((int) (temp.datapoint(i).cloudCover()*100) + "%" +",");
 						System.out.println("cloud % is:" +temp.datapoint(i).cloudCover()*100);
 					}
 					
 					for (int i=0;i<numOfHours;i++){
-						toReturn += temp.datapoint(i).precipType() +",";
-						toReturn += (int)(temp.datapoint(i).precipProbability()*100) + "%"+",";
+						toReturn.append(temp.datapoint(i).precipType() +",");
+						toReturn.append((int)(temp.datapoint(i).precipProbability()*100) + "%"+",");
 						System.out.println("Precipitation Type:" +temp.datapoint(i).precipType());
 						System.out.println("Chance of precipitation is:" +temp.datapoint(i).precipProbability()*100 +"%");
 					}
 					
 					for (int i=0;i<numOfHours;i++){
-						toReturn += temp.datapoint(i).dewPoint() +",";
+						toReturn.append(temp.datapoint(i).dewPoint() +",");
 						System.out.println("DewPoint is:" +temp.datapoint(i).dewPoint());
 					}
 					
 					for (int i=0;i<numOfHours;i++){
-						toReturn += temp.datapoint(i).windSpeed()+",";
+						toReturn.append(temp.datapoint(i).windSpeed()+",");
 						System.out.println("Wind Speed is:" +temp.datapoint(i).windSpeed());
 					}
 					
-					toReturn += "\r\n";
+					toReturn.append("\r\n");
 					entryNum++;
 				}
 			}
@@ -82,7 +82,7 @@ public class ForecastReport extends DataUnit {
 			
 	//	}
 
-		return toReturn;
+		return toReturn.toString();
 	}
 	
 	/**

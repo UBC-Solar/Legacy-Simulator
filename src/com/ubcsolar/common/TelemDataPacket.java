@@ -29,70 +29,70 @@ public class TelemDataPacket extends DataUnit{
 	{
 		HashMap<String, Integer> temperatures = this.getTemperatures();
 		HashMap<Integer, ArrayList<Float>> voltages = this.getCellVoltages();
-		String toPrint = "";
+		StringBuilder toPrint =new StringBuilder("");
 		
 		if (actualDateFormat.format(this.getTimeCreated()) != null){
-			toPrint += actualDateFormat.format(this.getTimeCreated()) + ",";
+			toPrint.append(actualDateFormat.format(this.getTimeCreated()) + ",");
 		}
 		else{
-			toPrint += "----,";
+			toPrint.append("----,");
 		}
 		if (excelDateFormat.format(this.getTimeCreated())!= null){
-			toPrint += excelDateFormat.format(this.getTimeCreated()) + ",";
+			toPrint.append(excelDateFormat.format(this.getTimeCreated()) + ",");
 		}
 		else{
-			toPrint += "----,";
+			toPrint.append("----,");
 		}
 		
-		toPrint += this.getSpeed() + ",";
-		toPrint += this.getStateOfCharge() +",";
+		toPrint.append(this.getSpeed() + ",");
+		toPrint.append(this.getStateOfCharge() +",");
 		if( temperatures != null )
 		{
 			
 			if ( temperatures.get("bms")!= null){  //if the temperature calls return 'null', the DB will error
-				toPrint += temperatures.get("bms")  + ","; 
+				toPrint.append(temperatures.get("bms")  + ","); 
 			}
 			else{
-				toPrint += "----,";
+				toPrint.append("----,");
 			}
 			
 			if (temperatures.get("motor")!= null){
-				toPrint += temperatures.get("motor") + ",";
+				toPrint.append(temperatures.get("motor") + ",");
 			}
 			else{
-				toPrint += "----,";
+				toPrint.append("----,");
 			}
 			
 			if (temperatures.get("pack0")!= null){
-				toPrint += temperatures.get("pack0") + ",";
+				toPrint.append(temperatures.get("pack0") + ",");
 			}
 			else{
-				toPrint += "----,";
+				toPrint.append("----,");
 			}
 			
 			if (temperatures.get("pack1")!= null){
-				toPrint += temperatures.get("pack1") + ",";
+				toPrint.append(temperatures.get("pack1") + ",");
 			}
 			else{
-				toPrint += "----,";
+				toPrint.append("----,");
 			}
 			
 			if (temperatures.get("pack2")!= null){
-				toPrint += temperatures.get("pack2") + ",";
+				toPrint.append(temperatures.get("pack2") + ",");
 			}
 			else{
-				toPrint += "----,";
+				toPrint.append("----,");
 			}
 			
 			if (temperatures.get("pack3")!= null){
-				toPrint += temperatures.get("pack3") + ",";
+				toPrint.append(temperatures.get("pack3") + ",");
 			}
 			else{
-				toPrint += "----,";
+				toPrint.append("----,");
 			}
 		}
 					
-		toPrint += this.getTotalVoltage() ;
+		toPrint.append(this.getTotalVoltage()) ;
 
 		//assumes that they have been loaded with the standard number of voltage entries
 		//NOTE: May need to modify this if you change the number of cells on the car, 
@@ -103,16 +103,16 @@ public class TelemDataPacket extends DataUnit{
 		{
 			for(int i = 0; i<4; i++){ 
 				if(voltages.get(i) == null){ //will need to offset this so the rest are in position
-					toPrint += this.numberOfCommas(expectedNumOfCells);
+					toPrint.append(this.numberOfCommas(expectedNumOfCells));
 				}
 				else{
 					for(Float f : voltages.get(0)){
-						toPrint +=  ","+f ;
+						toPrint.append( ","+f );
 					}
 				}
 			}
 		}
-				return toPrint;
+				return toPrint.toString();
 	}
 	
 	private String numberOfCommas(int numberOfCommas){

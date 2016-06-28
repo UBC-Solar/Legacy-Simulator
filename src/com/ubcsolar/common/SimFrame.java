@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.github.dvdme.ForecastIOLib.FIODataPoint;
 
-public class SimFrame extends DataUnit {
+public class SimFrame extends DataUnit{ //implements Runnable{
 	
 	private DateFormat actualDateFormat = new SimpleDateFormat("HH:mm:ss.SSS"); //time format. ss = seconds, SSS = ms
 	//couldn't manage to format milliseconds in a way that Excel can handle as time
@@ -25,16 +25,43 @@ public class SimFrame extends DataUnit {
 	 */
 	public String getCSVEntry()
 	{
+		StringBuilder frameToPrint = new StringBuilder("");
+		//frameToPrint += actualDateFormat.format (this.getTimeCreated())+ "," ;
+		//frameToPrint += excelDateFormat.format(this.getTimeCreated()) + "," ;
+		frameToPrint.append(actualDateFormat.format (this.getRepresentedTime())+ ",") ;
+		frameToPrint.append(excelDateFormat.format(this.getRepresentedTime()) + reportSeparation) ;
+		//frameToPrint += this.getForecast().getCSVEntry() + reportSeparation; //TODO
+		frameToPrint.append(this.getCarStatus().getCSVEntry() + reportSeparation);
+		frameToPrint.append(this.getGPSReport().getCSVEntry() + ",");
+		return frameToPrint.toString();
+	
+	
+	}
+	
+	/*
+	@Override
+	public void run() {
 		String frameToPrint = "";
-		frameToPrint += actualDateFormat.format (this.getTimeCreated())+ "," ;
-		frameToPrint += excelDateFormat.format(this.getTimeCreated()) + "," ;
 		frameToPrint += actualDateFormat.format (this.getRepresentedTime())+ "," ;
 		frameToPrint += excelDateFormat.format(this.getRepresentedTime()) + reportSeparation ;
 		//frameToPrint += this.getForecast().getCSVEntry() + reportSeparation; //TODO
 		frameToPrint += this.getCarStatus().getCSVEntry() + reportSeparation;
 		frameToPrint += this.getGPSReport().getCSVEntry() + ",";
-		return frameToPrint;
+		
+		String frameEntry = ""+frame;
+		parent.notifyOfResult(frameEntry,frameToPrint);
+
+		
 	}
+	
+	private int frame;
+	private SimulationReport parent;
+	SimFrame(int entry,SimulationReport temp ){
+		this.frame=entry;
+		parent=temp;
+		
+	}*/
+	
 	
 	/**
 	 * gets the column headings as a csv row
@@ -55,11 +82,11 @@ public class SimFrame extends DataUnit {
 	}
 
 	
-	private final long timeCreated; //the time this frame was created, not the time it represents. 
-	private final long representedTime;
-	private final FIODataPoint forecast;
-	private final TelemDataPacket carStatus;
-	private final LocationReport GPSReport;
+	private  final long timeCreated; //the time this frame was created, not the time it represents. 
+	private  final long representedTime;
+	private  final FIODataPoint forecast;
+	private  final TelemDataPacket carStatus;
+	private  final LocationReport GPSReport;
 	
 	
 	public SimFrame(FIODataPoint forecast, TelemDataPacket carStatus, LocationReport GPSReport, long timeRepresented) {
@@ -102,5 +129,7 @@ public class SimFrame extends DataUnit {
 	public long getRepresentedTime() {
 		return representedTime;
 	}
+
+
 
 }

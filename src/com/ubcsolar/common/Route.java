@@ -15,25 +15,25 @@ public class Route extends DataUnit{
 	 */
 	public String getCSVEntry()
 	{
-		String multiLine = "";
+		StringBuilder multiLine = new StringBuilder("");
 		int entryNum = 0;
 		double tempDistance=0;
 		GeoCoord lastPoint = null;
 		double runningTotalDistance = 0;
 		for(GeoCoord g : this.getTrailMarkers()){
 			if(lastPoint == null){
-				multiLine += (""+entryNum+","+g.getCSVEntry()+","+tempDistance+","+runningTotalDistance+"\r\n");
+				multiLine.append(""+entryNum+","+g.getCSVEntry()+","+tempDistance+","+runningTotalDistance+"\r\n");
 				lastPoint = g;
 			}else{
 				tempDistance = lastPoint.calculateDistance(g);
 				runningTotalDistance += tempDistance;
-				multiLine += (""+entryNum+","+g.getCSVEntry()+","+tempDistance+","+runningTotalDistance+"\r\n");
+				multiLine.append(""+entryNum+","+g.getCSVEntry()+","+tempDistance+","+runningTotalDistance+"\r\n");
 				lastPoint = g;
 			}
 			entryNum++;
 			
 		}
-		return multiLine;
+		return multiLine.toString();
 
 	}
 	
