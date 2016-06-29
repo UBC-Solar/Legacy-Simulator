@@ -15,9 +15,9 @@ public class SimFrame extends DataUnit{ //implements Runnable{
 	
 	private final static String reportSeparation = ",,";
 	public final static String classCSVHeaderRow = "TimeCrt, ExcelTimeCrt, TimeRep, ExcelTimeRep" +reportSeparation
-			+ ForecastReport.classCSVHeaderRow//TODO
-			//+ reportSeparation
-			+ TelemDataPacket.classCSVHeaderRow + reportSeparation + LocationReport.classCSVHeaderRow;
+			+ TelemDataPacket.classCSVHeaderRow + reportSeparation + LocationReport.classCSVHeaderRow +reportSeparation
+			+ WeatherPrinter.getCSVHeaderRowForDataPoint();
+			
 	/**
 	 * turns the class fields into an entry for a csv file
 	 * see returnsEntireTable for info on row versus table
@@ -26,13 +26,13 @@ public class SimFrame extends DataUnit{ //implements Runnable{
 	public String getCSVEntry()
 	{
 		StringBuilder frameToPrint = new StringBuilder("");
-		//frameToPrint += actualDateFormat.format (this.getTimeCreated())+ "," ;
-		//frameToPrint += excelDateFormat.format(this.getTimeCreated()) + "," ;
+		frameToPrint.append(actualDateFormat.format (this.getTimeCreated())+ ",") ;
+		frameToPrint.append(excelDateFormat.format(this.getTimeCreated()) + ",") ;
 		frameToPrint.append(actualDateFormat.format (this.getRepresentedTime())+ ",") ;
 		frameToPrint.append(excelDateFormat.format(this.getRepresentedTime()) + reportSeparation) ;
-		//frameToPrint += this.getForecast().getCSVEntry() + reportSeparation; //TODO
 		frameToPrint.append(this.getCarStatus().getCSVEntry() + reportSeparation);
-		frameToPrint.append(this.getGPSReport().getCSVEntry() + ",");
+		frameToPrint.append(this.getGPSReport().getCSVEntry() +reportSeparation);
+		frameToPrint.append(WeatherPrinter.getCSVRowForFIODataPoint(this.getForecast())); 
 		return frameToPrint.toString();
 	
 	
