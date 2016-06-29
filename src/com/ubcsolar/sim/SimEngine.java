@@ -56,7 +56,8 @@ public class SimEngine {
 		listOfFrames.add(startFrame);
 
 		SimFrame lastFrame = startFrame;
-		for(int i = startLocationIndex+1; i<toTraverse.getTrailMarkers().size(); i++){ 
+		int numOfPoints = toTraverse.getTrailMarkers().size();
+		for(int i = startLocationIndex+1; i<(numOfPoints*laps); i++){ 
 			/*
 			 * By starting at startPos, we calculate the jump from car's current location to the next breadcrumb, rather
 			 * than just assuming that it's actually at the last breadcrumb. 
@@ -72,14 +73,14 @@ public class SimEngine {
 					nextWeather = weatherReports.getForecasts().get(startLocationIndex);
 				}
 				else{
-					nextWeather = weatherReports.getForecasts().get(i);
+					nextWeather = weatherReports.getForecasts().get(i%numOfPoints);
 				}
 
 				nextPoint = lastFrame.getGPSReport().getLocation();
 			}
 			else{
-				nextWeather = weatherReports.getForecasts().get(i);
-				nextPoint = toTraverse.getTrailMarkers().get(i);
+				nextWeather = weatherReports.getForecasts().get(i%numOfPoints);
+				nextPoint = toTraverse.getTrailMarkers().get(i%numOfPoints);
 			}
 
 			SimFrame nextFrame = this.generateNextFrame(lastFrame, nextPoint, nextWeather, requestedSpeeds.get(nextPoint));
