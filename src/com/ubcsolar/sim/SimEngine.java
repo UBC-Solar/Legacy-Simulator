@@ -34,7 +34,10 @@ public class SimEngine {
 
 	private CarModel inUseCarModel;
 
-	public List<SimFrame> runSimulation(Route toTraverse, int startLocationIndex, ForecastReport weatherReports, TelemDataPacket carStartingCondition, Map<GeoCoord,Double> requestedSpeeds){
+	public List<SimFrame> runSimulation(Route toTraverse, int startLocationIndex, ForecastReport weatherReports, TelemDataPacket carStartingCondition, Map<GeoCoord,Double> requestedSpeeds, int laps){
+		if(laps <= 0){
+			throw new IllegalArgumentException("Must go at least one lap");
+		}
 		inUseCarModel = new DefaultCarModel();
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "simulation starting");
 		List<SimFrame> listOfFrames = new ArrayList<SimFrame>(toTraverse.getTrailMarkers().size());
@@ -44,7 +47,7 @@ public class SimEngine {
 		
 		ForecastIO weather = weatherReports.getForecasts().get(startLocationIndex); //assumes that the number of forecasts in weatherReports = number in Route.
 		GeoCoord start = toTraverse.getTrailMarkers().get(startLocationIndex);
-		GeoCoord next = toTraverse.getTrailMarkers().get(startLocationIndex + 1);
+		GeoCoord next = toTraverse.getTrailMarkers().get(startLocationIndex + 1); //won't index out of range because of check above. 
 		Double reqSpeed = requestedSpeeds.get(start);
 		TelemDataPacket startCondition = carStartingCondition;
 		FIODataPoint startWeather = new FIODataBlock(weather.getHourly()).datapoint(0);

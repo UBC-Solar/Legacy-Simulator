@@ -36,7 +36,23 @@ public class SimController extends ModuleController {
 		super(toAdd);
 	}
 	
-	public void runSimulation(Map<GeoCoord, Double> requestedSpeeds) throws NoForecastReportException, NoLoadedRouteException, NoLocationReportedException, NoCarStatusException{
+	/**
+	 * 
+	 * @param requestedSpeeds a map of geoCoordinates and requested speeds for the frames
+	 * ending at those geocoordinates. Used to override the sim's best-guess.
+	 * NOTE: not guaranteed that the speed will be achieved; may be limited due to acceleration,
+	 * power, etc. 
+	 * @param laps - number of laps for the car to complete. Must be >=1 (1 implies finishing the existing lap). 
+	 * @throws NoForecastReportException
+	 * @throws NoLoadedRouteException
+	 * @throws NoLocationReportedException
+	 * @throws NoCarStatusException
+	 * @throws IllegalArgumentException - if laps <= 0.
+	 */
+	public void runSimulation(Map<GeoCoord, Double> requestedSpeeds, int laps) throws NoForecastReportException, NoLoadedRouteException, NoLocationReportedException, NoCarStatusException{
+		if(laps<=0){
+			throw new IllegalArgumentException("Number of Laps too low, must go at least 1 lap");
+		}
 		//Compile all the information we need. 		
 		ForecastReport simmedForecastReport = this.mySession.getMyWeatherController().getSimmedForecastForEveryPointfForLoadedRoute();
 		LocationReport lastReported = this.mySession.getMapController().getLastReportedLocation();
@@ -72,7 +88,7 @@ public class SimController extends ModuleController {
 			this.mySession.sendNotification(new ExceptionNotification(new IndexOutOfBoundsException(), "ERROR: Simulation started at last point"));
 			//can still let it go through and calculate an empty simulation.
 		}
-		List<SimFrame> simFrames = new SimEngine().runSimulation(routeToTraverse, targetIndex, simmedForecastReport, lastCarReported, requestedSpeeds);
+		List<SimFrame> simFrames = new SimEngine().runSimulation(routeToTraverse, targetIndex, simmedForecastReport, lastCarReported, requestedSpeeds,laps);
 		
 		double endTimeNanos = System.nanoTime();
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim completed in " + ((endTimeNanos -startTimeNanos)/1000000) + "ms");

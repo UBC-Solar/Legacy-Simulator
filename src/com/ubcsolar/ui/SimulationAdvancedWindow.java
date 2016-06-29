@@ -437,7 +437,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		protected void runSimultion() {
 			Map<GeoCoord, Double> requestedSpeeds = generateRequestedSpeedMap();
 			try {
-				mySession.getMySimController().runSimulation(requestedSpeeds);
+				mySession.getMySimController().runSimulation(requestedSpeeds,1);
 			} catch (NoForecastReportException e) {
 				this.handleError("No Forcecasts Loaded");
 				return;
