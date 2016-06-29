@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.ubcsolar.sim.DefaultCarModel;
+
 public class TelemDataPacket extends DataUnit{
 
 	private DateFormat actualDateFormat = new SimpleDateFormat("HH:mm:ss.SSS"); //time format. ss = seconds, SSS = ms
@@ -97,7 +99,7 @@ public class TelemDataPacket extends DataUnit{
 		//assumes that they have been loaded with the standard number of voltage entries
 		//NOTE: May need to modify this if you change the number of cells on the car, 
 		//or the amount per pack.
-		int expectedNumOfCells = 10;
+		int expectedNumOfCells =new DefaultCarModel().getPackCells();
 			
 		if (voltages !=null)
 		{

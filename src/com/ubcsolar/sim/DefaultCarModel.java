@@ -4,6 +4,7 @@ import java.awt.Color;
 
 public class DefaultCarModel extends CarModel {
 	private final double numberOfBatteryPacks = 4;
+	private final int numberOfPackCells= 10;
 	private final double batteryCap = 800*numberOfBatteryPacks; //watt hrs
 	private final double solarPanelArea = 10; //square meters
 	
@@ -18,6 +19,11 @@ public class DefaultCarModel extends CarModel {
 	public double getMaxBatteryCap() {
 		// TODO Auto-generated method stub
 		return batteryCap;
+	}
+	
+	public int getPackCells()
+	{
+		return numberOfPackCells;
 	}
 
 	@Override
