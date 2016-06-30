@@ -40,7 +40,7 @@ public class WeatherPrinter {
 		
 		StringBuilder toReturn =new StringBuilder("");
 		toReturn.append(weatherDataPointHeaderRow);
-		System.out.println(toReturn.toString());
+		//System.out.println(toReturn.toString());
 		return toReturn.toString();
 
 	}
@@ -51,21 +51,21 @@ public class WeatherPrinter {
 		StringBuilder toReturn =new StringBuilder( "");
 	
 		toReturn.append(datapoint.temperature() +",");
-		System.out.println("temperature is :" +datapoint.temperature());
+		//System.out.println("temperature is :" +datapoint.temperature());
 	
 		toReturn.append((int) (datapoint.cloudCover()*100) + "%" +",");
-		System.out.println("cloud % is:" +datapoint.cloudCover()*100);
+		//System.out.println("cloud % is:" +datapoint.cloudCover()*100);
 
 		toReturn.append(datapoint.precipType() +",");
 		toReturn.append((int)(datapoint.precipProbability()*100) + "%"+",");
-		System.out.println("Precipitation Type:" +datapoint.precipType());
-		System.out.println("Chance of precipitation is:" +datapoint.precipProbability()*100 +"%");
+		//System.out.println("Precipitation Type:" +datapoint.precipType());
+		//System.out.println("Chance of precipitation is:" +datapoint.precipProbability()*100 +"%");
 
 		toReturn.append(datapoint.dewPoint() +",");
-		System.out.println("DewPoint is:" +datapoint.dewPoint());
+		//System.out.println("DewPoint is:" +datapoint.dewPoint());
 		
 		toReturn.append(datapoint.windSpeed());
-		System.out.println("Wind Speed is:" +datapoint.windSpeed());
+		//System.out.println("Wind Speed is:" +datapoint.windSpeed());
 		
 		return toReturn.toString();
 		

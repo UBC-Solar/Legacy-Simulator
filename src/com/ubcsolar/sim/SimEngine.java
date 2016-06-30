@@ -123,16 +123,16 @@ public class SimEngine {
 			nextSimFrameTime = lastTimeStamp + timeSinceLastFrame;
 			timeSinceLastFrameInHr = timeSinceLastFrame/(60.0*1000.0*60.0);
 
-			System.out.println(distanceCovered);
+			//System.out.println(distanceCovered);
 		}
 		else{
 			double tempTime = RECHARGE_TIME_MS; //double check units. km/h and m?? distanceCovered is in meters
 			timeSinceLastFrame = (long) tempTime;		
 			nextSimFrameTime = lastTimeStamp + timeSinceLastFrame;
 			timeSinceLastFrameInHr = tempTime/(1000*60*60);
-			System.out.println("AGAHAHAHAHAHAHAH RAN");
-			System.out.println(timeSinceLastFrameInHr);
-			System.out.println(distanceCovered);
+			//System.out.println("AGAHAHAHAHAHAHAH RAN");
+			//System.out.println(timeSinceLastFrameInHr);
+			//System.out.println(distanceCovered);
 		}
 
 
@@ -144,7 +144,7 @@ public class SimEngine {
 
 		double SunCharge = (sunPowerInWatts*timeSinceLastFrameInHr)/(inUseCarModel.getMaxBatteryCap()); //divide watt hrs from the sun by max watt hrs to get the percentage of charge from the sun
 		if(SunCharge>2000000){
-			System.out.println("" + distanceCovered + " " +  timeSinceLastFrameInHr + " Speed: " + speedToDrive);
+			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "" + distanceCovered + " " +  timeSinceLastFrameInHr + " Speed: " + speedToDrive);
 		}
 
 		TelemDataPacket newCarStatus;

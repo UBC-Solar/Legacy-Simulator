@@ -727,7 +727,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			
 		}
 		private void updateCarPositionBar(double kilometerMark){
-			System.out.println("DRAWING LINE FOR KM: " + kilometerMark);
+			//System.out.println("DRAWING LINE FOR KM: " + kilometerMark);
 			ValueMarker marker = new ValueMarker(kilometerMark);  // position is the value on the axis
 			marker.setPaint(Color.black);
 			//marker.setLabel("here"); // see JavaDoc for labels, colors, strokes
