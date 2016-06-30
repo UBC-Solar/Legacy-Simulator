@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -58,6 +59,9 @@ import java.awt.FlowLayout;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.DefaultComboBoxModel;
 
 public class SimulationAdvancedWindow extends JFrame implements Listener{
 
@@ -75,6 +79,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private final int xValues = 0; //for the Double[][] dataset
 	private final int yValues = 1; //for the Double[][] dataset
 	private JPanel buttonPanel; 
+	private final int MAX_NUM_OF_LAPS=30;//the max number of laps to put in the combo box. 30 picked arbitrarily
 	private ChartPanel mainDisplay; //the panel displaying the model
 	private SimulationReport lastSimReport; //cache the last simReport
 	
@@ -94,6 +99,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 
 	private static final String WelcomeInfoMessage = "use \"Load Forecasts for Route(48 hours)\" under the \"Forecasts\" menu to get the weather information."
 			+"\n\n"+ "Note: You should Load the route before this.";
+	private JComboBox<Integer> lapSelectComboBox;
 
 	private void handleError(String message){
 		JOptionPane.showMessageDialog(this, message);
@@ -241,6 +247,19 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			}
 		});
 		buttonPanel.add(chckbxElevation);
+		
+		lapSelectComboBox = new JComboBox<Integer>();
+		lapSelectComboBox.setPreferredSize(new Dimension(39, 18));
+		lapSelectComboBox.setEditable(true);
+		for(int i = 1; i<=MAX_NUM_OF_LAPS; i++){
+			lapSelectComboBox.addItem(new Integer(i));
+		}
+		
+		lapSelectComboBox.setSelectedIndex(0);
+		buttonPanel.add(lapSelectComboBox);
+		
+		JLabel lblOfLaps = new JLabel("# Of Laps: ");
+		buttonPanel.add(lblOfLaps);
 		
 		JPanel chartHoldingPanel = new JPanel();
 		contentPane.add(chartHoldingPanel, BorderLayout.CENTER);
@@ -435,9 +454,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		 * is not loaded, displays an error message to end user. 
 		 */
 		protected void runSimultion() {
+			int numLaps = lapSelectComboBox.getSelectedIndex() +1; //0 based index.
 			Map<GeoCoord, Double> requestedSpeeds = generateRequestedSpeedMap();
 			try {
-				mySession.getMySimController().runSimulation(requestedSpeeds,1);
+				mySession.getMySimController().runSimulation(requestedSpeeds,numLaps);
 			} catch (NoForecastReportException e) {
 				this.handleError("No Forcecasts Loaded");
 				return;
