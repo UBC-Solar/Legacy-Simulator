@@ -89,6 +89,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private boolean showStateOfCharge = true;
 	private boolean showCloud = true;
 	private boolean showElevation = true;
+	private boolean showTime = true;
 	private JScrollPane speedSlidersPanel;
 	private JTextField textField_1;
 	private JPanel SliderHoldingPanel;
@@ -100,6 +101,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private static final String WelcomeInfoMessage = "use \"Load Forecasts for Route(48 hours)\" under the \"Forecasts\" menu to get the weather information."
 			+"\n\n"+ "Note: You should Load the route before this.";
 	private JComboBox<Integer> lapSelectComboBox;
+	private JCheckBox checkBoxTime;
 
 	private void handleError(String message){
 		JOptionPane.showMessageDialog(this, message);
@@ -254,6 +256,22 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		for(int i = 1; i<=MAX_NUM_OF_LAPS; i++){
 			lapSelectComboBox.addItem(new Integer(i));
 		}
+		
+		checkBoxTime = new JCheckBox("Time");
+		checkBoxTime.setSelected(showTime);
+		checkBoxTime.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showTime = checkBoxTime.isSelected();
+
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
+				JFrame frame = new LoadingWindow(mySession);
+				frame.setVisible(true);
+				refreshChart();
+				frame.setVisible(false);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			}
+		});
+		buttonPanel.add(checkBoxTime);
 		
 		lapSelectComboBox.setSelectedIndex(0);
 		buttonPanel.add(lapSelectComboBox);
@@ -653,7 +671,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				plot.setRenderer(4, renderer5);
 			}
 			
-			if(true){ //should make a 'time series' checkbox
+			if(this.showTime){ //should make a 'time series' checkbox
 				DefaultXYDataset timeDataset = new DefaultXYDataset();
 				timeDataset.addSeries("Time", generateTimeSeries(simReport.getSimFrames(), startDistance));
 				final NumberAxis axis5 = new NumberAxis("time (min)");
