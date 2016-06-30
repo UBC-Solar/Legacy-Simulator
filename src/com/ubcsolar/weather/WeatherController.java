@@ -88,7 +88,10 @@ public class WeatherController extends ModuleController {
 		customForecasts = new ArrayList<ForecastIO>();
 		if(lastDownloadedReport != null){
 			this.mySession.sendNotification(new NewForecastReport(lastDownloadedReport));
-		}else{
+		}else{ //TODO it's a duct tape solution for dissapearing the green dot on map when the 48H forecast was not loaded
+			List<ForecastIO> forecast = new ArrayList<ForecastIO>();
+			ForecastReport theReport = new ForecastReport(forecast, this.mySession.getMapController().getLoadedMapName());
+			this.mySession.sendNotification(new NewForecastReport(theReport));
 			this.mySession.getGUIMain().clearWeather();
 		}
 	}
