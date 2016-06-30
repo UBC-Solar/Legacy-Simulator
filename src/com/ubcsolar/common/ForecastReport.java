@@ -8,10 +8,7 @@ import com.github.dvdme.ForecastIOLib.FIODataBlock;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 
 public class ForecastReport extends DataUnit {
-	
-
-	public final static String classCSVHeaderRow ="pointNum" + "," + WeatherPrinter.getCSVHeaderRowForForecastIO();
-	
+		
 	/**
 	 * turns the class fields into an entry for a csv file
 	 * see returnsEntireTable for info on row versus table
@@ -30,7 +27,7 @@ public class ForecastReport extends DataUnit {
 			if (forecasts.size() != 0){
 				
 				for ( ForecastIO forecast : forecasts){
-					toReturn.append(entryNum +",");
+					toReturn.append(entryNum +",,");
 					toReturn.append(WeatherPrinter.getCSVEntryForForecastIO(forecast));
 					toReturn.append("\r\n");
 					entryNum++;
@@ -46,7 +43,25 @@ public class ForecastReport extends DataUnit {
 	 */
 	public String getCSVHeaderRow()
 	{
-		return classCSVHeaderRow;
+		StringBuilder toReturn =new StringBuilder( "");
+
+		if (forecasts.size()== 0){
+			return toReturn.toString(); 
+		}
+		
+		FIODataBlock temp = new FIODataBlock(forecasts.get(0).getHourly());
+		
+		int numOfHours = temp.datablockSize();
+		
+		String DataPointHeader = WeatherPrinter.getCSVHeaderRowForForecastIO();
+		
+		toReturn.append("pointNum" );
+		
+		for (int i=0;i<numOfHours;i++){
+			toReturn.append(",Hour_"+ i+","+ DataPointHeader);
+		}
+		
+		return toReturn.toString();
 	}
 	
 	/**

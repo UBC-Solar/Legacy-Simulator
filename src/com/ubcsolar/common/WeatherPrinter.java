@@ -25,10 +25,10 @@ public class WeatherPrinter {
 		for (int i=0;i<numOfHours;i++){
 			
 			if (i > 0){
-				toReturn.append(",");
+				toReturn.append(",,");
 			}
 			
-			toReturn.append(","+ getCSVRowForFIODataPoint(temp.datapoint(i)));
+			toReturn.append( getCSVRowForFIODataPoint(temp.datapoint(i)));
 		}
 		
 		
@@ -39,16 +39,8 @@ public class WeatherPrinter {
 	public static String getCSVHeaderRowForForecastIO(){
 		
 		StringBuilder toReturn =new StringBuilder("");
-		
-		for (int i=0 ; i<numOfHours; i++){
-			
-			if(i>0){
-				toReturn.append(",");
-			}
-			
-			toReturn.append("Hour_"+i);
-			toReturn.append(","+weatherDataPointHeaderRow);
-		}
+		toReturn.append(weatherDataPointHeaderRow);
+		System.out.println(toReturn.toString());
 		return toReturn.toString();
 
 	}
