@@ -607,7 +607,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				//renderer2.setPlotShapes(true);
 				plot.setRenderer(1, renderer2);
 			}
-			
+		
 			if(this.showStateOfCharge){
 				DefaultXYDataset stateOfChargeDataSet = new DefaultXYDataset();
 				stateOfChargeDataSet.addSeries("State Of Charge", generateStateOfChargeSeries(simReport.getSimFrames(),startDistance));
@@ -653,6 +653,21 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				plot.setRenderer(4, renderer5);
 			}
 			
+			if(true){ //should make a 'time series' checkbox
+				DefaultXYDataset timeDataset = new DefaultXYDataset();
+				timeDataset.addSeries("Time", generateTimeSeries(simReport.getSimFrames(), startDistance));
+				final NumberAxis axis5 = new NumberAxis("time (min)");
+				axis5.setAutoRangeIncludesZero(false);
+				plot.setRangeAxis(5, axis5);
+				plot.setDataset(5, timeDataset);
+				plot.mapDatasetToRangeAxis(5, 5);
+				final StandardXYItemRenderer renderer5 = new StandardXYItemRenderer();
+				renderer5.setSeriesPaint(0, Color.WHITE);
+				//renderer.setBaseLegendTextFont(new Font("Helvetica", Font.BOLD, 11));
+				renderer5.setSeriesStroke(0, new BasicStroke(2));
+				//renderer2.setPlotShapes(true);
+				plot.setRenderer(5, renderer5);
+			}
 			
 			this.mainDisplay.setChart(this.simResults);
 			contentPane.repaint();
@@ -698,6 +713,27 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				runningTotalDistance += lastPosition.calculateDistance(thisPosition);
 				toReturn[xValues][i] = runningTotalDistance;
 				toReturn[yValues][i] = temp.getCarStatus().getSpeed();
+			}
+			
+			return toReturn;
+		}
+		
+		private double[][] generateTimeSeries(List<SimFrame> simFrames, double startDistance) {
+			double[][] toReturn= new double[2][simFrames.size()];
+			//[0] is distance, [1] is speed
+			double startTime = simFrames.get(0).getRepresentedTime();
+			toReturn[xValues][0] = startDistance;
+			toReturn[yValues][0] = 0;
+			
+			double runningTotalDistance = startDistance;
+			
+			for(int i = 1; i<simFrames.size(); i++){
+				SimFrame temp = simFrames.get(i);
+				GeoCoord lastPosition = simFrames.get(i-1).getGPSReport().getLocation();
+				GeoCoord thisPosition = temp.getGPSReport().getLocation();
+				runningTotalDistance += lastPosition.calculateDistance(thisPosition);
+				toReturn[xValues][i] = runningTotalDistance;
+				toReturn[yValues][i] = (((temp.getRepresentedTime() - startTime)/1000)/60);
 			}
 			
 			return toReturn;
