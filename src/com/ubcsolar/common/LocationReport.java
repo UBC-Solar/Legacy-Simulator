@@ -28,7 +28,7 @@ public class LocationReport extends DataUnit {
 		toPrint.append(this.getSource() + ",");
 		toPrint.append(locToAdd.getLat() + ",");
 		toPrint.append(locToAdd.getLon() + ",");
-		toPrint.append(locToAdd.getElevation() + ",");
+		toPrint.append(locToAdd.getElevation());
 		return toPrint.toString();
 	}
 	

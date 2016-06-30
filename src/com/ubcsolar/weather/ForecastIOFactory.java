@@ -21,6 +21,7 @@ public class ForecastIOFactory {
 	private double windSpeed = 0;
 	private double windBearing = 0;
 	private double cloudCover = 0;
+	private String icon = "cloudy";
 	private double stormBearing =0;
 	private double stormDistance =0;
 
@@ -29,7 +30,6 @@ public class ForecastIOFactory {
 	private String timezone = "AMERICA";
 	private int offset = -6;
 	private String summary = "TEST";
-	private String icon = "cloudy";
 	private int time = 0;
 	private double precipIntensity = 0;
 	private double visibility = 0;
@@ -52,6 +52,19 @@ public class ForecastIOFactory {
 	
 	public ForecastIOFactory cloudCover(double cloudCover){
 		this.cloudCover = cloudCover / 100;
+		
+		if (cloudCover <15){
+			this.icon = "Sunny";
+		}
+		else if (cloudCover >=15 && cloudCover <50){
+			this.icon = "Partly Cloudy";
+		}
+		else if (cloudCover >= 50 &&  cloudCover < 90 ){
+			this.icon = "Mostly cloudy";
+		}
+		else if( cloudCover >= 90){
+			this.icon = "Cloudy";
+		}
 		return this;
 	}
 	
