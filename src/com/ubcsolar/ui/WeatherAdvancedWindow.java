@@ -197,7 +197,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 					 frame.setVisible(true);
 					 
 					 try {
-						mySession.getMyWeatherController().loadLastForecastFromFile(fc.getSelectedFile());
+						mySession.getMyWeatherController().loadForecastFromFile(fc.getSelectedFile());
 					} catch (FileNotFoundException e) {
 						handleError("Error: File not found");
 						SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "File not found - tried to load FC from: " + fc.getSelectedFile());

@@ -162,7 +162,8 @@ public class DatabaseController extends ModuleController {
 		toPrint.close();
 	}
 	
-	public ForecastReport getLastCachedForecastReport(File file) throws IOException, FileNotFoundException{
+	public ForecastReport getCachedForecastReport(File file) throws IOException, FileNotFoundException{
+		
 		FileReader fr = new FileReader(file);
 		BufferedReader br = new BufferedReader(fr);
 		String resultBack = "";
@@ -170,7 +171,7 @@ public class DatabaseController extends ModuleController {
 		while((temp = br.readLine())!=null){
 			resultBack += temp;
 		}
-		
+		br.close();
 		return new ForecastReport(new JSONObject(resultBack));
 		
 	}

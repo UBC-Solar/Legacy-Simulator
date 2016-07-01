@@ -400,8 +400,8 @@ public class WeatherController extends ModuleController {
 		
 	}
 	
-	public void loadLastForecastFromFile(File fileToLoadFrom) throws IOException, FileNotFoundException, InconsistentForecastMapStateException{
-		ForecastReport temp = this.mySession.getMyDataBaseController().getLastCachedForecastReport(fileToLoadFrom);
+	public void loadForecastFromFile(File fileToLoadFrom) throws IOException, FileNotFoundException, InconsistentForecastMapStateException{
+		ForecastReport temp = this.mySession.getMyDataBaseController().getCachedForecastReport(fileToLoadFrom);
 		String forecastRouteName = temp.getRouteNameForecastsWereCreatedFor();
 		String currentlyLoadedRouteName = this.mySession.getMapController().getLoadedMapName();
 		if(!forecastRouteName.equalsIgnoreCase(currentlyLoadedRouteName)){
