@@ -4,9 +4,13 @@ import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.*;
 import com.ubcsolar.notification.*;
 
-
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
+
+import org.json.JSONObject;
 
 public class DatabaseController extends ModuleController {
 /* NOTE from NOAH at Nov 11, 2015.
@@ -118,6 +122,8 @@ public class DatabaseController extends ModuleController {
 				toAdd = new CSVDatabase<ForecastReport>(this.forecastFolderName+System.currentTimeMillis()); //name should be unique
 				toAdd.store(temp.getTheReport());
 				this.forecastReportsDB.add(toAdd);
+				
+				this.storeForecastAsFile(temp.getTheReport());				
 			}
 			
 			else if(n instanceof NewSimulationReportNotification){
@@ -144,6 +150,14 @@ public class DatabaseController extends ModuleController {
 
 	
 	
+	private void storeForecastAsFile(ForecastReport theReport) throws FileNotFoundException {
+		PrintWriter toPrint = new PrintWriter(this.forecastFolderName + System.currentTimeMillis() + theReport.getRouteNameForecastsWereCreatedFor());
+		toPrint.print(theReport.toJSON().toString());
+		toPrint.close();
+	}
+
+
+
 	/**
 	 * returns the last num dataunits of type X, or all of them if num>size.
 	 * @param num
