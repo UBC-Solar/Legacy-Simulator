@@ -403,7 +403,7 @@ public class WeatherController extends ModuleController {
 		ForecastReport temp = this.mySession.getMyDataBaseController().getLastCachedForecastReport();
 		String forecastRouteName = temp.getRouteNameForecastsWereCreatedFor();
 		String currentlyLoadedRouteName = this.mySession.getMapController().getLoadedMapName();
-		if(forecastRouteName.equalsIgnoreCase(currentlyLoadedRouteName)){
+		if(!forecastRouteName.equalsIgnoreCase(currentlyLoadedRouteName)){
 			throw new InconsistentForecastMapStateException(forecastRouteName, currentlyLoadedRouteName);
 		}
 		if(temp != null){
@@ -412,9 +412,6 @@ public class WeatherController extends ModuleController {
 			this.customForecasts = new ArrayList<ForecastIO>();
 		}
 		this.mySession.sendNotification(new NewForecastReport(temp));
-		
-		
-		
 	}
 
 }

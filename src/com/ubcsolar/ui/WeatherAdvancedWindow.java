@@ -34,6 +34,7 @@ import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LocationReport;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.exception.InconsistentForecastMapStateException;
 import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.notification.NewForecastReport;
 import com.ubcsolar.notification.NewLocationReportNotification;
@@ -95,6 +96,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 
 	
 	private List<GeoCoord> forecastPoints;
+	private JMenuItem mntmLoadLastForecast;
 
 	/**
 	 * Launch the application.
@@ -163,14 +165,47 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 					Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
 					e.printStackTrace();
 				}
-				
-
-				
 
 			}
 		});
 		
 		mnForecasts.add(mntmLoadForecastsFor);
+		
+		mntmLoadLastForecast = new JMenuItem("Load Last Forecast From File");
+		mntmLoadLastForecast.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
+				JFrame frame = new LoadingWindow(mySession);
+				frame.setVisible(true);
+				
+				try{
+					mySession.getMyWeatherController().loadLastForecastFromFile(); //main Process
+					
+					frame.setVisible(false);
+					contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
+					Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
+					
+					mapChartNavigationTutorialDialog();
+				}catch(IOException e){
+					frame.setVisible(false); //no need to show the loading screen now.
+					contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
+					handleError("IOException, check internet connection");
+					Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
+					e.printStackTrace();
+				} catch (InconsistentForecastMapStateException e) {
+					frame.setVisible(false); //no need to show the loading screen now.
+					contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
+					handleError("ERROR: Forecast From File does not match current Route");
+					Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
+					System.err.println("Report Route: " + e.getForecastRouteName() + ", loaded: " + e.getLoadedRouteName());
+					e.printStackTrace();
+				}
+
+			}
+		});
+		
+		mnForecasts.add(mntmLoadLastForecast);
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
