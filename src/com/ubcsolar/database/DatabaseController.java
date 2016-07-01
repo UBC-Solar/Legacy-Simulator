@@ -169,7 +169,7 @@ public class DatabaseController extends ModuleController {
 		String resultBack = "";
 		String temp = "";
 		while((temp = br.readLine())!=null){
-			resultBack += temp;
+			resultBack += temp; //may want to use a String Builder for performance 
 		}
 		br.close();
 		return new ForecastReport(new JSONObject(resultBack));
