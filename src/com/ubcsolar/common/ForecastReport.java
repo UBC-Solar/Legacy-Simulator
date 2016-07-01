@@ -17,6 +17,10 @@ public class ForecastReport extends DataUnit {
 	private final String MAP_NAME_JSON_KEY = "mapName";
 	private final String FC_LIST_SIZE_KEY = "NumOfForecasts";
 	private final String TIME_CREATED_KEY = "TimeCreated";
+	//This list exists because if you create a ForecastIO by update(String),
+	//you are unable to later get it out (i.e for saving to JSON). 
+	private final List<String> forecastIOInRawStringForm;
+	
 
 	/**
 	 * 
@@ -25,12 +29,14 @@ public class ForecastReport extends DataUnit {
 	 * @param timeCreated
 	 */
 	public ForecastReport(List<ForecastIO> forecasts, String routeName, long timeCreated) {
+		this.forecastIOInRawStringForm = null;
 		this.forecasts = new ArrayList<ForecastIO>(forecasts);
 		this.timeCreated = timeCreated;
 		this.routeForecastsWereCreatedFor = routeName;
 	}
 	
 	public ForecastReport(List<ForecastIO> forecasts, String routeName) {
+		this.forecastIOInRawStringForm = null;
 		this.forecasts = new ArrayList<ForecastIO>(forecasts);
 		this.timeCreated = System.currentTimeMillis();
 		this.routeForecastsWereCreatedFor = routeName;
@@ -67,7 +73,12 @@ public class ForecastReport extends DataUnit {
 		temp.put(FC_LIST_SIZE_KEY, this.forecasts.size());
 		temp.put(TIME_CREATED_KEY,this.timeCreated);
 		for(int i = 0; i<this.forecasts.size(); i++){
-			temp.put(String.valueOf(i),this.forecasts.get(i).getRawResponse());
+			if(this.forecastIOInRawStringForm != null){
+				temp.put(String.valueOf(i), forecastIOInRawStringForm.get(i));
+			}
+			else{
+				temp.put(String.valueOf(i),this.forecasts.get(i).getRawResponse());
+			}
 		}
 		return temp;
 	}
@@ -80,10 +91,13 @@ public class ForecastReport extends DataUnit {
 			this.routeForecastsWereCreatedFor = mapName;
 		}
 		this.timeCreated = jsonForecastReport.getLong(this.TIME_CREATED_KEY);
+		this.forecastIOInRawStringForm = new ArrayList<String>();
 		ArrayList<ForecastIO> retreivedForecasts = new ArrayList<ForecastIO>();
 		for(int i = 0; i<jsonForecastReport.getInt(this.FC_LIST_SIZE_KEY); i++){
 			ForecastIO temp = new ForecastIO(GlobalValues.WEATHER_KEY);
-			temp.getForecast(jsonForecastReport.getString(String.valueOf(i)));
+			String tempForecast = jsonForecastReport.getString(String.valueOf(i));
+			temp.getForecast(tempForecast);
+			this.forecastIOInRawStringForm.add(tempForecast); //because can't get it out of ForecastIO later. 
 			retreivedForecasts.add(temp);
 			System.out.println("Added FC from file to list");
 		}
