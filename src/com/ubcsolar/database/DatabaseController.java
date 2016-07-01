@@ -5,6 +5,7 @@ import com.ubcsolar.common.*;
 import com.ubcsolar.notification.*;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -161,8 +162,8 @@ public class DatabaseController extends ModuleController {
 		toPrint.close();
 	}
 	
-	public ForecastReport getLastCachedForecastReport() throws IOException, FileNotFoundException{
-		FileReader fr = new FileReader(this.lastForecastFilename);
+	public ForecastReport getLastCachedForecastReport(File file) throws IOException, FileNotFoundException{
+		FileReader fr = new FileReader(file);
 		BufferedReader br = new BufferedReader(fr);
 		String resultBack = "";
 		String temp = "";
@@ -214,6 +215,10 @@ public class DatabaseController extends ModuleController {
 		return null;
 	}
 	
+	
+	public String getCurrentOutputFolderName(){
+		return this.sessionFolderName;
+	}
 	/* commented out until LatLongs implemented
 	public ArrayList<LatLong> getAllLatLongsSince(double startTime){
 		return null;
