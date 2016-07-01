@@ -86,7 +86,7 @@ public class CustomLocationAddWindow extends JFrame {
 		getContentPane().add(lblSource, gbc_lblSource);
 		
 		txtSource = new JTextField();
-		txtSource.setText("PhoneGPS");
+		txtSource.setText("Debug");
 		txtSource.setHorizontalAlignment(SwingConstants.CENTER);
 		txtSource.setColumns(10);
 		GridBagConstraints gbc_txtSource = new GridBagConstraints();
