@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import com.github.dvdme.ForecastIOLib.FIODataBlock;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
+import com.ubcsolar.Main.GlobalValues;
 
 public class ForecastReport extends DataUnit {
 	private final List<ForecastIO> forecasts;
@@ -81,7 +82,10 @@ public class ForecastReport extends DataUnit {
 		this.timeCreated = jsonForecastReport.getLong(this.TIME_CREATED_KEY);
 		ArrayList<ForecastIO> retreivedForecasts = new ArrayList<ForecastIO>();
 		for(int i = 0; i<jsonForecastReport.getInt(this.FC_LIST_SIZE_KEY); i++){
-			retreivedForecasts.add(new ForecastIO(jsonForecastReport.getString(String.valueOf(i))));
+			ForecastIO temp = new ForecastIO(GlobalValues.WEATHER_KEY);
+			temp.getForecast(jsonForecastReport.getString(String.valueOf(i)));
+			retreivedForecasts.add(temp);
+			System.out.println("Added FC from file to list");
 		}
 		this.forecasts = retreivedForecasts;
 	}
