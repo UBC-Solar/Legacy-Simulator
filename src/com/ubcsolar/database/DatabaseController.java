@@ -4,7 +4,9 @@ import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.*;
 import com.ubcsolar.notification.*;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -44,6 +46,7 @@ public class DatabaseController extends ModuleController {
 	private final List<CSVDatabase<ForecastReport>> forecastReportsDB = new ArrayList<CSVDatabase<ForecastReport>>();
 	private final String routesFolderName = sessionFolderName + "Routes\\";
 	private final List<CSVDatabase<Route>> loadedRoutesDB = new ArrayList<CSVDatabase<Route>>();
+	private String lastForecastFilename;
 	
 
 	
@@ -151,11 +154,25 @@ public class DatabaseController extends ModuleController {
 	
 	
 	private void storeForecastAsFile(ForecastReport theReport) throws FileNotFoundException {
-		PrintWriter toPrint = new PrintWriter(this.forecastFolderName + System.currentTimeMillis() + theReport.getRouteNameForecastsWereCreatedFor());
+		String filename = this.forecastFolderName + System.currentTimeMillis() + theReport.getRouteNameForecastsWereCreatedFor()+ ".FIO";
+		this.lastForecastFilename = filename;
+		PrintWriter toPrint = new PrintWriter(filename);
 		toPrint.print(theReport.toJSON().toString());
 		toPrint.close();
 	}
-
+	
+	public ForecastReport getLastCachedForecastReport() throws IOException, FileNotFoundException{
+		FileReader fr = new FileReader(this.lastForecastFilename);
+		BufferedReader br = new BufferedReader(fr);
+		String resultBack = "";
+		String temp = "";
+		while((temp = br.readLine())!=null){
+			resultBack += temp;
+		}
+		
+		return new ForecastReport(new JSONObject(resultBack));
+		
+	}
 
 
 	/**

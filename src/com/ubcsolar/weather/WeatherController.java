@@ -1,5 +1,6 @@
 package com.ubcsolar.weather;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +16,7 @@ import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.Route;
 import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.exception.InconsistentForecastMapStateException;
 import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.map.MapController;
@@ -397,6 +399,22 @@ public class WeatherController extends ModuleController {
 		
 	}
 	
-	
+	public void loadLastForecastFromFile() throws IOException, FileNotFoundException, InconsistentForecastMapStateException{
+		ForecastReport temp = this.mySession.getMyDataBaseController().getLastCachedForecastReport();
+		String forecastRouteName = temp.getRouteNameForecastsWereCreatedFor();
+		String currentlyLoadedRouteName = this.mySession.getMapController().getLoadedMapName();
+		if(forecastRouteName.equalsIgnoreCase(currentlyLoadedRouteName)){
+			throw new InconsistentForecastMapStateException(forecastRouteName, currentlyLoadedRouteName);
+		}
+		if(temp != null){
+			this.lastDownloadedReport = temp;
+			this.retrievedForecasts = temp.getForecasts();
+			this.customForecasts = new ArrayList<ForecastIO>();
+		}
+		this.mySession.sendNotification(new NewForecastReport(temp));
+		
+		
+		
+	}
 
 }
