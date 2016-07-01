@@ -1,13 +1,14 @@
 package com.ubcsolar.map;
 import java.io.*;
 import java.net.URL;
+
 import java.util.*;
 import org.jdom2.*;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
+import org.jdom2.output.Format;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.PointOfInterest;
@@ -385,7 +386,12 @@ public class JdomkmlInterface {
 		FileWriter printer = null;
 		try{
 			printer = new FileWriter(fileWithAbsoluteFilename);
-			printer.write(new XMLOutputter().outputString(this.myDoc));
+			XMLOutputter output = new XMLOutputter(Format.getRawFormat().setEncoding("ASCII"));
+			
+	
+			output.output(this.myDoc, printer);
+			//printer.write(new XMLOutputter().outputString(this.myDoc));
+			printer.flush();
 		}
 		catch(IOException e){
 			throw e;
