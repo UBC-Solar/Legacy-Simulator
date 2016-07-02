@@ -85,7 +85,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	
 	
 	private final int KM_PER_SLIDER = 1; //could make this dynamic to allow for slider 'zooming'
-	private final double KM_PER_SLIDER_DOUBLE = 0.1;
+	private final double KM_PER_SLIDER_DOUBLE = 0.3;
 	private boolean showSpeed = true;
 	private boolean showStateOfCharge = true;
 	private boolean showCloud = true;
