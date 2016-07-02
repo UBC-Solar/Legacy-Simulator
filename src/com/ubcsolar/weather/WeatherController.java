@@ -1,5 +1,7 @@
 package com.ubcsolar.weather;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +17,7 @@ import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.ModuleController;
 import com.ubcsolar.common.Route;
 import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.exception.InconsistentForecastMapStateException;
 import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.map.MapController;
@@ -112,7 +115,10 @@ public class WeatherController extends ModuleController {
 		}
 		if(lastDownloadedReport != null){
 			this.mySession.sendNotification(new NewForecastReport(lastDownloadedReport));
-		}else{
+		}else{ //TODO it's a duct tape solution for dissapearing the green dot on map when the 48H forecast was not loaded
+			List<ForecastIO> forecast = new ArrayList<ForecastIO>();
+			ForecastReport theReport = new ForecastReport(forecast, this.mySession.getMapController().getLoadedMapName());
+			this.mySession.sendNotification(new NewForecastReport(theReport));
 			this.mySession.getGUIMain().clearWeather();
 		}
 	}
@@ -418,6 +424,19 @@ public class WeatherController extends ModuleController {
 		
 	}
 	
-	
+	public void loadForecastFromFile(File fileToLoadFrom) throws IOException, FileNotFoundException, InconsistentForecastMapStateException{
+		ForecastReport temp = this.mySession.getMyDataBaseController().getCachedForecastReport(fileToLoadFrom);
+		String forecastRouteName = temp.getRouteNameForecastsWereCreatedFor();
+		String currentlyLoadedRouteName = this.mySession.getMapController().getLoadedMapName();
+		if(!forecastRouteName.equalsIgnoreCase(currentlyLoadedRouteName)){
+			throw new InconsistentForecastMapStateException(forecastRouteName, currentlyLoadedRouteName);
+		}
+		if(temp != null){
+			this.lastDownloadedReport = temp;
+			this.retrievedForecasts = temp.getForecasts();
+			this.customForecasts = new ArrayList<ForecastIO>();
+		}
+		this.mySession.sendNotification(new NewForecastReport(temp));
+	}
 
 }

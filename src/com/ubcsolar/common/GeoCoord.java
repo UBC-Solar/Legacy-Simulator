@@ -13,11 +13,12 @@ public class GeoCoord extends DataUnit {
 	 */
 	public String getCSVEntry()
 	{
-		String toPrint= "";
-		toPrint += this.getLat()+ "," ;;
-		toPrint += this.getLon()+ "," ;;
-		toPrint += this.getElevation() ;;
-		return toPrint;
+		StringBuilder toPrint= new StringBuilder("");
+		toPrint.append(this.getLat()+ ",") ;
+		toPrint.append(this.getLon()+ ",") ;
+		toPrint.append(this.getElevation()+ ",") ;
+
+		return toPrint.toString();
 	}
 	
 	/**

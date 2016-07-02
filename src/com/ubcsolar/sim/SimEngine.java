@@ -34,15 +34,20 @@ public class SimEngine {
 
 	private CarModel inUseCarModel;
 
-	public List<SimFrame> runSimulation(Route toTraverse, int startLocationIndex, ForecastReport weatherReports, TelemDataPacket carStartingCondition, Map<GeoCoord,Double> requestedSpeeds){
+	public List<SimFrame> runSimulation(Route toTraverse, int startLocationIndex, ForecastReport weatherReports, TelemDataPacket carStartingCondition, Map<GeoCoord,Double> requestedSpeeds, int laps){
+		if(laps <= 0){
+			throw new IllegalArgumentException("Must go at least one lap");
+		}
 		inUseCarModel = new DefaultCarModel();
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "simulation starting");
 		List<SimFrame> listOfFrames = new ArrayList<SimFrame>(toTraverse.getTrailMarkers().size());
-
+		if(startLocationIndex == toTraverse.getTrailMarkers().size()-1){
+			return new ArrayList<SimFrame>(); //can't simulate if at end of race.
+		}
 		
 		ForecastIO weather = weatherReports.getForecasts().get(startLocationIndex); //assumes that the number of forecasts in weatherReports = number in Route.
 		GeoCoord start = toTraverse.getTrailMarkers().get(startLocationIndex);
-		GeoCoord next = toTraverse.getTrailMarkers().get(startLocationIndex + 1);
+		GeoCoord next = toTraverse.getTrailMarkers().get(startLocationIndex + 1); //won't index out of range because of check above. 
 		Double reqSpeed = requestedSpeeds.get(start);
 		TelemDataPacket startCondition = carStartingCondition;
 		FIODataPoint startWeather = new FIODataBlock(weather.getHourly()).datapoint(0);
@@ -51,7 +56,8 @@ public class SimEngine {
 		listOfFrames.add(startFrame);
 
 		SimFrame lastFrame = startFrame;
-		for(int i = startLocationIndex+1; i<toTraverse.getTrailMarkers().size(); i++){ 
+		int numOfPoints = toTraverse.getTrailMarkers().size();
+		for(int i = startLocationIndex+1; i<(numOfPoints*laps); i++){ 
 			/*
 			 * By starting at startPos, we calculate the jump from car's current location to the next breadcrumb, rather
 			 * than just assuming that it's actually at the last breadcrumb. 
@@ -67,14 +73,14 @@ public class SimEngine {
 					nextWeather = weatherReports.getForecasts().get(startLocationIndex);
 				}
 				else{
-					nextWeather = weatherReports.getForecasts().get(i);
+					nextWeather = weatherReports.getForecasts().get(i%numOfPoints);
 				}
 
 				nextPoint = lastFrame.getGPSReport().getLocation();
 			}
 			else{
-				nextWeather = weatherReports.getForecasts().get(i);
-				nextPoint = toTraverse.getTrailMarkers().get(i);
+				nextWeather = weatherReports.getForecasts().get(i%numOfPoints);
+				nextPoint = toTraverse.getTrailMarkers().get(i%numOfPoints);
 			}
 
 			SimFrame nextFrame = this.generateNextFrame(lastFrame, nextPoint, nextWeather, requestedSpeeds.get(nextPoint));
@@ -117,16 +123,16 @@ public class SimEngine {
 			nextSimFrameTime = lastTimeStamp + timeSinceLastFrame;
 			timeSinceLastFrameInHr = timeSinceLastFrame/(60.0*1000.0*60.0);
 
-			System.out.println(distanceCovered);
+			//System.out.println(distanceCovered);
 		}
 		else{
 			double tempTime = RECHARGE_TIME_MS; //double check units. km/h and m?? distanceCovered is in meters
 			timeSinceLastFrame = (long) tempTime;		
 			nextSimFrameTime = lastTimeStamp + timeSinceLastFrame;
 			timeSinceLastFrameInHr = tempTime/(1000*60*60);
-			System.out.println("AGAHAHAHAHAHAHAH RAN");
-			System.out.println(timeSinceLastFrameInHr);
-			System.out.println(distanceCovered);
+			//System.out.println("AGAHAHAHAHAHAHAH RAN");
+			//System.out.println(timeSinceLastFrameInHr);
+			//System.out.println(distanceCovered);
 		}
 
 
@@ -138,7 +144,7 @@ public class SimEngine {
 
 		double SunCharge = (sunPowerInWatts*timeSinceLastFrameInHr)/(inUseCarModel.getMaxBatteryCap()); //divide watt hrs from the sun by max watt hrs to get the percentage of charge from the sun
 		if(SunCharge>2000000){
-			System.out.println("" + distanceCovered + " " +  timeSinceLastFrameInHr + " Speed: " + speedToDrive);
+			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "" + distanceCovered + " " +  timeSinceLastFrameInHr + " Speed: " + speedToDrive);
 		}
 
 		TelemDataPacket newCarStatus;

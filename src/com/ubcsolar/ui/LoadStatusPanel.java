@@ -29,27 +29,22 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.awt.Component;
 import javax.swing.Box;
+import javax.swing.SwingConstants;
 
 public class LoadStatusPanel extends JPanel implements Listener {
 	private GlobalController mySession;
 	//private GUImain parent;
-	private JLabel lblForecast; //dispalyed the name of the loaded metar report
 	private JLabel lblCar; //displays the name of the loaded car (simulated or real?)
 	private JLabel lblTaf; //displays the name of the loaded Taf report
 	private JLabel lblDatabase; //displays the status of the Database. 
 	private JLabel lblLocationReport;
 	private JLabel lblTelemdata;
-	private Component horizontalGlue; //These glues add space between and grow the labels properly.
-	private Component horizontalGlue_1;
-	private Component horizontalGlue_2;
-	private Component horizontalGlue_3;
 	private Component horizontalGlue_4;
 	private DateFormat labelTimeFormat = new SimpleDateFormat("HH:mm:ss"); //the format for the times on the labels.
 	//private final String TAFTITLE = "Taf: ";
-	private final String FORECASTTITLE = "| Fc: ";
-	private final String CARLOADED = "| Car: ";
-	private final String LOCATIONREPORT = "| LocationReprt: ";
-	private final String TELEMDATA = "| TelemData: ";	
+	private final String CARLOADED = " Car: ";
+	private final String LOCATIONREPORT = "|  LocationReprt: ";
+	private final String TELEMDATA = "|  TelemData: ";	
 	/**
 	 * constructor
 	 * @param session - the session to get the needed controllers
@@ -59,40 +54,22 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		//this.parent = parent;
 		mySession = session;
 		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
-		horizontalGlue = Box.createHorizontalGlue();
-		add(horizontalGlue);
 		
-		//lblWeather = new JLabel(mySession.getMyWeatherController().getLoadedWeatherName());
-		//TODO add these in as we develop the model
-		lblForecast = new JLabel(FORECASTTITLE);
-		add(lblForecast);
-		
-		horizontalGlue_1 = Box.createHorizontalGlue();
-		add(horizontalGlue_1);
-		
-		/*lblTaf = new JLabel(TAFTITLE);
-		add(lblTaf);*/
-		
-		horizontalGlue_2 = Box.createHorizontalGlue();
-		add(horizontalGlue_2);
-		
-		horizontalGlue_3 = Box.createHorizontalGlue();
-		add(horizontalGlue_3);
-		
-		lblCar = new JLabel(CARLOADED);
+		lblCar = new JLabel("Car: ");
+		lblCar.setHorizontalAlignment(SwingConstants.LEFT);
 		add(lblCar);
 		
 		horizontalGlue_4 = Box.createHorizontalGlue();
 		add(horizontalGlue_4);
 		
-		lblDatabase = new JLabel("| Database: unknown");
+		lblDatabase = new JLabel("|    Database: unknown   ");
 		add(lblDatabase);
 		
-		lblTelemdata = new JLabel(TELEMDATA);
+		lblTelemdata = new JLabel("|        TelemData: ");
 		add(lblTelemdata);
 		
-		lblLocationReport = new JLabel(LOCATIONREPORT);
+		lblLocationReport = new JLabel("|        LocationReprt: ");
+		lblLocationReport.setHorizontalAlignment(SwingConstants.RIGHT);
 		add(lblLocationReport);
 
 		if(mySession != null){
@@ -102,7 +79,6 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	}
 	
 	private void initializeValues(){
-		updateForcastlbl("none");
 		//updateTafLabel("none");
 		this.updateLocationLabel("none");
 		this.updateTelemLabel("none");
@@ -134,7 +110,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		//Could consider breaking this into two different methods; don't need the name for a 
 		//disconnection. 
 		if(isClosed){
-		this.lblDatabase.setText("Database: DISCONECTED@" + labelTimeFormat.format(time)); 
+		this.lblDatabase.setText("|  Database: DISCONECTED@" + labelTimeFormat.format(time)); 
 		}
 		else{
 			this.lblDatabase.setText("| Database: " + databaseName + "@" + labelTimeFormat.format(time));
@@ -146,16 +122,6 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		//Add support for additional notifications as they come. 
 		if(n.getClass() == NewCarLoadedNotification.class){
 			updateCarLabel(((NewCarLoadedNotification) n).getNameOfCar()); //to update the car label
-		}
-		else if(n.getClass() == NewForecastReport.class){
-			NewForecastReport test = (NewForecastReport) n;
-			if(test.getTheReport().getRouteNameForecastsWereCreatedFor()== null){
-				updateForcastlbl("Cleared @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
-			}
-			else{
-				updateForcastlbl("Dwnlded @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
-			}
-			
 		}
 		/*else if(n.getClass() == NewMetarReportLoadedNotification.class){
 			updateTafLabel("" + GlobalValues.hourMinSec.format(n.getTimeCreated()));
@@ -185,10 +151,6 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	}
 	
 	
-	private void updateForcastlbl(String string) {
-		this.lblForecast.setText(FORECASTTITLE + string);
-		
-	}
 
 /*	private void updateTafLabel(String string) {
 		this.lblTaf.setText(TAFTITLE + string);

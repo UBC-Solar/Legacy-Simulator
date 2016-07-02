@@ -4,9 +4,16 @@ import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.*;
 import com.ubcsolar.notification.*;
 
-
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
+
+import org.json.JSONObject;
 
 public class DatabaseController extends ModuleController {
 /* NOTE from NOAH at Nov 11, 2015.
@@ -40,6 +47,7 @@ public class DatabaseController extends ModuleController {
 	private final List<CSVDatabase<ForecastReport>> forecastReportsDB = new ArrayList<CSVDatabase<ForecastReport>>();
 	private final String routesFolderName = sessionFolderName + "Routes\\";
 	private final List<CSVDatabase<Route>> loadedRoutesDB = new ArrayList<CSVDatabase<Route>>();
+	private String lastForecastFilename;
 	
 
 	
@@ -108,14 +116,7 @@ public class DatabaseController extends ModuleController {
 			else if(n instanceof NewMapLoadedNotification){
 				NewMapLoadedNotification temp = (NewMapLoadedNotification) n;
 				CSVDatabase<Route> toAdd;
-				toAdd = new CSVDatabase<Route>(this.routesFolderName+System.currentTimeMillis()); //name should be unique
-				toAdd.store(temp.getRoute());
-				this.loadedRoutesDB.add(toAdd);
-			}
-			else if(n instanceof NewMapLoadedNotification){
-				NewMapLoadedNotification temp = (NewMapLoadedNotification) n;
-				CSVDatabase<Route> toAdd;
-				toAdd = new CSVDatabase<Route>(this.routesFolderName+System.currentTimeMillis()); //name should be unique
+				toAdd = new CSVDatabase<Route>(this.routesFolderName+System.currentTimeMillis()+"_"+temp.getMapLoadedName()); //name should be unique
 				toAdd.store(temp.getRoute());
 				this.loadedRoutesDB.add(toAdd);
 			}
@@ -125,6 +126,8 @@ public class DatabaseController extends ModuleController {
 				toAdd = new CSVDatabase<ForecastReport>(this.forecastFolderName+System.currentTimeMillis()); //name should be unique
 				toAdd.store(temp.getTheReport());
 				this.forecastReportsDB.add(toAdd);
+				
+				this.storeForecastAsFile(temp.getTheReport());				
 			}
 			
 			else if(n instanceof NewSimulationReportNotification){
@@ -151,6 +154,29 @@ public class DatabaseController extends ModuleController {
 
 	
 	
+	private void storeForecastAsFile(ForecastReport theReport) throws FileNotFoundException {
+		String filename = this.forecastFolderName + System.currentTimeMillis() + theReport.getRouteNameForecastsWereCreatedFor()+ ".FIO";
+		this.lastForecastFilename = filename;
+		PrintWriter toPrint = new PrintWriter(filename);
+		toPrint.print(theReport.toJSON().toString());
+		toPrint.close();
+	}
+	
+	public ForecastReport getCachedForecastReport(File file) throws IOException, FileNotFoundException{
+		
+		FileReader fr = new FileReader(file);
+		BufferedReader br = new BufferedReader(fr);
+		String resultBack = "";
+		String temp = "";
+		while((temp = br.readLine())!=null){
+			resultBack += temp; //may want to use a String Builder for performance 
+		}
+		br.close();
+		return new ForecastReport(new JSONObject(resultBack));
+		
+	}
+
+
 	/**
 	 * returns the last num dataunits of type X, or all of them if num>size.
 	 * @param num
@@ -190,6 +216,10 @@ public class DatabaseController extends ModuleController {
 		return null;
 	}
 	
+	
+	public String getCurrentOutputFolderName(){
+		return this.sessionFolderName;
+	}
 	/* commented out until LatLongs implemented
 	public ArrayList<LatLong> getAllLatLongsSince(double startTime){
 		return null;

@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -37,6 +38,7 @@ import com.ubcsolar.notification.ExceptionNotification;
 
 import com.ubcsolar.common.LogType;
 import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.exception.InconsistentForecastMapStateException;
 import com.ubcsolar.exception.NoLoadedRouteException;
 
 import com.ubcsolar.notification.NewForecastReport;
@@ -45,6 +47,7 @@ import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.Notification;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -52,6 +55,8 @@ import javax.swing.JOptionPane;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -97,8 +102,9 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				+"\n\n"+ "Note: You should Load the route before this.";
 
 
-	
+	protected final WeatherAdvancedWindow parentInstance = this;
 	private List<GeoCoord> forecastPoints;
+	private JMenuItem mntmLoadLastForecast;
 
 	/**
 	 * Launch the application.
@@ -167,9 +173,6 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 					Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
 					e.printStackTrace();
 				}
-				
-
-				
 
 			}
 		});
@@ -198,6 +201,57 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		});
 		
 		mnForecasts.add(mntmLoadForecastsFor_1);
+		
+		mntmLoadLastForecast = new JMenuItem("Load Last Forecast From File");
+		mntmLoadLastForecast.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				File defaultDirectory = new File(mySession.getMyDataBaseController().getCurrentOutputFolderName());
+				JFileChooser fc = new JFileChooser();
+				if(defaultDirectory.exists() && defaultDirectory.isDirectory()){
+					fc.setCurrentDirectory(defaultDirectory);
+				}
+				fc.addChoosableFileFilter(new FileNameExtensionFilter("Forecast Cache Files", "FIO", "fio"));
+				fc.setAcceptAllFileFilterUsed(false); //makes the 'kml' one default. 
+				fc.setAcceptAllFileFilterUsed(true);
+				 int returnVal = fc.showOpenDialog(parentInstance);
+				 
+				 if (returnVal == JFileChooser.APPROVE_OPTION) {
+					
+				//	 loadFrame and change the cursor type to waiting cursor
+					 
+					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					 JFrame frame = new LoadingWindow(mySession);
+					 frame.setVisible(true);
+					 
+					 try {
+						mySession.getMyWeatherController().loadForecastFromFile(fc.getSelectedFile());
+					} catch (FileNotFoundException e) {
+						handleError("Error: File not found");
+						SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "File not found - tried to load FC from: " + fc.getSelectedFile());
+						e.printStackTrace();
+					} catch (IOException e) {
+						handleError("Error: IO Exception");
+						SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "IOException - tried to load FC from: " + fc.getSelectedFile());
+						e.printStackTrace();
+					} //main process
+					 catch (InconsistentForecastMapStateException e) {
+						 handleError("ERROR: Forecast not for current map");
+						 SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to load FC for route: " + e.getForecastRouteName() + " but loaded route was: " + e.getLoadedRouteName());
+						e.printStackTrace();
+					}
+					 
+					 frame.setVisible(false);
+					 contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			        }
+				 
+				 else {
+			            //cancelled by user, do nothing
+			        	return;
+			        }
+			}
+		});
+		
+		mnForecasts.add(mntmLoadLastForecast);
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -755,7 +809,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			
 		}
 		private void updateCarPositionBar(double kilometerMark){
-			System.out.println("DRAWING LINE FOR KM: " + kilometerMark);
+			//System.out.println("DRAWING LINE FOR KM: " + kilometerMark);
 			ValueMarker marker = new ValueMarker(kilometerMark);  // position is the value on the axis
 			marker.setPaint(Color.black);
 			//marker.setLabel("here"); // see JavaDoc for labels, colors, strokes

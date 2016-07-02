@@ -13,6 +13,7 @@ import java.io.IOException;
 import com.github.dvdme.ForecastIOLib.FIODataBlock;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
@@ -44,6 +45,8 @@ public class WeatherPanel extends JPanel implements Listener {
 	private JLabel CloudPercent;
 	private JLabel WindSpeed;
 	private JLabel Rainfall;
+	private JLabel lblForecast;
+	private JLabel ForecastLoaded;
 	
 	
 	public WeatherPanel(GlobalController session, GUImain parent){
@@ -89,28 +92,42 @@ public class WeatherPanel extends JPanel implements Listener {
 				GridBagConstraints gbc_lblWind = new GridBagConstraints();
 				gbc_lblWind.insets = new Insets(0, 0, 5, 5);
 				gbc_lblWind.gridx = 0;
-				gbc_lblWind.gridy = 4;
+				gbc_lblWind.gridy = 3;
 				panel_2.add(lblWind, gbc_lblWind);
 				
 				WindSpeed = new JLabel("NONE");
 				GridBagConstraints gbc_WindSpeed = new GridBagConstraints();
 				gbc_WindSpeed.insets = new Insets(0, 0, 5, 0);
 				gbc_WindSpeed.gridx = 1;
-				gbc_WindSpeed.gridy = 4;
+				gbc_WindSpeed.gridy = 3;
 				panel_2.add(WindSpeed, gbc_WindSpeed);
 				
 				lblRain = new JLabel("Precipitation Intensity:");
 				GridBagConstraints gbc_lblRain = new GridBagConstraints();
-				gbc_lblRain.insets = new Insets(0, 0, 0, 5);
+				gbc_lblRain.insets = new Insets(0, 0, 5, 5);
 				gbc_lblRain.gridx = 0;
-				gbc_lblRain.gridy = 7;
+				gbc_lblRain.gridy = 5;
 				panel_2.add(lblRain, gbc_lblRain);
 				
 				Rainfall = new JLabel("NONE");
 				GridBagConstraints gbc_Rainfall = new GridBagConstraints();
+				gbc_Rainfall.insets = new Insets(0, 0, 5, 0);
 				gbc_Rainfall.gridx = 1;
-				gbc_Rainfall.gridy = 7;
+				gbc_Rainfall.gridy = 5;
 				panel_2.add(Rainfall, gbc_Rainfall);
+				
+				lblForecast = new JLabel("Forecast:");
+				GridBagConstraints gbc_lblForecast = new GridBagConstraints();
+				gbc_lblForecast.insets = new Insets(0, 0, 0, 5);
+				gbc_lblForecast.gridx = 0;
+				gbc_lblForecast.gridy = 7;
+				panel_2.add(lblForecast, gbc_lblForecast);
+				
+				ForecastLoaded = new JLabel("NONE");
+				GridBagConstraints gbc_ForecastLoaded = new GridBagConstraints();
+				gbc_ForecastLoaded.gridx = 1;
+				gbc_ForecastLoaded.gridy = 7;
+				panel_2.add(ForecastLoaded, gbc_ForecastLoaded);
 		btnAdvanced.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				launchWeather();
@@ -140,7 +157,7 @@ public class WeatherPanel extends JPanel implements Listener {
 			Double weather = temp_forecast_block.datapoint(0).precipIntensity();
 			String weather_string = String.valueOf(weather);
 			
-			WindSpeed.setText(wind + " m/s");
+			WindSpeed.setText(wind + " kts");
 			CloudPercent.setText(cloud_percent_word + "%");
 			Rainfall.setText(weather_string);
 			
@@ -155,6 +172,10 @@ public class WeatherPanel extends JPanel implements Listener {
 		
 	}
 	
+	private void updateForcastlbl(String string) {
+		this.ForecastLoaded.setText(string);
+		
+	}
 	
 	
 
@@ -165,6 +186,14 @@ public class WeatherPanel extends JPanel implements Listener {
 			if (mySession.getMapController().getLastReportedLocation() != null){
 				//System.out.println("here");
 				updateKeyLabels(mySession.getMapController().getLastReportedLocation());
+				
+			}
+			NewForecastReport test = (NewForecastReport) n;
+			if(test.getTheReport().getRouteNameForecastsWereCreatedFor()== null){
+				updateForcastlbl("Cleared @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
+			}
+			else{
+				updateForcastlbl("Dwnlded @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
 			}
 		}
 		else if(n.getClass() == NewLocationReportNotification.class){

@@ -36,6 +36,7 @@ public class MapController extends ModuleController{
 	GPSFromPhoneReceiver gpsBlueToothConnection;
 	LocationReport lastReported;
 	Map<GeoCoord, Double> distanceAlongRoute;
+	private int closestPointIndex;
 
 	public MapController(GlobalController toAdd) throws IOException{
 		super(toAdd);	
@@ -202,7 +203,8 @@ public class MapController extends ModuleController{
 		 */
 		
 		List<GeoCoord> breadcrumbs = myJDOMMap.getRoute().getTrailMarkers();
-		int closestPointIndex = -1;
+		closestPointIndex = -1;
+		//int closestPointIndex = -1;
 		double minDistance = Double.MAX_VALUE; //anything is guaranteed to be less
 		
 		for(int i = 0; i<breadcrumbs.size(); i++){
@@ -237,5 +239,9 @@ public class MapController extends ModuleController{
 	
 	public boolean hasMapLoaded(){
 		return this.myJDOMMap != null;
+	}
+	
+	public int getClosestPointIndex(){
+		return closestPointIndex;
 	}
 }

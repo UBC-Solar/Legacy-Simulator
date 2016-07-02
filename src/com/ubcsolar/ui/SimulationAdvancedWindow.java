@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -58,6 +59,9 @@ import java.awt.FlowLayout;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.DefaultComboBoxModel;
 
 public class SimulationAdvancedWindow extends JFrame implements Listener{
 
@@ -75,6 +79,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private final int xValues = 0; //for the Double[][] dataset
 	private final int yValues = 1; //for the Double[][] dataset
 	private JPanel buttonPanel; 
+	private final int MAX_NUM_OF_LAPS=30;//the max number of laps to put in the combo box. 30 picked arbitrarily
 	private ChartPanel mainDisplay; //the panel displaying the model
 	private SimulationReport lastSimReport; //cache the last simReport
 	
@@ -84,6 +89,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private boolean showStateOfCharge = true;
 	private boolean showCloud = true;
 	private boolean showElevation = true;
+	private boolean showTime = true;
 	private JScrollPane speedSlidersPanel;
 	private JTextField textField_1;
 	private JPanel SliderHoldingPanel;
@@ -94,6 +100,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 
 	private static final String WelcomeInfoMessage = "use \"Load Forecasts for Route(48 hours)\" under the \"Forecasts\" menu to get the weather information."
 			+"\n\n"+ "Note: You should Load the route before this.";
+	private JComboBox<Integer> lapSelectComboBox;
+	private JCheckBox checkBoxTime;
 
 	private void handleError(String message){
 		JOptionPane.showMessageDialog(this, message);
@@ -241,6 +249,35 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			}
 		});
 		buttonPanel.add(chckbxElevation);
+		
+		lapSelectComboBox = new JComboBox<Integer>();
+		lapSelectComboBox.setPreferredSize(new Dimension(39, 18));
+		lapSelectComboBox.setEditable(true);
+		for(int i = 1; i<=MAX_NUM_OF_LAPS; i++){
+			lapSelectComboBox.addItem(new Integer(i));
+		}
+		
+		checkBoxTime = new JCheckBox("Time");
+		checkBoxTime.setSelected(showTime);
+		checkBoxTime.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showTime = checkBoxTime.isSelected();
+
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
+				JFrame frame = new LoadingWindow(mySession);
+				frame.setVisible(true);
+				refreshChart();
+				frame.setVisible(false);
+				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			}
+		});
+		buttonPanel.add(checkBoxTime);
+		
+		lapSelectComboBox.setSelectedIndex(0);
+		buttonPanel.add(lapSelectComboBox);
+		
+		JLabel lblOfLaps = new JLabel("# Of Laps: ");
+		buttonPanel.add(lblOfLaps);
 		
 		JPanel chartHoldingPanel = new JPanel();
 		contentPane.add(chartHoldingPanel, BorderLayout.CENTER);
@@ -435,9 +472,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		 * is not loaded, displays an error message to end user. 
 		 */
 		protected void runSimultion() {
+			int numLaps = lapSelectComboBox.getSelectedIndex() +1; //0 based index.
 			Map<GeoCoord, Double> requestedSpeeds = generateRequestedSpeedMap();
 			try {
-				mySession.getMySimController().runSimulation(requestedSpeeds);
+				mySession.getMySimController().runSimulation(requestedSpeeds,numLaps);
 			} catch (NoForecastReportException e) {
 				this.handleError("No Forcecasts Loaded");
 				return;
@@ -587,7 +625,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				//renderer2.setPlotShapes(true);
 				plot.setRenderer(1, renderer2);
 			}
-			
+		
 			if(this.showStateOfCharge){
 				DefaultXYDataset stateOfChargeDataSet = new DefaultXYDataset();
 				stateOfChargeDataSet.addSeries("State Of Charge", generateStateOfChargeSeries(simReport.getSimFrames(),startDistance));
@@ -633,6 +671,21 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				plot.setRenderer(4, renderer5);
 			}
 			
+			if(this.showTime){ //should make a 'time series' checkbox
+				DefaultXYDataset timeDataset = new DefaultXYDataset();
+				timeDataset.addSeries("Time", generateTimeSeries(simReport.getSimFrames(), startDistance));
+				final NumberAxis axis5 = new NumberAxis("time (min)");
+				axis5.setAutoRangeIncludesZero(false);
+				plot.setRangeAxis(5, axis5);
+				plot.setDataset(5, timeDataset);
+				plot.mapDatasetToRangeAxis(5, 5);
+				final StandardXYItemRenderer renderer5 = new StandardXYItemRenderer();
+				renderer5.setSeriesPaint(0, Color.WHITE);
+				//renderer.setBaseLegendTextFont(new Font("Helvetica", Font.BOLD, 11));
+				renderer5.setSeriesStroke(0, new BasicStroke(2));
+				//renderer2.setPlotShapes(true);
+				plot.setRenderer(5, renderer5);
+			}
 			
 			this.mainDisplay.setChart(this.simResults);
 			contentPane.repaint();
@@ -678,6 +731,27 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				runningTotalDistance += lastPosition.calculateDistance(thisPosition);
 				toReturn[xValues][i] = runningTotalDistance;
 				toReturn[yValues][i] = temp.getCarStatus().getSpeed();
+			}
+			
+			return toReturn;
+		}
+		
+		private double[][] generateTimeSeries(List<SimFrame> simFrames, double startDistance) {
+			double[][] toReturn= new double[2][simFrames.size()];
+			//[0] is distance, [1] is speed
+			double startTime = simFrames.get(0).getRepresentedTime();
+			toReturn[xValues][0] = startDistance;
+			toReturn[yValues][0] = 0;
+			
+			double runningTotalDistance = startDistance;
+			
+			for(int i = 1; i<simFrames.size(); i++){
+				SimFrame temp = simFrames.get(i);
+				GeoCoord lastPosition = simFrames.get(i-1).getGPSReport().getLocation();
+				GeoCoord thisPosition = temp.getGPSReport().getLocation();
+				runningTotalDistance += lastPosition.calculateDistance(thisPosition);
+				toReturn[xValues][i] = runningTotalDistance;
+				toReturn[yValues][i] = (((temp.getRepresentedTime() - startTime)/1000)/60);
 			}
 			
 			return toReturn;

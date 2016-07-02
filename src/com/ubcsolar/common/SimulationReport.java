@@ -5,6 +5,8 @@ import java.util.Map;
 
 public class SimulationReport extends DataUnit {
 	
+	//private String simTable;
+	private Map<String, String> map;
 	public final static String classCSVHeaderRow = "simulation frame" + "," + SimFrame.classCSVHeaderRow;
 	/**
 	 * turns the class fields into an entry for a csv file
@@ -13,15 +15,45 @@ public class SimulationReport extends DataUnit {
 	 */
 	public String getCSVEntry()
 	{
+		StringBuilder simTable= new StringBuilder("");
 		int frame=0;
-		String simTable="";
-		simTable += frame;
+				
 		for (SimFrame f : this.getSimFrames())
 		{
-			simTable += ","+ f.getCSVEntry() +"\r\n";
+	//		Thread t= new Thread(new SimFrame(frame,this,f));
+	//		t.start();
+			
+			simTable.append(frame+ ","+ f.getCSVEntry() +"\r\n");
+			frame++;
 		}
-		return simTable;
+		
+	//	System.out.println("Start of loop");
+
+	//	if(this.getSimFrames()!=null){
+	//		while (map.size()<= this.getSimFrames().size());
+	//	}
+	//	System.out.println("DONE");
+
+		return simTable.toString();
 	}
+	/*
+	public void notifyOfResult(String frame, String frameToPrint) {
+		map.put(frame, frameToPrint);
+		
+		if(this.getSimFrames()!=null){
+			if (map.size()== this.getSimFrames().size()){
+				int f=0;
+				String key="";
+				for(int i=0;i<map.size();i++){
+					key=""+f;
+					simTable += key+ ","+ map.get(key)+"\r\n";
+					f++;
+					System.out.println("it's the frame : "+key);
+				}
+				map.put("last", "entry");
+			}
+		}
+	}*/
 	
 	/**
 	 * gets the column headings as a csv row
@@ -70,5 +102,7 @@ public class SimulationReport extends DataUnit {
 	public Map<GeoCoord, Double> getManuallyRequestedSpeeds() {
 		return manuallyRequestedSpeeds;
 	}
+
+
 
 }
