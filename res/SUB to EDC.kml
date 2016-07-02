@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="ASCII"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+	<Document>
+		<name>Untitled map</name>
+		<description><![CDATA[]]></description>
+		<Folder>
+			<name>Untitled layer</name>
+		</Folder>
+		<Folder>
+			<name>Directions from 6163 University Blvd, Vancouver, BC V6T, Canada to 2345 East Mall, Vancouver, BC</name>
+			<Placemark>
+				<name>Directions from 6163 University Blvd, Vancouver, BC V6T, Canada to 2345 East Mall, Vancouver, BC</name>
+				<styleUrl>#line-1267FF-5-nodesc</styleUrl>
+				<LineString>
+					<tessellate>1</tessellate>
+					<coordinates>-123.24974,49.26572,87.0 -123.25027,49.26568,86.94648742675781 -123.2504,49.26556,87.3119888305664 -123.25028,49.26543,88.0 -123.24997,49.26508,89.0 -123.24959,49.26465,90.2647476196289 -123.24944,49.26447,91.66169738769531 -123.24925,49.26426,91.18592834472656 -123.24885,49.26377,93.73949432373047 -123.24837,49.26319,96.0 -123.24788,49.2626,96.03387451171875 -123.2477,49.26233,97.0 -123.24806,49.2622,97.0 </coordinates>
+				</LineString>
+			</Placemark>
+			<Placemark>
+				<name>6163 University Blvd, Vancouver, BC V6T, Canada</name>
+				<styleUrl>#icon-503-DB4436-nodesc</styleUrl>
+				<Point>
+					<coordinates>-123.2497371,49.2657219,87.0 </coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>2345 East Mall, Vancouver, BC</name>
+				<styleUrl>#icon-503-DB4436-nodesc</styleUrl>
+				<Point>
+					<coordinates>-123.2480559,49.2622008,97.0 </coordinates>
+				</Point>
+			</Placemark>
+		</Folder>
+		<Style id="icon-503-DB4436-nodesc-normal">
+			<IconStyle>
+				<color>ff3644DB</color>
+				<scale>1.1</scale>
+				<Icon>
+					<href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+				</Icon>
+				<hotSpot x="16" y="31" xunits="pixels" yunits="insetPixels">
+				</hotSpot>
+			</IconStyle>
+			<LabelStyle>
+				<scale>0.0</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<Style id="icon-503-DB4436-nodesc-highlight">
+			<IconStyle>
+				<color>ff3644DB</color>
+				<scale>1.1</scale>
+				<Icon>
+					<href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+				</Icon>
+				<hotSpot x="16" y="31" xunits="pixels" yunits="insetPixels">
+				</hotSpot>
+			</IconStyle>
+			<LabelStyle>
+				<scale>1.1</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<StyleMap id="icon-503-DB4436-nodesc">
+			<Pair>
+				<key>normal</key>
+				<styleUrl>#icon-503-DB4436-nodesc-normal</styleUrl>
+			</Pair>
+			<Pair>
+				<key>highlight</key>
+				<styleUrl>#icon-503-DB4436-nodesc-highlight</styleUrl>
+			</Pair>
+		</StyleMap>
+		<Style id="line-1267FF-5-nodesc-normal">
+			<LineStyle>
+				<color>ffFF6712</color>
+				<width>5</width>
+			</LineStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<Style id="line-1267FF-5-nodesc-highlight">
+			<LineStyle>
+				<color>ffFF6712</color>
+				<width>8.0</width>
+			</LineStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<StyleMap id="line-1267FF-5-nodesc">
+			<Pair>
+				<key>normal</key>
+				<styleUrl>#line-1267FF-5-nodesc-normal</styleUrl>
+			</Pair>
+			<Pair>
+				<key>highlight</key>
+				<styleUrl>#line-1267FF-5-nodesc-highlight</styleUrl>
+			</Pair>
+		</StyleMap>
+	</Document>
+</kml>
