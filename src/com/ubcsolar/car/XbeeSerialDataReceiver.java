@@ -34,7 +34,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 		System.out.println(serialPortName);
 		serialPort = new SerialPort(serialPortName);
 		serialPort.openPort();
-		serialPort.setParams(57600, 8, 1, 0);
+		serialPort.setParams(115200, 8, 1, 0);
 		serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
 	}
 	
@@ -79,7 +79,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 		};
 
 		CRC32 crc32 = new CRC32();
-		crc32.update(exampleData, 0, 57);
+		crc32.update(inData, 0, 57);
 		
 		long crc32FromData = 0;
 		for(int i=0; i<8; i++){
@@ -161,7 +161,9 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 				if(serialReadBuf[serialReadBufPos] == BINMSG_SEPARATOR){
 					if(serialReadBufPos == BINMSG_LENGTH){
 						loadBinaryData(serialReadBuf);
-						System.out.println(this.lastLoadedDataPacket.toString());
+						if(this.lastLoadedDataPacket != null){
+							System.out.println(this.lastLoadedDataPacket.toString());
+						}
 					}
 					serialReadBufPos = 0;
 				}else{
