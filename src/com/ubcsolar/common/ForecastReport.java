@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.github.dvdme.ForecastIOLib.FIODataBlock;
@@ -94,12 +95,16 @@ public class ForecastReport extends DataUnit {
 		this.forecastIOInRawStringForm = new ArrayList<String>();
 		ArrayList<ForecastIO> retreivedForecasts = new ArrayList<ForecastIO>();
 		for(int i = 0; i<jsonForecastReport.getInt(this.FC_LIST_SIZE_KEY); i++){
-			ForecastIO temp = new ForecastIO(GlobalValues.WEATHER_KEY);
-			String tempForecast = jsonForecastReport.getString(String.valueOf(i));
-			temp.getForecast(tempForecast);
-			this.forecastIOInRawStringForm.add(tempForecast); //because can't get it out of ForecastIO later. 
-			retreivedForecasts.add(temp);
-			System.out.println("Added FC from file to list");
+			try{
+				ForecastIO temp = new ForecastIO(GlobalValues.WEATHER_KEY);			
+				String tempForecast = jsonForecastReport.getString(String.valueOf(i));
+				temp.getForecast(tempForecast);
+				this.forecastIOInRawStringForm.add(tempForecast); //because can't get it out of ForecastIO later. 
+				retreivedForecasts.add(temp);
+				System.out.println("Added FC from file to list");
+			}catch(JSONException e){
+				System.out.println("Unabe to load forecast.");
+			}
 		}
 		this.forecasts = retreivedForecasts;
 	}

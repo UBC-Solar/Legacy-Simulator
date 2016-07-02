@@ -30,7 +30,7 @@ public class WeatherController extends ModuleController {
 	private ForecastReport lastDownloadedReport = null;
 	private ForecastReport lastCustomReport = null;
 	private List<ForecastIO> retrievedForecasts;
-	private List<ForecastIO> customForecasts;
+	private List<ForecastIO> customForecasts = new ArrayList<ForecastIO>();
 	private List<ForecastIO> comboForecasts = new ArrayList<ForecastIO>();
 	private MapController myMapController;
 	
