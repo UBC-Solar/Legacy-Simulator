@@ -175,7 +175,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		});
 		
 		mnForecasts.add(mntmLoadForecastsFor);
-
+		//still need to make this work
 		JMenuItem mntmLoadForecastsFor_1 = new JMenuItem("Load Forecasts for current location");
 		mntmLoadForecastsFor_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
