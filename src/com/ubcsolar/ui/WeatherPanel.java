@@ -150,7 +150,7 @@ public class WeatherPanel extends JPanel implements Listener {
 	private void updateKeyLabels(LocationReport location){
 		GeoCoord actual_location = location.getLocation();
 		try {
-			ForecastIO temp_forecast = mySession.getMyWeatherController().getForecastForSpecificPoint(actual_location, false);
+			ForecastIO temp_forecast = mySession.getMyWeatherController().getForecastForSpecificPoint(actual_location, true);
 			FIODataBlock temp_forecast_block = new FIODataBlock(temp_forecast.getHourly());
 			Double cloud = temp_forecast_block.datapoint(0).cloudCover();
 			double cloud_percent = cloud*100;
