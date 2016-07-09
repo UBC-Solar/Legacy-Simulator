@@ -572,7 +572,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				}
 				updateChart(test.getSimReport(), startDistance);
 				this.clearAndLoadSpeedSliders(lastSimReport.getSimFrames(), KM_PER_SLIDER, lastSimReport.getManuallyRequestedSpeeds(), startDistance);
+				this.validate();
 				this.repaint();
+				
 			}
 			
 		}
