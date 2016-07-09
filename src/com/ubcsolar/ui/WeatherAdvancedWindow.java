@@ -696,7 +696,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 						//GeoCoords easier when calculating headwind
 						distances[distanceIndex] = travelDistance;
 						distanceIndex++;
-					}if(trailMarkerIndex == trailMarkers.size()-1){
+					}else if(trailMarkerIndex == trailMarkers.size()-1){
 						distances[distanceIndex] = travelDistance;
 						distanceIndex++;
 					}
