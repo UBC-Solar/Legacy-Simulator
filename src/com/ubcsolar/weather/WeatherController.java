@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.Main.GlobalValues;
@@ -217,13 +219,82 @@ public class WeatherController extends ModuleController {
 		double startDistance = GeoCoord.haversine(startForecast.getLatitude(), startForecast.getLongitude(), currentLoc.getLat(), currentLoc.getLon());
 		double endDistance = GeoCoord.haversine(endForecast.getLatitude(), endForecast.getLongitude(), currentLoc.getLat(), currentLoc.getLon());
 		if(startDistance<endDistance){
-			return startForecast;
+			double startWeight = 1 / (endDistance + startDistance) * endDistance;
+			ForecastIO interpolated = createInterpolatedForecast(startForecast, endForecast, startWeight, currentLoc);
+			return interpolated;
 		}
 		else{
 			return endForecast;
 		}
 	}
-
+	
+	private ForecastIO createInterpolatedForecast(ForecastIO closer, ForecastIO farther, double closeWeight, GeoCoord currentLoc){
+		double farWeight = 1 - closeWeight;
+		JsonValue closeHourlyValue = closer.getCurrently().get("data");
+		JsonArray closeHourly = new JsonArray();
+		if(closeHourlyValue.isArray()){
+			closeHourly = (JsonArray) closeHourlyValue;
+		}else{
+			//TODO: throw error?
+		}
+		JsonValue farHourlyValue = farther.getCurrently().get("data");
+		JsonArray farHourly = new JsonArray();
+		if(farHourlyValue.isArray()){
+			farHourly = (JsonArray) farHourlyValue;
+		}else{
+			//TODO: throw error?
+		}
+		int numHours;
+		if(closeHourly.size() < farHourly.size()){
+			numHours = closeHourly.size();
+		}else{
+			numHours = farHourly.size();
+		}
+		if(numHours == 0){
+			//TODO: definitely throw error
+		}
+		FIODataPointFactory factory = new FIODataPointFactory();
+		List<JsonObject> datapoints = new ArrayList<JsonObject>();
+		for(int i = 0; i < numHours; i++){
+			JsonObject closeHourCurr = (JsonObject) closeHourly.get(i);
+			JsonObject farHourCurr = (JsonObject) farHourly.get(i);
+			
+			double cldCover = parseJsonDouble(farHourCurr.get("cloudCover"))*farWeight +
+					parseJsonDouble(closeHourCurr.get("cloudCover"))*closeWeight;
+			double dewPoint = parseJsonDouble(farHourCurr.get("dewPoint"))*farWeight +
+					parseJsonDouble(closeHourCurr.get("dewPoint"))*closeWeight;
+			double humidity = parseJsonDouble(farHourCurr.get("humidity"))*farWeight +
+					parseJsonDouble(closeHourCurr.get("humidity"))*closeWeight;
+			double precipProb = parseJsonDouble(farHourCurr.get("precipProbability"))*farWeight +
+					parseJsonDouble(closeHourCurr.get("precipProbability"))*closeWeight;
+			double temp = parseJsonDouble(farHourCurr.get("temperature"))*farWeight +
+					parseJsonDouble(closeHourCurr.get("temperature"))*closeWeight;
+			double windBearing = parseJsonDouble(farHourCurr.get("windBearing"))*farWeight +
+					parseJsonDouble(closeHourCurr.get("windBearing"))*closeWeight;
+			double windSpeed = parseJsonDouble(farHourCurr.get("windSpeed"))*farWeight +
+					parseJsonDouble(closeHourCurr.get("windSpeed"))*closeWeight;
+			String precipType = closeHourCurr.get("precipType").toString();
+			
+			factory.cloudCover(cldCover).dewPoint(dewPoint).humidity(humidity).
+				precipProb(precipProb).precipType(precipType).temperature(temp).windBearing(windBearing).
+				windSpeed(windSpeed)/*.stormBearing(strmBearing).stormDistance(strmDistance)*/;
+			//not quite sure how to get storms working, cause a lot of forecasts don't have them
+		
+			datapoints.add(factory.build());
+		}
+		ForecastIOFactory2.addDatapoints(datapoints);
+		ForecastIOFactory2.changeLocation(currentLoc);
+		return ForecastIOFactory2.build();
+	}
+	
+	/**
+	 * convenience method to parse doubles from Json fields
+	 * @param field
+	 * @return
+	 */
+	private double parseJsonDouble(JsonValue field){
+		return Double.parseDouble(field.toString());
+	}
 	
 	/**
 	 * Returns the forecast tha is closest to the given point 
