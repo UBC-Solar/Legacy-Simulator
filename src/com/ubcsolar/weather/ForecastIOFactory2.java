@@ -17,6 +17,22 @@ public class ForecastIOFactory2 {
 	
 	public static void addDatapoints(List<JsonObject> newDatapoints){
 		datapoints = new ArrayList<JsonObject>(newDatapoints);
+
+		for(int i = 1; i < datapoints.size() - 1; i++){
+			int j = i;
+			while(j>0 && Integer.parseInt(datapoints.get(j).get("time").toString())
+				< Integer.parseInt(datapoints.get(j-1).get("time").toString())){
+					JsonObject temp = datapoints.get(j-1);
+					datapoints.set(j-1, datapoints.get(j));
+					datapoints.set(j, temp);
+					j = j-1;
+			}
+		}
+		
+		//TODO: remove debug code below
+		for(int i = 0; i < datapoints.size(); i++){
+			System.out.println(datapoints.get(i).get("time"));
+		}
 	}
 	
 	public static ForecastIO build(){

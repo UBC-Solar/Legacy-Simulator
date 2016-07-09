@@ -17,13 +17,13 @@ public class FIODataPointFactory {
 		private double cloudCover = 0;
 		private double stormBearing = 0;
 		private double stormDistance = 0;
+		private int time = 0;
 
 		
 		//fixed
 		
 		private String summary = "TEST";
 		private String icon;
-		private int time = 0;
 		private double precipIntensity = 0;
 		private double visibility = 0;
 		private double pressure = 0;
@@ -34,6 +34,16 @@ public class FIODataPointFactory {
 		public FIODataPointFactory temperature(double temperature){
 			this.temperature = temperature;
 			this.apparentTemperature = temperature;
+			return this;
+		}
+		
+		/**
+		 * Sets the time of the datapoint
+		 * @param time: given in seconds from 1970 (I think)
+		 * @return the same factory
+		 */
+		public FIODataPointFactory time(int time){
+			this.time = time;
 			return this;
 		}
 		
