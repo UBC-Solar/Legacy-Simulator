@@ -7,6 +7,7 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalValues;
+import com.ubcsolar.common.GeoCoord;
 
 public class ForecastIOFactory2 {
 	private static double latitude = 0;
@@ -33,6 +34,11 @@ public class ForecastIOFactory2 {
 		for(int i = 0; i < datapoints.size(); i++){
 			System.out.println(datapoints.get(i).get("time"));
 		}
+	}
+	
+	public static void changeLocation(GeoCoord loc){
+		latitude = loc.getLat();
+		longitude = loc.getLon();
 	}
 	
 	public static ForecastIO build(){

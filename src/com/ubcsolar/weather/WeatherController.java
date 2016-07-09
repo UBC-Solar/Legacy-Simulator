@@ -224,7 +224,9 @@ public class WeatherController extends ModuleController {
 			return interpolated;
 		}
 		else{
-			return endForecast;
+			double endWeight = 1 / (endDistance + startDistance) * startDistance;
+			ForecastIO interpolated = createInterpolatedForecast(endForecast, startForecast, endWeight, currentLoc);
+			return interpolated;
 		}
 	}
 	
