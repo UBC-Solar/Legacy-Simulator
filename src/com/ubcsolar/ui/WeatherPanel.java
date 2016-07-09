@@ -18,6 +18,8 @@ import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LocationReport;
+import com.ubcsolar.common.LogType;
+import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.TelemDataPacket;
 import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.map.MapController;
@@ -162,15 +164,26 @@ public class WeatherPanel extends JPanel implements Listener {
 			Rainfall.setText(weather_string);
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			WindSpeed.setText("No Internet");
+			CloudPercent.setText("No Internet");
+			Rainfall.setText("No Internet");
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "IO Error updating FC labels for current pos");
 		} catch (NoForecastReportException e) {
-			// TODO Auto-generated catch block
+			WindSpeed.setText("No Forecast Yet");
+			CloudPercent.setText("No Forecast");
+			Rainfall.setText("No Forecast");
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "No Forecast when updating FC labels for current pos");
+		}catch(NullPointerException e){
+			WindSpeed.setText("ERROR GETTING");
+			CloudPercent.setText("ERROR GETTING");
+			Rainfall.setText("ERROR GETTING");
+			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Null Pointer Exception when updating FC labels for current pos");
 			e.printStackTrace();
 		}
 
 		
 	}
+	
 	
 	private void updateForcastlbl(String string) {
 		this.ForecastLoaded.setText(string);
