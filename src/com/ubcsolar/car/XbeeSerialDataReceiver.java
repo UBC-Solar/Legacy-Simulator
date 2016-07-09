@@ -98,20 +98,20 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 		}
 		
 		int i = 0;
-		double speed = (double) inData[i++];
-		int totalVoltage = (int) inData[i++];
-		int stateOfCharge  = (int) inData[i++];
+		double speed = (double) (0xff & (int) inData[i++]);
+		int totalVoltage = 0xff & (int) inData[i++];
+		int stateOfCharge  = 0xff & (int) inData[i++];
 		HashMap<String,Integer> mapForTemperatures = new HashMap<String,Integer>();
-		mapForTemperatures.put("bms", (int) inData[i++]);
-		mapForTemperatures.put("motor", (int) inData[i++]);
+		mapForTemperatures.put("bms", 0xff & (int) inData[i++]);
+		mapForTemperatures.put("motor", 0xff & (int) inData[i++]);
 		for(int j = 0; j < 4; j++){
-			mapForTemperatures.put("pack" + j, (int) inData[i++]);
+			mapForTemperatures.put("pack" + j, 0xff & (int) inData[i++]);
 		}
 		HashMap<Integer,ArrayList<Float>> mapForCellVoltages = new HashMap<Integer,ArrayList<Float>>();
 		for(int j = 0; j < 4; j++){
 			mapForCellVoltages.put(j, new ArrayList<Float>());
 			for(int k = 0; k < 12; k++){
-				mapForCellVoltages.get(j).add(((float) inData[i++]) / 50);
+				mapForCellVoltages.get(j).add(((float) (0xff & (int) inData[i++])) / 50);
 			}
 		}
 		
