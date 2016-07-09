@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.Listener;
 import com.ubcsolar.common.LogType;
@@ -29,6 +30,7 @@ public class MapPanel extends JPanel implements Listener {
 	protected GUImain parent;
 	private GlobalController mySession;
 	private JLabel label_1;
+	private JLabel lbl_Report;
 	private JLabel label_position;
 	private GeoCoord currentLocation;
 	private double kilometerMark;
@@ -51,12 +53,12 @@ public class MapPanel extends JPanel implements Listener {
 		add(panel_1, BorderLayout.CENTER);
 		GridBagLayout gbl_panel_1 = new GridBagLayout();
 		gbl_panel_1.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_panel_1.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_panel_1.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
 		gbl_panel_1.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-		gbl_panel_1.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+		gbl_panel_1.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 		panel_1.setLayout(gbl_panel_1);
 		
-		JLabel lblCar = new JLabel("Car's Current Position on Route:");
+		JLabel lblCar = new JLabel(" Car's Current Position on Route:");
 		GridBagConstraints gbc_lblCar = new GridBagConstraints();
 		gbc_lblCar.insets = new Insets(0, 0, 5, 5);
 		gbc_lblCar.gridx = 3;
@@ -73,11 +75,27 @@ public class MapPanel extends JPanel implements Listener {
 		
 		label_position.setText("N/A");
 		
+		JLabel lblLocationRecievedAt = new JLabel(" Location Report at:");
+		lblLocationRecievedAt.setFont(new Font("Tahoma", Font.BOLD, 12));
+		GridBagConstraints gbc_lblLocationRecievedAt = new GridBagConstraints();
+		gbc_lblLocationRecievedAt.insets = new Insets(0, 0, 5, 5);
+		gbc_lblLocationRecievedAt.gridx = 3;
+		gbc_lblLocationRecievedAt.gridy = 5;
+		panel_1.add(lblLocationRecievedAt, gbc_lblLocationRecievedAt);
+		
+		lbl_Report = new JLabel("NONE");
+		lbl_Report.setFont(new Font("Tahoma", Font.BOLD, 12));
+		GridBagConstraints gbc_lbl_Report = new GridBagConstraints();
+		gbc_lbl_Report.insets = new Insets(0, 0, 5, 5);
+		gbc_lbl_Report.gridx = 5;
+		gbc_lbl_Report.gridy = 5;
+		panel_1.add(lbl_Report, gbc_lbl_Report);
+		
 		JLabel lblMapLoaded = new JLabel("Map Loaded: ");
 		GridBagConstraints gbc_lblMapLoaded = new GridBagConstraints();
 		gbc_lblMapLoaded.insets = new Insets(0, 0, 0, 5);
 		gbc_lblMapLoaded.gridx = 3;
-		gbc_lblMapLoaded.gridy = 6;
+		gbc_lblMapLoaded.gridy = 7;
 		panel_1.add(lblMapLoaded, gbc_lblMapLoaded);
 		
 		label_1 = new JLabel("");
@@ -85,7 +103,7 @@ public class MapPanel extends JPanel implements Listener {
 		GridBagConstraints gbc_label_1 = new GridBagConstraints();
 		gbc_label_1.insets = new Insets(0, 0, 0, 5);
 		gbc_label_1.gridx = 5;
-		gbc_label_1.gridy = 6;
+		gbc_label_1.gridy = 7;
 		panel_1.add(label_1, gbc_label_1);
 		
 		label_1.setText("NONE");
@@ -108,6 +126,10 @@ public class MapPanel extends JPanel implements Listener {
 	private void updateMapLabel(String mapName){
 		label_1.setText(mapName);		
 	}
+	private void updateReportLabel(String string){
+		lbl_Report.setText(string);
+	}
+	
 	
 	@Override
 	public void notify(Notification n) {
@@ -127,6 +149,9 @@ public class MapPanel extends JPanel implements Listener {
 					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to get Car location on Map Controller, but no route loaded");
 				}
 			}
+		}
+		if(n.getClass() == NewLocationReportNotification.class){
+			updateReportLabel(GlobalValues.hourMinSec.format(n.getTimeCreated()));
 		}
 	}
 	@Override

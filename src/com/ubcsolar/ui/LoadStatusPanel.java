@@ -37,13 +37,11 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	private JLabel lblCar; //displays the name of the loaded car (simulated or real?)
 	private JLabel lblTaf; //displays the name of the loaded Taf report
 	private JLabel lblDatabase; //displays the status of the Database. 
-	private JLabel lblLocationReport;
 	private JLabel lblTelemdata;
 	private Component horizontalGlue_4;
 	private DateFormat labelTimeFormat = new SimpleDateFormat("HH:mm:ss"); //the format for the times on the labels.
 	//private final String TAFTITLE = "Taf: ";
 	private final String CARLOADED = " Car: ";
-	private final String LOCATIONREPORT = "|  LocationReprt: ";
 	private final String TELEMDATA = "|  TelemData: ";	
 	/**
 	 * constructor
@@ -67,10 +65,6 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		
 		lblTelemdata = new JLabel("|        TelemData: ");
 		add(lblTelemdata);
-		
-		lblLocationReport = new JLabel("|        LocationReprt: ");
-		lblLocationReport.setHorizontalAlignment(SwingConstants.RIGHT);
-		add(lblLocationReport);
 
 		if(mySession != null){
 			initializeValues();
@@ -80,7 +74,6 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	
 	private void initializeValues(){
 		//updateTafLabel("none");
-		this.updateLocationLabel("none");
 		this.updateTelemLabel("none");
 		updateCarLabel(mySession.getMyCarController().getLoadedCarName());
 		if(mySession.getMyDataBaseController() != null){
@@ -135,9 +128,7 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		else if(n.getClass() == CarUpdateNotification.class){
 			this.updateTelemLabel("rcv'd @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
 		}
-		else if(n.getClass() == NewLocationReportNotification.class){
-			this.updateLocationLabel("rcv'd @ " + GlobalValues.hourMinSec.format(n.getTimeCreated()));
-		}
+		
 		
 		/*//TODO implement these
 		else if(n.getClass() == NewWeatherLoadedNotification.class){ //to update the weather label
@@ -157,9 +148,6 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		
 	}
 	*/
-	private void updateLocationLabel(String string){
-		lblLocationReport.setText(LOCATIONREPORT + string);
-	}
 	
 	private void updateTelemLabel(String string){
 		lblTelemdata.setText(TELEMDATA + string);
