@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 
 import javax.swing.ImageIcon;
 
+import com.github.dvdme.ForecastIOLib.ForecastIO;
+
 public class GlobalValues {
 	
 	//Hooman's key
@@ -61,5 +63,9 @@ public class GlobalValues {
 	 * Whether the user has hit 'don't show me again'
 	 */
 	public static boolean showChartNavigationTutorialAgain = true;
+	
+	public static final String WEATHER_UNITS = ForecastIO.UNITS_CA;
+	
+	public static final String WEATHER_LANG = ForecastIO.LANG_ENGLISH;
 }
 

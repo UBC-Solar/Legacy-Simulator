@@ -159,7 +159,7 @@ public class WeatherPanel extends JPanel implements Listener {
 			Double weather = temp_forecast_block.datapoint(0).precipIntensity();
 			String weather_string = String.valueOf(weather);
 			
-			WindSpeed.setText(wind + " kts");
+			WindSpeed.setText(wind + " km/h");
 			CloudPercent.setText(cloud_percent_word + "%");
 			Rainfall.setText(weather_string);
 			

@@ -47,8 +47,13 @@ public class FIODataPointFactory {
 			return this;
 		}
 		
+		/**
+		 * 
+		 * @param cloudCover: must be a value between 0 and 1 inclusive
+		 * @return
+		 */
 		public FIODataPointFactory cloudCover(double cloudCover){
-			this.cloudCover = cloudCover / 100;
+			this.cloudCover = cloudCover;
 			return this;
 		}
 		
@@ -82,8 +87,13 @@ public class FIODataPointFactory {
 			return this;
 		}
 		
+		/**
+		 * 
+		 * @param precipitationProbability: must be a value between 0 and 1 inclusive
+		 * @return
+		 */
 		public FIODataPointFactory precipProb(double precipitationProbability){
-			this.precipProbability = precipitationProbability / 100;
+			this.precipProbability = precipitationProbability;
 			return this;
 		}
 		

@@ -104,7 +104,8 @@ public class ForecastFactory {
 		 
 		 @Override
 		public void run() {
-			myForecast = new ForecastIO("" + target.getLat(), "" + target.getLon(), GlobalValues.WEATHER_KEY);
+			myForecast = new ForecastIO("" + target.getLat(), "" + target.getLon(), GlobalValues.WEATHER_UNITS,
+					GlobalValues.WEATHER_LANG, GlobalValues.WEATHER_KEY);
 		}
 		 
 		public ForecastIO getTheForecast(){

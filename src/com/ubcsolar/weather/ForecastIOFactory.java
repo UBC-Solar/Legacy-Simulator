@@ -50,8 +50,14 @@ public class ForecastIOFactory {
 		return this;
 	}
 	
+	/**
+	 * 
+	 * @param cloudCover: must be a value between 0 and 1 inclusive
+	 * 
+	 * @return
+	 */
 	public ForecastIOFactory cloudCover(double cloudCover){
-		this.cloudCover = cloudCover / 100;
+		this.cloudCover = cloudCover;
 		
 		if (cloudCover <15){
 			this.icon = "Sunny";
@@ -98,8 +104,14 @@ public class ForecastIOFactory {
 		return this;
 	}
 	
+	
+	/**
+	 * 
+	 * @param precipitationProbability: must be between 0 and 1 inclusive
+	 * @return
+	 */
 	public ForecastIOFactory precipProb(double precipitationProbability){
-		this.precipProbability = precipitationProbability / 100;
+		this.precipProbability = precipitationProbability;
 		return this;
 	}
 	
@@ -227,6 +239,7 @@ public class ForecastIOFactory {
 			dataArrayEntry.add("time", time);
 			dataArrayEntry.add("summary", summary);
 			dataArrayEntry.add("icon", icon);
+			dataArrayEntry.add("precipType", precipType);
 			dataArrayEntry.add("precipIntensity", precipIntensity);
 			dataArrayEntry.add("precipProbability", precipProbability);
 			dataArrayEntry.add("temperature", temperature);

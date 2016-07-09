@@ -215,7 +215,7 @@ public class WeatherController extends ModuleController {
 	 */
 	private ForecastIO interpolateForecast(ForecastIO startForecast, ForecastIO endForecast, GeoCoord currentLoc) {
 		if(endForecast == null){
-			return startForecast;
+			endForecast = startForecast;
 		}
 		
 		double startDistance = GeoCoord.haversine(startForecast.getLatitude(), startForecast.getLongitude(), currentLoc.getLat(), currentLoc.getLon());
@@ -234,14 +234,14 @@ public class WeatherController extends ModuleController {
 	
 	private ForecastIO createInterpolatedForecast(ForecastIO closer, ForecastIO farther, double closeWeight, GeoCoord currentLoc){
 		double farWeight = 1 - closeWeight;
-		JsonValue closeHourlyValue = closer.getCurrently().get("data");
+		JsonValue closeHourlyValue = closer.getHourly().get("data");
 		JsonArray closeHourly = new JsonArray();
 		if(closeHourlyValue.isArray()){
 			closeHourly = (JsonArray) closeHourlyValue;
 		}else{
 			//TODO: throw error?
 		}
-		JsonValue farHourlyValue = farther.getCurrently().get("data");
+		JsonValue farHourlyValue = farther.getHourly().get("data");
 		JsonArray farHourly = new JsonArray();
 		if(farHourlyValue.isArray()){
 			farHourly = (JsonArray) farHourlyValue;

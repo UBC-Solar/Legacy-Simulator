@@ -349,7 +349,7 @@ public class FakeForecastAddWindow extends JFrame{
 		}
 		double cldCover;
 		try{
-			cldCover = Double.parseDouble(this.txtCloudCover.getText());
+			cldCover = Double.parseDouble(this.txtCloudCover.getText()) / 100;
 		}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Cloud cover % formatted incorrectly");
@@ -405,7 +405,7 @@ public class FakeForecastAddWindow extends JFrame{
 		}
 		double precipProb;
 		try{
-			precipProb = Double.parseDouble(this.txtPrecipProb.getText());
+			precipProb = Double.parseDouble(this.txtPrecipProb.getText()) / 100;
 			}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Precipitation probability formatted incorrectly");
