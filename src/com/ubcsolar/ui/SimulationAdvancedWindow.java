@@ -84,7 +84,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private SimulationReport lastSimReport; //cache the last simReport
 	
 	
-	private final int KM_PER_SLIDER = 5; //could make this dynamic to allow for slider 'zooming'
+	private final int KM_PER_SLIDER = 1; //could make this dynamic to allow for slider 'zooming'
+	private final double KM_PER_SLIDER_DOUBLE = 0.3;
 	private boolean showSpeed = true;
 	private boolean showStateOfCharge = true;
 	private boolean showCloud = true;
@@ -408,15 +409,19 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			GeoCoord end = simResultValues.get(i).getGPSReport().getLocation();
 			runningTotalDistance += start.calculateDistance(end);
 			
-			if((runningTotalDistance-lastAddedPointDistance)>KM_PER_SLIDER || i == simResultValues.size() - 1){
+			//NOTE: CHANGED THIS FROM THE DEFAULT INT THING AT THE TOP
+			if((runningTotalDistance-lastAddedPointDistance)>KM_PER_SLIDER_DOUBLE || i == simResultValues.size() - 1){
 				List<GeoCoord> pointsToRepresent = new ArrayList<GeoCoord>();
 				double totalSpeed = 0;
-				for(int index = lastAddedPointIndex+1; index<=i; index++){
+				for(int index = lastAddedPointIndex+1; index<i; index++){
+					System.out.println("adding a speed: " + simResultValues.get(index).getCarStatus().getSpeed());
 					totalSpeed += simResultValues.get(index).getCarStatus().getSpeed();
 					pointsToRepresent.add(simResultValues.get(index).getGPSReport().getLocation());
 				}
+			
 				
-				double averageSpeed = totalSpeed/(i-(lastAddedPointIndex+1)); //avg speed across all points represented
+				double averageSpeed = totalSpeed/(double)(i-(lastAddedPointIndex+1)); //avg speed across all points represented
+			
 				String formattedKMOne = String.format("%.2f", lastAddedPointDistance); //to avoid having 16 digits
 				String formattedKMTwo = String.format("%.2f", runningTotalDistance);
 				String label = "KMs: " + formattedKMOne+"-"+formattedKMTwo;
@@ -426,6 +431,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 					//not sure to do if any of them, or if majority, or if all, etc. 
 					if(lastManuallyReqSpeeds.get(g)!=null){
 						isManuallySet = true;
+						System.out.println("total speed: " + totalSpeed);
+						System.out.println("Average speed: " + averageSpeed);
+						System.out.println((i-(lastAddedPointIndex+1) + ""));
 					}
 				}
 				
@@ -564,7 +572,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				}
 				updateChart(test.getSimReport(), startDistance);
 				this.clearAndLoadSpeedSliders(lastSimReport.getSimFrames(), KM_PER_SLIDER, lastSimReport.getManuallyRequestedSpeeds(), startDistance);
+				this.validate();
 				this.repaint();
+				
 			}
 			
 		}

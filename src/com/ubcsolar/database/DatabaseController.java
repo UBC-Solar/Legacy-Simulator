@@ -53,6 +53,8 @@ public class DatabaseController extends ModuleController {
 	
 	public DatabaseController(GlobalController myGlobalController)throws IOException {
 		super(myGlobalController);
+		this.mySession.sendNotification(new DatabaseCreatedOrConnectedNotification("CSV FILES"));
+		this.databaseName = "CSV Files";//because if it got here, it created all the ablove already.
 	}
 	
   
@@ -83,6 +85,15 @@ public class DatabaseController extends ModuleController {
 	public void saveAndDisconnect() throws IOException{
 		this.myCarPacketDatabase.saveAndDisconnect();
 		this.myLocationUpdateDatabase.saveAndDisconnect();
+		for(CSVDatabase csvd : this.mySimulationResultsDB){
+			csvd.saveAndDisconnect();
+		}
+		for(CSVDatabase csvd : this.forecastReportsDB){
+			csvd.saveAndDisconnect();
+		}
+		for(CSVDatabase csvd : this.loadedRoutesDB){
+			csvd.saveAndDisconnect();
+		}
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Database saved and disconnected");
 		this.mySession.sendNotification(new DatabaseDisconnectedOrClosed(this.databaseName));
 		this.databaseName = null;

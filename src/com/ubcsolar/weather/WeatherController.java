@@ -3,6 +3,8 @@ package com.ubcsolar.weather;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -474,7 +476,7 @@ public class WeatherController extends ModuleController {
 	/**
 	 * Returns the ForecastIO for the requested location. If doInterprolation is true,
 	 * interprolates based on the two closes forecasts. If false, will attempt
-	 * to download a brand new forecastIO. 
+	 * to download a brand new forecastIO (and if that fails, will just give an interprolated one)
 	 * @param target
 	 * @param doInterprolation
 	 * @return the forecastIO for the requested location. 
@@ -483,7 +485,7 @@ public class WeatherController extends ModuleController {
 	 * @throws NoForecastReportException if no forecasts have been downloaded/added
 	 */
 	public ForecastIO getForecastForSpecificPoint(GeoCoord target, Boolean doInterprolation) throws IOException, NoForecastReportException{
-		if(!doInterprolation){
+		if(!doInterprolation && isInternetReachable()){
 			return new ForecastIO("" + target.getLat(), "" + target.getLon(), GlobalValues.WEATHER_KEY);
 		}
 		
@@ -497,6 +499,27 @@ public class WeatherController extends ModuleController {
 		
 	}
 	
+	private boolean isInternetReachable() throws IOException{
+        
+
+    	//make a URL to a known source
+     URL url = new URL(GlobalValues.URL_TO_CHECK_INTERNET_WITH);
+
+     //open a connection to that source
+     
+     HttpURLConnection urlConnect = (HttpURLConnection)url.openConnection();
+     urlConnect.setConnectTimeout(GlobalValues.MAX_TIME_MS_WAIT_FOR_URL);
+	 	try{
+     //trying to retrieve data from the source. If there
+     //is no connection, this line will fail
+	 		urlConnect.getContent();   
+    }
+    catch(IOException e){return false;}
+    finally{
+    	urlConnect.disconnect();
+    }
+ return true;
+}
 	public void loadForecastFromFile(File fileToLoadFrom) throws IOException, FileNotFoundException, InconsistentForecastMapStateException{
 		ForecastReport temp = this.mySession.getMyDataBaseController().getCachedForecastReport(fileToLoadFrom);
 		String forecastRouteName = temp.getRouteNameForecastsWereCreatedFor();

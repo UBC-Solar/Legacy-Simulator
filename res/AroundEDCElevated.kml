@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="ASCII"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+	<Document>
+		<name>Untitled map</name>
+		<description><![CDATA[]]></description>
+		<Folder>
+			<name>Untitled layer</name>
+		</Folder>
+		<Folder>
+			<name>Directions from 2358 Engineering Rd, Vancouver, BC V6T 1Z4, Canada to 2358 Engineering Rd, Vancouver, BC V6T 1Z4, Canada</name>
+			<Placemark>
+				<name>Directions from 2358 Engineering Rd, Vancouver, BC V6T 1Z4, Canada to 2358 Engineering Rd, Vancouver, BC V6T 1Z4, Canada</name>
+				<styleUrl>#line-1267FF-5-nodesc</styleUrl>
+				<LineString>
+					<tessellate>1</tessellate>
+					<coordinates>-123.24882,49.26191,96.0 -123.24882,49.26192,96.0 -123.2488,49.26193,96.0 -123.2477,49.26233,97.0 -123.24788,49.2626,96.03387451171875 -123.24748,49.26274,97.0 -123.24719,49.26284,97.0 -123.24679,49.26298,97.14028930664062 -123.24719,49.26284,97.0 -123.24748,49.26274,97.0 -123.24788,49.2626,96.03387451171875 -123.24837,49.26319,96.0 -123.24788,49.2626,96.03387451171875 -123.2477,49.26233,97.0 -123.2488,49.26193,96.0 -123.24882,49.26192,96.0 -123.24883,49.26191,96.0 </coordinates>
+				</LineString>
+			</Placemark>
+			<Placemark>
+				<name>2358 Engineering Rd, Vancouver, BC V6T 1Z4, Canada</name>
+				<styleUrl>#icon-503-DB4436-nodesc</styleUrl>
+				<Point>
+					<coordinates>-123.2488212,49.2619113,96.0 </coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>2252 Health Sciences Mall, Vancouver, BC V6T, Canada</name>
+				<styleUrl>#icon-503-DB4436-nodesc</styleUrl>
+				<Point>
+					<coordinates>-123.2467902,49.2629763,97.14871978759766 </coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>2251 E Mall, Vancouver, BC V6T, Canada</name>
+				<styleUrl>#icon-503-DB4436-nodesc</styleUrl>
+				<Point>
+					<coordinates>-123.2483719,49.2631899,96.0 </coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>2358 Engineering Rd, Vancouver, BC V6T 1Z4, Canada</name>
+				<styleUrl>#icon-503-DB4436-nodesc</styleUrl>
+				<Point>
+					<coordinates>-123.2488254,49.2619052,96.0 </coordinates>
+				</Point>
+			</Placemark>
+		</Folder>
+		<Style id="icon-503-DB4436-nodesc-normal">
+			<IconStyle>
+				<color>ff3644DB</color>
+				<scale>1.1</scale>
+				<Icon>
+					<href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+				</Icon>
+				<hotSpot x="16" y="31" xunits="pixels" yunits="insetPixels">
+				</hotSpot>
+			</IconStyle>
+			<LabelStyle>
+				<scale>0.0</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<Style id="icon-503-DB4436-nodesc-highlight">
+			<IconStyle>
+				<color>ff3644DB</color>
+				<scale>1.1</scale>
+				<Icon>
+					<href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+				</Icon>
+				<hotSpot x="16" y="31" xunits="pixels" yunits="insetPixels">
+				</hotSpot>
+			</IconStyle>
+			<LabelStyle>
+				<scale>1.1</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<StyleMap id="icon-503-DB4436-nodesc">
+			<Pair>
+				<key>normal</key>
+				<styleUrl>#icon-503-DB4436-nodesc-normal</styleUrl>
+			</Pair>
+			<Pair>
+				<key>highlight</key>
+				<styleUrl>#icon-503-DB4436-nodesc-highlight</styleUrl>
+			</Pair>
+		</StyleMap>
+		<Style id="line-1267FF-5-nodesc-normal">
+			<LineStyle>
+				<color>ffFF6712</color>
+				<width>5</width>
+			</LineStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<Style id="line-1267FF-5-nodesc-highlight">
+			<LineStyle>
+				<color>ffFF6712</color>
+				<width>8.0</width>
+			</LineStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<StyleMap id="line-1267FF-5-nodesc">
+			<Pair>
+				<key>normal</key>
+				<styleUrl>#line-1267FF-5-nodesc-normal</styleUrl>
+			</Pair>
+			<Pair>
+				<key>highlight</key>
+				<styleUrl>#line-1267FF-5-nodesc-highlight</styleUrl>
+			</Pair>
+		</StyleMap>
+	</Document>
+</kml>

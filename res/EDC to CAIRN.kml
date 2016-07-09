@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="ASCII"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+	<Document>
+		<name>Untitled map</name>
+		<description><![CDATA[]]></description>
+		<Folder>
+			<name>Untitled layer</name>
+		</Folder>
+		<Folder>
+			<name>Directions from 2345 East Mall, Vancouver, BC to 2345 East Mall, Vancouver, BC</name>
+			<Placemark>
+				<name>Directions from 2345 East Mall, Vancouver, BC to 2345 East Mall, Vancouver, BC</name>
+				<styleUrl>#line-1267FF-5-nodesc</styleUrl>
+				<LineString>
+					<tessellate>1</tessellate>
+					<coordinates>-123.24806,49.2622,97.0 -123.2488,49.26193,96.0 -123.24882,49.26192,96.0 -123.24883,49.2619,96.0 -123.24883,49.26188,96.0 -123.24881,49.26186,96.0 -123.24862,49.26164,95.7416000366211 -123.24863,49.26164,95.75019836425781 -123.24878,49.26162,95.78388977050781 -123.24887,49.26159,95.87103271484375 -123.24891,49.26155,95.9591293334961 -123.24912,49.26147,96.0 -123.2492,49.26145,96.0 -123.24925,49.26141,96.0 -123.24928,49.26136,95.97907257080078 -123.24938,49.26132,96.0 -123.2497,49.26122,96.0 -123.25037,49.26204,95.0 -123.25068,49.26239,95.83396911621094 -123.25081,49.26255,95.84765625 -123.25083,49.26258,95.71244049072266 -123.25082,49.26258,95.69332122802734 -123.25075,49.26261,95.32698822021484 -123.25071,49.26262,95.18643188476562 -123.25062,49.26266,95.02043914794922 -123.2505,49.2627,95.02730560302734 -123.2504,49.26275,95.19721984863281 -123.25036,49.26277,95.16796112060547 -123.25034,49.26279,95.14867401123047 -123.25032,49.26282,95.11115264892578 -123.2503,49.26286,95.0350341796875 -123.25029,49.26285,95.0 -123.25028,49.26284,95.0 -123.25027,49.26284,95.0 -123.25026,49.26283,95.0 -123.25022,49.26282,95.0 -123.25018,49.26281,95.0 -123.25014,49.2628,95.0 -123.2501,49.26278,95.06513977050781 -123.25003,49.26272,95.45921325683594 -123.24999,49.26268,95.7899398803711 -123.24995,49.26265,95.99824523925781 -123.24991,49.26263,95.85416412353516 -123.24988,49.26261,95.7936782836914 -123.24984,49.2626,95.71393585205078 -123.24933,49.26279,95.2355728149414 -123.24932,49.2628,95.19036102294922 -123.24931,49.26281,95.15194702148438 -123.2493,49.26284,94.97920989990234 -123.24929,49.26284,95.02831268310547 -123.24921,49.26288,95.2894287109375 -123.24915,49.2629,95.53521728515625 -123.24914,49.2629,95.58226776123047 -123.24912,49.2629,95.67636108398438 -123.24908,49.26289,95.87532043457031 -123.24906,49.26289,95.89094543457031 -123.24905,49.26289,95.89876556396484 -123.24904,49.2629,95.86600494384766 -123.24863,49.26304,96.0 -123.24862,49.26305,96.0 -123.24849,49.26315,96.0 -123.24848,49.26315,96.0 -123.24837,49.26319,96.0 -123.24788,49.2626,96.03387451171875 -123.2477,49.26233,97.0 -123.24806,49.2622,97.0 </coordinates>
+				</LineString>
+			</Placemark>
+			<Placemark>
+				<name>2345 East Mall, Vancouver, BC</name>
+				<styleUrl>#icon-503-DB4436-nodesc</styleUrl>
+				<Point>
+					<coordinates>-123.2480559,49.2622008,97.0 </coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>2331 Main Mall, Vancouver, BC V6T 1Z4, Canada</name>
+				<styleUrl>#icon-503-DB4436-nodesc</styleUrl>
+				<Point>
+					<coordinates>-123.2508056,49.2625502,95.82999420166016 </coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>2251 E Mall, Vancouver, BC V6T, Canada</name>
+				<styleUrl>#icon-503-DB4436-nodesc</styleUrl>
+				<Point>
+					<coordinates>-123.2483719,49.2631899,96.0 </coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>2345 East Mall, Vancouver, BC</name>
+				<styleUrl>#icon-503-DB4436-nodesc</styleUrl>
+				<Point>
+					<coordinates>-123.2480559,49.2622008,97.0 </coordinates>
+				</Point>
+			</Placemark>
+		</Folder>
+		<Style id="icon-503-DB4436-nodesc-normal">
+			<IconStyle>
+				<color>ff3644DB</color>
+				<scale>1.1</scale>
+				<Icon>
+					<href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+				</Icon>
+				<hotSpot x="16" y="31" xunits="pixels" yunits="insetPixels">
+				</hotSpot>
+			</IconStyle>
+			<LabelStyle>
+				<scale>0.0</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<Style id="icon-503-DB4436-nodesc-highlight">
+			<IconStyle>
+				<color>ff3644DB</color>
+				<scale>1.1</scale>
+				<Icon>
+					<href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+				</Icon>
+				<hotSpot x="16" y="31" xunits="pixels" yunits="insetPixels">
+				</hotSpot>
+			</IconStyle>
+			<LabelStyle>
+				<scale>1.1</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<StyleMap id="icon-503-DB4436-nodesc">
+			<Pair>
+				<key>normal</key>
+				<styleUrl>#icon-503-DB4436-nodesc-normal</styleUrl>
+			</Pair>
+			<Pair>
+				<key>highlight</key>
+				<styleUrl>#icon-503-DB4436-nodesc-highlight</styleUrl>
+			</Pair>
+		</StyleMap>
+		<Style id="line-1267FF-5-nodesc-normal">
+			<LineStyle>
+				<color>ffFF6712</color>
+				<width>5</width>
+			</LineStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<Style id="line-1267FF-5-nodesc-highlight">
+			<LineStyle>
+				<color>ffFF6712</color>
+				<width>8.0</width>
+			</LineStyle>
+			<BalloonStyle>
+				<text><![CDATA[<h3>$[name]</h3>]]></text>
+			</BalloonStyle>
+		</Style>
+		<StyleMap id="line-1267FF-5-nodesc">
+			<Pair>
+				<key>normal</key>
+				<styleUrl>#line-1267FF-5-nodesc-normal</styleUrl>
+			</Pair>
+			<Pair>
+				<key>highlight</key>
+				<styleUrl>#line-1267FF-5-nodesc-highlight</styleUrl>
+			</Pair>
+		</StyleMap>
+	</Document>
+</kml>

@@ -16,7 +16,7 @@ public class GeoCoord extends DataUnit {
 		StringBuilder toPrint= new StringBuilder("");
 		toPrint.append(this.getLat()+ ",") ;
 		toPrint.append(this.getLon()+ ",") ;
-		toPrint.append(this.getElevation()+ ",") ;
+		toPrint.append(this.getElevation()) ;
 
 		return toPrint.toString();
 	}

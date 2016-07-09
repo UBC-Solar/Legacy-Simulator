@@ -67,7 +67,9 @@ public class GPSFromPhoneReceiver implements Runnable, SentenceListener{
 	public void stop(){
 		NMEASentenceReader.stop();
 		NMEASentenceReader.removeSentenceListener(this);
-		serialPort.disconnect();
+		if(serialPort.isConnected()){
+			serialPort.disconnect();
+		}
 	}
 
 

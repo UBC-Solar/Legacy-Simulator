@@ -34,7 +34,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 		System.out.println(serialPortName);
 		serialPort = new SerialPort(serialPortName);
 		serialPort.openPort();
-		serialPort.setParams(57600, 8, 1, 0);
+		serialPort.setParams(115200, 8, 1, 0);
 		serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
 	}
 	
@@ -79,7 +79,7 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 		};
 
 		CRC32 crc32 = new CRC32();
-		crc32.update(exampleData, 0, 57);
+		crc32.update(inData, 0, 57);
 		
 		long crc32FromData = 0;
 		for(int i=0; i<8; i++){
@@ -98,20 +98,20 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 		}
 		
 		int i = 0;
-		double speed = (double) inData[i++];
-		int totalVoltage = (int) inData[i++];
-		int stateOfCharge  = (int) inData[i++];
+		double speed = (double) (0xff & (int) inData[i++]);
+		int totalVoltage = 0xff & (int) inData[i++];
+		int stateOfCharge  = 0xff & (int) inData[i++];
 		HashMap<String,Integer> mapForTemperatures = new HashMap<String,Integer>();
-		mapForTemperatures.put("bms", (int) inData[i++]);
-		mapForTemperatures.put("motor", (int) inData[i++]);
+		mapForTemperatures.put("bms", 0xff & (int) inData[i++]);
+		mapForTemperatures.put("motor", 0xff & (int) inData[i++]);
 		for(int j = 0; j < 4; j++){
-			mapForTemperatures.put("pack" + j, (int) inData[i++]);
+			mapForTemperatures.put("pack" + j, 0xff & (int) inData[i++]);
 		}
 		HashMap<Integer,ArrayList<Float>> mapForCellVoltages = new HashMap<Integer,ArrayList<Float>>();
 		for(int j = 0; j < 4; j++){
 			mapForCellVoltages.put(j, new ArrayList<Float>());
 			for(int k = 0; k < 12; k++){
-				mapForCellVoltages.get(j).add(((float) inData[i++]) / 50);
+				mapForCellVoltages.get(j).add(((float) (0xff & (int) inData[i++])) / 50);
 			}
 		}
 		
@@ -161,7 +161,9 @@ public class XbeeSerialDataReceiver extends AbstractDataReceiver implements Runn
 				if(serialReadBuf[serialReadBufPos] == BINMSG_SEPARATOR){
 					if(serialReadBufPos == BINMSG_LENGTH){
 						loadBinaryData(serialReadBuf);
-						System.out.println(this.lastLoadedDataPacket.toString());
+						if(this.lastLoadedDataPacket != null){
+							System.out.println(this.lastLoadedDataPacket.toString());
+						}
 					}
 					serialReadBufPos = 0;
 				}else{
