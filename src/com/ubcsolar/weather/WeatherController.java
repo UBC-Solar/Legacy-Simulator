@@ -262,6 +262,7 @@ public class WeatherController extends ModuleController {
 		}
 		FIODataPointFactory factory = new FIODataPointFactory();
 		List<JsonObject> datapoints = new ArrayList<JsonObject>();
+		boolean errorOccurred = false;
 		for(int i = 0; i < numHours; i++){
 			JsonObject closeHourCurr = (JsonObject) closeHourly.get(i);
 			JsonObject farHourCurr = (JsonObject) farHourly.get(i);
@@ -291,7 +292,7 @@ public class WeatherController extends ModuleController {
 						parseJsonDouble(closeHourCurr.get("temperature"))*closeWeight;
 				}
 			catch(java.lang.NullPointerException e){
-				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have temperature data");
+				errorOccurred = true;
 				temp = 0;
 			}
 			double cldCover;
@@ -300,7 +301,7 @@ public class WeatherController extends ModuleController {
 						parseJsonDouble(closeHourCurr.get("cloudCover"))*closeWeight;
 			}
 			catch(java.lang.NullPointerException e){
-				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have cloud cover data");
+				errorOccurred = true;
 				cldCover = 0;
 			}
 			double dewPoint;
@@ -309,7 +310,7 @@ public class WeatherController extends ModuleController {
 						parseJsonDouble(closeHourCurr.get("dewPoint"))*closeWeight;
 				}
 			catch(java.lang.NullPointerException e){
-				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have dew point data");
+				errorOccurred = true;
 				dewPoint = 0;
 			}
 			double humidity;
@@ -318,7 +319,7 @@ public class WeatherController extends ModuleController {
 						parseJsonDouble(closeHourCurr.get("humidity"))*closeWeight;
 				}
 			catch(java.lang.NullPointerException e){
-				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have humidity data");
+				errorOccurred = true;
 				humidity = 0;
 			}
 			double strmBearing;
@@ -327,7 +328,7 @@ public class WeatherController extends ModuleController {
 						parseJsonDouble(closeHourCurr.get("nearestStormBearing"))*closeWeight;
 				}
 			catch(java.lang.NullPointerException e){
-				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have storm bearing data");
+				errorOccurred = true;
 				strmBearing = 0;
 			}
 			double strmDistance;
@@ -336,7 +337,7 @@ public class WeatherController extends ModuleController {
 						parseJsonDouble(closeHourCurr.get("nearestStormDistance"))*closeWeight;
 				}
 			catch(java.lang.NullPointerException e){
-				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have storm distance data");
+				errorOccurred = true;
 				strmDistance = 0;
 			}
 			double windBearing;
@@ -345,7 +346,7 @@ public class WeatherController extends ModuleController {
 						parseJsonDouble(closeHourCurr.get("windBearing"))*closeWeight;
 				}
 			catch(java.lang.NullPointerException e){
-				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have wind bearing data");
+				errorOccurred = true;
 				windBearing = 0;
 			}
 			double windSpeed;
@@ -354,7 +355,7 @@ public class WeatherController extends ModuleController {
 						parseJsonDouble(closeHourCurr.get("windSpeed"))*closeWeight;
 			}
 			catch(java.lang.NullPointerException e){
-				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have wind speed data");
+				errorOccurred = true;
 				windSpeed = 0;
 			}
 			double precipProb;
@@ -363,14 +364,14 @@ public class WeatherController extends ModuleController {
 						parseJsonDouble(closeHourCurr.get("precipProbability"))*closeWeight;
 				}
 			catch(java.lang.NullPointerException e){
-				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have precipitation probability data");
+				errorOccurred = true;
 				precipProb = 0;
 			}
 			String precipType;
 			try{
 				precipType = closeHourCurr.get("precipType").toString();
 			}catch(java.lang.NullPointerException e){
-				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have precipitation type data");
+				errorOccurred = true;
 				precipType = "";
 			}
 			
@@ -379,6 +380,9 @@ public class WeatherController extends ModuleController {
 				windSpeed(windSpeed).stormBearing(strmBearing).stormDistance(strmDistance);
 		
 			datapoints.add(factory.build());
+		}
+		if(errorOccurred){
+			System.out.println("One of the forecasts was missing a field (probably storm related)");
 		}
 		ForecastIOFactory2.addDatapoints(datapoints);
 		ForecastIOFactory2.changeLocation(currentLoc);
