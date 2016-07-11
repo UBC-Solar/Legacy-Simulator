@@ -5,8 +5,10 @@ package com.ubcsolar.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Point;
+import java.awt.Toolkit;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -175,8 +177,17 @@ public class GUImain implements Listener{
 		mySession = parent; //adds parent 
 		mainFrame = new JFrame(); //
 		setTitleAndLogo();
+		
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		double screenWidth = screenSize.getWidth();
+		double screenHeight = screenSize.getHeight();
+		double programWindowWidth = screenWidth/1.4;
+		double programWindowHeight = screenHeight/1.05; //leave a little gap at top
+		double programWindowStartx = (screenWidth - programWindowWidth)/2; //center it
+		double programWindowStarty = 0+(screenHeight/40); //give a little buffer.
+		
 		//public void setBounds(int x, int y, int width, int height)
-		mainFrame.setBounds(110, 20, 1200, 700); //main window size on opening
+		mainFrame.setBounds((int) programWindowStartx, (int) programWindowStarty, (int) programWindowWidth, (int) programWindowHeight); //main window size on opening
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.setVisible(true);
 		//NOTE: Could consider not building all the windows at once in case of performance issues.
