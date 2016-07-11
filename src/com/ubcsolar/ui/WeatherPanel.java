@@ -169,7 +169,7 @@ public class WeatherPanel extends JPanel implements Listener {
 			Rainfall.setText("No Internet");
 			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "IO Error updating FC labels for current pos");
 		} catch (NoForecastReportException e) {
-			WindSpeed.setText("No Forecast Yet");
+			WindSpeed.setText("No Forecast");
 			CloudPercent.setText("No Forecast");
 			Rainfall.setText("No Forecast");
 			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "No Forecast when updating FC labels for current pos");
@@ -197,7 +197,6 @@ public class WeatherPanel extends JPanel implements Listener {
 		
 		if(n.getClass() == NewForecastReport.class){
 			if (mySession.getMapController().getLastReportedLocation() != null){
-				//System.out.println("here");
 				updateKeyLabels(mySession.getMapController().getLastReportedLocation());
 				
 			}

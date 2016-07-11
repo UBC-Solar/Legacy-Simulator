@@ -31,9 +31,9 @@ public class ForecastIOFactory2 {
 		}
 		
 		//TODO: remove debug code below
-		for(int i = 0; i < datapoints.size(); i++){
+		/*for(int i = 0; i < datapoints.size(); i++){
 			System.out.println(datapoints.get(i).get("time"));
-		}
+		}*/
 	}
 	
 	public static void changeLocation(GeoCoord loc){
@@ -112,7 +112,7 @@ public class ForecastIOFactory2 {
 		flags.add("sources", sourcesArray);
 		flags.add("isd-stations", isdArray);
 		flags.add("madis-stations", madisArray);
-		flags.add("units", "si");
+		flags.add("units", "ca");
 		
 		return flags;
 	}

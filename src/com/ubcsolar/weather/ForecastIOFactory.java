@@ -59,16 +59,16 @@ public class ForecastIOFactory {
 	public ForecastIOFactory cloudCover(double cloudCover){
 		this.cloudCover = cloudCover;
 		
-		if (cloudCover <15){
+		if (cloudCover < 0.15){
 			this.icon = "Sunny";
 		}
-		else if (cloudCover >=15 && cloudCover <50){
+		else if (cloudCover >=0.15 && cloudCover < 0.50){
 			this.icon = "Partly Cloudy";
 		}
-		else if (cloudCover >= 50 &&  cloudCover < 90 ){
+		else if (cloudCover >= 0.50 &&  cloudCover < 0.90 ){
 			this.icon = "Mostly cloudy";
 		}
-		else if( cloudCover >= 90){
+		else if( cloudCover >= 0.90){
 			this.icon = "Cloudy";
 		}
 		return this;

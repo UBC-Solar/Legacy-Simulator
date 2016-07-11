@@ -60,6 +60,9 @@ public class WeatherController extends ModuleController {
 		ForecastFactory forecastGetter = new ForecastFactory();
 		try{
 			retrievedForecasts = forecastGetter.getForecasts(toGet);
+			if(comboForecasts.size() == 0){
+				comboForecasts = new ArrayList<ForecastIO>(retrievedForecasts);
+			}
 			ForecastReport theReport = new ForecastReport(retrievedForecasts, this.mySession.getMapController().getLoadedMapName());
 			lastDownloadedReport = theReport;
 			this.mySession.sendNotification(new NewForecastReport(theReport));
@@ -262,7 +265,7 @@ public class WeatherController extends ModuleController {
 		for(int i = 0; i < numHours; i++){
 			JsonObject closeHourCurr = (JsonObject) closeHourly.get(i);
 			JsonObject farHourCurr = (JsonObject) farHourly.get(i);
-			
+			/*try{
 			double cldCover = parseJsonDouble(farHourCurr.get("cloudCover"))*farWeight +
 					parseJsonDouble(closeHourCurr.get("cloudCover"))*closeWeight;
 			double dewPoint = parseJsonDouble(farHourCurr.get("dewPoint"))*farWeight +
@@ -278,11 +281,102 @@ public class WeatherController extends ModuleController {
 			double windSpeed = parseJsonDouble(farHourCurr.get("windSpeed"))*farWeight +
 					parseJsonDouble(closeHourCurr.get("windSpeed"))*closeWeight;
 			String precipType = closeHourCurr.get("precipType").toString();
+			}catch(NullPointerException e){
+				System.out.println
+			}*/
+			
+			double temp;
+			try{
+				temp = parseJsonDouble(farHourCurr.get("temperature"))*farWeight +
+						parseJsonDouble(closeHourCurr.get("temperature"))*closeWeight;
+				}
+			catch(java.lang.NullPointerException e){
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have temperature data");
+				temp = 0;
+			}
+			double cldCover;
+			try{
+				cldCover = parseJsonDouble(farHourCurr.get("cloudCover"))*farWeight +
+						parseJsonDouble(closeHourCurr.get("cloudCover"))*closeWeight;
+			}
+			catch(java.lang.NullPointerException e){
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have cloud cover data");
+				cldCover = 0;
+			}
+			double dewPoint;
+			try{
+				dewPoint = parseJsonDouble(farHourCurr.get("dewPoint"))*farWeight +
+						parseJsonDouble(closeHourCurr.get("dewPoint"))*closeWeight;
+				}
+			catch(java.lang.NullPointerException e){
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have dew point data");
+				dewPoint = 0;
+			}
+			double humidity;
+			try{
+				humidity = parseJsonDouble(farHourCurr.get("humidity"))*farWeight +
+						parseJsonDouble(closeHourCurr.get("humidity"))*closeWeight;
+				}
+			catch(java.lang.NullPointerException e){
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have humidity data");
+				humidity = 0;
+			}
+			double strmBearing;
+			try{
+				strmBearing = parseJsonDouble(farHourCurr.get("nearestStormBearing"))*farWeight +
+						parseJsonDouble(closeHourCurr.get("nearestStormBearing"))*closeWeight;
+				}
+			catch(java.lang.NullPointerException e){
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have storm bearing data");
+				strmBearing = 0;
+			}
+			double strmDistance;
+			try{
+				strmDistance = parseJsonDouble(farHourCurr.get("nearestStormDistance"))*farWeight +
+						parseJsonDouble(closeHourCurr.get("nearestStormDistance"))*closeWeight;
+				}
+			catch(java.lang.NullPointerException e){
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have storm distance data");
+				strmDistance = 0;
+			}
+			double windBearing;
+			try{
+				windBearing = parseJsonDouble(farHourCurr.get("windBearing"))*farWeight +
+						parseJsonDouble(closeHourCurr.get("windBearing"))*closeWeight;
+				}
+			catch(java.lang.NullPointerException e){
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have wind bearing data");
+				windBearing = 0;
+			}
+			double windSpeed;
+			try{
+				windSpeed = parseJsonDouble(farHourCurr.get("windSpeed"))*farWeight +
+						parseJsonDouble(closeHourCurr.get("windSpeed"))*closeWeight;
+			}
+			catch(java.lang.NullPointerException e){
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have wind speed data");
+				windSpeed = 0;
+			}
+			double precipProb;
+			try{
+				precipProb = parseJsonDouble(farHourCurr.get("precipProbability"))*farWeight +
+						parseJsonDouble(closeHourCurr.get("precipProbability"))*closeWeight;
+				}
+			catch(java.lang.NullPointerException e){
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have precipitation probability data");
+				precipProb = 0;
+			}
+			String precipType;
+			try{
+				precipType = closeHourCurr.get("precipType").toString();
+			}catch(java.lang.NullPointerException e){
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Forecast did not have precipitation type data");
+				precipType = "";
+			}
 			
 			factory.cloudCover(cldCover).dewPoint(dewPoint).humidity(humidity).
 				precipProb(precipProb).precipType(precipType).temperature(temp).windBearing(windBearing).
-				windSpeed(windSpeed)/*.stormBearing(strmBearing).stormDistance(strmDistance)*/;
-			//not quite sure how to get storms working, cause a lot of forecasts don't have them
+				windSpeed(windSpeed).stormBearing(strmBearing).stormDistance(strmDistance);
 		
 			datapoints.add(factory.build());
 		}
@@ -475,10 +569,10 @@ public class WeatherController extends ModuleController {
 	
 	/**
 	 * Returns the ForecastIO for the requested location. If doInterprolation is true,
-	 * interprolates based on the two closes forecasts. If false, will attempt
-	 * to download a brand new forecastIO (and if that fails, will just give an interprolated one)
+	 * interpolates based on the two closes forecasts. If false, will attempt
+	 * to download a brand new forecastIO (and if that fails, will just give an interpolated one)
 	 * @param target
-	 * @param doInterprolation
+	 * @param doInterpolation
 	 * @return the forecastIO for the requested location. 
 	 * 
 	 * @throws IOException if no internet available
@@ -489,7 +583,7 @@ public class WeatherController extends ModuleController {
 			return new ForecastIO("" + target.getLat(), "" + target.getLon(), GlobalValues.WEATHER_KEY);
 		}
 		
-		if(this.lastCustomReport == null || this.lastCustomReport.getForecasts().size() == 0){
+		if(comboForecasts.size() == 0){
 			throw new NoForecastReportException();
 		}
 		
