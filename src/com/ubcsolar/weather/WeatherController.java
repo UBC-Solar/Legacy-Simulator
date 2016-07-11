@@ -266,25 +266,14 @@ public class WeatherController extends ModuleController {
 		for(int i = 0; i < numHours; i++){
 			JsonObject closeHourCurr = (JsonObject) closeHourly.get(i);
 			JsonObject farHourCurr = (JsonObject) farHourly.get(i);
-			/*try{
-			double cldCover = parseJsonDouble(farHourCurr.get("cloudCover"))*farWeight +
-					parseJsonDouble(closeHourCurr.get("cloudCover"))*closeWeight;
-			double dewPoint = parseJsonDouble(farHourCurr.get("dewPoint"))*farWeight +
-					parseJsonDouble(closeHourCurr.get("dewPoint"))*closeWeight;
-			double humidity = parseJsonDouble(farHourCurr.get("humidity"))*farWeight +
-					parseJsonDouble(closeHourCurr.get("humidity"))*closeWeight;
-			double precipProb = parseJsonDouble(farHourCurr.get("precipProbability"))*farWeight +
-					parseJsonDouble(closeHourCurr.get("precipProbability"))*closeWeight;
-			double temp = parseJsonDouble(farHourCurr.get("temperature"))*farWeight +
-					parseJsonDouble(closeHourCurr.get("temperature"))*closeWeight;
-			double windBearing = parseJsonDouble(farHourCurr.get("windBearing"))*farWeight +
-					parseJsonDouble(closeHourCurr.get("windBearing"))*closeWeight;
-			double windSpeed = parseJsonDouble(farHourCurr.get("windSpeed"))*farWeight +
-					parseJsonDouble(closeHourCurr.get("windSpeed"))*closeWeight;
-			String precipType = closeHourCurr.get("precipType").toString();
-			}catch(NullPointerException e){
-				System.out.println
-			}*/
+			
+			int time;
+			try{
+				time = Integer.parseInt(farHourCurr.get("time").toString());
+			}catch(java.lang.NullPointerException e){
+				System.out.println("this forecast was missing a timestamp, all your times are probably wrong now");
+				time = 0;
+			}
 			
 			double temp;
 			try{
@@ -375,7 +364,7 @@ public class WeatherController extends ModuleController {
 				precipType = "";
 			}
 			
-			factory.cloudCover(cldCover).dewPoint(dewPoint).humidity(humidity).
+			factory.time(time).cloudCover(cldCover).dewPoint(dewPoint).humidity(humidity).
 				precipProb(precipProb).precipType(precipType).temperature(temp).windBearing(windBearing).
 				windSpeed(windSpeed).stormBearing(strmBearing).stormDistance(strmDistance);
 		

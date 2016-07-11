@@ -29,11 +29,6 @@ public class ForecastIOFactory2 {
 					j = j-1;
 			}
 		}
-		
-		//TODO: remove debug code below
-		/*for(int i = 0; i < datapoints.size(); i++){
-			System.out.println(datapoints.get(i).get("time"));
-		}*/
 	}
 	
 	public static void changeLocation(GeoCoord loc){
