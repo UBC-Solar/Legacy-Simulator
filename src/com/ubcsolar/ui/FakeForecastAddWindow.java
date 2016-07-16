@@ -37,8 +37,6 @@ import com.eclipsesource.json.JsonObject;
 
 public class FakeForecastAddWindow extends JFrame{
 	
-	//TODO: figure out what to do if window is opened before route is loaded
-	
 	private GlobalController mySession;
 	private WeatherController myWeather;
 	private MapController myMap;
