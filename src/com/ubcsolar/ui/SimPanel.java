@@ -31,6 +31,9 @@ public class SimPanel extends JPanel implements Listener {
 	private GlobalController mySession;
 	
 	public SimPanel (GUImain parent, GlobalController session){
+		if (session == null || parent == null){
+			return;
+		}
 		mySession = session;
 		this.parent = parent;
 		setLayout(new BorderLayout(0, 0));
