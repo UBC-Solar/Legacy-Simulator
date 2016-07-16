@@ -161,7 +161,7 @@ public class WeatherPanel extends JPanel implements Listener {
 			
 			WindSpeed.setText(wind + " km/h");
 			CloudPercent.setText(cloud_percent_word + "%");
-			Rainfall.setText(weather_string);
+			Rainfall.setText(weather_string + " mm/h");
 			
 		} catch (IOException e) {
 			WindSpeed.setText("No Internet");

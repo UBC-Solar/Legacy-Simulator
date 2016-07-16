@@ -15,7 +15,9 @@ import com.ubcsolar.common.Route;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.map.MapController;
+import com.ubcsolar.weather.FIODataPointFactory;
 import com.ubcsolar.weather.ForecastIOFactory;
+import com.ubcsolar.weather.ForecastIOFactory2;
 import com.ubcsolar.weather.WeatherController;
 
 import java.awt.GridBagConstraints;
@@ -53,6 +55,7 @@ public class FakeForecastAddWindow extends JFrame{
 	private JTextField txtPrecipProb;
 	private JTextField txtPrecipType;
 	private JSpinner distanceSpinner;
+	private JTextField txtPrecipIntensity;
 	
 	public FakeForecastAddWindow(GlobalController mySession) {
 		
@@ -65,9 +68,9 @@ public class FakeForecastAddWindow extends JFrame{
 		
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] {30, 0, 0, 0};
-		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0, Double.MIN_VALUE};
-		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		getContentPane().setLayout(gridBagLayout);
 		
 		JLabel lblDistanceAlongRoute = new JLabel("Distance along route (km):");
@@ -275,10 +278,28 @@ public class FakeForecastAddWindow extends JFrame{
 				handleOkClick();
 			}
 		});
+		
+		JLabel lblPrecipitationIntensity = new JLabel("Precipitation Intensity (mm/h):");
+		GridBagConstraints gbc_lblPrecipitationIntensity = new GridBagConstraints();
+		gbc_lblPrecipitationIntensity.anchor = GridBagConstraints.EAST;
+		gbc_lblPrecipitationIntensity.insets = new Insets(0, 0, 5, 5);
+		gbc_lblPrecipitationIntensity.gridx = 0;
+		gbc_lblPrecipitationIntensity.gridy = 12;
+		getContentPane().add(lblPrecipitationIntensity, gbc_lblPrecipitationIntensity);
+		
+		txtPrecipIntensity = new JTextField();
+		txtPrecipIntensity.setText("0.4");
+		GridBagConstraints gbc_txtPrecipIntensity = new GridBagConstraints();
+		gbc_txtPrecipIntensity.insets = new Insets(0, 0, 5, 5);
+		gbc_txtPrecipIntensity.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtPrecipIntensity.gridx = 1;
+		gbc_txtPrecipIntensity.gridy = 12;
+		getContentPane().add(txtPrecipIntensity, gbc_txtPrecipIntensity);
+		txtPrecipIntensity.setColumns(10);
 		GridBagConstraints gbc_btnOk = new GridBagConstraints();
 		gbc_btnOk.insets = new Insets(0, 0, 5, 5);
 		gbc_btnOk.gridx = 1;
-		gbc_btnOk.gridy = 12;
+		gbc_btnOk.gridy = 13;
 		getContentPane().add(btnOk, gbc_btnOk);
 		
 		JButton btnCancel = new JButton("Cancel");
@@ -291,7 +312,7 @@ public class FakeForecastAddWindow extends JFrame{
 		GridBagConstraints gbc_btnCancel = new GridBagConstraints();
 		gbc_btnCancel.insets = new Insets(0, 0, 5, 0);
 		gbc_btnCancel.gridx = 2;
-		gbc_btnCancel.gridy = 12;
+		gbc_btnCancel.gridy = 13;
 		getContentPane().add(btnCancel, gbc_btnCancel);
 	}
 	
@@ -411,17 +432,34 @@ public class FakeForecastAddWindow extends JFrame{
 			this.handleError("Precipitation probability formatted incorrectly");
 			return null;
 		}
+		double precipIntensity;
+		try{
+			precipIntensity = Double.parseDouble(this.txtPrecipIntensity.getText());
+		}catch(java.lang.NumberFormatException e){
+			this.handleError("Precipitation intensity formatted incorrectly");
+			return null;
+		}
 		String precipType = this.txtPrecipType.getText();
 		double distance = (double)distanceSpinner.getValue();
 		GeoCoord location = findNearestPoint(distance);
 		
-		ForecastIOFactory factory = new ForecastIOFactory();
+		FIODataPointFactory factory = new FIODataPointFactory();
+		List<JsonObject> datapoints = new ArrayList<JsonObject>();
 		
-		factory.location(location).cloudCover(cldCover).dewPoint(dewPoint).humidity(humidity).
+		factory.cloudCover(cldCover).dewPoint(dewPoint).humidity(humidity).precipIntensity(precipIntensity).
 			precipProb(precipProb).precipType(precipType).temperature(temp).windBearing(windBearing).
 			windSpeed(windSpeed).stormBearing(strmBearing).stormDistance(strmDistance);
 		
-		ForecastIO forecast = factory.build();
+		for(int i = 0; i < 48; i++){
+			factory.time((int)System.currentTimeMillis()/1000 + 3600*i);
+			datapoints.add(factory.build());
+		}
+		
+		ForecastIOFactory2.addDatapoints(datapoints);
+		ForecastIOFactory2.changeLocation(location);
+		
+		ForecastIO forecast = ForecastIOFactory2.build();
+		
 		return forecast;
 	}
 	

@@ -17,6 +17,7 @@ public class FIODataPointFactory {
 		private double cloudCover = 0;
 		private double stormBearing = 0;
 		private double stormDistance = 0;
+		private double precipIntensity = 0;
 		private int time = 0;
 
 		
@@ -24,7 +25,6 @@ public class FIODataPointFactory {
 		
 		private String summary = "TEST";
 		private String icon;
-		private double precipIntensity = 0;
 		private double visibility = 0;
 		private double pressure = 0;
 		private double ozone = 0;
@@ -99,6 +99,11 @@ public class FIODataPointFactory {
 		
 		public FIODataPointFactory precipType(String precipType){
 			this.precipType = precipType;
+			return this;
+		}
+		
+		public FIODataPointFactory precipIntensity(double precipIntensity){
+			this.precipIntensity = precipIntensity;
 			return this;
 		}
 		

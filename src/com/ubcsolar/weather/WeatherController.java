@@ -216,26 +216,32 @@ public class WeatherController extends ModuleController {
 	/*
 	 * Supposed to interpolate between the start forecast and next forecast. Currently just returns the closest. 
 	 */
-	private ForecastIO interpolateForecast(ForecastIO startForecast, ForecastIO endForecast, GeoCoord currentLoc) {
+	private ForecastIO interpolateForecast(ForecastIO startForecast, 
+			ForecastIO endForecast, GeoCoord currentLoc) {
 		if(endForecast == null){
 			endForecast = startForecast;
 		}
 		
-		double startDistance = GeoCoord.haversine(startForecast.getLatitude(), startForecast.getLongitude(), currentLoc.getLat(), currentLoc.getLon());
-		double endDistance = GeoCoord.haversine(endForecast.getLatitude(), endForecast.getLongitude(), currentLoc.getLat(), currentLoc.getLon());
+		double startDistance = GeoCoord.haversine(startForecast.getLatitude(), 
+				startForecast.getLongitude(), currentLoc.getLat(), currentLoc.getLon());
+		double endDistance = GeoCoord.haversine(endForecast.getLatitude(), 
+				endForecast.getLongitude(), currentLoc.getLat(), currentLoc.getLon());
 		if(startDistance<endDistance){
 			double startWeight = 1 / (endDistance + startDistance) * endDistance;
-			ForecastIO interpolated = createInterpolatedForecast(startForecast, endForecast, startWeight, currentLoc);
+			ForecastIO interpolated = createInterpolatedForecast(startForecast, endForecast, 
+					startWeight, currentLoc);
 			return interpolated;
 		}
 		else{
 			double endWeight = 1 / (endDistance + startDistance) * startDistance;
-			ForecastIO interpolated = createInterpolatedForecast(endForecast, startForecast, endWeight, currentLoc);
+			ForecastIO interpolated = createInterpolatedForecast(endForecast, startForecast, 
+					endWeight, currentLoc);
 			return interpolated;
 		}
 	}
 	
-	private ForecastIO createInterpolatedForecast(ForecastIO closer, ForecastIO farther, double closeWeight, GeoCoord currentLoc){
+	private ForecastIO createInterpolatedForecast(ForecastIO closer, ForecastIO farther, 
+			double closeWeight, GeoCoord currentLoc){
 		double farWeight = 1 - closeWeight;
 		JsonValue closeHourlyValue = closer.getHourly().get("data");
 		JsonArray closeHourly = new JsonArray();
@@ -356,6 +362,14 @@ public class WeatherController extends ModuleController {
 				errorOccurred = true;
 				precipProb = 0;
 			}
+			double precipIntensity;
+			try{
+				precipIntensity = parseJsonDouble(farHourCurr.get("precipIntensity"))*farWeight +
+						parseJsonDouble(closeHourCurr.get("precipIntensity"))*closeWeight;
+			}catch(java.lang.NullPointerException e){
+				errorOccurred = true;
+				precipIntensity = 0;
+			}
 			String precipType;
 			try{
 				precipType = closeHourCurr.get("precipType").toString();
@@ -366,7 +380,7 @@ public class WeatherController extends ModuleController {
 			
 			factory.time(time).cloudCover(cldCover).dewPoint(dewPoint).humidity(humidity).
 				precipProb(precipProb).precipType(precipType).temperature(temp).windBearing(windBearing).
-				windSpeed(windSpeed).stormBearing(strmBearing).stormDistance(strmDistance);
+				windSpeed(windSpeed).stormBearing(strmBearing).stormDistance(strmDistance).precipIntensity(precipIntensity);
 		
 			datapoints.add(factory.build());
 		}
