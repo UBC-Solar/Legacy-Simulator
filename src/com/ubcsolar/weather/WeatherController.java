@@ -391,9 +391,9 @@ public class WeatherController extends ModuleController {
 		if(errorOccurred){
 			System.out.println("One of the forecasts was missing a field (probably storm related)");
 		}
-		ForecastIOFactory2.addDatapoints(datapoints);
-		ForecastIOFactory2.changeLocation(currentLoc);
-		return ForecastIOFactory2.build();
+		ForecastIOFactory.addDatapoints(datapoints);
+		ForecastIOFactory.changeLocation(currentLoc);
+		return ForecastIOFactory.build();
 	}
 	
 	/**
@@ -560,7 +560,6 @@ public class WeatherController extends ModuleController {
 	
 	private ForecastIO copyAtLocation(ForecastIO initial, GeoCoord location){
 		
-		//GeoCoord location = myMapController.getAllPoints().getTrailMarkers().get(0);
 		double latitude = location.getLat();
 		double longitude = location.getLon();
 		JsonObject forecastInfo = new JsonObject();
@@ -568,7 +567,6 @@ public class WeatherController extends ModuleController {
 		forecastInfo.add("longitude", longitude);
 		forecastInfo.add("currently", initial.getCurrently());
 		forecastInfo.add("hourly", initial.getHourly());
-		forecastInfo.add("daily", initial.getDaily());
 		forecastInfo.add("flags", initial.getFlags());
 		ForecastIO forecast = new ForecastIO(GlobalValues.WEATHER_KEY);
 		forecast.getForecast(forecastInfo);

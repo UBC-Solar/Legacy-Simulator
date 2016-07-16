@@ -17,7 +17,6 @@ import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.map.MapController;
 import com.ubcsolar.weather.FIODataPointFactory;
 import com.ubcsolar.weather.ForecastIOFactory;
-import com.ubcsolar.weather.ForecastIOFactory2;
 import com.ubcsolar.weather.WeatherController;
 
 import java.awt.GridBagConstraints;
@@ -455,10 +454,10 @@ public class FakeForecastAddWindow extends JFrame{
 			datapoints.add(factory.build());
 		}
 		
-		ForecastIOFactory2.addDatapoints(datapoints);
-		ForecastIOFactory2.changeLocation(location);
+		ForecastIOFactory.addDatapoints(datapoints);
+		ForecastIOFactory.changeLocation(location);
 		
-		ForecastIO forecast = ForecastIOFactory2.build();
+		ForecastIO forecast = ForecastIOFactory.build();
 		
 		return forecast;
 	}
