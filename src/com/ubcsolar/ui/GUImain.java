@@ -330,10 +330,6 @@ public class GUImain implements Listener{
 				RowSpec.decode("default:grow"),}));
 		
 		//THIS SECTION ADDS IN THE PANELS
-		loadStatusPanel = new LoadStatusPanel(this.mySession);
-		loadStatusPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-		//frame.getContentPane().add(LoadStatusPanel);
-		mainFrame.getContentPane().add(loadStatusPanel, "1, 1, 3, 1, fill, top");
 		
 		weatherPanel = new WeatherPanel(this.mySession, this);
 		weatherPanel.setBorder(BorderFactory.createLineBorder(Color.black));
