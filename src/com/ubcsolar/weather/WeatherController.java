@@ -245,18 +245,22 @@ public class WeatherController extends ModuleController {
 		double farWeight = 1 - closeWeight;
 		JsonValue closeHourlyValue = closer.getHourly().get("data");
 		JsonArray closeHourly = new JsonArray();
-		if(closeHourlyValue.isArray()){
+		try{
 			closeHourly = (JsonArray) closeHourlyValue;
-		}else{
-			//TODO: throw error?
+		}catch(java.lang.ClassCastException e){
+			System.out.println("Your jsons aren't formatted right");
+			e.printStackTrace();
 		}
+		
 		JsonValue farHourlyValue = farther.getHourly().get("data");
 		JsonArray farHourly = new JsonArray();
-		if(farHourlyValue.isArray()){
+		try{
 			farHourly = (JsonArray) farHourlyValue;
-		}else{
-			//TODO: throw error?
+		}catch(java.lang.ClassCastException e){
+			System.out.println("Your jsons aren't formatted right");
+			e.printStackTrace();
 		}
+		
 		int numHours;
 		if(closeHourly.size() < farHourly.size()){
 			numHours = closeHourly.size();
@@ -264,7 +268,7 @@ public class WeatherController extends ModuleController {
 			numHours = farHourly.size();
 		}
 		if(numHours == 0){
-			//TODO: definitely throw error
+			System.out.println("There's no data here!! (in interpolate method)");
 		}
 		FIODataPointFactory factory = new FIODataPointFactory();
 		List<JsonObject> datapoints = new ArrayList<JsonObject>();
