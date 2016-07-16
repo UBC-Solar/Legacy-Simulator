@@ -52,6 +52,9 @@ public class WeatherPanel extends JPanel implements Listener {
 	
 	
 	public WeatherPanel(GlobalController session, GUImain parent){
+		if (session == null || parent == null){
+			return;
+		}
 		this.parent = parent;
 		setLayout(new BorderLayout(0, 0));
 		

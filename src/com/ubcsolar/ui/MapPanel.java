@@ -37,6 +37,9 @@ public class MapPanel extends JPanel implements Listener {
 
 	
 	public MapPanel(GUImain main, GlobalController session) {
+		if (main == null || session == null){
+			return;
+		}
 	mySession = session;
 	parent = main;
 	this.setBorder(BorderFactory.createLineBorder(Color.black));

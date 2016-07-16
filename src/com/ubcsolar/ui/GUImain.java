@@ -319,7 +319,7 @@ public class GUImain implements Listener{
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),},
 			new RowSpec[] {
-				RowSpec.decode("40px"), //this is the row for the status panel 
+				RowSpec.decode("0px"), //this is the row for the status panel 
 				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("default:grow"),
 				FormFactory.RELATED_GAP_ROWSPEC,
