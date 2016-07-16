@@ -221,6 +221,9 @@ public class WeatherController extends ModuleController {
 		if(endForecast == null){
 			endForecast = startForecast;
 		}
+		if(startForecast == null){
+			startForecast = endForecast;
+		}
 		
 		double startDistance = GeoCoord.haversine(startForecast.getLatitude(), 
 				startForecast.getLongitude(), currentLoc.getLat(), currentLoc.getLon());
@@ -233,7 +236,12 @@ public class WeatherController extends ModuleController {
 			return interpolated;
 		}
 		else{
-			double endWeight = 1 / (endDistance + startDistance) * startDistance;
+			double endWeight;
+			if(Math.abs(endDistance)<0.0001 && Math.abs(startDistance)<0.0001){
+				endWeight = 0;
+			}else{
+				endWeight = 1 / (endDistance + startDistance) * startDistance;
+			}
 			ForecastIO interpolated = createInterpolatedForecast(endForecast, startForecast, 
 					endWeight, currentLoc);
 			return interpolated;
@@ -388,9 +396,9 @@ public class WeatherController extends ModuleController {
 		
 			datapoints.add(factory.build());
 		}
-		if(errorOccurred){
+		/*if(errorOccurred){
 			System.out.println("One of the forecasts was missing a field (probably storm related)");
-		}
+		}*/
 		ForecastIOFactory.addDatapoints(datapoints);
 		ForecastIOFactory.changeLocation(currentLoc);
 		return ForecastIOFactory.build();
