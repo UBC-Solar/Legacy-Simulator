@@ -41,7 +41,6 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	private Component horizontalGlue_4;
 	private DateFormat labelTimeFormat = new SimpleDateFormat("HH:mm:ss"); //the format for the times on the labels.
 	//private final String TAFTITLE = "Taf: ";
-	private final String CARLOADED = " Car: ";
 	private final String TELEMDATA = "|  TelemData: ";	
 	/**
 	 * constructor
@@ -52,10 +51,6 @@ public class LoadStatusPanel extends JPanel implements Listener {
 		//this.parent = parent;
 		mySession = session;
 		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-		
-		lblCar = new JLabel("Car: ");
-		lblCar.setHorizontalAlignment(SwingConstants.LEFT);
-		add(lblCar);
 		
 		horizontalGlue_4 = Box.createHorizontalGlue();
 		add(horizontalGlue_4);
@@ -75,7 +70,6 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	private void initializeValues(){
 		//updateTafLabel("none");
 		this.updateTelemLabel("none");
-		updateCarLabel(mySession.getMyCarController().getLoadedCarName());
 		if(mySession.getMyDataBaseController() != null){
 		if((mySession.getMyDataBaseController()).getDatabaseName() != null){
 		this.updateDatabaseLabel(mySession.getMyDataBaseController().getDatabaseName(), false, System.currentTimeMillis());
@@ -95,9 +89,6 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	 * updates the car label with the right message to display
 	 * @param carName - the name of the car to display
 	 */
-	private void updateCarLabel(String carName){
-		lblCar.setText(CARLOADED + carName);
-	}
 	
 	private void updateDatabaseLabel(String databaseName, boolean isClosed, double time){
 		//Could consider breaking this into two different methods; don't need the name for a 
@@ -113,13 +104,10 @@ public class LoadStatusPanel extends JPanel implements Listener {
 	@Override
 	public void notify(Notification n) {
 		//Add support for additional notifications as they come. 
-		if(n.getClass() == NewCarLoadedNotification.class){
-			updateCarLabel(((NewCarLoadedNotification) n).getNameOfCar()); //to update the car label
-		}
 		/*else if(n.getClass() == NewMetarReportLoadedNotification.class){
 			updateTafLabel("" + GlobalValues.hourMinSec.format(n.getTimeCreated()));
 		}*/
-		else if(n.getClass() == DatabaseCreatedOrConnectedNotification.class){
+		if(n.getClass() == DatabaseCreatedOrConnectedNotification.class){
 			this.updateDatabaseLabel(((DatabaseCreatedOrConnectedNotification) n).getName(), false, n.getTimeCreated());
 		}
 		else if(n.getClass() == DatabaseDisconnectedOrClosed.class){
