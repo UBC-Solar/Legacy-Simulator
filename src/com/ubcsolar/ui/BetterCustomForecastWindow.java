@@ -3,6 +3,7 @@ package com.ubcsolar.ui;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
+import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 
 import com.eclipsesource.json.JsonObject;
@@ -10,15 +11,24 @@ import com.github.dvdme.ForecastIOLib.FIODataPoint;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.Main.GlobalValues;
+import com.ubcsolar.common.GeoCoord;
+import com.ubcsolar.common.LogType;
+import com.ubcsolar.common.SolarLog;
+import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.map.MapController;
+import com.ubcsolar.weather.ForecastIOFactory;
+import com.ubcsolar.weather.WeatherController;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 
@@ -27,6 +37,7 @@ public class BetterCustomForecastWindow extends JFrame{
 	private GlobalController mySession;
 	private JSpinner distanceSpinner;
 	private MapController myMap;
+	private WeatherController myWeather;
 	private JList<JsonObject> forecastList;
 	private DefaultListModel<JsonObject> listModel;
 	
@@ -34,6 +45,7 @@ public class BetterCustomForecastWindow extends JFrame{
 		
 		this.mySession = mySession;
 		this.myMap = mySession.getMapController();
+		this.myWeather = mySession.getMyWeatherController();
 		this.setBounds(500, 250, 400, 400);
 		setTitleAndLogo();
 		
@@ -81,12 +93,26 @@ public class BetterCustomForecastWindow extends JFrame{
 		gbc_btnRemove.gridy = 1;
 		getContentPane().add(btnRemove, gbc_btnRemove);
 		
+		btnRemove.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0){
+				handleRemoveClick();
+			}
+		});
+		
 		JButton btnCopy = new JButton("Copy");
 		GridBagConstraints gbc_btnCopy = new GridBagConstraints();
 		gbc_btnCopy.insets = new Insets(0, 0, 5, 0);
 		gbc_btnCopy.gridx = 2;
 		gbc_btnCopy.gridy = 1;
 		getContentPane().add(btnCopy, gbc_btnCopy);
+		
+		btnCopy.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0){
+				handleCopyClick();
+			}
+		});
 		
 		
 		listModel = new DefaultListModel<JsonObject>();
@@ -101,12 +127,20 @@ public class BetterCustomForecastWindow extends JFrame{
 		
 		ForecastDatapointRenderer datapointRenderer = new ForecastDatapointRenderer();
 		forecastList.setCellRenderer(datapointRenderer);
+		forecastList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		JButton btnFinish = new JButton("Finish");
 		GridBagConstraints gbc_btnFinish = new GridBagConstraints();
 		gbc_btnFinish.gridx = 2;
 		gbc_btnFinish.gridy = 2;
 		getContentPane().add(btnFinish, gbc_btnFinish);
+		
+		btnFinish.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0){
+				handleFinishClick();
+			}
+		});
 	}
 	
 	private void handleAddClick(){
@@ -114,9 +148,61 @@ public class BetterCustomForecastWindow extends JFrame{
 		frame.setVisible(true);
 	}
 	
+	private void handleRemoveClick(){
+		listModel.remove(forecastList.getSelectedIndex());
+	}
+	
+	private void handleCopyClick(){
+		int selectedIndex = forecastList.getSelectedIndex();
+		if(selectedIndex == -1){
+			return;
+		}
+		JFrame frame = new ChangeHoursWindow(listModel.getElementAt(selectedIndex), listModel);
+		frame.setVisible(true);
+	}
+	
+	private void handleFinishClick() {
+		double distance = (double) distanceSpinner.getValue();
+		GeoCoord location = findNearestPoint(distance);
+		if (listModel.size() > 0) {
+			List<JsonObject> datapoints = new ArrayList<JsonObject>();
+			for (int i = 0; i < listModel.size(); i++) {
+				datapoints.add(listModel.getElementAt(i));
+			}
+			ForecastIOFactory.addDatapoints(datapoints);
+			ForecastIOFactory.changeLocation(location);
+			ForecastIO forecast = ForecastIOFactory.build();
+			try {
+				myWeather.loadCustomForecast(forecast);
+			} catch (NoLoadedRouteException e) {
+				// TODO Auto-generated catch block
+				this.handleError("No Route Loaded, unable to add custom forecast");
+				SolarLog.write(LogType.ERROR, System.currentTimeMillis(),
+						"Tried to load custom forecast, but no route loaded");
+			}
+		}
+		this.dispose();
+	}
+	
 	private void setTitleAndLogo() {
 		this.setIconImage(GlobalValues.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
 		this.setTitle("Custom Forecast Report");
+	}
+	
+	private GeoCoord findNearestPoint(double distance){
+		double travelDistance = 0.0;
+		List<GeoCoord> trailMarkers = mySession.getMapController().getAllPoints().getTrailMarkers();
+		int trailMarkerIndex = 1;
+		while(travelDistance < distance && trailMarkerIndex < trailMarkers.size()){
+			travelDistance += trailMarkers.get(trailMarkerIndex-1).calculateDistance(
+					trailMarkers.get(trailMarkerIndex));
+			trailMarkerIndex++;
+		}
+		return trailMarkers.get(trailMarkerIndex-1);
+	}
+	
+	private void handleError(String message){
+		JOptionPane.showMessageDialog(this, message);
 	}
 
 }

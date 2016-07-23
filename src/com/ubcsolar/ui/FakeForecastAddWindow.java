@@ -449,44 +449,20 @@ public class FakeForecastAddWindow extends JFrame{
 			return false;
 		}
 		String precipType = this.txtPrecipType.getText();
-		//double distance = (double)distanceSpinner.getValue();
-		//GeoCoord location = findNearestPoint(distance);
 		
 		FIODataPointFactory factory = new FIODataPointFactory();
-		//List<JsonObject> datapoints = new ArrayList<JsonObject>();
 		
 		factory.time(time).cloudCover(cldCover).dewPoint(dewPoint).humidity(humidity).
 			precipIntensity(precipIntensity).precipProb(precipProb).precipType(precipType).
 			temperature(temp).windBearing(windBearing).windSpeed(windSpeed).
 			stormBearing(strmBearing).stormDistance(strmDistance);
-		/*
-		for(int i = 0; i < 48; i++){
-			factory.time((int)System.currentTimeMillis()/1000 + 3600*i);
-			datapoints.add(factory.build());
-		}
-		
-		ForecastIOFactory.addDatapoints(datapoints);
-		ForecastIOFactory.changeLocation(location);
-		
-		ForecastIO forecast = ForecastIOFactory.build();
-		*/
 		
 		listModel.addElement(factory.build());
 		
 		return true;
 	}
 	
-	private GeoCoord findNearestPoint(double distance){
-		double travelDistance = 0.0;
-		List<GeoCoord> trailMarkers = mySession.getMapController().getAllPoints().getTrailMarkers();
-		int trailMarkerIndex = 1;
-		while(travelDistance < distance && trailMarkerIndex < trailMarkers.size()){
-			travelDistance += trailMarkers.get(trailMarkerIndex-1).calculateDistance(
-					trailMarkers.get(trailMarkerIndex));
-			trailMarkerIndex++;
-		}
-		return trailMarkers.get(trailMarkerIndex-1);
-	}
+	
 	
 
 }
