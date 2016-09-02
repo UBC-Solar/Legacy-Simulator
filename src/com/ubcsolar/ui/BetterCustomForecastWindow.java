@@ -146,12 +146,15 @@ public class BetterCustomForecastWindow extends JFrame{
 	}
 	
 	private void handleAddClick(){
-		JFrame frame = new FakeForecastAddWindow(mySession, listModel, currTime);
+		JFrame frame = new FakeForecastAddWindow(mySession, listModel, currTime, this);
 		frame.setVisible(true);
 	}
 	
 	private void handleRemoveClick(){
-		listModel.remove(forecastList.getSelectedIndex());
+		int selectedIndex = forecastList.getSelectedIndex();
+		if(selectedIndex == -1)
+			return;
+		listModel.remove(selectedIndex);
 	}
 	
 	private void handleCopyClick(){
@@ -161,6 +164,28 @@ public class BetterCustomForecastWindow extends JFrame{
 		}
 		JFrame frame = new ChangeHoursWindow(listModel.getElementAt(selectedIndex), listModel);
 		frame.setVisible(true);
+	}
+	
+	/**
+	 * erases datapoints that have the same time of the most recently added datapoint. 
+	 * Should always be called when a new datapoint is added to the list.
+	 */
+	public void eraseDuplicates(){
+		ArrayList<Integer> toRemove = new ArrayList<Integer>();
+		for(int j = listModel.size()-2; j >= 0; j--){
+			JsonObject curr = listModel.get(listModel.size()-1);
+			JsonObject test = listModel.get(j);
+			double currTime = Double.parseDouble(curr.get("hourTime").toString());
+			double testTime = Double.parseDouble(test.get("hourTime").toString());
+			if(currTime == testTime){
+				System.out.println("aqui");
+				toRemove.add(j);
+			}
+		}
+		for(int i = 0; i < toRemove.size(); i++){
+			listModel.remove(toRemove.get(i));
+		}
+		return;
 	}
 	
 	private void handleFinishClick() {

@@ -43,6 +43,7 @@ public class FakeForecastAddWindow extends JFrame{
 	private WeatherController myWeather;
 	private MapController myMap;
 	private Route theRoute;
+	private BetterCustomForecastWindow parentWindow;
 	private JTextField txtTemp;
 	private JTextField txtCloudCover;
 	private JTextField txtDewPoint;
@@ -59,13 +60,14 @@ public class FakeForecastAddWindow extends JFrame{
 	private double currTime;
 	
 	public FakeForecastAddWindow(GlobalController mySession, DefaultListModel<JsonObject> listModel,
-			double currTime) {
+			double currTime, BetterCustomForecastWindow parentWindow) {
 		
 		this.mySession = mySession;
 		this.myWeather = mySession.getMyWeatherController();
 		this.myMap = mySession.getMapController();
 		this.listModel = listModel;
 		this.currTime = currTime;
+		this.parentWindow = parentWindow;
 		this.setBounds(500, 250, 415, 400);
 		setTitleAndLogo();
 		
@@ -331,19 +333,12 @@ public class FakeForecastAddWindow extends JFrame{
 		if(!addedDatapoint){
 			return;
 		}else{
-			//TODO: figure out if this tryCatch is needed?
-			/*try {
-				myWeather.loadCustomForecast(customForecast);
-			} catch (NoLoadedRouteException e) {
-				// TODO Auto-generated catch block
-				this.handleError("No Route Loaded, unable to add custom forecast");
-				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to load custom forecast, but no route loaded");
-			}*/
 			closeWindow();
 		}
 	}
 	
 	private void closeWindow(){
+		parentWindow.eraseDuplicates();
 		this.dispose();
 	}
 	
