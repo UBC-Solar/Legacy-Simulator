@@ -30,7 +30,8 @@ public class ForecastDatapointRenderer extends JLabel implements ListCellRendere
 	public Component getListCellRendererComponent(JList<? extends JsonObject> list, JsonObject value, 
 			int index, boolean isSelected, boolean cellHasFocus) {
 		
-		setText(value.get("time").toString());
+		setText("Hour " + value.get("hourTime").toString());
+		//setText(value.get("time").toString());
 
 		Color background;
 		Color foreground;

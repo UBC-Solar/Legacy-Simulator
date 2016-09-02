@@ -56,13 +56,16 @@ public class FakeForecastAddWindow extends JFrame{
 	private JTextField txtPrecipIntensity;
 	private DefaultListModel<JsonObject> listModel;
 	private JTextField txtTime;
+	private double currTime;
 	
-	public FakeForecastAddWindow(GlobalController mySession, DefaultListModel<JsonObject> listModel) {
+	public FakeForecastAddWindow(GlobalController mySession, DefaultListModel<JsonObject> listModel,
+			double currTime) {
 		
 		this.mySession = mySession;
 		this.myWeather = mySession.getMyWeatherController();
 		this.myMap = mySession.getMapController();
 		this.listModel = listModel;
+		this.currTime = currTime;
 		this.setBounds(500, 250, 415, 400);
 		setTitleAndLogo();
 		
@@ -362,9 +365,10 @@ public class FakeForecastAddWindow extends JFrame{
 	
 	private boolean addDatapoint(){
 		int time;
+		double hourTime;
 		try{
-			double hourTime = Double.parseDouble(this.txtTime.getText());
-			time = (int) (System.currentTimeMillis()/1000 + hourTime*3600);
+			hourTime = Double.parseDouble(this.txtTime.getText());
+			time = (int) (currTime + hourTime*3600);
 		}catch(java.lang.NumberFormatException e){
 			this.handleError("Time formatted incorrectly");
 			return false;
@@ -455,7 +459,7 @@ public class FakeForecastAddWindow extends JFrame{
 		factory.time(time).cloudCover(cldCover).dewPoint(dewPoint).humidity(humidity).
 			precipIntensity(precipIntensity).precipProb(precipProb).precipType(precipType).
 			temperature(temp).windBearing(windBearing).windSpeed(windSpeed).
-			stormBearing(strmBearing).stormDistance(strmDistance);
+			stormBearing(strmBearing).stormDistance(strmDistance).hourTime(hourTime);
 		
 		listModel.addElement(factory.build());
 		

@@ -40,12 +40,14 @@ public class BetterCustomForecastWindow extends JFrame{
 	private WeatherController myWeather;
 	private JList<JsonObject> forecastList;
 	private DefaultListModel<JsonObject> listModel;
+	private double currTime;
 	
 	public BetterCustomForecastWindow(GlobalController mySession) {
 		
 		this.mySession = mySession;
 		this.myMap = mySession.getMapController();
 		this.myWeather = mySession.getMyWeatherController();
+		this.currTime = System.currentTimeMillis()/1000;
 		this.setBounds(500, 250, 400, 400);
 		setTitleAndLogo();
 		
@@ -144,7 +146,7 @@ public class BetterCustomForecastWindow extends JFrame{
 	}
 	
 	private void handleAddClick(){
-		JFrame frame = new FakeForecastAddWindow(mySession, listModel);
+		JFrame frame = new FakeForecastAddWindow(mySession, listModel, currTime);
 		frame.setVisible(true);
 	}
 	
