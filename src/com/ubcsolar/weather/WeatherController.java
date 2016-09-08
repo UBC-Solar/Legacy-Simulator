@@ -175,14 +175,19 @@ public class WeatherController extends ModuleController {
 		if(comboForecasts == null){
 			throw new NoForecastReportException();
 		}
+		//if there is only 1 forecast, you can't do any interpolation, so it just returns that one
+		if(comboForecasts.size() == 1){
+			return comboForecasts.get(0);
+		}
 		int startIndex = this.getIndexOfStartForecast(comboForecasts, target);
+		System.out.println("startIndex: " + startIndex);
 		ForecastIO startForecast = this.comboForecasts.get(startIndex);
 		
 		//check to see if the target point is off the end of the forecast list. 
-		if((startIndex >= comboForecasts.size()-1) || (startIndex<= 0)){
+		if((startIndex >= comboForecasts.size()-1) || (startIndex <= 0)){
 			GeoCoord firstSpot = new GeoCoord(startForecast.getLatitude(),startForecast.getLongitude(),0.0);
 			ForecastIO secondForecast;
-			if(startIndex>= comboForecasts.size()-1){
+			if(startIndex >= comboForecasts.size()-1){
 				secondForecast = this.comboForecasts.get(startIndex - 1);
 			}else{ //i.e is 0
 				secondForecast = this.comboForecasts.get(startIndex + 1);
@@ -214,7 +219,7 @@ public class WeatherController extends ModuleController {
 				
 	}
 	/*
-	 * Supposed to interpolate between the start forecast and next forecast. Currently just returns the closest. 
+	 * Interpolates between the start forecast and the end forecast
 	 */
 	private ForecastIO interpolateForecast(ForecastIO startForecast, 
 			ForecastIO endForecast, GeoCoord currentLoc) {
@@ -414,7 +419,7 @@ public class WeatherController extends ModuleController {
 	}
 	
 	/**
-	 * Returns the forecast tha is closest to the given point 
+	 * Returns the forecast that is closest to the given point 
 	 * @param toSearch
 	 * @param g
 	 * @return
