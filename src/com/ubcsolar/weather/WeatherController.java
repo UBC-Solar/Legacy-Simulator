@@ -180,7 +180,6 @@ public class WeatherController extends ModuleController {
 			return comboForecasts.get(0);
 		}
 		int startIndex = this.getIndexOfStartForecast(comboForecasts, target);
-		System.out.println("startIndex: " + startIndex);
 		ForecastIO startForecast = this.comboForecasts.get(startIndex);
 		
 		//check to see if the target point is off the end of the forecast list. 
