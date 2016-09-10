@@ -59,6 +59,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.GridBagLayout;
@@ -105,6 +106,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	protected final WeatherAdvancedWindow parentInstance = this;
 	private List<GeoCoord> forecastPoints;
 	private JMenuItem mntmLoadLastForecast;
+	private JMenuItem mntmSetSystemOffset;
 
 
 	private void setLabelDefaultValues(){
@@ -237,6 +239,9 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		});
 		
 		mnForecasts.add(mntmLoadLastForecast);
+		
+		mntmSetSystemOffset = new JMenuItem("Change system timezone");
+		mnForecasts.add(mntmSetSystemOffset);
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -738,13 +743,31 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							data[1][i] = currentHourForecast.windSpeed();
 						}
 					}
-					dds.addSeries("Hour " + numHours, data);
+					FIODataPoint firstForecast = hourlyForecasts.get(0).datapoint(numHours);
+					//SimpleDateFormat sdf = GlobalValues.forecastIODateParser;
+					//long timeNum = Long.parseLong(datapoint.time().toString())
+					//String time = sdf.format(Long.parseLong(firstForecast.time())*1000);
+					String time = firstForecast.time();
+					dds.addSeries(time, data);
 					numHours++;
 				}
 				
 				return dds;
 			}
 		}
+	
+		/**
+		 * Converts a time (like the one obtained from an FIODataPoint) to a 
+		 * time in a different timezone.
+		 * @param GMTTime The time in GMT (formatted as DD-MM-YYYY HH:MM:SS)
+		 * 		(should actually work with any timezone, but the Forecast.io API generally
+		 * 		gives it in GMT)
+		 * @param hoursOffset 
+		 * @return
+		 */
+		/*private String convertFromGMT(String GMTTime, int hoursOffset){
+			
+		}*/
 		
 		private XYDataset createDataset(){
 			DefaultXYDataset dds = new DefaultXYDataset();
