@@ -2,12 +2,14 @@ package com.ubcsolar.ui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.text.SimpleDateFormat;
 
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 import com.eclipsesource.json.JsonObject;
+import com.ubcsolar.Main.GlobalValues;
 
 /**
  * 
@@ -30,7 +32,10 @@ public class ForecastDatapointRenderer extends JLabel implements ListCellRendere
 	public Component getListCellRendererComponent(JList<? extends JsonObject> list, JsonObject value, 
 			int index, boolean isSelected, boolean cellHasFocus) {
 		
-		setText("Hour " + value.get("hourTime").toString());
+		SimpleDateFormat sdf = GlobalValues.forecastIODateParser;
+		String date = sdf.format(value.get("time").asLong()*1000);//have to multiply by 1000 or date will be wrong
+		
+		setText(date);
 
 		Color background;
 		Color foreground;

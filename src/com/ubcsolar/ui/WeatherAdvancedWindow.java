@@ -106,23 +106,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private List<GeoCoord> forecastPoints;
 	private JMenuItem mntmLoadLastForecast;
 
-	/**
-	 * Launch the application.
-	 *//*//don't need a main here.
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Weather frame = new Weather();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}*/
 
-	
 	private void setLabelDefaultValues(){
 		this.stormLabel.setText("No storm warning");
 		this.fogLabel.setText("No fog warning");
@@ -131,6 +115,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	/**
 	 * Create the frame.
 	 * @param mySession 
+	 * @param main is the GUImain object that created this window
 	 */
 	public WeatherAdvancedWindow(final GlobalController mySession, GUImain main) {
 		
@@ -692,10 +677,12 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				DefaultXYDataset dds = new DefaultXYDataset();
 				List<ForecastIO> forecastsForChart = currentForecastReport.getForecasts();
 				forecastPoints = new ArrayList<GeoCoord>();
+				double maxBlockSize = 0;
 				
 				List<FIODataBlock> hourlyForecasts = new ArrayList<FIODataBlock>();
 				for(int i = 0; i < forecastsForChart.size()+1; i++){
 					//if statement adds duplicate point at the end
+					//done to extend line to the end of the graph
 					if (i == forecastsForChart.size()){
 						forecastPoints.add(new GeoCoord(forecastsForChart.get(i-1).getLatitude(), 
 								forecastsForChart.get(i-1).getLongitude(), 0.0));//uses 0 for elevation cause it doesn't matter for our uses
@@ -704,6 +691,9 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 						forecastPoints.add(new GeoCoord(forecastsForChart.get(i).getLatitude(), 
 								forecastsForChart.get(i).getLongitude(), 0.0));//uses 0 for elevation cause it doesn't matter for our uses
 						hourlyForecasts.add(new FIODataBlock(forecastsForChart.get(i).getHourly()));
+					}
+					if(hourlyForecasts.get(hourlyForecasts.size()-1).datablockSize() > maxBlockSize){
+						maxBlockSize = hourlyForecasts.get(hourlyForecasts.size()-1).datablockSize();
 					}
 				}
 				
@@ -733,7 +723,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 
 				
 				int numHours = 0;
-				while((numHours < NUM_LINES) && ( numHours < hourlyForecasts.get(0).datablockSize()) ){
+				while((numHours < NUM_LINES) && (numHours < maxBlockSize)){
 					double[][] data = new double[2][distances.length];
 					for(int i = 0; i < hourlyForecasts.size(); i++){
 						data[0][i] = distances[i];
