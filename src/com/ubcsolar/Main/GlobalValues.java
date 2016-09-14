@@ -47,7 +47,6 @@ public class GlobalValues {
 	
 	public static final String DEFAULT_TILE_SAVE_LOCATION = System.getProperty("user.dir")+"/"+"res/tileCache/";
 	
-	
 	/**
 	 * The message shown on any 'advanced' window with a graph, to explain how to navigate
 	 * the charts. 

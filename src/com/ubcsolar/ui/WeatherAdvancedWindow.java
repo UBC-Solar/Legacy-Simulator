@@ -744,6 +744,9 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 					//long timeNum = Long.parseLong(datapoint.time().toString())
 					//String time = sdf.format(Long.parseLong(firstForecast.time())*1000);
 					String time = firstForecast.time();
+					if(firstForecast.getTimezone().equals("GMT")){
+						time = convertFromGMT(time);
+					}
 					dds.addSeries(time, data);
 					numHours++;
 				}
@@ -758,12 +761,12 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		 * @param GMTTime The time in GMT (formatted as DD-MM-YYYY HH:MM:SS)
 		 * 		(should actually work with any timezone, but the Forecast.io API generally
 		 * 		gives it in GMT)
-		 * @param hoursOffset 
 		 * @return
 		 */
-		/*private String convertFromGMT(String GMTTime, int hoursOffset){
+		private String convertFromGMT(String GMTTime){
 			
-		}*/
+			return"";
+		}
 		
 		private XYDataset createDataset(){
 			DefaultXYDataset dds = new DefaultXYDataset();
