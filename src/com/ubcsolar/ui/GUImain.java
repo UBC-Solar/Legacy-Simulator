@@ -312,6 +312,15 @@ public class GUImain implements Listener{
 		mnDebug.add(mntmAddCarTelempacket);
 		mnDebug.add(mntmAddLocationReport);
 		
+		JMenuItem mntmSetSystemTimezone = new JMenuItem("Set System Timezone");
+		mntmSetSystemTimezone.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFrame frame = new TimeZoneWindow(mySession);
+				frame.setVisible(true);
+			}
+		});
+		mnDebug.add(mntmSetSystemTimezone);
+		
 		//This sets up the layout for the main window
 		mainFrame.getContentPane().setLayout(new FormLayout(new ColumnSpec[] {
 				ColumnSpec.decode("300px"),

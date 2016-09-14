@@ -106,7 +106,6 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	protected final WeatherAdvancedWindow parentInstance = this;
 	private List<GeoCoord> forecastPoints;
 	private JMenuItem mntmLoadLastForecast;
-	private JMenuItem mntmSetSystemOffset;
 
 
 	private void setLabelDefaultValues(){
@@ -239,9 +238,6 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		});
 		
 		mnForecasts.add(mntmLoadLastForecast);
-		
-		mntmSetSystemOffset = new JMenuItem("Change system timezone");
-		mnForecasts.add(mntmSetSystemOffset);
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
