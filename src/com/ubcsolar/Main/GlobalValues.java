@@ -63,6 +63,8 @@ public class GlobalValues {
 	 */
 	public static boolean showChartNavigationTutorialAgain = true;
 	
+	public static final int OFFSET = -07;
+	
 	public static final String WEATHER_UNITS = ForecastIO.UNITS_CA;
 	
 	public static final String WEATHER_LANG = ForecastIO.LANG_ENGLISH;

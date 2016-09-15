@@ -763,9 +763,46 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		 * 		gives it in GMT)
 		 * @return
 		 */
+		
+		//TODO: add leading zeros, make sure it integrates with custom forecasts nicely
 		private String convertFromGMT(String GMTTime){
-			
-			return"";
+			String[] strTokens = GMTTime.split("[^0-9]");
+			int[] numTokens = new int[strTokens.length];
+			for(int i = 0; i < strTokens.length; i++){
+				numTokens[i] = Integer.parseInt(strTokens[i]);
+			}
+			//index: 0 - DD, 1 - MM, 2 - YYYY, 3 - HH, 4 - MM, 5 - SS
+			numTokens[3] = numTokens[3] + GlobalValues.OFFSET;
+			if(numTokens[3] < 00){
+				numTokens[3] += 24;
+				numTokens[0] -= 01;
+				if(numTokens[0] == 00){
+					numTokens[1] -= 1;
+					switch (numTokens[1]) {
+						case 0: numTokens[1] = 12;
+								numTokens[2] -= 1;
+								numTokens[0] = 31;
+								break;
+						case 1: case 3: case 5: 
+						case 7: case 8: case 10:
+								numTokens[0] = 31;
+								break;
+						case 4: case 6: case 9: case 11:
+								numTokens[0] = 30;
+								break;
+						case 2: if(numTokens[2] % 4 == 0){
+									numTokens[1] = 29;
+								}else{
+									numTokens[1] = 28;
+								}
+								break;
+						default: break;
+					}
+				}
+			}
+			String localTime = "" + numTokens[0] + "-" + numTokens[1] + "-" + numTokens[2]
+					+ " " + numTokens[3] + ":" + numTokens[4] + ":" + numTokens[5];
+			return localTime;
 		}
 		
 		private XYDataset createDataset(){
