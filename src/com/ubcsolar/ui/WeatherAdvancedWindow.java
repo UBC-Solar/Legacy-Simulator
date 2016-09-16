@@ -58,10 +58,16 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -756,52 +762,28 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		}
 	
 		/**
-		 * Converts a time (like the one obtained from an FIODataPoint) to a 
-		 * time in a different timezone.
-		 * @param GMTTime The time in GMT (formatted as DD-MM-YYYY HH:MM:SS)
+		 * Converts a time (like the one obtained from an FIODataPoint) to 
+		 * your system's local timezone
+		 * @param gmtTime The time in GMT (formatted as DD-MM-YYYY HH:MM:SS)
 		 * 		(should actually work with any timezone, but the Forecast.io API generally
 		 * 		gives it in GMT)
 		 * @return
 		 */
-		
-		//TODO: add leading zeros, make sure it integrates with custom forecasts nicely
-		private String convertFromGMT(String GMTTime){
-			String[] strTokens = GMTTime.split("[^0-9]");
-			int[] numTokens = new int[strTokens.length];
-			for(int i = 0; i < strTokens.length; i++){
-				numTokens[i] = Integer.parseInt(strTokens[i]);
+
+		private String convertFromGMT(String gmtTime){
+			Date gmtDate;
+			try{
+				gmtDate = GlobalValues.forecastIODateParser.parse(gmtTime);
+			}catch(ParseException e){
+				e.printStackTrace();
+				return gmtTime;
 			}
-			//index: 0 - DD, 1 - MM, 2 - YYYY, 3 - HH, 4 - MM, 5 - SS
-			numTokens[3] = numTokens[3] + GlobalValues.OFFSET;
-			if(numTokens[3] < 00){
-				numTokens[3] += 24;
-				numTokens[0] -= 01;
-				if(numTokens[0] == 00){
-					numTokens[1] -= 1;
-					switch (numTokens[1]) {
-						case 0: numTokens[1] = 12;
-								numTokens[2] -= 1;
-								numTokens[0] = 31;
-								break;
-						case 1: case 3: case 5: 
-						case 7: case 8: case 10:
-								numTokens[0] = 31;
-								break;
-						case 4: case 6: case 9: case 11:
-								numTokens[0] = 30;
-								break;
-						case 2: if(numTokens[2] % 4 == 0){
-									numTokens[1] = 29;
-								}else{
-									numTokens[1] = 28;
-								}
-								break;
-						default: break;
-					}
-				}
-			}
-			String localTime = "" + numTokens[0] + "-" + numTokens[1] + "-" + numTokens[2]
-					+ " " + numTokens[3] + ":" + numTokens[4] + ":" + numTokens[5];
+			long gmtTimestamp = gmtDate.getTime();
+			TimeZone localTz = Calendar.getInstance().getTimeZone();
+			int offset = localTz.getOffset(new Date().getTime());
+			long localTimestamp = gmtTimestamp + offset;
+			Date localDate = new Date(localTimestamp);
+			String localTime = GlobalValues.forecastIODateParser.format(localDate);
 			return localTime;
 		}
 		
