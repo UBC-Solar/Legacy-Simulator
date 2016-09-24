@@ -33,8 +33,8 @@ One program is http://wiki.openstreetmap.org/wiki/JTileDownloader, however 2 cav
  b) I haven't figured out the URL for Bing Aerial Maps or another OSM tile provider yet.  
 
 WEATHER
-1) Forecast.io seems to do everything we need (gathers info from NASA and NOAA DB's in the back end)
-(https://developer.forecast.io/)
+1) Dark Sky API (Previously named as "Forecast.io") seems to do everything we need (gathers info from NASA and NOAA DB's in the back end)
+(https://darksky.net/dev/)    (Previously it was :   https://developer.forecast.io/)
 Program key: e4f99878991a762e85efbffc7db8d657
 Registered under: Strategy@ubcsolar.com
 
