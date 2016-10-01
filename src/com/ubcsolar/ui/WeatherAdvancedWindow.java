@@ -106,7 +106,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private boolean showWelcomeMessageAgain = true;
 	
 	private static final String WelcomeInfoMessage = "use \"Load Forecasts for Route(48 hours)\" under the \"Forecasts\" menu to get the weather information."
-				+"\n\n"+ "Note: You should Load the route before this.";
+				+"\n\n"+ "Note: You should Load the route before this. Have fun.";
 
 
 	protected final WeatherAdvancedWindow parentInstance = this;
