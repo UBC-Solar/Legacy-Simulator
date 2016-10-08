@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.jfree.chart.ChartFactory;
@@ -67,6 +68,15 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 
 import javax.swing.SwingConstants;
+import javax.swing.JDesktopPane;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.JSplitPane;
+import java.awt.SystemColor;
+import java.awt.Component;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeListener;
 
 public class WeatherAdvancedWindow extends JFrame implements Listener{
 	
@@ -77,7 +87,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private JFreeChart temperatureChartJFree;
 	private ForecastReport currentForecastReport;
 	private final String X_AXIS_LABEL = "Travel Distance (km)";
-	private final int NUM_LINES = 4;
+	private int NUM_LINES;
 	private ChartPanel cloudCoverChart;
 	private JFreeChart cloudCoverChartJFree;
 	private ChartPanel precipitationChart;
@@ -85,7 +95,6 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private ChartPanel windSpeedChart;
 	private JFreeChart windSpeedChartJFree;
 	private JPanel windDirectionPanel;
-	private JPanel panel;
 	private JPanel fogPanel;
 	private JLabel fogLabel;
 	private JPanel stormPanel;
@@ -105,6 +114,9 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	protected final WeatherAdvancedWindow parentInstance = this;
 	private List<GeoCoord> forecastPoints;
 	private JMenuItem mntmLoadLastForecast;
+	private JSpinner spinner;
+	private JSplitPane splitPane;
+	private JLabel lblSelectNumberOf;
 
 	/**
 	 * Launch the application.
@@ -340,13 +352,30 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		stormLabel = new JLabel("DEFAULT");
 		stormPanel.add(stormLabel);
 		
+		splitPane = new JSplitPane();
+		GridBagConstraints gbc_splitPane = new GridBagConstraints();
+		gbc_splitPane.fill = GridBagConstraints.HORIZONTAL;
+		gbc_splitPane.gridx = 1;
+		gbc_splitPane.gridy = 3;
+		contentPane.add(splitPane, gbc_splitPane);
+		
+		//Spinner to control number of hours displayed
+		spinner = new JSpinner();
+		spinner.setModel(new SpinnerNumberModel(0, 0, 24, 1));
+		splitPane.setLeftComponent(spinner);
+		spinner.setToolTipText("");
+		
+		//if spinner value is changed, update charts
+				spinner.addChangeListener(new ChangeListener() {
+					public void stateChanged(ChangeEvent arg0) {
+						updateCharts();
+					}
+				});
+		
+		lblSelectNumberOf = new JLabel("Select Number Of Hours");
+		splitPane.setRightComponent(lblSelectNumberOf);
+		
 		this.setLabelDefaultValues();
-		panel = new JPanel();
-		GridBagConstraints gbc_panel = new GridBagConstraints();
-		gbc_panel.fill = GridBagConstraints.BOTH;
-		gbc_panel.gridx = 1;
-		gbc_panel.gridy = 3;
-		contentPane.add(panel, gbc_panel);
 		
 		
 		setTitleAndLogo();
@@ -733,6 +762,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 
 				
 				int numHours = 0;
+				NUM_LINES = (int) spinner.getValue(); //get spinner value
 				while((numHours < NUM_LINES) && ( numHours < hourlyForecasts.get(0).datablockSize()) ){
 					double[][] data = new double[2][distances.length];
 					for(int i = 0; i < hourlyForecasts.size(); i++){
@@ -845,4 +875,5 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			contentPane.revalidate();
 			contentPane.repaint();
 		}
+		
 }
