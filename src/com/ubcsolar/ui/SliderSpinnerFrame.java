@@ -42,9 +42,10 @@ public class SliderSpinnerFrame extends JPanel {
 	//simulator, we should change color or something. 
 	private int currentValue; 
 	private List<GeoCoord> representedCoordinates;
+	private final int lapNumber;
 	
-	
-	public SliderSpinnerFrame(String labelAtTheTop, int initialValue, boolean isManuallySetInitialValue, List<GeoCoord> representingCoords) {
+	public SliderSpinnerFrame(String labelAtTheTop, int initialValue, boolean isManuallySetInitialValue, List<GeoCoord> representingCoords, int lapNumber) {
+		this.lapNumber = lapNumber;
 		this.isManuallySet = isManuallySetInitialValue;
 		currentValue = initialValue;
 		this.representedCoordinates = representingCoords;
@@ -137,8 +138,7 @@ public class SliderSpinnerFrame extends JPanel {
 	}
 
 	public int getLapNumber() {
-		// TODO Auto-generated method stub
-		return 1;
+		return this.lapNumber;
 	}
 
 }

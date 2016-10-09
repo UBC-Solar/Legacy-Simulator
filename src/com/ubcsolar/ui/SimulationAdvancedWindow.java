@@ -407,10 +407,13 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		for(int i = 1; i<simResultValues.size(); i++){
 			GeoCoord start = simResultValues.get(i-1).getGPSReport().getLocation();
 			GeoCoord end = simResultValues.get(i).getGPSReport().getLocation();
+			int startLapNumber = simResultValues.get(i-1).getLapNumber();
 			runningTotalDistance += start.calculateDistance(end);
 			
 			//NOTE: CHANGED THIS FROM THE DEFAULT INT THING AT THE TOP
-			if((runningTotalDistance-lastAddedPointDistance)>KM_PER_SLIDER_DOUBLE || i == simResultValues.size() - 1){
+			if((runningTotalDistance-lastAddedPointDistance)>KM_PER_SLIDER_DOUBLE
+					|| i == simResultValues.size() - 1 ||
+					simResultValues.get(i).getLapNumber() != startLapNumber){ //each slider can have points from only one lap
 				List<GeoCoord> pointsToRepresent = new ArrayList<GeoCoord>();
 				double totalSpeed = 0;
 				for(int index = lastAddedPointIndex+1; index<i; index++){
@@ -438,7 +441,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				}
 				
 				SliderSpinnerFrame toAddToPanel = new SliderSpinnerFrame(label ,
-										(int) averageSpeed, isManuallySet,pointsToRepresent);
+										(int) averageSpeed, isManuallySet,pointsToRepresent,startLapNumber);
 				displayedSpeedSliderSpinners.add(toAddToPanel);
 				
 				lastAddedPointIndex = i;

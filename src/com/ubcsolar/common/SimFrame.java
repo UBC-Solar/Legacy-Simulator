@@ -133,6 +133,10 @@ public class SimFrame extends DataUnit{ //implements Runnable{
 		return representedTime;
 	}
 
+	public int getLapNumber() {
+		return this.lapNumber;
+	}
+
 
 
 }
