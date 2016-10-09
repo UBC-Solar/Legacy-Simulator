@@ -414,7 +414,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				List<GeoCoord> pointsToRepresent = new ArrayList<GeoCoord>();
 				double totalSpeed = 0;
 				for(int index = lastAddedPointIndex+1; index<i; index++){
-					System.out.println("adding a speed: " + simResultValues.get(index).getCarStatus().getSpeed());
+					//System.out.println("adding a speed: " + simResultValues.get(index).getCarStatus().getSpeed());
 					totalSpeed += simResultValues.get(index).getCarStatus().getSpeed();
 					pointsToRepresent.add(simResultValues.get(index).getGPSReport().getLocation());
 				}

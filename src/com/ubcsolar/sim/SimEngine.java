@@ -52,12 +52,16 @@ public class SimEngine {
 		TelemDataPacket startCondition = carStartingCondition;
 		FIODataPoint startWeather = new FIODataBlock(weather.getHourly()).datapoint(0);
 		LocationReport simmedStartPoint = new LocationReport(toTraverse.getTrailMarkers().get(startLocationIndex), "Raven", "Simmed");
-		SimFrame startFrame = new SimFrame(startWeather, startCondition, simmedStartPoint, System.currentTimeMillis()); //starting frame is current.
+		SimFrame startFrame = new SimFrame(startWeather, startCondition, simmedStartPoint, System.currentTimeMillis(), 1); //starting frame is current.
 		listOfFrames.add(startFrame);
 
 		SimFrame lastFrame = startFrame;
 		int numOfPoints = toTraverse.getTrailMarkers().size();
+		int currentLap = 1; 
 		for(int i = startLocationIndex+1; i<(numOfPoints*laps); i++){ 
+			if(i%numOfPoints == (numOfPoints-1)){ //if it's the last point in the lap
+				currentLap++; //say we're going to the next lap! 
+			}
 			/*
 			 * By starting at startPos, we calculate the jump from car's current location to the next breadcrumb, rather
 			 * than just assuming that it's actually at the last breadcrumb. 
@@ -69,6 +73,9 @@ public class SimEngine {
 			GeoCoord nextPoint;
 			if (lastFrame.getCarStatus().getSpeed()<=0){
 				i--; //if the speed is zero then we need to redo the frame because the car is not moving, and thus is in the same place
+				if(i%numOfPoints == 0){
+					currentLap--;//was adjusted earlier above, shouldn't have been. 
+				}
 				if(i<0){
 					nextWeather = weatherReports.getForecasts().get(startLocationIndex);
 				}
@@ -83,7 +90,7 @@ public class SimEngine {
 				nextPoint = toTraverse.getTrailMarkers().get(i%numOfPoints);
 			}
 
-			SimFrame nextFrame = this.generateNextFrame(lastFrame, nextPoint, nextWeather, requestedSpeeds.get(nextPoint));
+			SimFrame nextFrame = this.generateNextFrame(lastFrame, nextPoint, nextWeather, requestedSpeeds.get(nextPoint),currentLap);
 			lastFrame = nextFrame;
 			listOfFrames.add(nextFrame);
 		}	
@@ -94,7 +101,7 @@ public class SimEngine {
 
 
 
-	private SimFrame generateNextFrame(SimFrame lastFrame, GeoCoord nextPoint, ForecastIO nextWeather, Double requestedSpeed) {
+	private SimFrame generateNextFrame(SimFrame lastFrame, GeoCoord nextPoint, ForecastIO nextWeather, Double requestedSpeed,int currentLap) {
 		TelemDataPacket lastCarStatus = lastFrame.getCarStatus();
 		GeoCoord lastPosition = lastFrame.getGPSReport().getLocation();
 		double lastSpeed = lastCarStatus.getSpeed();
@@ -151,7 +158,7 @@ public class SimEngine {
 		newCarStatus = calculateNewCarStatus(lastCarStatus, distanceCovered, elevationChange, forecastForPoint, speedToDrive, SunCharge);
 		LocationReport nextLocationReport = generateLocationReport(lastFrame.getGPSReport(), nextPoint);
 
-		SimFrame toReturn = new SimFrame(forecastForPoint, newCarStatus, nextLocationReport, nextSimFrameTime);
+		SimFrame toReturn = new SimFrame(forecastForPoint, newCarStatus, nextLocationReport, nextSimFrameTime,currentLap);
 
 		try {
 			Date fcParseTime = GlobalValues.forecastIODateParser.parse(toReturn.getForecast().time());
