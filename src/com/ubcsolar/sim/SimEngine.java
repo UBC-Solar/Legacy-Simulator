@@ -65,9 +65,7 @@ public class SimEngine {
 		int numOfPoints = toTraverse.getTrailMarkers().size();
 		int currentLap = 1; 
 		for(int i = startLocationIndex+1; i<(numOfPoints*laps); i++){ 
-			if(i%numOfPoints == (numOfPoints-1)){ //if it's the last point in the lap
-				currentLap++; //say we're going to the next lap! 
-			}
+
 			/*
 			 * By starting at startPos, we calculate the jump from car's current location to the next breadcrumb, rather
 			 * than just assuming that it's actually at the last breadcrumb. 
@@ -103,6 +101,9 @@ public class SimEngine {
 		
 			lastFrame = nextFrame;
 			listOfFrames.add(nextFrame);
+			if(i%numOfPoints == (numOfPoints-1)){ //if it's the last point in the lap
+				currentLap++; //say we're going to the next lap! 
+			}
 		}	
 
 		return listOfFrames;
