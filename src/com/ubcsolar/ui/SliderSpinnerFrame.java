@@ -123,7 +123,7 @@ public class SliderSpinnerFrame extends JPanel {
 			showManuallySet = this.showIsNotManuallySet;
 		}
 		if(topLabel != null){
-			String currentLabelMinusFlag = topLabel.getText().substring(this.showIsManuallySet.length());
+			String currentLabelMinusFlag = topLabel.getText().substring(this.showIsManuallySet.length())+"{" + this.lapNumber + "}";
 			this.topLabel.setText(showManuallySet + currentLabelMinusFlag);
 		}
 	}
