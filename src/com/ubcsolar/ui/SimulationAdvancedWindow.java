@@ -510,8 +510,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			
 			for(SliderSpinnerFrame f : this.displayedSpeedSliderSpinners){
 				if(f.isManuallySet()){
-					//TODO get lapnumber dynamically
-					int lapNumber = 1;
+					int lapNumber = f.getLapNumber();
 					for(GeoCoord g : f.getRepresentedCoordinates()){
 						if(toReturn.get(g) == null){
 							Map<Integer, Double> lapAndSpeed = new HashMap<Integer,Double>();

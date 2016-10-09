@@ -136,4 +136,9 @@ public class SliderSpinnerFrame extends JPanel {
 		isManuallySet = newValue;
 	}
 
+	public int getLapNumber() {
+		// TODO Auto-generated method stub
+		return 1;
+	}
+
 }

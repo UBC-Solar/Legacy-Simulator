@@ -183,7 +183,6 @@ public class SimEngine {
 
 
 	private LocationReport generateLocationReport(LocationReport oldReport, GeoCoord nextPoint) {
-		// TODO Auto-generated method stub
 		LocationReport toReturn = new LocationReport(nextPoint, oldReport.getCarName(), "Simulated");
 		return toReturn;
 	}
