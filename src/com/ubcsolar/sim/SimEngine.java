@@ -34,7 +34,11 @@ public class SimEngine {
 
 	private CarModel inUseCarModel;
 
-	public List<SimFrame> runSimulation(Route toTraverse, int startLocationIndex, ForecastReport weatherReports, TelemDataPacket carStartingCondition, Map<GeoCoord,Double> requestedSpeeds, int laps){
+	/*
+	 * Did RequestedSpeeds as a Map<CeoCoord point, Map<lap number, requested speed>>, to be able to 
+	 * request different speeds for different laps.  
+	 */
+	public List<SimFrame> runSimulation(Route toTraverse, int startLocationIndex, ForecastReport weatherReports, TelemDataPacket carStartingCondition, Map<GeoCoord,Map<Integer,Double>> requestedSpeeds, int laps){
 		if(laps <= 0){
 			throw new IllegalArgumentException("Must go at least one lap");
 		}
@@ -48,7 +52,9 @@ public class SimEngine {
 		ForecastIO weather = weatherReports.getForecasts().get(startLocationIndex); //assumes that the number of forecasts in weatherReports = number in Route.
 		GeoCoord start = toTraverse.getTrailMarkers().get(startLocationIndex);
 		GeoCoord next = toTraverse.getTrailMarkers().get(startLocationIndex + 1); //won't index out of range because of check above. 
-		Double reqSpeed = requestedSpeeds.get(start);
+		if(requestedSpeeds.get(start) != null && requestedSpeeds.get(start).get(1) != null){
+			Double reqSpeed = requestedSpeeds.get(start).get(1);//first lap
+		}
 		TelemDataPacket startCondition = carStartingCondition;
 		FIODataPoint startWeather = new FIODataBlock(weather.getHourly()).datapoint(0);
 		LocationReport simmedStartPoint = new LocationReport(toTraverse.getTrailMarkers().get(startLocationIndex), "Raven", "Simmed");
@@ -89,8 +95,12 @@ public class SimEngine {
 				nextWeather = weatherReports.getForecasts().get(i%numOfPoints);
 				nextPoint = toTraverse.getTrailMarkers().get(i%numOfPoints);
 			}
-
-			SimFrame nextFrame = this.generateNextFrame(lastFrame, nextPoint, nextWeather, requestedSpeeds.get(nextPoint),currentLap);
+			Double requestedSpeedTemp = null;
+			if(requestedSpeeds.get(nextPoint) != null){
+				requestedSpeedTemp = requestedSpeeds.get(nextPoint).get(currentLap);
+			}
+			SimFrame nextFrame = this.generateNextFrame(lastFrame, nextPoint, nextWeather, requestedSpeedTemp,currentLap);
+		
 			lastFrame = nextFrame;
 			listOfFrames.add(nextFrame);
 		}	

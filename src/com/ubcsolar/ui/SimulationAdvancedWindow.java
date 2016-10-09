@@ -362,7 +362,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	 */
 	protected void clearManualSpeedSettings() {
 		if(this.lastSimReport.getSimFrames().size() == 0){
-			this.clearAndLoadSpeedSliders(this.lastSimReport.getSimFrames(), KM_PER_SLIDER, new HashMap<GeoCoord, Double>(), 0.0);
+			this.clearAndLoadSpeedSliders(this.lastSimReport.getSimFrames(), KM_PER_SLIDER, new HashMap<GeoCoord, Map<Integer,Double>>(), 0.0);
 			return;
 		}
 		double startDistance;
@@ -373,10 +373,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			e.printStackTrace();
 			startDistance = 0.0;
 		}
-		this.clearAndLoadSpeedSliders(this.lastSimReport.getSimFrames(), KM_PER_SLIDER, new HashMap<GeoCoord, Double>(), startDistance );
+		this.clearAndLoadSpeedSliders(this.lastSimReport.getSimFrames(), KM_PER_SLIDER, new HashMap<GeoCoord,Map<Integer, Double>>(), startDistance );
 	}
 
-	private void clearAndLoadSpeedSliders(List<SimFrame> simResultValues, int KM_PER_SLIDER, Map<GeoCoord, Double> lastManuallyReqSpeeds, double startDistance) {
+	private void clearAndLoadSpeedSliders(List<SimFrame> simResultValues, int KM_PER_SLIDER, Map<GeoCoord, Map<Integer, Double>> map, double startDistance) {
 	
 		SliderHoldingPanel.removeAll();
 		SliderHoldingPanel.validate();
@@ -429,7 +429,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				boolean isManuallySet = false;
 				for(GeoCoord g : pointsToRepresent){
 					//not sure to do if any of them, or if majority, or if all, etc. 
-					if(lastManuallyReqSpeeds.get(g)!=null){
+					if(map.get(g)!=null){
 						isManuallySet = true;
 						System.out.println("total speed: " + totalSpeed);
 						System.out.println("Average speed: " + averageSpeed);
@@ -481,7 +481,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		 */
 		protected void runSimultion() {
 			int numLaps = lapSelectComboBox.getSelectedIndex() +1; //0 based index.
-			Map<GeoCoord, Double> requestedSpeeds = generateRequestedSpeedMap();
+			Map<GeoCoord,Map<Integer, Double>> requestedSpeeds = generateRequestedSpeedMap();
 			try {
 				mySession.getMySimController().runSimulation(requestedSpeeds,numLaps);
 			} catch (NoForecastReportException e) {
@@ -499,8 +499,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			}
 	}
 		
-		private Map<GeoCoord, Double> generateRequestedSpeedMap() {
-			HashMap<GeoCoord, Double> toReturn = new HashMap<GeoCoord, Double>();
+		private Map<GeoCoord,Map<Integer, Double>> generateRequestedSpeedMap() {
+			HashMap<GeoCoord,Map<Integer, Double>> toReturn = new HashMap<GeoCoord, Map<Integer,Double>>();
 			/*Random rng = new Random();
 			if(rng.nextBoolean()){
 				for(SimFrame g : this.lastSimReport.getSimFrames()){
@@ -510,8 +510,18 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			
 			for(SliderSpinnerFrame f : this.displayedSpeedSliderSpinners){
 				if(f.isManuallySet()){
+					//TODO get lapnumber dynamically
+					int lapNumber = 1;
 					for(GeoCoord g : f.getRepresentedCoordinates()){
-						toReturn.put(g, f.getValue()+0.0); //the '+0.0' is to make it a Double. 
+						if(toReturn.get(g) == null){
+							Map<Integer, Double> lapAndSpeed = new HashMap<Integer,Double>();
+							lapAndSpeed.put(lapNumber, f.getValue()+0.0);
+							toReturn.put(g,lapAndSpeed);
+						}
+						else{
+							toReturn.get(g).put(lapNumber, f.getValue()+0.0); //the '+0.0' is to make it a Double.
+						}
+						 
 					}
 					System.out.println("Manually Requesting speed to: " + f.getValue());
 				}
@@ -595,7 +605,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			if(simReport.getSimFrames().size() == 0){
 				this.setDefaultChart(); //last sim was deleted.
 				this.mainDisplay.setChart(this.simResults);
-				clearAndLoadSpeedSliders(new ArrayList<SimFrame>(),KM_PER_SLIDER,new HashMap<GeoCoord, Double>(), startDistance);
+				clearAndLoadSpeedSliders(new ArrayList<SimFrame>(),KM_PER_SLIDER,new HashMap<GeoCoord,Map<Integer, Double>>(), startDistance);
 				
 				contentPane.repaint();
 				contentPane.validate();

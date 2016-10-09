@@ -75,10 +75,10 @@ public class SimulationReport extends DataUnit {
 
 	
 	private final List<SimFrame> simData;
-	private final Map<GeoCoord, Double> manuallyRequestedSpeeds;
+	private final Map<GeoCoord, Map<Integer, Double>> manuallyRequestedSpeeds;
 	
 	
-	public SimulationReport(List<SimFrame> simData, Map<GeoCoord, Double> requestedSpeeds, String info) {
+	public SimulationReport(List<SimFrame> simData, Map<GeoCoord, Map<Integer, Double>> requestedSpeeds, String info) {
 		this.simData = simData;
 		this.manuallyRequestedSpeeds = requestedSpeeds;
 	}
@@ -99,7 +99,7 @@ public class SimulationReport extends DataUnit {
 		return null;
 	}
 
-	public Map<GeoCoord, Double> getManuallyRequestedSpeeds() {
+	public Map<GeoCoord, Map<Integer, Double>> getManuallyRequestedSpeeds() {
 		return manuallyRequestedSpeeds;
 	}
 
