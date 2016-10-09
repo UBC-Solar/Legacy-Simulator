@@ -432,8 +432,13 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				boolean isManuallySet = false;
 				for(GeoCoord g : pointsToRepresent){
 					//not sure to do if any of them, or if majority, or if all, etc. 
-					if(map.get(g)!=null){
+					if(map.get(g)!=null && map.get(g).get(startLapNumber) != null){
 						isManuallySet = true;
+						System.out.println("total speed: " + totalSpeed);
+						System.out.println("Average speed: " + averageSpeed);
+						System.out.println((i-(lastAddedPointIndex+1) + ""));
+					}
+					if(averageSpeed <2 || totalSpeed <500 || (int) averageSpeed < 1){
 						System.out.println("total speed: " + totalSpeed);
 						System.out.println("Average speed: " + averageSpeed);
 						System.out.println((i-(lastAddedPointIndex+1) + ""));
@@ -582,6 +587,14 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 						return;
 					}
 				}
+		
+				int totalFrames = lastSimReport.getSimFrames().size();
+				if(totalFrames>0){
+					int maxLap = lastSimReport.getSimFrames().get(totalFrames-1).getLapNumber();
+					this.lapSelectComboBox.getModel().setSelectedItem(maxLap); 
+				}
+						
+				
 				updateChart(test.getSimReport(), startDistance);
 				this.clearAndLoadSpeedSliders(lastSimReport.getSimFrames(), KM_PER_SLIDER, lastSimReport.getManuallyRequestedSpeeds(), startDistance);
 				this.validate();
