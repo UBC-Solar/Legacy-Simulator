@@ -87,21 +87,24 @@ public class SimFrame extends DataUnit{ //implements Runnable{
 	private  final FIODataPoint forecast;
 	private  final TelemDataPacket carStatus;
 	private  final LocationReport GPSReport;
+	private final int lapNumber;
 	
 	
-	public SimFrame(FIODataPoint forecast, TelemDataPacket carStatus, LocationReport GPSReport, long timeRepresented) {
+	public SimFrame(FIODataPoint forecast, TelemDataPacket carStatus, LocationReport GPSReport, long timeRepresented, int lapNumber) {
 		this.forecast = forecast;
 		this.carStatus = carStatus;
 		this.GPSReport = GPSReport;	
 		this.representedTime = timeRepresented;
 		this.timeCreated = System.currentTimeMillis();
+		this.lapNumber = lapNumber;
 	}
-	public SimFrame(FIODataPoint forecast, TelemDataPacket carStatus, LocationReport GPSReport, long timeRepresented, long timeCreated) {
+	public SimFrame(FIODataPoint forecast, TelemDataPacket carStatus, LocationReport GPSReport, long timeRepresented, int lapNumber, long timeCreated) {
 		this.forecast = forecast;
 		this.carStatus = carStatus;
 		this.GPSReport = GPSReport;
 		this.representedTime = timeRepresented;
 		this.timeCreated = timeCreated;	
+		this.lapNumber = lapNumber;
 	}
 
 	@Override
@@ -128,6 +131,10 @@ public class SimFrame extends DataUnit{ //implements Runnable{
 	}
 	public long getRepresentedTime() {
 		return representedTime;
+	}
+
+	public int getLapNumber() {
+		return this.lapNumber;
 	}
 
 
