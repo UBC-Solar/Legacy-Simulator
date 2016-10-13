@@ -55,8 +55,8 @@ public class FakeForecastAddWindow extends JFrame{
 	private JTextField txtPrecipProb;
 	private JTextField txtPrecipType;
 	private JTextField txtPrecipIntensity;
+	private JSpinner timeSpinner;
 	private DefaultListModel<JsonObject> listModel;
-	private JTextField txtTime;
 	private double currTime;
 	
 	public FakeForecastAddWindow(GlobalController mySession, DefaultListModel<JsonObject> listModel,
@@ -86,15 +86,12 @@ public class FakeForecastAddWindow extends JFrame{
 		gbc_lblTime.gridy = 1;
 		getContentPane().add(lblTime, gbc_lblTime);
 		
-		txtTime = new JTextField();
-		txtTime.setText("0");
-		GridBagConstraints gbc_txtTime = new GridBagConstraints();
-		gbc_txtTime.insets = new Insets(0, 0, 5, 0);
-		gbc_txtTime.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtTime.gridx = 1;
-		gbc_txtTime.gridy = 1;
-		getContentPane().add(txtTime, gbc_txtTime);
-		txtTime.setColumns(10);
+		timeSpinner = new JSpinner();
+		GridBagConstraints gbc_spinner = new GridBagConstraints();
+		gbc_spinner.insets = new Insets(0, 0, 5, 0);
+		gbc_spinner.gridx = 1;
+		gbc_spinner.gridy = 1;
+		getContentPane().add(timeSpinner, gbc_spinner);
 		
 		JLabel lblTemp = new JLabel("Temp. (\u00B0C):");
 		GridBagConstraints gbc_lblTemp = new GridBagConstraints();
@@ -360,14 +357,16 @@ public class FakeForecastAddWindow extends JFrame{
 	
 	private boolean addDatapoint(){
 		int time;
-		double hourTime;
-		try{
-			hourTime = Double.parseDouble(this.txtTime.getText());
-			time = (int) (currTime + hourTime*3600);
-		}catch(java.lang.NumberFormatException e){
-			this.handleError("Time formatted incorrectly");
-			return false;
-		}
+		time = (int) ((int)(timeSpinner.getValue())*3600 + currTime);
+		time /= 3600;
+		time *= 3600; //trying to truncate it to the nearest hour
+//		try{
+//			hourTime = Double.parseDouble(this.txtTime.getText());
+//			time = (int) (currTime + hourTime*3600);
+//		}catch(java.lang.NumberFormatException e){
+//			this.handleError("Time formatted incorrectly");
+//			return false;
+//		}
 		double temp;
 		try{
 			temp = Double.parseDouble(this.txtTemp.getText());
@@ -454,7 +453,7 @@ public class FakeForecastAddWindow extends JFrame{
 		factory.time(time).cloudCover(cldCover).dewPoint(dewPoint).humidity(humidity).
 			precipIntensity(precipIntensity).precipProb(precipProb).precipType(precipType).
 			temperature(temp).windBearing(windBearing).windSpeed(windSpeed).
-			stormBearing(strmBearing).stormDistance(strmDistance).hourTime(hourTime);
+			stormBearing(strmBearing).stormDistance(strmDistance);
 		
 		listModel.addElement(factory.build());
 		

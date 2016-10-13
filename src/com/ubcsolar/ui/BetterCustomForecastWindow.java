@@ -175,10 +175,9 @@ public class BetterCustomForecastWindow extends JFrame{
 		for(int j = listModel.size()-2; j >= 0; j--){
 			JsonObject curr = listModel.get(listModel.size()-1);
 			JsonObject test = listModel.get(j);
-			double currTime = Double.parseDouble(curr.get("hourTime").toString());
-			double testTime = Double.parseDouble(test.get("hourTime").toString());
+			double currTime = Double.parseDouble(curr.get("time").toString());
+			double testTime = Double.parseDouble(test.get("time").toString());
 			if(currTime == testTime){
-				System.out.println("aqui");
 				toRemove.add(j);
 			}
 		}
