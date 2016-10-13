@@ -24,6 +24,9 @@ public class GlobalValues {
 	//to convert from the ForecastIO default. 
 	public final static SimpleDateFormat forecastIODateParser = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 	
+	//to convert from the ForecastIO default just using the time and not the date
+	public final static SimpleDateFormat forecastIOTimeParser = new SimpleDateFormat("HH:mm:ss");
+	
 	//Strategy@ubcsolar.com's key
 	public final static String WEATHER_KEY= "e4f99878991a762e85efbffc7db8d657";
 	

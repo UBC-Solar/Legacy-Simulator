@@ -778,9 +778,6 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 						}
 					}
 					FIODataPoint firstForecast = hourlyForecasts.get(0).datapoint(numHours);
-					//SimpleDateFormat sdf = GlobalValues.forecastIODateParser;
-					//long timeNum = Long.parseLong(datapoint.time().toString())
-					//String time = sdf.format(Long.parseLong(firstForecast.time())*1000);
 					String time = firstForecast.time();
 					if(firstForecast.getTimezone().equals("GMT")){
 						time = convertFromGMT(time);
@@ -815,7 +812,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			int offset = localTz.getOffset(new Date().getTime());
 			long localTimestamp = gmtTimestamp + offset;
 			Date localDate = new Date(localTimestamp);
-			String localTime = GlobalValues.forecastIODateParser.format(localDate);
+			String localTime = GlobalValues.forecastIOTimeParser.format(localDate);
 			return localTime;
 		}
 		
