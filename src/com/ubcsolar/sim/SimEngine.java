@@ -125,9 +125,11 @@ public class SimEngine {
 			speedToDrive = calculateBestSpeed(lastCarStatus.getSpeed(), elevationChange, lastCarStatus.getStateOfCharge()); //stubMethod. Also this is a greedy algo.
 			//obviously need to add more arguments ^^
 		}
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^KEEP ALL ABOVE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 		else{
 			speedToDrive = requestedSpeed;
 		}
+//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 		//not sure if calculateDistance() takes elevation into account....
 		double distanceCovered = lastPosition.calculateDistance(nextPoint)*1000; 
@@ -140,7 +142,8 @@ public class SimEngine {
 			timeSinceLastFrame = (long) tempTime;		
 			nextSimFrameTime = lastTimeStamp + timeSinceLastFrame;
 			timeSinceLastFrameInHr = timeSinceLastFrame/(60.0*1000.0*60.0);
-
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ENCLOSED IS GOOD STUFF^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//                      STUFF BELOW HERE TO THE NEXT LINE I AM NOT TOO FAMILIAR WITH
 			//System.out.println(distanceCovered);
 		}
 		else{
@@ -188,7 +191,7 @@ public class SimEngine {
 		return toReturn;
 	}
 
-
+//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 	/**
 	 * Important helper method, calculates the state of the car after traverssing the last gap. 
 	 * @param lastCarStatus - th
@@ -214,7 +217,7 @@ public class SimEngine {
 
 		return toReturn;
 	}
-
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^KEEP ENCLOSED ABOVE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 	/**
 	 * May generate a value more than 100 or less than 0, but keeps it somewhere within that.
@@ -280,6 +283,8 @@ public class SimEngine {
 	}
 	 */
 
+	
+//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 	/**
 	 * Helper function; calculate the amount of solar power falling on the car during the frame. 
 	 * @param nextPoint - to get the lon/lat for sun elevation in degrees
@@ -322,8 +327,8 @@ public class SimEngine {
 		//because watts, don't need to include time. 
 		return watts; 
 	}
-
-
+//^^^^^^^^^^^^^^^^^SOME GOOD IDEAS IN HERE, LIKE CHANGING SUNLIGHT WITH TIME OF DAY AND GETTING CLOUD COVER^^^^^^^^^^^^^^^^^^^^^^^^^
+//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 	/**
 	 * Helper function, picks the right report from a list of hourly reports and a time. 
 	 * @param weather
@@ -336,7 +341,7 @@ public class SimEngine {
 		toReturn.setTimezone("PST");
 		return toReturn;
 	}
-
+//^^^^^^^^^^^^^^^^^^^^^^^^^^I THINK THIS IS GOOD TO KEEP^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 	private double calculateBestSpeed(double lastCarSpeed, double elevationChange, double SoC) {
 		double SpeedReturn;
@@ -392,7 +397,7 @@ public class SimEngine {
 	}
 
 
-
+//not sure if this does anything
 	private int getStartPos(ArrayList<GeoCoord> trailMarkers, GeoCoord location) {
 		// find the closest point and return the position number. 
 		
