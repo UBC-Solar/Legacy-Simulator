@@ -24,10 +24,14 @@ public class ChangeHoursWindow extends JFrame{
 	private DefaultListModel<JsonObject> listModel;
 	private JSpinner timeSpinner;
 	private double currTime;
+	private BetterCustomForecastWindow parent;
 	
-	public ChangeHoursWindow(JsonObject datapoint, DefaultListModel<JsonObject> listModel, double currTime){
+	public ChangeHoursWindow(JsonObject datapoint, DefaultListModel<JsonObject> listModel, 
+			double currTime, BetterCustomForecastWindow parent){
 		
 		this.currTime = currTime;
+		this.parent = parent;
+		
 		original = datapoint;
 		this.listModel = listModel;
 		this.setBounds(500, 250, 300, 100);
@@ -101,11 +105,12 @@ public class ChangeHoursWindow extends JFrame{
 		}
 		newDatapoint.set("time", time);
 		listModel.addElement(newDatapoint);
+		parent.eraseDuplicates();
 		this.dispose();
 	}
 	
 	private void handleCancelClick(){
-		
+		this.dispose();
 	}
 	
 	private void handleError(String message){

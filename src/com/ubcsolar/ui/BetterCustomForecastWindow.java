@@ -162,7 +162,8 @@ public class BetterCustomForecastWindow extends JFrame{
 		if(selectedIndex == -1){
 			return;
 		}
-		JFrame frame = new ChangeHoursWindow(listModel.getElementAt(selectedIndex), listModel, currTime);
+		JFrame frame = new ChangeHoursWindow(listModel.getElementAt(selectedIndex), listModel, 
+				currTime, this);
 		frame.setVisible(true);
 	}
 	
