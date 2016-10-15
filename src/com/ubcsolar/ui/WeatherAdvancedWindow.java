@@ -79,6 +79,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeListener;
 import javax.swing.JTabbedPane;
 import java.awt.Font;
+import javax.swing.UIManager;
 
 public class WeatherAdvancedWindow extends JFrame implements Listener{
 	
@@ -582,9 +583,10 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				if(fogWarning){
 					fogLabel.setText("Fog warning. (Temp is " + 
 							dewDifference + "° above dew point.)");
-					//fogLabel.paintAll(g);
+					
 				}else{
 					fogLabel.setText("No fog warning");
+					
 				}
 				if(stormWarning){
 					double stormBearing = closestCurrently.nearestStormBearing();
