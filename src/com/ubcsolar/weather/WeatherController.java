@@ -36,7 +36,7 @@ import com.ubcsolar.notification.Notification;
 public class WeatherController extends ModuleController {
 	private ForecastReport lastDownloadedReport = null;
 	private ForecastReport lastCustomReport = null;
-	private List<ForecastIO> retrievedForecasts;
+	private List<ForecastIO> retrievedForecasts = new ArrayList<ForecastIO>();
 	private List<ForecastIO> customForecasts = new ArrayList<ForecastIO>();
 	private List<ForecastIO> comboForecasts = new ArrayList<ForecastIO>();
 	private MapController myMapController;
@@ -121,79 +121,32 @@ public class WeatherController extends ModuleController {
 	
 	
 	/** 
-	 * Creates a custom forecast from a list of Json datapoints and a location. If there 
-	 * 		are less datapoints than there are in the existing forecasts, this will interpolate 
+	 * 	Takes a custom forecast, and, if there are less datapoints than there are in 
+	 * 		the existing forecasts, this will interpolate 
 	 * 		the custom datapoints with datapoints from existing forecasts, so that the custom forecast
 	 * 		has the same number of hours worth of data as the existing forecasts.
 	 * 		This is necessary to prevent bugs when drawing the downloaded and custom forecasts
-	 * 		at the same time. This function DOES NOT retroactively expand old custom forecasts
-	 * 		if a new forecast with greater size is added.
-	 * @param datapoints: the list of custom forecast datapoints to put in the custom forecast
-	 * @param location: a GeoCoord giving the location of the custom forecast
-	 * @throws NoLoadedRouteException
+	 * 		at the same time. 
+	 * @param oldForecast: the custom forecast with only a partial hourly forecast suite
+	 * @return: a copy of the original custom forecast with the blanks in the hourly forecast
+	 * 		filled in by the forecasts from the nearest downloaded forecast or the original 
+	 * 		forecast if there are no downloaded forecasts
 	 */
-	public void loadCustomForecast(List<JsonObject> datapoints, GeoCoord location) throws NoLoadedRouteException{
-		if(!(comboForecasts.size() == 0)){
-			ForecastIO nearest = comboForecasts.get(0);
-			GeoCoord currLoc = new GeoCoord(nearest.getLatitude(), nearest.getLongitude(), 0);
-			double minDistance = Math.abs(location.calculateDistance(currLoc));
-			for(int i = 1; i < comboForecasts.size(); i++){
-				ForecastIO currForecast = comboForecasts.get(i);
-				currLoc = new GeoCoord(currForecast.getLatitude(), 
-						currForecast.getLongitude(), 0);
-				double currDistance = Math.abs(currLoc.calculateDistance(location));
-				if(currDistance < minDistance){
-					minDistance = currDistance;
-					nearest = currForecast;
-				}else
-					break;
-			}
-			List<Long> customTimes = new ArrayList<Long>();
-			for(int i = 0; i < datapoints.size(); i++){
-				customTimes.add(Long.parseLong(datapoints.get(i).get("time").toString()));
-			}
-			if(nearest != null){//if this if statement is skipped, something's wrong
-				System.out.println("latitude: " + location.getLat() + " longitude: " + location.getLon());
-				System.out.println("we got here");
-				JsonObject prevHourly = nearest.getHourly();
-				JsonArray hourlyData = (JsonArray)prevHourly.get("data");
-				for(int i = 0; i < hourlyData.size(); i++){
-					JsonObject currHour = (JsonObject) hourlyData.get(i);
-					String thisTimeStr = currHour.get("time").toString();
-					long time = Long.parseLong(thisTimeStr); 
-					if(!customTimes.contains(time)){
-						datapoints.add(currHour);
-						customTimes.add(time);
-						
-					}
-				}
-			}
-			
-		}
-		ForecastIOFactory.addDatapoints(datapoints);
-		ForecastIOFactory.changeLocation(location);
-		ForecastIO customForecast = ForecastIOFactory.build();
-		try{
-			loadCustomForecast(customForecast);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
 	
 	public ForecastIO fillEmptyHours(ForecastIO oldForecast){
 		
-		if(!(comboForecasts.size() == 0)){
+		if(!(retrievedForecasts.size() == 0)){
 			JsonObject oldHourly = oldForecast.getHourly();
 			JsonArray oldHourlyData = (JsonArray)oldHourly.get("data");
 			GeoCoord location = new GeoCoord(oldForecast.getLatitude(), oldForecast.getLongitude(), 0);
-			ForecastIO nearest = comboForecasts.get(0);
+			ForecastIO nearest = retrievedForecasts.get(0);
 			GeoCoord currLoc = new GeoCoord(nearest.getLatitude(), nearest.getLongitude(), 0);
-			double minDistance = Math.abs(location.calculateDistance(currLoc));
-			for(int i = 1; i < comboForecasts.size(); i++){
-				ForecastIO currForecast = comboForecasts.get(i);
+			double minDistance = location.calculateDistance(currLoc);
+			for(int i = 1; i < retrievedForecasts.size(); i++){
+				ForecastIO currForecast = retrievedForecasts.get(i);
 				currLoc = new GeoCoord(currForecast.getLatitude(), 
 						currForecast.getLongitude(), 0);
-				double currDistance = Math.abs(currLoc.calculateDistance(location));
+				double currDistance = currLoc.calculateDistance(location);
 				if(currDistance < minDistance){
 					minDistance = currDistance;
 					nearest = currForecast;
@@ -209,8 +162,6 @@ public class WeatherController extends ModuleController {
 				customTimes.add(Long.parseLong(((JsonObject)oldHourlyData.get(i)).get("time").toString()));
 			}
 			if(nearest != null){//if this if statement is skipped, something's wrong
-				System.out.println("latitude: " + location.getLat() + " longitude: " + location.getLon());
-				System.out.println("we got here");
 				JsonObject prevHourly = nearest.getHourly();
 				JsonArray hourlyData = (JsonArray)prevHourly.get("data");
 				for(int i = 0; i < hourlyData.size(); i++){

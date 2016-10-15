@@ -360,13 +360,6 @@ public class FakeForecastAddWindow extends JFrame{
 		time = (int) ((int)(timeSpinner.getValue())*3600 + currTime);
 		time /= 3600;
 		time *= 3600; //trying to truncate it to the nearest hour
-//		try{
-//			hourTime = Double.parseDouble(this.txtTime.getText());
-//			time = (int) (currTime + hourTime*3600);
-//		}catch(java.lang.NumberFormatException e){
-//			this.handleError("Time formatted incorrectly");
-//			return false;
-//		}
 		double temp;
 		try{
 			temp = Double.parseDouble(this.txtTemp.getText());

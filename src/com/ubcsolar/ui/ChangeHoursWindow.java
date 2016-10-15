@@ -17,14 +17,17 @@ import java.awt.event.MouseEvent;
 import javax.swing.JTextField;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JSpinner;
 
 public class ChangeHoursWindow extends JFrame{
-	private JTextField txtTime;
 	private JsonObject original;
 	private DefaultListModel<JsonObject> listModel;
+	private JSpinner timeSpinner;
+	private double currTime;
 	
-	public ChangeHoursWindow(JsonObject datapoint, DefaultListModel<JsonObject> listModel){
+	public ChangeHoursWindow(JsonObject datapoint, DefaultListModel<JsonObject> listModel, double currTime){
 		
+		this.currTime = currTime;
 		original = datapoint;
 		this.listModel = listModel;
 		this.setBounds(500, 250, 300, 100);
@@ -45,15 +48,12 @@ public class ChangeHoursWindow extends JFrame{
 		gbc_lblTime.gridy = 0;
 		getContentPane().add(lblTime, gbc_lblTime);
 		
-		txtTime = new JTextField();
-		txtTime.setText("0");
-		GridBagConstraints gbc_txtTime = new GridBagConstraints();
-		gbc_txtTime.insets = new Insets(0, 0, 5, 0);
-		gbc_txtTime.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtTime.gridx = 1;
-		gbc_txtTime.gridy = 0;
-		getContentPane().add(txtTime, gbc_txtTime);
-		txtTime.setColumns(10);
+		timeSpinner = new JSpinner();
+		GridBagConstraints gbc_timeSpinner = new GridBagConstraints();
+		gbc_timeSpinner.insets = new Insets(0, 0, 5, 0);
+		gbc_timeSpinner.gridx = 1;
+		gbc_timeSpinner.gridy = 0;
+		getContentPane().add(timeSpinner, gbc_timeSpinner);
 		
 		JButton btnOk = new JButton("OK");
 		GridBagConstraints gbc_btnOk = new GridBagConstraints();
@@ -91,9 +91,10 @@ public class ChangeHoursWindow extends JFrame{
 	private void handleOkClick(){
 		JsonObject newDatapoint = new JsonObject(original);
 		int time;
-		try{
-			double hourTime = Double.parseDouble(this.txtTime.getText());
-			time = (int) (System.currentTimeMillis()/1000 + hourTime*3600);
+		try{			
+			time = (int) ((int)(timeSpinner.getValue())*3600 + currTime);
+			time /= 3600;
+			time *= 3600;
 		}catch(java.lang.NumberFormatException e){
 			this.handleError("Time formatted incorrectly");
 			return;
