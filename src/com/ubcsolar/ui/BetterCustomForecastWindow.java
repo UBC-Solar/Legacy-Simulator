@@ -199,7 +199,7 @@ public class BetterCustomForecastWindow extends JFrame{
 			ForecastIOFactory.changeLocation(location);
 			ForecastIO forecast = ForecastIOFactory.build();
 			try {
-				myWeather.loadCustomForecast(datapoints, location);
+				myWeather.loadCustomForecast(forecast);
 			} catch (NoLoadedRouteException e) {
 				// TODO Auto-generated catch block
 				this.handleError("No Route Loaded, unable to add custom forecast");

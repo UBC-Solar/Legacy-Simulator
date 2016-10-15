@@ -51,8 +51,9 @@ public class WeatherController extends ModuleController {
 	 * @param numOfKMBetweenForecasts - we only have 1000 calls, so we probably can't get a forecast for every point
 	 * in the Route. 
 	 * @throws IOException 
+	 * @throws NoLoadedRouteException 
 	 */
-	public void downloadNewForecastsForRoute(int numOfKMBetweenForecasts) throws IOException{
+	public void downloadNewForecastsForRoute(int numOfKMBetweenForecasts) throws IOException, NoLoadedRouteException{
 		Route currentlyLoadedRoute = this.mySession.getMapController().getAllPoints();
 		if(currentlyLoadedRoute == null){
 			mySession.sendNotification(new ExceptionNotification(new NullPointerException(), "Tried to get forecast but route was null"));
@@ -65,8 +66,15 @@ public class WeatherController extends ModuleController {
 			retrievedForecasts = forecastGetter.getForecasts(toGet);
 			if(comboForecasts.size() == 0){
 				comboForecasts = new ArrayList<ForecastIO>(retrievedForecasts);
+			}else{
+				
+				for(int i = 0; i < customForecasts.size(); i++){
+					ForecastIO temp = fillEmptyHours(customForecasts.get(i));
+					customForecasts.set(i, temp);
+				}
+				addCustomForecasts();
 			}
-			ForecastReport theReport = new ForecastReport(retrievedForecasts, this.mySession.getMapController().getLoadedMapName());
+			ForecastReport theReport = new ForecastReport(comboForecasts, this.mySession.getMapController().getLoadedMapName());
 			lastDownloadedReport = theReport;
 			this.mySession.sendNotification(new NewForecastReport(theReport));
 		}
@@ -74,7 +82,6 @@ public class WeatherController extends ModuleController {
 			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to load Forecasts, but IOException thrown (bad internet likely)");
 			throw e;
 		}
-
 	}
 	
 	public void downloadCurrentLocationForecast(GeoCoord location) throws NoLoadedRouteException{
@@ -105,7 +112,7 @@ public class WeatherController extends ModuleController {
 	 */
 	
 	public void loadCustomForecast(ForecastIO customForecast) throws NoLoadedRouteException{
-		customForecasts.add(customForecast);
+		customForecasts.add(fillEmptyHours(customForecast));
 		addCustomForecasts();
 		ForecastReport theReport = new ForecastReport(comboForecasts, this.mySession.getMapController().getLoadedMapName());
 		lastCustomReport = theReport;
@@ -127,13 +134,14 @@ public class WeatherController extends ModuleController {
 	 */
 	public void loadCustomForecast(List<JsonObject> datapoints, GeoCoord location) throws NoLoadedRouteException{
 		if(!(comboForecasts.size() == 0)){
-			double minDistance = 1000000000;
-			ForecastIO nearest = null;
-			for(int i = 0; i < comboForecasts.size(); i++){
+			ForecastIO nearest = comboForecasts.get(0);
+			GeoCoord currLoc = new GeoCoord(nearest.getLatitude(), nearest.getLongitude(), 0);
+			double minDistance = Math.abs(location.calculateDistance(currLoc));
+			for(int i = 1; i < comboForecasts.size(); i++){
 				ForecastIO currForecast = comboForecasts.get(i);
-				GeoCoord currLoc = new GeoCoord(currForecast.getLatitude(), 
+				currLoc = new GeoCoord(currForecast.getLatitude(), 
 						currForecast.getLongitude(), 0);
-				double currDistance = currLoc.calculateDistance(location);
+				double currDistance = Math.abs(currLoc.calculateDistance(location));
 				if(currDistance < minDistance){
 					minDistance = currDistance;
 					nearest = currForecast;
@@ -145,6 +153,8 @@ public class WeatherController extends ModuleController {
 				customTimes.add(Long.parseLong(datapoints.get(i).get("time").toString()));
 			}
 			if(nearest != null){//if this if statement is skipped, something's wrong
+				System.out.println("latitude: " + location.getLat() + " longitude: " + location.getLon());
+				System.out.println("we got here");
 				JsonObject prevHourly = nearest.getHourly();
 				JsonArray hourlyData = (JsonArray)prevHourly.get("data");
 				for(int i = 0; i < hourlyData.size(); i++){
@@ -168,6 +178,57 @@ public class WeatherController extends ModuleController {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+	}
+	
+	public ForecastIO fillEmptyHours(ForecastIO oldForecast){
+		
+		if(!(comboForecasts.size() == 0)){
+			JsonObject oldHourly = oldForecast.getHourly();
+			JsonArray oldHourlyData = (JsonArray)oldHourly.get("data");
+			GeoCoord location = new GeoCoord(oldForecast.getLatitude(), oldForecast.getLongitude(), 0);
+			ForecastIO nearest = comboForecasts.get(0);
+			GeoCoord currLoc = new GeoCoord(nearest.getLatitude(), nearest.getLongitude(), 0);
+			double minDistance = Math.abs(location.calculateDistance(currLoc));
+			for(int i = 1; i < comboForecasts.size(); i++){
+				ForecastIO currForecast = comboForecasts.get(i);
+				currLoc = new GeoCoord(currForecast.getLatitude(), 
+						currForecast.getLongitude(), 0);
+				double currDistance = Math.abs(currLoc.calculateDistance(location));
+				if(currDistance < minDistance){
+					minDistance = currDistance;
+					nearest = currForecast;
+				}else
+					break;
+			}
+			List<JsonObject> datapoints = new ArrayList<JsonObject>();
+			for(int i = 0; i < oldHourlyData.size(); i++){
+				datapoints.add((JsonObject)oldHourlyData.get(i));
+			}
+			List<Long> customTimes = new ArrayList<Long>();
+			for(int i = 0; i < oldHourlyData.size(); i++){
+				customTimes.add(Long.parseLong(((JsonObject)oldHourlyData.get(i)).get("time").toString()));
+			}
+			if(nearest != null){//if this if statement is skipped, something's wrong
+				System.out.println("latitude: " + location.getLat() + " longitude: " + location.getLon());
+				System.out.println("we got here");
+				JsonObject prevHourly = nearest.getHourly();
+				JsonArray hourlyData = (JsonArray)prevHourly.get("data");
+				for(int i = 0; i < hourlyData.size(); i++){
+					JsonObject currHour = (JsonObject) hourlyData.get(i);
+					String thisTimeStr = currHour.get("time").toString();
+					long time = Long.parseLong(thisTimeStr); 
+					if(!customTimes.contains(time)){
+						datapoints.add(currHour);
+						customTimes.add(time);
+					}
+				}
+			}
+			ForecastIOFactory.addDatapoints(datapoints);
+			ForecastIOFactory.changeLocation(location);
+			ForecastIO customForecast = ForecastIOFactory.build();
+			return customForecast;
+		}else
+			return oldForecast;
 	}
 	
 	/**
@@ -565,7 +626,7 @@ public class WeatherController extends ModuleController {
 	 * If any of the custom forecasts are given the same location as previously downloaded
 	 * forecasts, they will overwrite the downloaded forecasts
 	 * 
-	 * @return the list of ForecastIOs that should be put in the ForecastReport
+	 * POST: comboForecasts will contain the ForecastIOs that should be put in the ForecastReport
 	 */
 	private void addCustomForecasts() throws NoLoadedRouteException{
 		if(retrievedForecasts == null){

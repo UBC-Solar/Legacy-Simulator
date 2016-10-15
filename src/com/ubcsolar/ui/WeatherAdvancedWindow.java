@@ -170,10 +170,13 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 					Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
 					
 					mapChartNavigationTutorialDialog();
-				}catch(IOException e){
+				}catch(IOException | NoLoadedRouteException e){
 					frame.setVisible(false); //no need to show the loading screen now.
 					contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
-					handleError("IOException, check internet connection");
+					if(e instanceof IOException)
+						handleError("IOException, check internet connection");
+					else
+						handleError("No route has been loaded");
 					Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
 					e.printStackTrace();
 				}
