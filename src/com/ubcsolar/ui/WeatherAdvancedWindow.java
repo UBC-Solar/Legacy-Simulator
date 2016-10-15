@@ -60,9 +60,16 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -119,23 +126,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private JLabel lblSelectNumberOf;
 	private JSplitPane splitPane;
 
-	/**
-	 * Launch the application.
-	 *//*//don't need a main here.
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Weather frame = new Weather();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}*/
 
-	
 	private void setLabelDefaultValues(){
 		//this.stormLabel.setText("No storm warning");
 		this.fogLabel.setText("No fog warning");
@@ -144,6 +135,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	/**
 	 * Create the frame.
 	 * @param mySession 
+	 * @param main is the GUImain object that created this window
 	 */
 	public WeatherAdvancedWindow(final GlobalController mySession, GUImain main) {
 		
@@ -179,10 +171,13 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 					Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
 					
 					mapChartNavigationTutorialDialog();
-				}catch(IOException e){
+				}catch(IOException | NoLoadedRouteException e){
 					frame.setVisible(false); //no need to show the loading screen now.
 					contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
-					handleError("IOException, check internet connection");
+					if(e instanceof IOException)
+						handleError("IOException, check internet connection");
+					else
+						handleError("No route has been loaded");
 					Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
 					e.printStackTrace();
 				}
@@ -736,10 +731,12 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				DefaultXYDataset dds = new DefaultXYDataset();
 				List<ForecastIO> forecastsForChart = currentForecastReport.getForecasts();
 				forecastPoints = new ArrayList<GeoCoord>();
+				double maxBlockSize = 0;
 				
 				List<FIODataBlock> hourlyForecasts = new ArrayList<FIODataBlock>();
 				for(int i = 0; i < forecastsForChart.size()+1; i++){
 					//if statement adds duplicate point at the end
+					//done to extend line to the end of the graph
 					if (i == forecastsForChart.size()){
 						forecastPoints.add(new GeoCoord(forecastsForChart.get(i-1).getLatitude(), 
 								forecastsForChart.get(i-1).getLongitude(), 0.0));//uses 0 for elevation cause it doesn't matter for our uses
@@ -748,6 +745,9 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 						forecastPoints.add(new GeoCoord(forecastsForChart.get(i).getLatitude(), 
 								forecastsForChart.get(i).getLongitude(), 0.0));//uses 0 for elevation cause it doesn't matter for our uses
 						hourlyForecasts.add(new FIODataBlock(forecastsForChart.get(i).getHourly()));
+					}
+					if(hourlyForecasts.get(hourlyForecasts.size()-1).datablockSize() > maxBlockSize){
+						maxBlockSize = hourlyForecasts.get(hourlyForecasts.size()-1).datablockSize();
 					}
 				}
 				
@@ -793,12 +793,43 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							data[1][i] = currentHourForecast.windSpeed();
 						}
 					}
-					dds.addSeries("Hour " + numHours, data);
+					FIODataPoint firstForecast = hourlyForecasts.get(0).datapoint(numHours);
+					String time = firstForecast.time();
+					if(firstForecast.getTimezone().equals("GMT")){
+						time = convertFromGMT(time);
+					}
+					dds.addSeries(time, data);
 					numHours++;
 				}
 				
 				return dds;
 			}
+		}
+	
+		/**
+		 * Converts a time (like the one obtained from an FIODataPoint) to 
+		 * your system's local timezone
+		 * @param gmtTime The time in GMT (formatted as DD-MM-YYYY HH:MM:SS)
+		 * 		(should actually work with any timezone, but the Forecast.io API generally
+		 * 		gives it in GMT)
+		 * @return
+		 */
+
+		private String convertFromGMT(String gmtTime){
+			Date gmtDate;
+			try{
+				gmtDate = GlobalValues.forecastIODateParser.parse(gmtTime);
+			}catch(ParseException e){
+				e.printStackTrace();
+				return gmtTime;
+			}
+			long gmtTimestamp = gmtDate.getTime();
+			TimeZone localTz = Calendar.getInstance().getTimeZone();
+			int offset = localTz.getOffset(new Date().getTime());
+			long localTimestamp = gmtTimestamp + offset;
+			Date localDate = new Date(localTimestamp);
+			String localTime = GlobalValues.forecastIOTimeParser.format(localDate);
+			return localTime;
 		}
 		
 		private XYDataset createDataset(){
