@@ -60,13 +60,13 @@ public class CarTelemPacketWindow extends JFrame {
 		setResizable(true);
 		this.mySession = mySession;
 		setTitleAndLogo();
-//		this.setBounds(500, 250, 400, 355);
-		this.setBounds(500, 250, (int)this.getToolkit().getScreenSize().getWidth()*1/3, (int)this.getToolkit().getScreenSize().getHeight()*1/2);
+		this.setBounds(500, 250, 400, 355);
+//		this.setBounds(500, 250, (int)this.getToolkit().getScreenSize().getWidth()*1/3, (int)this.getToolkit().getScreenSize().getHeight()*1/2);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 83, 0, 70, 0};
-		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		gridBagLayout.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-		gridBagLayout.rowWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+		gridBagLayout.rowWeights = new double[]{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE};
 		getContentPane().setLayout(gridBagLayout);
 		
 		JLabel lblStateOfCharge = new JLabel("State Of Charge (%):");
@@ -114,19 +114,6 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_lblnewTotalVoltage.gridx = 1;
 		gbc_lblnewTotalVoltage.gridy = 3;
 		getContentPane().add(lblnewTotalVoltage, gbc_lblnewTotalVoltage);
-		
-		JButton btnOk = new JButton("OK");
-		btnOk.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				handleOkClick();
-			}
-		});
-		btnOk.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				handleOkClick();
-			}
-		});
 		
 		txttotalcellvolt = new JTextField();
 		txttotalcellvolt.setText("44");
@@ -279,12 +266,30 @@ public class CarTelemPacketWindow extends JFrame {
 		gbc_timeField.gridx = 2;
 		gbc_timeField.gridy = 11;
 		getContentPane().add(timeField, gbc_timeField);
+		
+		JButton btnOk = new JButton("OK");
+		btnOk.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				handleOkClick();
+			}
+		});
+		btnOk.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				handleOkClick();
+			}
+		});
 		GridBagConstraints gbc_btnOk = new GridBagConstraints();
 		gbc_btnOk.anchor = GridBagConstraints.EAST;
-		gbc_btnOk.insets = new Insets(0, 0, 0, 5);
+		gbc_btnOk.insets = new Insets(0, 0, 5, 5);
 		gbc_btnOk.gridx = 2;
 		gbc_btnOk.gridy = 12;
 		getContentPane().add(btnOk, gbc_btnOk);
+		
+		btnOk.requestFocus();
+		btnOk.requestFocusInWindow();
+		getRootPane().setDefaultButton(btnOk);
+		btnOk.requestFocus();
 		
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(new ActionListener() {
@@ -300,15 +305,11 @@ public class CarTelemPacketWindow extends JFrame {
 		});
 		
 		GridBagConstraints gbc_btnCancel = new GridBagConstraints();
+		gbc_btnCancel.insets = new Insets(0, 0, 5, 0);
 		gbc_btnCancel.anchor = GridBagConstraints.WEST;
 		gbc_btnCancel.gridx = 3;
 		gbc_btnCancel.gridy = 12;
 		getContentPane().add(btnCancel, gbc_btnCancel);
-		
-		btnOk.requestFocus();
-		btnOk.requestFocusInWindow();
-		getRootPane().setDefaultButton(btnOk);
-		btnOk.requestFocus();
 	}
 	
 	//------------------------------------------------------
