@@ -11,6 +11,8 @@ import java.util.Random;
 
 import org.jfree.data.Values;
 
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
 import com.github.dvdme.ForecastIOLib.FIOCurrently;
 import com.github.dvdme.ForecastIOLib.FIODataBlock;
 import com.github.dvdme.ForecastIOLib.FIODataPoint;
@@ -27,6 +29,7 @@ import com.ubcsolar.common.TelemDataPacket;
 
 public class SimEngine {
 	private final double RECHARGE_TIME_MS= 3*1000;
+	private final int EFF_SOLAR_CONSTANT = 990;
 
 	public SimEngine() {
 
@@ -330,14 +333,31 @@ public class SimEngine {
 //^^^^^^^^^^^^^^^^^SOME GOOD IDEAS IN HERE, LIKE CHANGING SUNLIGHT WITH TIME OF DAY AND GETTING CLOUD COVER^^^^^^^^^^^^^^^^^^^^^^^^^
 //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 	/**
-	 * Helper function, picks the right report from a list of hourly reports and a time. 
-	 * @param weather
-	 * @param timeFrame ms since jan1 1970 (see System.currentTimeMillis)
-	 * @return
+	 * Helper function, picks the hourly report that is closest in time to timeFrame
+	 * @param ForecastIO with full selection of weather data, and a set of hourly forecasts that
+	 * 		is sorted by time
+	 * @param timeFrame: time in ms since jan1 1970 (see System.currentTimeMillis)
+	 * @return an FIODataPoint containing the hourly forecast for the hour closest to timeFrame
 	 */
 	private FIODataPoint chooseReport(ForecastIO weather, double timeFrame) {
-		//TODO actually make this choose something. 
-		FIODataPoint toReturn  = new FIODataBlock(weather.getHourly()).datapoint(0);
+		JsonObject hourly = weather.getHourly();
+		JsonArray hourlyData = (JsonArray)hourly.get("data");
+		int currTime = Integer.parseInt(((JsonObject)hourlyData.get(0)).get("time").toString());
+		int bestIndex = 0;
+		double smallestDiff = Math.abs(timeFrame-currTime);
+		double prevDiff = smallestDiff;
+		for(int i = 1; i < hourlyData.size(); i++){
+			currTime = Integer.parseInt(((JsonObject)hourlyData.get(i)).get("time").toString());
+			double currDiff = Math.abs(timeFrame-currTime);
+			if(currDiff < smallestDiff){
+				smallestDiff = currDiff;
+				bestIndex = i;
+			}
+			if(currDiff > prevDiff)
+				break;
+			prevDiff = currDiff;
+		}
+		FIODataPoint toReturn  = new FIODataBlock(weather.getHourly()).datapoint(bestIndex);
 		toReturn.setTimezone("PST");
 		return toReturn;
 	}
