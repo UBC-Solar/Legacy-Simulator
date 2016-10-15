@@ -12,7 +12,7 @@ import com.ubcsolar.common.GeoCoord;
 public class ForecastIOFactory {
 	private static double latitude = 0;
 	private static double longitude = 0;
-	private static String timezone = "AMERICA";
+	private static String timezone = "PST";
 	private static int offset = -6;
 	private static List<JsonObject> datapoints;
 	

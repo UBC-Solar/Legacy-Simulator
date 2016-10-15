@@ -42,9 +42,10 @@ public class SliderSpinnerFrame extends JPanel {
 	//simulator, we should change color or something. 
 	private int currentValue; 
 	private List<GeoCoord> representedCoordinates;
+	private final int lapNumber;
 	
-	
-	public SliderSpinnerFrame(String labelAtTheTop, int initialValue, boolean isManuallySetInitialValue, List<GeoCoord> representingCoords) {
+	public SliderSpinnerFrame(String labelAtTheTop, int initialValue, boolean isManuallySetInitialValue, List<GeoCoord> representingCoords, int lapNumber) {
+		this.lapNumber = lapNumber;
 		this.isManuallySet = isManuallySetInitialValue;
 		currentValue = initialValue;
 		this.representedCoordinates = representingCoords;
@@ -98,6 +99,9 @@ public class SliderSpinnerFrame extends JPanel {
 		topLabel.setText(labelAtTheTop);
 		panel.add(topLabel, BorderLayout.NORTH);
 		updateSelectors();
+		if(currentValue < 1){
+			System.out.println("Slider pane initial value: " + initialValue);
+		}
 	}
 
 	public int getValue(){
@@ -119,7 +123,7 @@ public class SliderSpinnerFrame extends JPanel {
 			showManuallySet = this.showIsNotManuallySet;
 		}
 		if(topLabel != null){
-			String currentLabelMinusFlag = topLabel.getText().substring(this.showIsManuallySet.length());
+			String currentLabelMinusFlag = topLabel.getText().substring(this.showIsManuallySet.length())+"{" + this.lapNumber + "}";
 			this.topLabel.setText(showManuallySet + currentLabelMinusFlag);
 		}
 	}
@@ -134,6 +138,10 @@ public class SliderSpinnerFrame extends JPanel {
 	
 	public void changeManuallySet(Boolean newValue) {
 		isManuallySet = newValue;
+	}
+
+	public int getLapNumber() {
+		return this.lapNumber;
 	}
 
 }

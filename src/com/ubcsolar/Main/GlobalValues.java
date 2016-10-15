@@ -24,6 +24,9 @@ public class GlobalValues {
 	//to convert from the ForecastIO default. 
 	public final static SimpleDateFormat forecastIODateParser = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 	
+	//to convert from the ForecastIO default just using the time and not the date
+	public final static SimpleDateFormat forecastIOTimeParser = new SimpleDateFormat("HH:mm:ss");
+	
 	//Strategy@ubcsolar.com's key
 	public final static String WEATHER_KEY= "e4f99878991a762e85efbffc7db8d657";
 	
@@ -47,7 +50,6 @@ public class GlobalValues {
 	
 	public static final String DEFAULT_TILE_SAVE_LOCATION = System.getProperty("user.dir")+"/"+"res/tileCache/";
 	
-	
 	/**
 	 * The message shown on any 'advanced' window with a graph, to explain how to navigate
 	 * the charts. 
@@ -63,6 +65,8 @@ public class GlobalValues {
 	 * Whether the user has hit 'don't show me again'
 	 */
 	public static boolean showChartNavigationTutorialAgain = true;
+	
+	public static final int OFFSET = -07;
 	
 	public static final String WEATHER_UNITS = ForecastIO.UNITS_CA;
 	

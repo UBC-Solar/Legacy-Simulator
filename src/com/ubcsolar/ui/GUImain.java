@@ -279,7 +279,7 @@ public class GUImain implements Listener{
 					mySession.sendNotification(new ExceptionNotification(new NullPointerException(), 
 							"Must load route before adding forecasts."));
 				}else{
-					JFrame frame = new FakeForecastAddWindow(mySession);
+					JFrame frame = new BetterCustomForecastWindow(mySession);
 					frame.setVisible(true);
 				}
 			}

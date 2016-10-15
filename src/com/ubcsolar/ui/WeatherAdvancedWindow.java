@@ -12,6 +12,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.jfree.chart.ChartFactory;
@@ -58,15 +60,34 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Toolkit;
 
 import javax.swing.SwingConstants;
+import javax.swing.JDesktopPane;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.JSplitPane;
+import java.awt.SystemColor;
+import java.awt.Component;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeListener;
+import javax.swing.JTabbedPane;
+import java.awt.Font;
+import javax.swing.UIManager;
 
 public class WeatherAdvancedWindow extends JFrame implements Listener{
 	
@@ -77,7 +98,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private JFreeChart temperatureChartJFree;
 	private ForecastReport currentForecastReport;
 	private final String X_AXIS_LABEL = "Travel Distance (km)";
-	private final int NUM_LINES = 4;
+	private int NUM_LINES;
 	private ChartPanel cloudCoverChart;
 	private JFreeChart cloudCoverChartJFree;
 	private ChartPanel precipitationChart;
@@ -85,11 +106,10 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private ChartPanel windSpeedChart;
 	private JFreeChart windSpeedChartJFree;
 	private JPanel windDirectionPanel;
-	private JPanel panel;
 	private JPanel fogPanel;
 	private JLabel fogLabel;
-	private JPanel stormPanel;
-	private JLabel stormLabel;
+	//private JPanel stormPanel;
+	//private JLabel stormLabel;
 	private JLabel windDirectionLabel;
 	private GeoCoord currentLocation;
 	private final int DEW_POINT_DIFF = 7;
@@ -105,32 +125,21 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	protected final WeatherAdvancedWindow parentInstance = this;
 	private List<GeoCoord> forecastPoints;
 	private JMenuItem mntmLoadLastForecast;
+	private JSpinner spinner;
+	private JLabel lblSelectNumberOf;
+	private JSplitPane splitPane;
+	private JLabel lblNewLabel;
 
-	/**
-	 * Launch the application.
-	 *//*//don't need a main here.
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Weather frame = new Weather();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}*/
 
-	
 	private void setLabelDefaultValues(){
-		this.stormLabel.setText("No storm warning");
+		//this.stormLabel.setText("No storm warning");
 		this.fogLabel.setText("No fog warning");
 		this.windDirectionLabel.setText("Wind is blowing from: None");
 	}
 	/**
 	 * Create the frame.
 	 * @param mySession 
+	 * @param main is the GUImain object that created this window
 	 */
 	public WeatherAdvancedWindow(final GlobalController mySession, GUImain main) {
 		
@@ -166,10 +175,13 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 					Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
 					
 					mapChartNavigationTutorialDialog();
-				}catch(IOException e){
+				}catch(IOException | NoLoadedRouteException e){
 					frame.setVisible(false); //no need to show the loading screen now.
 					contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));// changing the cursor type
-					handleError("IOException, check internet connection");
+					if(e instanceof IOException)
+						handleError("IOException, check internet connection");
+					else
+						handleError("No route has been loaded");
 					Toolkit.getDefaultToolkit().beep(); // simple alert for end of process
 					e.printStackTrace();
 				}
@@ -258,12 +270,38 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[]{0, 0, 0};
-		gbl_contentPane.rowHeights = new int[]{0, 0, 0, 0, 0};
+		gbl_contentPane.rowHeights = new int[]{30, 0, 0, 0, 0, 0, 0};
 		gbl_contentPane.columnWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE};
+		gbl_contentPane.rowWeights = new double[]{0.0, 1.0, 1.0, 0.0, 1.0, 1.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 				
 		buildTemperatureChart(createBlankDataset());
+		
+		splitPane = new JSplitPane();
+		GridBagConstraints gbc_splitPane = new GridBagConstraints();
+		gbc_splitPane.anchor = GridBagConstraints.WEST;
+		gbc_splitPane.fill = GridBagConstraints.VERTICAL;
+		gbc_splitPane.insets = new Insets(0, 0, 5, 5);
+		gbc_splitPane.gridx = 0;
+		gbc_splitPane.gridy = 0;
+		contentPane.add(splitPane, gbc_splitPane);
+		
+		//Spinner to control number of hours displayed
+		spinner = new JSpinner();
+		splitPane.setRightComponent(spinner);
+		spinner.setModel(new SpinnerNumberModel(1, 0, 12, 1));
+		spinner.setToolTipText("");
+		
+		lblSelectNumberOf = new JLabel("Select Number Of Hours to Display");
+		splitPane.setLeftComponent(lblSelectNumberOf);
+		lblSelectNumberOf.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		//if spinner value is changed, update charts
+				spinner.addChangeListener(new ChangeListener() {
+					public void stateChanged(ChangeEvent arg0) {
+						updateCharts();
+					}
+				});
 		temperatureChart = new ChartPanel(temperatureChartJFree);
 		temperatureChart.setMouseWheelEnabled(true);
 		temperatureChart.setMouseZoomable(true);
@@ -272,7 +310,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		gbc_temperatureChart.insets = new Insets(0, 0, 5, 5);
 		gbc_temperatureChart.fill = GridBagConstraints.BOTH;
 		gbc_temperatureChart.gridx = 0;
-		gbc_temperatureChart.gridy = 0;
+		gbc_temperatureChart.gridy = 1;
 		contentPane.add(temperatureChart, gbc_temperatureChart);
 		
 		buildCloudCoverChart(createBlankDataset());
@@ -283,7 +321,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		gbc_cloudCoverChart.insets = new Insets(0, 0, 5, 0);
 		gbc_cloudCoverChart.fill = GridBagConstraints.BOTH;
 		gbc_cloudCoverChart.gridx = 1;
-		gbc_cloudCoverChart.gridy = 0;
+		gbc_cloudCoverChart.gridy = 1;
 		contentPane.add(cloudCoverChart, gbc_cloudCoverChart);
 		
 		buildPrecipitationChart(createBlankDataset());
@@ -295,7 +333,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		gbc_precipitationChart.insets = new Insets(0, 0, 5, 5);
 		gbc_precipitationChart.fill = GridBagConstraints.BOTH;
 		gbc_precipitationChart.gridx = 0;
-		gbc_precipitationChart.gridy = 1;
+		gbc_precipitationChart.gridy = 2;
 		contentPane.add(precipitationChart, gbc_precipitationChart);
 		
 		buildWindSpeedChart(createBlankDataset());
@@ -306,29 +344,40 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		gbc_windSpeedChart.insets = new Insets(0, 0, 5, 0);
 		gbc_windSpeedChart.fill = GridBagConstraints.BOTH;
 		gbc_windSpeedChart.gridx = 1;
-		gbc_windSpeedChart.gridy = 1;
+		gbc_windSpeedChart.gridy = 2;
 		contentPane.add(windSpeedChart, gbc_windSpeedChart);
+		
+		lblNewLabel = new JLabel("Current Location Warnings");
+		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 20));
+		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
+		gbc_lblNewLabel.gridwidth = 2;
+		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNewLabel.gridx = 0;
+		gbc_lblNewLabel.gridy = 3;
+		contentPane.add(lblNewLabel, gbc_lblNewLabel);
 		
 		fogPanel = new JPanel();
 		GridBagConstraints gbc_fogPanel = new GridBagConstraints();
 		gbc_fogPanel.insets = new Insets(0, 0, 5, 5);
 		gbc_fogPanel.gridx = 0;
-		gbc_fogPanel.gridy = 2;
+		gbc_fogPanel.gridy = 4;
 		contentPane.add(fogPanel, gbc_fogPanel);
 		
 		windDirectionPanel = new JPanel();
 		GridBagConstraints gbc_windDirectionPanel = new GridBagConstraints();
 		gbc_windDirectionPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_windDirectionPanel.gridx = 1;
-		gbc_windDirectionPanel.gridy = 2;
+		gbc_windDirectionPanel.gridy = 4;
 		contentPane.add(windDirectionPanel, gbc_windDirectionPanel);
-		
+		/* Could not get this working since the forecasts would not return good
+		 * storm data anymore.
 		stormPanel = new JPanel();
 		GridBagConstraints gbc_stormPanel = new GridBagConstraints();
 		gbc_stormPanel.insets = new Insets(0, 0, 0, 5);
 		gbc_stormPanel.gridx = 0;
-		gbc_stormPanel.gridy = 3;
+		gbc_stormPanel.gridy = 5;
 		contentPane.add(stormPanel, gbc_stormPanel);
+		*/
 		
 		windDirectionLabel = new JLabel("DEFAULT");
 		windDirectionPanel.add(windDirectionLabel);
@@ -336,17 +385,11 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		fogLabel = new JLabel("DEFAULT");
 		fogLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		fogPanel.add(fogLabel);
-		
+		/*
 		stormLabel = new JLabel("DEFAULT");
 		stormPanel.add(stormLabel);
-		
+		*/
 		this.setLabelDefaultValues();
-		panel = new JPanel();
-		GridBagConstraints gbc_panel = new GridBagConstraints();
-		gbc_panel.fill = GridBagConstraints.BOTH;
-		gbc_panel.gridx = 1;
-		gbc_panel.gridy = 3;
-		contentPane.add(panel, gbc_panel);
 		
 		
 		setTitleAndLogo();
@@ -515,13 +558,16 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				String windDirection = findDirection(windBearing);
 				
 				boolean fogWarning = false;
+				double dewDifferenceNum = 0.0;
 				String dewDifference = "";
 				if(closestForecastNow.dewPoint()+DEW_POINT_DIFF >= closestForecastNow.temperature()){
 					fogWarning = true;
-					 double dewDifferenceNum = closestForecastNow.temperature()-closestForecastNow.dewPoint();
-					 dewDifference = new DecimalFormat("#.##").format(dewDifferenceNum);
+					dewDifferenceNum = closestForecastNow.temperature()-closestForecastNow.dewPoint();
+					dewDifference = new DecimalFormat("#.##").format(dewDifferenceNum);
 				}
 				
+				// Was not getting good storm weather data anymore
+				/*
 				boolean stormWarning = false;
 				FIODataPoint closestCurrently = new FIODataPoint(closestForecast.getCurrently());
 				if(closestForecast.hasCurrently()){
@@ -531,23 +577,33 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 						stormWarning = true;
 					}
 				}
-				
+				*/
 				
 				windDirectionLabel.setText("Wind is blowing from: " + windDirection + " (" 
 						+ windBearing + "°)");
-				if(fogWarning){
+				if(fogWarning == true && dewDifferenceNum > 0){
+					fogPanel.setBorder(new LineBorder(Color.orange));
 					fogLabel.setText("Fog warning. (Temp is " + 
-							dewDifference + "° above dew point.)");
+
+						dewDifference + "° above dew point.)");
+				}
+				else if (fogWarning == true && dewDifferenceNum <= 0) {
+					fogPanel.setBorder(new LineBorder(Color.RED));
+					fogLabel.setText("Fog warning. You are in fog.");
+
 				}else{
 					fogLabel.setText("No fog warning");
+					
 				}
+				/*
 				if(stormWarning){
+					stormPanel.setBorder(new LineBorder(Color.RED));
 					double stormBearing = closestCurrently.nearestStormBearing();
 					String stormDirection = findDirection(stormBearing);
 					stormLabel.setText("Warning: There's a storm " + closestCurrently.nearestStormDistance()
 							+ " km to the " + stormDirection + " (" + stormBearing + "°)");
 				}
-				
+				*/
 				
 			}
 			else{
@@ -557,8 +613,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			windDirectionPanel.repaint();
 			fogLabel.repaint();
 			fogPanel.repaint();
-			stormLabel.repaint();
-			stormPanel.repaint();
+			//stormLabel.repaint();
+			//stormPanel.repaint();
 		}
 
 		private String findDirection(double windBearing){
@@ -692,10 +748,12 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				DefaultXYDataset dds = new DefaultXYDataset();
 				List<ForecastIO> forecastsForChart = currentForecastReport.getForecasts();
 				forecastPoints = new ArrayList<GeoCoord>();
+				double maxBlockSize = 0;
 				
 				List<FIODataBlock> hourlyForecasts = new ArrayList<FIODataBlock>();
 				for(int i = 0; i < forecastsForChart.size()+1; i++){
 					//if statement adds duplicate point at the end
+					//done to extend line to the end of the graph
 					if (i == forecastsForChart.size()){
 						forecastPoints.add(new GeoCoord(forecastsForChart.get(i-1).getLatitude(), 
 								forecastsForChart.get(i-1).getLongitude(), 0.0));//uses 0 for elevation cause it doesn't matter for our uses
@@ -704,6 +762,9 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 						forecastPoints.add(new GeoCoord(forecastsForChart.get(i).getLatitude(), 
 								forecastsForChart.get(i).getLongitude(), 0.0));//uses 0 for elevation cause it doesn't matter for our uses
 						hourlyForecasts.add(new FIODataBlock(forecastsForChart.get(i).getHourly()));
+					}
+					if(hourlyForecasts.get(hourlyForecasts.size()-1).datablockSize() > maxBlockSize){
+						maxBlockSize = hourlyForecasts.get(hourlyForecasts.size()-1).datablockSize();
 					}
 				}
 				
@@ -733,6 +794,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 
 				
 				int numHours = 0;
+				NUM_LINES = (int) spinner.getValue(); //get spinner value
 				while((numHours < NUM_LINES) && ( numHours < hourlyForecasts.get(0).datablockSize()) ){
 					double[][] data = new double[2][distances.length];
 					for(int i = 0; i < hourlyForecasts.size(); i++){
@@ -748,12 +810,43 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 							data[1][i] = currentHourForecast.windSpeed();
 						}
 					}
-					dds.addSeries("Hour " + numHours, data);
+					FIODataPoint firstForecast = hourlyForecasts.get(0).datapoint(numHours);
+					String time = firstForecast.time();
+					if(firstForecast.getTimezone().equals("GMT")){
+						time = convertFromGMT(time);
+					}
+					dds.addSeries(time, data);
 					numHours++;
 				}
 				
 				return dds;
 			}
+		}
+	
+		/**
+		 * Converts a time (like the one obtained from an FIODataPoint) to 
+		 * your system's local timezone
+		 * @param gmtTime The time in GMT (formatted as DD-MM-YYYY HH:MM:SS)
+		 * 		(should actually work with any timezone, but the Forecast.io API generally
+		 * 		gives it in GMT)
+		 * @return
+		 */
+
+		private String convertFromGMT(String gmtTime){
+			Date gmtDate;
+			try{
+				gmtDate = GlobalValues.forecastIODateParser.parse(gmtTime);
+			}catch(ParseException e){
+				e.printStackTrace();
+				return gmtTime;
+			}
+			long gmtTimestamp = gmtDate.getTime();
+			TimeZone localTz = Calendar.getInstance().getTimeZone();
+			int offset = localTz.getOffset(new Date().getTime());
+			long localTimestamp = gmtTimestamp + offset;
+			Date localDate = new Date(localTimestamp);
+			String localTime = GlobalValues.forecastIOTimeParser.format(localDate);
+			return localTime;
 		}
 		
 		private XYDataset createDataset(){
@@ -845,4 +938,5 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			contentPane.revalidate();
 			contentPane.repaint();
 		}
+		
 }

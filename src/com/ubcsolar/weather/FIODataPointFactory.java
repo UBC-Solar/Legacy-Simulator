@@ -19,6 +19,7 @@ public class FIODataPointFactory {
 		private double stormDistance = 0;
 		private double precipIntensity = 0;
 		private int time = 0;
+		private double hourTime = 0; //for display purposes in custom forecast window only
 
 		
 		//fixed
@@ -107,6 +108,11 @@ public class FIODataPointFactory {
 			return this;
 		}
 		
+		public FIODataPointFactory hourTime(double hourTime){
+			this.hourTime = hourTime;
+			return this;
+		}
+		
 		/**
 		 * creates a JsonObject with all of the data given to the dataPoint. If
 		 * data is missing, it will be entered as 0
@@ -135,6 +141,7 @@ public class FIODataPointFactory {
 			data.add("cloudCover", cloudCover);
 			data.add("pressure", pressure);
 			data.add("ozone", ozone);
+			data.add("hourTime", hourTime);
 			
 			return data;
 		}

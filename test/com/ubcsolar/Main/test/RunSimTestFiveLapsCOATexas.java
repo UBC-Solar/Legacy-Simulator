@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -35,7 +36,7 @@ public class RunSimTestFiveLapsCOATexas {
 		theProgram.getMyCarController().adviseOfNewCarReport(RandomObjectGenerator.generateNewTelemDataPack());
 		LocationReport carLocationReported = new LocationReport(new GeoCoord(30.131831,-97.6398,155.8408355712891), "raven", "generated");
 		theProgram.getMapController().recordNewCarLocation(carLocationReported);
-		theProgram.getMySimController().runSimulation(new HashMap<GeoCoord, Double>(),5);
+		theProgram.getMySimController().runSimulation(new HashMap<GeoCoord, Map<Integer, Double>>(),5);
 	}
 	
 	
