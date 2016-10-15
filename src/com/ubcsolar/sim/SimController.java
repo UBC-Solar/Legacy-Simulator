@@ -49,7 +49,7 @@ public class SimController extends ModuleController {
 	 * @throws NoCarStatusException
 	 * @throws IllegalArgumentException - if laps <= 0.
 	 */
-	public void runSimulation(Map<GeoCoord, Double> requestedSpeeds, int laps) throws NoForecastReportException, NoLoadedRouteException, NoLocationReportedException, NoCarStatusException{
+	public void runSimulation(Map<GeoCoord,Map<Integer, Double>> requestedSpeeds, int laps) throws NoForecastReportException, NoLoadedRouteException, NoLocationReportedException, NoCarStatusException{
 		if(laps<=0){
 			throw new IllegalArgumentException("Number of Laps too low, must go at least 1 lap");
 		}
@@ -104,7 +104,7 @@ public class SimController extends ModuleController {
 	public void notify(Notification n) {
 		//handle any notifications that were registered for here
 		if(n.getClass() == NewMapLoadedNotification.class){
-			SimulationReport toSend = new SimulationReport(new ArrayList<SimFrame>(),new HashMap<GeoCoord, Double>(), "Deleted");
+			SimulationReport toSend = new SimulationReport(new ArrayList<SimFrame>(),new HashMap<GeoCoord,Map<Integer,Double>>(), "Deleted");
 			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Deleted last run Sim because new route loaded");
 			this.mySession.sendNotification(new NewSimulationReportNotification(toSend));
 		}

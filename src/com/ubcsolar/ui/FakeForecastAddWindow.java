@@ -3,6 +3,7 @@ package com.ubcsolar.ui;
 import javax.swing.JFrame;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 
 import com.github.dvdme.ForecastIOLib.FIODataPoint;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JTextField;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
@@ -37,12 +39,11 @@ import com.eclipsesource.json.JsonObject;
 
 public class FakeForecastAddWindow extends JFrame{
 	
-	//TODO: figure out what to do if window is opened before route is loaded
-	
 	private GlobalController mySession;
 	private WeatherController myWeather;
 	private MapController myMap;
 	private Route theRoute;
+	private BetterCustomForecastWindow parentWindow;
 	private JTextField txtTemp;
 	private JTextField txtCloudCover;
 	private JTextField txtDewPoint;
@@ -53,40 +54,44 @@ public class FakeForecastAddWindow extends JFrame{
 	private JTextField txtWindSpeed;
 	private JTextField txtPrecipProb;
 	private JTextField txtPrecipType;
-	private JSpinner distanceSpinner;
 	private JTextField txtPrecipIntensity;
+	private JSpinner timeSpinner;
+	private DefaultListModel<JsonObject> listModel;
+	private double currTime;
 	
-	public FakeForecastAddWindow(GlobalController mySession) {
+	public FakeForecastAddWindow(GlobalController mySession, DefaultListModel<JsonObject> listModel,
+			double currTime, BetterCustomForecastWindow parentWindow) {
 		
 		this.mySession = mySession;
 		this.myWeather = mySession.getMyWeatherController();
 		this.myMap = mySession.getMapController();
-		
-		this.setBounds(500, 250, 400, 400);
+		this.listModel = listModel;
+		this.currTime = currTime;
+		this.parentWindow = parentWindow;
+		this.setBounds(500, 250, 415, 400);
 		setTitleAndLogo();
 		
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[] {30, 0, 0, 0};
+		gridBagLayout.columnWidths = new int[] {30, 0, 0};
 		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0, Double.MIN_VALUE};
+		gridBagLayout.columnWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		getContentPane().setLayout(gridBagLayout);
 		
-		JLabel lblDistanceAlongRoute = new JLabel("Distance along route (km):");
-		GridBagConstraints gbc_lblDistanceAlongRoute = new GridBagConstraints();
-		gbc_lblDistanceAlongRoute.anchor = GridBagConstraints.EAST;
-		gbc_lblDistanceAlongRoute.insets = new Insets(0, 0, 5, 5);
-		gbc_lblDistanceAlongRoute.gridx = 0;
-		gbc_lblDistanceAlongRoute.gridy = 1;
-		getContentPane().add(lblDistanceAlongRoute, gbc_lblDistanceAlongRoute);
+		JLabel lblTime = new JLabel("Time (hours from now):");
+		GridBagConstraints gbc_lblTime = new GridBagConstraints();
+		gbc_lblTime.insets = new Insets(0, 0, 5, 5);
+		gbc_lblTime.anchor = GridBagConstraints.EAST;
+		gbc_lblTime.gridx = 0;
+		gbc_lblTime.gridy = 1;
+		getContentPane().add(lblTime, gbc_lblTime);
 		
-		distanceSpinner = new JSpinner();
-		distanceSpinner.setModel(new SpinnerNumberModel(0, 0, myMap.findTotalDistanceAlongLoadedRoute(), 1));
-		GridBagConstraints gbc_distanceSpinner = new GridBagConstraints();
-		gbc_distanceSpinner.insets = new Insets(0, 0, 5, 5);
-		gbc_distanceSpinner.gridx = 1;
-		gbc_distanceSpinner.gridy = 1;
-		getContentPane().add(distanceSpinner, gbc_distanceSpinner);
+		timeSpinner = new JSpinner();
+		GridBagConstraints gbc_spinner = new GridBagConstraints();
+		gbc_spinner.insets = new Insets(0, 0, 5, 0);
+		gbc_spinner.gridx = 1;
+		gbc_spinner.gridy = 1;
+		getContentPane().add(timeSpinner, gbc_spinner);
 		
 		JLabel lblTemp = new JLabel("Temp. (\u00B0C):");
 		GridBagConstraints gbc_lblTemp = new GridBagConstraints();
@@ -100,7 +105,7 @@ public class FakeForecastAddWindow extends JFrame{
 		txtTemp.setText("20");
 		GridBagConstraints gbc_txtTemp = new GridBagConstraints();
 		gbc_txtTemp.anchor = GridBagConstraints.NORTH;
-		gbc_txtTemp.insets = new Insets(0, 0, 5, 5);
+		gbc_txtTemp.insets = new Insets(0, 0, 5, 0);
 		gbc_txtTemp.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtTemp.gridx = 1;
 		gbc_txtTemp.gridy = 2;
@@ -118,7 +123,7 @@ public class FakeForecastAddWindow extends JFrame{
 		txtCloudCover = new JTextField();
 		txtCloudCover.setText("50");
 		GridBagConstraints gbc_txtCloudCover = new GridBagConstraints();
-		gbc_txtCloudCover.insets = new Insets(0, 0, 5, 5);
+		gbc_txtCloudCover.insets = new Insets(0, 0, 5, 0);
 		gbc_txtCloudCover.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtCloudCover.gridx = 1;
 		gbc_txtCloudCover.gridy = 3;
@@ -136,7 +141,7 @@ public class FakeForecastAddWindow extends JFrame{
 		txtDewPoint = new JTextField();
 		txtDewPoint.setText("22");
 		GridBagConstraints gbc_txtDewPoint = new GridBagConstraints();
-		gbc_txtDewPoint.insets = new Insets(0, 0, 5, 5);
+		gbc_txtDewPoint.insets = new Insets(0, 0, 5, 0);
 		gbc_txtDewPoint.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtDewPoint.gridx = 1;
 		gbc_txtDewPoint.gridy = 4;
@@ -154,7 +159,7 @@ public class FakeForecastAddWindow extends JFrame{
 		txtHumidity = new JTextField();
 		txtHumidity.setText("20");
 		GridBagConstraints gbc_txtHumidity = new GridBagConstraints();
-		gbc_txtHumidity.insets = new Insets(0, 0, 5, 5);
+		gbc_txtHumidity.insets = new Insets(0, 0, 5, 0);
 		gbc_txtHumidity.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtHumidity.gridx = 1;
 		gbc_txtHumidity.gridy = 5;
@@ -172,7 +177,7 @@ public class FakeForecastAddWindow extends JFrame{
 		txtNearestStormBearing = new JTextField();
 		txtNearestStormBearing.setText("30");
 		GridBagConstraints gbc_txtNearestStormBearing = new GridBagConstraints();
-		gbc_txtNearestStormBearing.insets = new Insets(0, 0, 5, 5);
+		gbc_txtNearestStormBearing.insets = new Insets(0, 0, 5, 0);
 		gbc_txtNearestStormBearing.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtNearestStormBearing.gridx = 1;
 		gbc_txtNearestStormBearing.gridy = 6;
@@ -191,7 +196,7 @@ public class FakeForecastAddWindow extends JFrame{
 		txtNearestStormDistance.setText("25");
 		GridBagConstraints gbc_txtNearestStormDistance = new GridBagConstraints();
 		gbc_txtNearestStormDistance.anchor = GridBagConstraints.NORTH;
-		gbc_txtNearestStormDistance.insets = new Insets(0, 0, 5, 5);
+		gbc_txtNearestStormDistance.insets = new Insets(0, 0, 5, 0);
 		gbc_txtNearestStormDistance.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtNearestStormDistance.gridx = 1;
 		gbc_txtNearestStormDistance.gridy = 7;
@@ -209,7 +214,7 @@ public class FakeForecastAddWindow extends JFrame{
 		txtWindBearing = new JTextField();
 		txtWindBearing.setText("275");
 		GridBagConstraints gbc_txtWindBearing = new GridBagConstraints();
-		gbc_txtWindBearing.insets = new Insets(0, 0, 5, 5);
+		gbc_txtWindBearing.insets = new Insets(0, 0, 5, 0);
 		gbc_txtWindBearing.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtWindBearing.gridx = 1;
 		gbc_txtWindBearing.gridy = 8;
@@ -227,7 +232,7 @@ public class FakeForecastAddWindow extends JFrame{
 		txtWindSpeed = new JTextField();
 		txtWindSpeed.setText("10");
 		GridBagConstraints gbc_txtWindSpeed = new GridBagConstraints();
-		gbc_txtWindSpeed.insets = new Insets(0, 0, 5, 5);
+		gbc_txtWindSpeed.insets = new Insets(0, 0, 5, 0);
 		gbc_txtWindSpeed.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtWindSpeed.gridx = 1;
 		gbc_txtWindSpeed.gridy = 9;
@@ -245,7 +250,7 @@ public class FakeForecastAddWindow extends JFrame{
 		txtPrecipProb = new JTextField();
 		txtPrecipProb.setText("36");
 		GridBagConstraints gbc_txtPrecipProb = new GridBagConstraints();
-		gbc_txtPrecipProb.insets = new Insets(0, 0, 5, 5);
+		gbc_txtPrecipProb.insets = new Insets(0, 0, 5, 0);
 		gbc_txtPrecipProb.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtPrecipProb.gridx = 1;
 		gbc_txtPrecipProb.gridy = 10;
@@ -263,20 +268,12 @@ public class FakeForecastAddWindow extends JFrame{
 		txtPrecipType = new JTextField();
 		txtPrecipType.setText("Rain");
 		GridBagConstraints gbc_txtPrecipType = new GridBagConstraints();
-		gbc_txtPrecipType.insets = new Insets(0, 0, 5, 5);
+		gbc_txtPrecipType.insets = new Insets(0, 0, 5, 0);
 		gbc_txtPrecipType.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtPrecipType.gridx = 1;
 		gbc_txtPrecipType.gridy = 11;
 		getContentPane().add(txtPrecipType, gbc_txtPrecipType);
 		txtPrecipType.setColumns(10);
-		
-		JButton btnOk = new JButton("OK");
-		btnOk.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				handleOkClick();
-			}
-		});
 		
 		JLabel lblPrecipitationIntensity = new JLabel("Precipitation Intensity (mm/h):");
 		GridBagConstraints gbc_lblPrecipitationIntensity = new GridBagConstraints();
@@ -289,15 +286,23 @@ public class FakeForecastAddWindow extends JFrame{
 		txtPrecipIntensity = new JTextField();
 		txtPrecipIntensity.setText("0.4");
 		GridBagConstraints gbc_txtPrecipIntensity = new GridBagConstraints();
-		gbc_txtPrecipIntensity.insets = new Insets(0, 0, 5, 5);
+		gbc_txtPrecipIntensity.insets = new Insets(0, 0, 5, 0);
 		gbc_txtPrecipIntensity.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtPrecipIntensity.gridx = 1;
 		gbc_txtPrecipIntensity.gridy = 12;
 		getContentPane().add(txtPrecipIntensity, gbc_txtPrecipIntensity);
 		txtPrecipIntensity.setColumns(10);
+		
+		JButton btnOk = new JButton("OK");
+		btnOk.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				handleOkClick();
+			}
+		});
 		GridBagConstraints gbc_btnOk = new GridBagConstraints();
 		gbc_btnOk.insets = new Insets(0, 0, 5, 5);
-		gbc_btnOk.gridx = 1;
+		gbc_btnOk.gridx = 0;
 		gbc_btnOk.gridy = 13;
 		getContentPane().add(btnOk, gbc_btnOk);
 		
@@ -310,7 +315,7 @@ public class FakeForecastAddWindow extends JFrame{
 		});
 		GridBagConstraints gbc_btnCancel = new GridBagConstraints();
 		gbc_btnCancel.insets = new Insets(0, 0, 5, 0);
-		gbc_btnCancel.gridx = 2;
+		gbc_btnCancel.gridx = 1;
 		gbc_btnCancel.gridy = 13;
 		getContentPane().add(btnCancel, gbc_btnCancel);
 	}
@@ -321,22 +326,16 @@ public class FakeForecastAddWindow extends JFrame{
 	 * incorrectly, it will spit an error message but won't close the window.
 	 */
 	private void handleOkClick(){
-		ForecastIO customForecast = buildForecastIO();
-		if(customForecast == null){
+		boolean addedDatapoint = addDatapoint();
+		if(!addedDatapoint){
 			return;
 		}else{
-			try {
-				myWeather.loadCustomForecast(customForecast);
-			} catch (NoLoadedRouteException e) {
-				// TODO Auto-generated catch block
-				this.handleError("No Route Loaded, unable to add custom forecast");
-				SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to load custom forecast, but no route loaded");
-			}
 			closeWindow();
 		}
 	}
 	
 	private void closeWindow(){
+		parentWindow.eraseDuplicates();
 		this.dispose();
 	}
 	
@@ -353,19 +352,21 @@ public class FakeForecastAddWindow extends JFrame{
 	 * Will build a ForecastIO from the information entered into the fields in the window.
 	 * Fields that aren't included in the window will be filled with garbage values
 	 * If one of the entries is formatted incorrectly, the method will spit an error message
-	 * and return a null value
-	 * @return a ForecastIO with the data entered into the window, or null if that data
-	 * was formatted incorrectly
+	 * @return true if datapoint was added successfully, false is an error was encountered
 	 */
 	
-	private ForecastIO buildForecastIO(){
+	private boolean addDatapoint(){
+		int time;
+		time = (int) ((int)(timeSpinner.getValue())*3600 + currTime);
+		time /= 3600;
+		time *= 3600; //trying to truncate it to the nearest hour
 		double temp;
 		try{
 			temp = Double.parseDouble(this.txtTemp.getText());
 			}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Temperature formatted incorrectly");
-			return null;
+			return false;
 		}
 		double cldCover;
 		try{
@@ -373,7 +374,7 @@ public class FakeForecastAddWindow extends JFrame{
 		}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Cloud cover % formatted incorrectly");
-			return null;
+			return false;
 		}
 		double dewPoint;
 		try{
@@ -381,7 +382,7 @@ public class FakeForecastAddWindow extends JFrame{
 			}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Dew point formatted incorrectly");
-			return null;
+			return false;
 		}
 		double humidity;
 		try{
@@ -389,7 +390,7 @@ public class FakeForecastAddWindow extends JFrame{
 			}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Humidity formatted incorrectly");
-			return null;
+			return false;
 		}
 		double strmBearing;
 		try{
@@ -397,7 +398,7 @@ public class FakeForecastAddWindow extends JFrame{
 			}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Storm bearing formatted incorrectly");
-			return null;
+			return false;
 		}
 		double strmDistance;
 		try{
@@ -405,7 +406,7 @@ public class FakeForecastAddWindow extends JFrame{
 			}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Storm distance formatted incorrectly");
-			return null;
+			return false;
 		}
 		double windBearing;
 		try{
@@ -413,7 +414,7 @@ public class FakeForecastAddWindow extends JFrame{
 			}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Wind bearing formatted incorrectly");
-			return null;
+			return false;
 		}
 		double windSpeed;
 		try{
@@ -421,7 +422,7 @@ public class FakeForecastAddWindow extends JFrame{
 		}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Wind speed formatted incorrectly");
-			return null;
+			return false;
 		}
 		double precipProb;
 		try{
@@ -429,50 +430,30 @@ public class FakeForecastAddWindow extends JFrame{
 			}
 		catch(java.lang.NumberFormatException e){
 			this.handleError("Precipitation probability formatted incorrectly");
-			return null;
+			return false;
 		}
 		double precipIntensity;
 		try{
 			precipIntensity = Double.parseDouble(this.txtPrecipIntensity.getText());
 		}catch(java.lang.NumberFormatException e){
 			this.handleError("Precipitation intensity formatted incorrectly");
-			return null;
+			return false;
 		}
 		String precipType = this.txtPrecipType.getText();
-		double distance = (double)distanceSpinner.getValue();
-		GeoCoord location = findNearestPoint(distance);
 		
 		FIODataPointFactory factory = new FIODataPointFactory();
-		List<JsonObject> datapoints = new ArrayList<JsonObject>();
 		
-		factory.cloudCover(cldCover).dewPoint(dewPoint).humidity(humidity).precipIntensity(precipIntensity).
-			precipProb(precipProb).precipType(precipType).temperature(temp).windBearing(windBearing).
-			windSpeed(windSpeed).stormBearing(strmBearing).stormDistance(strmDistance);
+		factory.time(time).cloudCover(cldCover).dewPoint(dewPoint).humidity(humidity).
+			precipIntensity(precipIntensity).precipProb(precipProb).precipType(precipType).
+			temperature(temp).windBearing(windBearing).windSpeed(windSpeed).
+			stormBearing(strmBearing).stormDistance(strmDistance);
 		
-		for(int i = 0; i < 48; i++){
-			factory.time((int)System.currentTimeMillis()/1000 + 3600*i);
-			datapoints.add(factory.build());
-		}
+		listModel.addElement(factory.build());
 		
-		ForecastIOFactory.addDatapoints(datapoints);
-		ForecastIOFactory.changeLocation(location);
-		
-		ForecastIO forecast = ForecastIOFactory.build();
-		
-		return forecast;
+		return true;
 	}
 	
-	private GeoCoord findNearestPoint(double distance){
-		double travelDistance = 0.0;
-		List<GeoCoord> trailMarkers = mySession.getMapController().getAllPoints().getTrailMarkers();
-		int trailMarkerIndex = 1;
-		while(travelDistance < distance && trailMarkerIndex < trailMarkers.size()){
-			travelDistance += trailMarkers.get(trailMarkerIndex-1).calculateDistance(
-					trailMarkers.get(trailMarkerIndex));
-			trailMarkerIndex++;
-		}
-		return trailMarkers.get(trailMarkerIndex-1);
-	}
+	
 	
 
 }

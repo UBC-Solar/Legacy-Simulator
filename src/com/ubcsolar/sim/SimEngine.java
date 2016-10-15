@@ -34,7 +34,11 @@ public class SimEngine {
 
 	private CarModel inUseCarModel;
 
-	public List<SimFrame> runSimulation(Route toTraverse, int startLocationIndex, ForecastReport weatherReports, TelemDataPacket carStartingCondition, Map<GeoCoord,Double> requestedSpeeds, int laps){
+	/*
+	 * Did RequestedSpeeds as a Map<CeoCoord point, Map<lap number, requested speed>>, to be able to 
+	 * request different speeds for different laps.  
+	 */
+	public List<SimFrame> runSimulation(Route toTraverse, int startLocationIndex, ForecastReport weatherReports, TelemDataPacket carStartingCondition, Map<GeoCoord,Map<Integer,Double>> requestedSpeeds, int laps){
 		if(laps <= 0){
 			throw new IllegalArgumentException("Must go at least one lap");
 		}
@@ -48,16 +52,20 @@ public class SimEngine {
 		ForecastIO weather = weatherReports.getForecasts().get(startLocationIndex); //assumes that the number of forecasts in weatherReports = number in Route.
 		GeoCoord start = toTraverse.getTrailMarkers().get(startLocationIndex);
 		GeoCoord next = toTraverse.getTrailMarkers().get(startLocationIndex + 1); //won't index out of range because of check above. 
-		Double reqSpeed = requestedSpeeds.get(start);
+		if(requestedSpeeds.get(start) != null && requestedSpeeds.get(start).get(1) != null){
+			Double reqSpeed = requestedSpeeds.get(start).get(1);//first lap
+		}
 		TelemDataPacket startCondition = carStartingCondition;
 		FIODataPoint startWeather = new FIODataBlock(weather.getHourly()).datapoint(0);
 		LocationReport simmedStartPoint = new LocationReport(toTraverse.getTrailMarkers().get(startLocationIndex), "Raven", "Simmed");
-		SimFrame startFrame = new SimFrame(startWeather, startCondition, simmedStartPoint, System.currentTimeMillis()); //starting frame is current.
+		SimFrame startFrame = new SimFrame(startWeather, startCondition, simmedStartPoint, System.currentTimeMillis(), 1); //starting frame is current.
 		listOfFrames.add(startFrame);
 
 		SimFrame lastFrame = startFrame;
 		int numOfPoints = toTraverse.getTrailMarkers().size();
+		int currentLap = 1; 
 		for(int i = startLocationIndex+1; i<(numOfPoints*laps); i++){ 
+
 			/*
 			 * By starting at startPos, we calculate the jump from car's current location to the next breadcrumb, rather
 			 * than just assuming that it's actually at the last breadcrumb. 
@@ -69,6 +77,9 @@ public class SimEngine {
 			GeoCoord nextPoint;
 			if (lastFrame.getCarStatus().getSpeed()<=0){
 				i--; //if the speed is zero then we need to redo the frame because the car is not moving, and thus is in the same place
+				if(i%numOfPoints == 0){
+					currentLap--;//was adjusted earlier above, shouldn't have been. 
+				}
 				if(i<0){
 					nextWeather = weatherReports.getForecasts().get(startLocationIndex);
 				}
@@ -82,10 +93,17 @@ public class SimEngine {
 				nextWeather = weatherReports.getForecasts().get(i%numOfPoints);
 				nextPoint = toTraverse.getTrailMarkers().get(i%numOfPoints);
 			}
-
-			SimFrame nextFrame = this.generateNextFrame(lastFrame, nextPoint, nextWeather, requestedSpeeds.get(nextPoint));
+			Double requestedSpeedTemp = null;
+			if(requestedSpeeds.get(nextPoint) != null){
+				requestedSpeedTemp = requestedSpeeds.get(nextPoint).get(currentLap);
+			}
+			SimFrame nextFrame = this.generateNextFrame(lastFrame, nextPoint, nextWeather, requestedSpeedTemp,currentLap);
+		
 			lastFrame = nextFrame;
 			listOfFrames.add(nextFrame);
+			if(i%numOfPoints == (numOfPoints-1)){ //if it's the last point in the lap
+				currentLap++; //say we're going to the next lap! 
+			}
 		}	
 
 		return listOfFrames;
@@ -94,7 +112,7 @@ public class SimEngine {
 
 
 
-	private SimFrame generateNextFrame(SimFrame lastFrame, GeoCoord nextPoint, ForecastIO nextWeather, Double requestedSpeed) {
+	private SimFrame generateNextFrame(SimFrame lastFrame, GeoCoord nextPoint, ForecastIO nextWeather, Double requestedSpeed,int currentLap) {
 		TelemDataPacket lastCarStatus = lastFrame.getCarStatus();
 		GeoCoord lastPosition = lastFrame.getGPSReport().getLocation();
 		double lastSpeed = lastCarStatus.getSpeed();
@@ -107,9 +125,11 @@ public class SimEngine {
 			speedToDrive = calculateBestSpeed(lastCarStatus.getSpeed(), elevationChange, lastCarStatus.getStateOfCharge()); //stubMethod. Also this is a greedy algo.
 			//obviously need to add more arguments ^^
 		}
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^KEEP ALL ABOVE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 		else{
 			speedToDrive = requestedSpeed;
 		}
+//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 		//not sure if calculateDistance() takes elevation into account....
 		double distanceCovered = lastPosition.calculateDistance(nextPoint)*1000; 
@@ -122,7 +142,8 @@ public class SimEngine {
 			timeSinceLastFrame = (long) tempTime;		
 			nextSimFrameTime = lastTimeStamp + timeSinceLastFrame;
 			timeSinceLastFrameInHr = timeSinceLastFrame/(60.0*1000.0*60.0);
-
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ENCLOSED IS GOOD STUFF^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//                      STUFF BELOW HERE TO THE NEXT LINE I AM NOT TOO FAMILIAR WITH
 			//System.out.println(distanceCovered);
 		}
 		else{
@@ -151,7 +172,7 @@ public class SimEngine {
 		newCarStatus = calculateNewCarStatus(lastCarStatus, distanceCovered, elevationChange, forecastForPoint, speedToDrive, SunCharge);
 		LocationReport nextLocationReport = generateLocationReport(lastFrame.getGPSReport(), nextPoint);
 
-		SimFrame toReturn = new SimFrame(forecastForPoint, newCarStatus, nextLocationReport, nextSimFrameTime);
+		SimFrame toReturn = new SimFrame(forecastForPoint, newCarStatus, nextLocationReport, nextSimFrameTime,currentLap);
 
 		try {
 			Date fcParseTime = GlobalValues.forecastIODateParser.parse(toReturn.getForecast().time());
@@ -166,12 +187,11 @@ public class SimEngine {
 
 
 	private LocationReport generateLocationReport(LocationReport oldReport, GeoCoord nextPoint) {
-		// TODO Auto-generated method stub
 		LocationReport toReturn = new LocationReport(nextPoint, oldReport.getCarName(), "Simulated");
 		return toReturn;
 	}
 
-
+//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 	/**
 	 * Important helper method, calculates the state of the car after traverssing the last gap. 
 	 * @param lastCarStatus - th
@@ -197,7 +217,7 @@ public class SimEngine {
 
 		return toReturn;
 	}
-
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^KEEP ENCLOSED ABOVE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 	/**
 	 * May generate a value more than 100 or less than 0, but keeps it somewhere within that.
@@ -263,6 +283,8 @@ public class SimEngine {
 	}
 	 */
 
+	
+//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 	/**
 	 * Helper function; calculate the amount of solar power falling on the car during the frame. 
 	 * @param nextPoint - to get the lon/lat for sun elevation in degrees
@@ -305,8 +327,8 @@ public class SimEngine {
 		//because watts, don't need to include time. 
 		return watts; 
 	}
-
-
+//^^^^^^^^^^^^^^^^^SOME GOOD IDEAS IN HERE, LIKE CHANGING SUNLIGHT WITH TIME OF DAY AND GETTING CLOUD COVER^^^^^^^^^^^^^^^^^^^^^^^^^
+//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 	/**
 	 * Helper function, picks the right report from a list of hourly reports and a time. 
 	 * @param weather
@@ -319,7 +341,7 @@ public class SimEngine {
 		toReturn.setTimezone("PST");
 		return toReturn;
 	}
-
+//^^^^^^^^^^^^^^^^^^^^^^^^^^I THINK THIS IS GOOD TO KEEP^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 	private double calculateBestSpeed(double lastCarSpeed, double elevationChange, double SoC) {
 		double SpeedReturn;
@@ -375,7 +397,7 @@ public class SimEngine {
 	}
 
 
-
+//not sure if this does anything
 	private int getStartPos(ArrayList<GeoCoord> trailMarkers, GeoCoord location) {
 		// find the closest point and return the position number. 
 		
