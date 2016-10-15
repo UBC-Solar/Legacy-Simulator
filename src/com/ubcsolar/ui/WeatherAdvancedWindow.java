@@ -77,6 +77,8 @@ import java.awt.SystemColor;
 import java.awt.Component;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeListener;
+import javax.swing.JTabbedPane;
+import java.awt.Font;
 
 public class WeatherAdvancedWindow extends JFrame implements Listener{
 	
@@ -117,6 +119,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private JSpinner spinner;
 	private JLabel lblSelectNumberOf;
 	private JSplitPane splitPane;
+	private JLabel lblNewLabel;
 
 	/**
 	 * Launch the application.
@@ -270,16 +273,17 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[]{0, 0, 0};
-		gbl_contentPane.rowHeights = new int[]{30, 0, 0, 0, 0, 0};
+		gbl_contentPane.rowHeights = new int[]{30, 0, 0, 0, 0, 0, 0};
 		gbl_contentPane.columnWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{0.0, 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE};
+		gbl_contentPane.rowWeights = new double[]{0.0, 1.0, 1.0, 0.0, 1.0, 1.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 				
 		buildTemperatureChart(createBlankDataset());
 		
 		splitPane = new JSplitPane();
 		GridBagConstraints gbc_splitPane = new GridBagConstraints();
-		gbc_splitPane.fill = GridBagConstraints.BOTH;
+		gbc_splitPane.anchor = GridBagConstraints.WEST;
+		gbc_splitPane.fill = GridBagConstraints.VERTICAL;
 		gbc_splitPane.insets = new Insets(0, 0, 5, 5);
 		gbc_splitPane.gridx = 0;
 		gbc_splitPane.gridy = 0;
@@ -346,25 +350,34 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		gbc_windSpeedChart.gridy = 2;
 		contentPane.add(windSpeedChart, gbc_windSpeedChart);
 		
+		lblNewLabel = new JLabel("Current Warnings");
+		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 20));
+		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
+		gbc_lblNewLabel.gridwidth = 2;
+		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNewLabel.gridx = 0;
+		gbc_lblNewLabel.gridy = 3;
+		contentPane.add(lblNewLabel, gbc_lblNewLabel);
+		
 		fogPanel = new JPanel();
 		GridBagConstraints gbc_fogPanel = new GridBagConstraints();
 		gbc_fogPanel.insets = new Insets(0, 0, 5, 5);
 		gbc_fogPanel.gridx = 0;
-		gbc_fogPanel.gridy = 3;
+		gbc_fogPanel.gridy = 4;
 		contentPane.add(fogPanel, gbc_fogPanel);
 		
 		windDirectionPanel = new JPanel();
 		GridBagConstraints gbc_windDirectionPanel = new GridBagConstraints();
 		gbc_windDirectionPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_windDirectionPanel.gridx = 1;
-		gbc_windDirectionPanel.gridy = 3;
+		gbc_windDirectionPanel.gridy = 4;
 		contentPane.add(windDirectionPanel, gbc_windDirectionPanel);
 		
 		stormPanel = new JPanel();
 		GridBagConstraints gbc_stormPanel = new GridBagConstraints();
 		gbc_stormPanel.insets = new Insets(0, 0, 0, 5);
 		gbc_stormPanel.gridx = 0;
-		gbc_stormPanel.gridy = 4;
+		gbc_stormPanel.gridy = 5;
 		contentPane.add(stormPanel, gbc_stormPanel);
 		
 		windDirectionLabel = new JLabel("DEFAULT");
@@ -569,6 +582,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				if(fogWarning){
 					fogLabel.setText("Fog warning. (Temp is " + 
 							dewDifference + "° above dew point.)");
+					//fogLabel.paintAll(g);
 				}else{
 					fogLabel.setText("No fog warning");
 				}
