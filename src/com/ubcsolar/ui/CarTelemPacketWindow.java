@@ -57,10 +57,11 @@ public class CarTelemPacketWindow extends JFrame {
 	private JTextField txtCharge;
 
 	public CarTelemPacketWindow(GlobalController mySession) throws HeadlessException {
-		setResizable(false);
+		setResizable(true);
 		this.mySession = mySession;
 		setTitleAndLogo();
-		this.setBounds(500, 250, 400, 355);
+//		this.setBounds(500, 250, 447, 400);
+		this.setBounds(500, 250, (int)this.getToolkit().getScreenSize().getWidth()*1/3, (int)this.getToolkit().getScreenSize().getHeight()*1/2);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 83, 0, 70, 0};
 		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
