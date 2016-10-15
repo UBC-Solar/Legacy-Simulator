@@ -332,6 +332,9 @@ public class SimEngine {
 	}
 //^^^^^^^^^^^^^^^^^SOME GOOD IDEAS IN HERE, LIKE CHANGING SUNLIGHT WITH TIME OF DAY AND GETTING CLOUD COVER^^^^^^^^^^^^^^^^^^^^^^^^^
 //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+	
+	//TODO: test this
+	
 	/**
 	 * Helper function, picks the hourly report that is closest in time to timeFrame
 	 * @param ForecastIO with full selection of weather data, and a set of hourly forecasts that
