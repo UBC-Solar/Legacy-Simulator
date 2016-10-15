@@ -444,7 +444,7 @@ public class CarTelemPacketWindow extends JFrame {
 	}
 	private void setTitleAndLogo() {
 		this.setIconImage(GlobalValues.iconImage.getImage()); //centrally stored image for easy update (SPOC!)
-		this.setTitle("Custom Location Report");
+		this.setTitle("Add Car TelemPacket\r\n");
 	}
 //-------------------------------------------------------------------------------------------------------------	
 	private TelemDataPacket generateNewTelemDataPack(){
