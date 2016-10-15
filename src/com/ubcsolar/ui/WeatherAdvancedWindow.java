@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -97,8 +98,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 	private JPanel windDirectionPanel;
 	private JPanel fogPanel;
 	private JLabel fogLabel;
-	private JPanel stormPanel;
-	private JLabel stormLabel;
+	//private JPanel stormPanel;
+	//private JLabel stormLabel;
 	private JLabel windDirectionLabel;
 	private GeoCoord currentLocation;
 	private final int DEW_POINT_DIFF = 7;
@@ -136,7 +137,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 
 	
 	private void setLabelDefaultValues(){
-		this.stormLabel.setText("No storm warning");
+		//this.stormLabel.setText("No storm warning");
 		this.fogLabel.setText("No fog warning");
 		this.windDirectionLabel.setText("Wind is blowing from: None");
 	}
@@ -359,13 +360,15 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		gbc_windDirectionPanel.gridx = 1;
 		gbc_windDirectionPanel.gridy = 3;
 		contentPane.add(windDirectionPanel, gbc_windDirectionPanel);
-		
+		/* Could not get this working since the forecasts would not return good
+		 * storm data anymore.
 		stormPanel = new JPanel();
 		GridBagConstraints gbc_stormPanel = new GridBagConstraints();
 		gbc_stormPanel.insets = new Insets(0, 0, 0, 5);
 		gbc_stormPanel.gridx = 0;
 		gbc_stormPanel.gridy = 4;
 		contentPane.add(stormPanel, gbc_stormPanel);
+		*/
 		
 		windDirectionLabel = new JLabel("DEFAULT");
 		windDirectionPanel.add(windDirectionLabel);
@@ -373,10 +376,10 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		fogLabel = new JLabel("DEFAULT");
 		fogLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		fogPanel.add(fogLabel);
-		
+		/*
 		stormLabel = new JLabel("DEFAULT");
 		stormPanel.add(stormLabel);
-		
+		*/
 		this.setLabelDefaultValues();
 		
 		
@@ -546,13 +549,16 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 				String windDirection = findDirection(windBearing);
 				
 				boolean fogWarning = false;
+				double dewDifferenceNum = 0.0;
 				String dewDifference = "";
 				if(closestForecastNow.dewPoint()+DEW_POINT_DIFF >= closestForecastNow.temperature()){
 					fogWarning = true;
-					 double dewDifferenceNum = closestForecastNow.temperature()-closestForecastNow.dewPoint();
-					 dewDifference = new DecimalFormat("#.##").format(dewDifferenceNum);
+					dewDifferenceNum = closestForecastNow.temperature()-closestForecastNow.dewPoint();
+					dewDifference = new DecimalFormat("#.##").format(dewDifferenceNum);
 				}
 				
+				// Was not getting good storm weather data anymore
+				/*
 				boolean stormWarning = false;
 				FIODataPoint closestCurrently = new FIODataPoint(closestForecast.getCurrently());
 				if(closestForecast.hasCurrently()){
@@ -562,23 +568,30 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 						stormWarning = true;
 					}
 				}
-				
+				*/
 				
 				windDirectionLabel.setText("Wind is blowing from: " + windDirection + " (" 
 						+ windBearing + "°)");
-				if(fogWarning){
+				if(fogWarning == true && dewDifferenceNum > 0){
+					fogPanel.setBorder(new LineBorder(Color.orange));
 					fogLabel.setText("Fog warning. (Temp is " + 
-							dewDifference + "° above dew point.)");
+						dewDifference + "° above dew point.)");
+				}
+				else if (fogWarning == true && dewDifferenceNum <= 0) {
+					fogPanel.setBorder(new LineBorder(Color.RED));
+					fogLabel.setText("Fog warning. You are in fog.");
 				}else{
 					fogLabel.setText("No fog warning");
 				}
+				/*
 				if(stormWarning){
+					stormPanel.setBorder(new LineBorder(Color.RED));
 					double stormBearing = closestCurrently.nearestStormBearing();
 					String stormDirection = findDirection(stormBearing);
 					stormLabel.setText("Warning: There's a storm " + closestCurrently.nearestStormDistance()
 							+ " km to the " + stormDirection + " (" + stormBearing + "°)");
 				}
-				
+				*/
 				
 			}
 			else{
@@ -588,8 +601,8 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 			windDirectionPanel.repaint();
 			fogLabel.repaint();
 			fogPanel.repaint();
-			stormLabel.repaint();
-			stormPanel.repaint();
+			//stormLabel.repaint();
+			//stormPanel.repaint();
 		}
 
 		private String findDirection(double windBearing){
