@@ -47,7 +47,7 @@ public class CustomLocationAddWindow extends JFrame {
 	private JSpinner spinElevation;
 
 	public CustomLocationAddWindow(GlobalController mySession) throws HeadlessException {
-		setResizable(false);
+		setResizable(true);
 		this.mySession = mySession;
 		setTitleAndLogo();
 		this.setBounds(500, 250, 400, 225);
@@ -55,7 +55,7 @@ public class CustomLocationAddWindow extends JFrame {
 		gridBagLayout.columnWidths = new int[]{0, 83, 0, 70, 0};
 		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
 		gridBagLayout.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gridBagLayout.rowWeights = new double[]{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE};
 		getContentPane().setLayout(gridBagLayout);
 		
 		JLabel lblCarName = new JLabel("Car Name:");
