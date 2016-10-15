@@ -386,6 +386,7 @@ public class GUImain implements Listener{
 			this.buildAllWindows();
 		}
 		simFrame.setVisible(true);
+		simFrame.setState(Frame.NORMAL);
 		
 	}
 
@@ -400,7 +401,7 @@ public class GUImain implements Listener{
 		}
 		weatherFrame.setVisible(true);
 		//if(weatherFrame.getState()!=Frame.NORMAL) { weatherFrame.setState(Frame.NORMAL); }
-		weatherFrame.toFront();
+		weatherFrame.setState(Frame.NORMAL);
 		weatherFrame.repaint();
 		
 	}
@@ -414,6 +415,7 @@ public class GUImain implements Listener{
 			this.buildAllWindows();
 		}
 		carFrame.setVisible(true);
+		carFrame.setState(Frame.NORMAL);
 		
 	}
 	/**
@@ -427,6 +429,7 @@ public class GUImain implements Listener{
 		}
 		
 		mapFrame.setVisible(true);
+		mapFrame.setState(Frame.NORMAL);
 	}
 	
 	public void tryCloseProgram() {
