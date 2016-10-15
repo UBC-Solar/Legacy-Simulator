@@ -293,7 +293,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		//Spinner to control number of hours displayed
 		spinner = new JSpinner();
 		splitPane.setRightComponent(spinner);
-		spinner.setModel(new SpinnerNumberModel(0, 0, 12, 1));
+		spinner.setModel(new SpinnerNumberModel(1, 0, 12, 1));
 		spinner.setToolTipText("");
 		
 		lblSelectNumberOf = new JLabel("Select Number Of Hours to Display");
@@ -351,7 +351,7 @@ public class WeatherAdvancedWindow extends JFrame implements Listener{
 		gbc_windSpeedChart.gridy = 2;
 		contentPane.add(windSpeedChart, gbc_windSpeedChart);
 		
-		lblNewLabel = new JLabel("Current Warnings");
+		lblNewLabel = new JLabel("Current Location Warnings");
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 20));
 		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
 		gbc_lblNewLabel.gridwidth = 2;
