@@ -74,9 +74,11 @@ public class WeatherController extends ModuleController {
 				}
 				addCustomForecasts();
 			}
-			ForecastReport theReport = new ForecastReport(comboForecasts, this.mySession.getMapController().getLoadedMapName());
-			lastDownloadedReport = theReport;
-			this.mySession.sendNotification(new NewForecastReport(theReport));
+			ForecastReport downloadedReport = new ForecastReport(retrievedForecasts, this.mySession.getMapController().getLoadedMapName());
+			ForecastReport comboReport = new ForecastReport(comboForecasts, this.mySession.getMapController().getLoadedMapName());
+			lastDownloadedReport = downloadedReport;
+			lastCustomReport = comboReport;
+			this.mySession.sendNotification(new NewForecastReport(comboReport));
 		}
 		catch(IOException e){
 			SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Tried to load Forecasts, but IOException thrown (bad internet likely)");
@@ -204,11 +206,11 @@ public class WeatherController extends ModuleController {
 	}
 	
 	/*
-	 * returns a report with forecasts for every point in the route's breadcrumbs list, interprolating 
+	 * returns a report with forecasts for every point in the route's breadcrumbs list, interpolating 
 	 * between loaded reports. Does not refresh downloaded weather reports. 
 	 */
-	public ForecastReport getSimmedForecastForEveryPointfForLoadedRoute() throws NoForecastReportException, NoLoadedRouteException{
-		if(lastDownloadedReport == null){
+	public ForecastReport getSimmedForecastForEveryPointForLoadedRoute() throws NoForecastReportException, NoLoadedRouteException{
+		if(lastCustomReport == null){
 			throw new NoForecastReportException();
 		}
 		Route currentlyLoadedRoute = this.mySession.getMapController().getAllPoints();
@@ -218,16 +220,16 @@ public class WeatherController extends ModuleController {
 		
 		//assumes that the first forecast is the first point. 
 		
-		List<ForecastIO> currentForecasts = lastDownloadedReport.getForecasts();
+		//List<ForecastIO> currentForecasts = lastDownloadedReport.getForecasts();
 		List<ForecastIO> theForecastList = new ArrayList<ForecastIO>(currentlyLoadedRoute.getTrailMarkers().size());
 		
 		for(GeoCoord g : currentlyLoadedRoute.getTrailMarkers()){
-			int indexOfStart = this.getIndexOfStartForecast(lastDownloadedReport.getForecasts(), g);
-			if(indexOfStart == lastDownloadedReport.getForecasts().size()-1){
-				theForecastList.add(this.interpolateForecast(currentForecasts.get(indexOfStart), null, g));
+			int indexOfStart = this.getIndexOfStartForecast(comboForecasts, g);
+			if(indexOfStart == comboForecasts.size()-1){
+				theForecastList.add(this.interpolateForecast(comboForecasts.get(indexOfStart), null, g));
 			}
 			else{
-			theForecastList.add(this.interpolateForecast(currentForecasts.get(indexOfStart), currentForecasts.get(indexOfStart+1),g));
+				theForecastList.add(this.interpolateForecast(comboForecasts.get(indexOfStart), comboForecasts.get(indexOfStart+1),g));
 			}
 		}
 		
@@ -244,7 +246,7 @@ public class WeatherController extends ModuleController {
 	 * @return
 	 * @throws NoForecastReportException
 	 */
-	private ForecastIO interprolateForecast(GeoCoord target) throws NoForecastReportException{
+	private ForecastIO interpolateForecast(GeoCoord target) throws NoForecastReportException{
 		if(comboForecasts == null){
 			throw new NoForecastReportException();
 		}
@@ -682,7 +684,7 @@ public class WeatherController extends ModuleController {
 		}
 		
 		
-		return this.interprolateForecast(target);
+		return this.interpolateForecast(target);
 		
 		
 	}
