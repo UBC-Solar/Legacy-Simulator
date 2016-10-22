@@ -376,8 +376,36 @@ public class SimEngine {
 		toReturn.setTimezone("PST");
 		return toReturn;
 	}
-//^^^^^^^^^^^^^^^^^^^^^^^^^^I THINK THIS IS GOOD TO KEEP^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+//^^^^^^^^^^^^^^^^^^^^^^^^^^THIS HAS BEEN UPDATED^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	
+	/**
+	 * Calculates the estimated resistive force due to air drag acting on the car in the
+	 *  interval from fromLoc to toLoc 
+	 * @param toLoc: breadcrumb that simulated car is traveling to
+	 * @param fromLoc: breadcrumb that simulated car is traveling from
+	 * @param carSpeed: the simulated car's current speed (from the previous breadcrumb)
+	 * @param toForecast: the weather forecast at the current time at the destination location,
+	 * 			used to find the headwind
+	 * @return the estimated resistive force acting on the car during the interval (fromLoc-toLoc) 
+	 */
+	
+	private double calculateDrag(GeoCoord toLoc, GeoCoord fromLoc, double carSpeed, 
+			FIODataPoint toForecast){
+		double latDiff = toLoc.getLat()-fromLoc.getLat();
+		double lonDiff = toLoc.getLon()-fromLoc.getLon();
+		double carDirection;//measured as angle in degrees, with 0 at north and measured clockwise
+		double alpha = Math.atan(latDiff/lonDiff);
+		double alphaDegrees = alpha * 180.0 / Math.PI;
+		if(lonDiff>=0){
+			carDirection = 90.0 - alphaDegrees;
+		}else{
+			carDirection = 270.0 - alphaDegrees;
+		}
+		double windBearing = toForecast.windBearing();
+		double windSpeed = toForecast.windSpeed();
+		return 0.0;//TODO: put real return value
+	}
+	
 	private double calculateBestSpeed(double lastCarSpeed, double elevationChange, double SoC) {
 		double SpeedReturn;
 		double MaxCarSpeed=110;
