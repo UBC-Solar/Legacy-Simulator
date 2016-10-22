@@ -386,7 +386,9 @@ public class SimEngine {
 	 * @param carSpeed: the simulated car's current speed (from the previous breadcrumb)
 	 * @param toForecast: the weather forecast at the current time at the destination location,
 	 * 			used to find the headwind
-	 * @return the estimated resistive force acting on the car during the interval (fromLoc-toLoc) 
+	 * @return the estimated resistive force acting on the car during the interval (fromLoc-toLoc)
+	 * 			This value will be positive if the drag is resisting the car's motion (i.e.
+	 * 			there is a headwind) or negative if it's assisting (tailwind) 
 	 */
 	
 	private double calculateDrag(GeoCoord toLoc, GeoCoord fromLoc, double carSpeed, 

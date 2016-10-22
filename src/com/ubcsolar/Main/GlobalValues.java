@@ -74,5 +74,9 @@ public class GlobalValues {
 	
 	public static final double PANEL_EFFICIENCY = 0.75;
 	//TODO: measure this somehow
+	
+	public static final double DRAG_COEFF = 1.0;
+	
+	public static final double CAR_CROSS_SECTIONAL_AREA = 1.0;
 }
 
