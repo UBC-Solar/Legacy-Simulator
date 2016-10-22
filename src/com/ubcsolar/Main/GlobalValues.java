@@ -71,5 +71,10 @@ public class GlobalValues {
 	public static final String WEATHER_UNITS = ForecastIO.UNITS_CA;
 	
 	public static final String WEATHER_LANG = ForecastIO.LANG_ENGLISH;
+	
+	/**
+	 * TODO: Update car's mass once information available. (in kg) Dummy value right now.
+	 */
+	public static final double CAR_MASS = 1000;
 }
 
