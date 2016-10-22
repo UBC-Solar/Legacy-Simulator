@@ -162,8 +162,7 @@ public class SimEngine {
 
 
 		FIODataPoint forecastForPoint = chooseReport(nextWeather, nextSimFrameTime);
-		double squareMetersOfPanel = inUseCarModel.getSolarPanelArea();
-		double sunPowerInWatts = calculateSunPower(nextPoint, forecastForPoint, (lastTimeStamp + (timeSinceLastFrame/2)), squareMetersOfPanel, lastFrame);
+		double sunPowerInWatts = calculateSunPower(forecastForPoint);
 
 
 		double SunCharge = (sunPowerInWatts*timeSinceLastFrameInHr)/(inUseCarModel.getMaxBatteryCap()); //divide watt hrs from the sun by max watt hrs to get the percentage of charge from the sun
@@ -289,46 +288,59 @@ public class SimEngine {
 	
 //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 	/**
-	 * Helper function; calculate the amount of solar power falling on the car during the frame. 
-	 * @param nextPoint - to get the lon/lat for sun elevation in degrees
-	 * @param forecastForPoint - the weather forecast for the point
-	 * @param squareMetersOfPanel - the total collection area of solar panels
-	 * @return
+	 * Calculates power gain from solar panels on the car, assuming it is experiencing
+	 * the weather given in forecastForPoint, according to formulas given at 
+	 * http://scool.larc.nasa.gov/lesson_plans/CloudCoverSolarRadiation.pdf
+	 * and at http://photovoltaic-software.com/PV-solar-energy-calculation.php
+	 * @param forecastForPoint: the forecast for the point you're trying to predict
+	 * 		power output at. 
+	 * @return the amount of power (in Watts) that the panels will produce in the given
+	 * 		situation
 	 */
-	private double calculateSunPower(GeoCoord nextPoint, FIODataPoint forecastForPoint, double timeOfDay, double squareMetersOfPanel, SimFrame lastFrame) {
-		Calendar rightNow = Calendar.getInstance();
-		rightNow.setTimeInMillis((long) timeOfDay);
-
-		int hour= rightNow.HOUR_OF_DAY;
-		// TODO Auto-generated method stub
-
-		//Get the sun elevation given the time of day and the latitude and longitude. 
-
-		double cloudCover = lastFrame.getForecast().cloudCover();
-
-
-
-		//assume 100 watts per square foot. (thanks random forum guy)
-		//10.7639 sq feet per sq. meter. 
-		double timeFactor=1;
-
-		//replace with sunrise equation later
-		if (hour<12 && hour>6){
-			timeFactor=(4-24/hour)/2; //calculations just meant to get a 0-1 scale
-		}
-		if (hour>12 && hour<21){
-			timeFactor=(1-hour/21)/.4286; //.4286 is a conversion factor to get on a scale of 0-1
-		}
-
-		double watts = 100*10.7639 * squareMetersOfPanel* timeFactor* cloudCover;
-
-		//calculate how much sun there is given the weather (cloudy? Probably not much). 
-		//I think there's actually a parameter in FIODataPoint for sun exposure. If not, use the cloudyness measurement. 
-
-		//assuming no weather at all right now. 
-
-		//because watts, don't need to include time. 
-		return watts; 
+	
+	//TODO: more sophisticated calculations, involving time of day/year, angle of incidence
+		// of sun, etc.
+	private double calculateSunPower(FIODataPoint forecastForPoint) {
+		double cloudCover = forecastForPoint.cloudCover();
+		double cloudCoverFactor = 990.0*(1-0.75*cloudCover);
+		double panelArea = inUseCarModel.getSolarPanelArea();
+		double sunPower = panelArea * GlobalValues.PANEL_EFFICIENCY * cloudCoverFactor;
+		
+		return sunPower;
+		
+		//		Calendar rightNow = Calendar.getInstance();
+//		rightNow.setTimeInMillis((long) timeOfDay);
+//
+//		int hour= rightNow.HOUR_OF_DAY;
+//		// TODO Auto-generated method stub
+//
+//		//Get the sun elevation given the time of day and the latitude and longitude. 
+//
+//		double cloudCover = lastFrame.getForecast().cloudCover();
+//
+//
+//
+//		//assume 100 watts per square foot. (thanks random forum guy)
+//		//10.7639 sq feet per sq. meter. 
+//		double timeFactor=1;
+//
+//		//replace with sunrise equation later
+//		if (hour<12 && hour>6){
+//			timeFactor=(4-24/hour)/2; //calculations just meant to get a 0-1 scale
+//		}
+//		if (hour>12 && hour<21){
+//			timeFactor=(1-hour/21)/.4286; //.4286 is a conversion factor to get on a scale of 0-1
+//		}
+//
+//		double watts = 100*10.7639 * squareMetersOfPanel* timeFactor* cloudCover;
+//
+//		//calculate how much sun there is given the weather (cloudy? Probably not much). 
+//		//I think there's actually a parameter in FIODataPoint for sun exposure. If not, use the cloudyness measurement. 
+//
+//		//assuming no weather at all right now. 
+//
+//		//because watts, don't need to include time. 
+//		return watts; 
 	}
 //^^^^^^^^^^^^^^^^^SOME GOOD IDEAS IN HERE, LIKE CHANGING SUNLIGHT WITH TIME OF DAY AND GETTING CLOUD COVER^^^^^^^^^^^^^^^^^^^^^^^^^
 //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv

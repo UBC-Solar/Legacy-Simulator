@@ -434,15 +434,15 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 					//not sure to do if any of them, or if majority, or if all, etc. 
 					if(map.get(g)!=null && map.get(g).get(startLapNumber) != null){
 						isManuallySet = true;
-						System.out.println("total speed: " + totalSpeed);
-						System.out.println("Average speed: " + averageSpeed);
-						System.out.println((i-(lastAddedPointIndex+1) + ""));
+//						System.out.println("total speed: " + totalSpeed);
+//						System.out.println("Average speed: " + averageSpeed);
+//						System.out.println((i-(lastAddedPointIndex+1) + ""));
 					}
-					if(averageSpeed <2 || totalSpeed <500 || (int) averageSpeed < 1){
-						System.out.println("total speed: " + totalSpeed);
-						System.out.println("Average speed: " + averageSpeed);
-						System.out.println((i-(lastAddedPointIndex+1) + ""));
-					}
+//					if(averageSpeed <2 || totalSpeed <500 || (int) averageSpeed < 1){
+//						System.out.println("total speed: " + totalSpeed);
+//						System.out.println("Average speed: " + averageSpeed);
+//						System.out.println((i-(lastAddedPointIndex+1) + ""));
+//					}
 				}
 				
 				SliderSpinnerFrame toAddToPanel = new SliderSpinnerFrame(label ,

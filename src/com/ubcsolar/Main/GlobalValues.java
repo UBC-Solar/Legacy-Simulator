@@ -71,5 +71,8 @@ public class GlobalValues {
 	public static final String WEATHER_UNITS = ForecastIO.UNITS_CA;
 	
 	public static final String WEATHER_LANG = ForecastIO.LANG_ENGLISH;
+	
+	public static final double PANEL_EFFICIENCY = 0.75;
+	//TODO: measure this somehow
 }
 
