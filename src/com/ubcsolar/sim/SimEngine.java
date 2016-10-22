@@ -478,4 +478,30 @@ public class SimEngine {
 		
 		return 0;
 	}
+	
+	public double getInclinationAngle(GeoCoord startPoint, GeoCoord endPoint) {
+		double inclinationAngle = 0;
+		double distance = startPoint.calculateDistance(endPoint);
+		double heightDifference = endPoint.getElevation() - startPoint.getElevation();
+		/*
+		 * If heightDifference returns a positive number, this means that we are elevating from a lower starting point.
+		 * Thus, the inclinationAngle should be positive.
+		 */
+		inclinationAngle = Math.atan(heightDifference/distance);
+		return inclinationAngle;
+	}
+	
+	public double getGradientResistanceForce(double angle) {
+		// F = mgsin(theta)
+		double force = GlobalValues.CAR_MASS * 9.8 * Math.sin(angle);
+		return force;
+	}
+	
+	public double getRollingResistanceForce(double angle, double tirePressure, double velocity) {
+		double rollingCoefficient = 0.005 + (1/tirePressure)*(0.01+0.0095*Math.pow(velocity/100, 2));
+		// Normal Force = mgcos(theta)
+		double normalForce = GlobalValues.CAR_MASS * 9.8 * Math.cos(angle);
+		double force = rollingCoefficient * normalForce;
+		return force;
+	}
 }
