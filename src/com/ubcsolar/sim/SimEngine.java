@@ -393,17 +393,27 @@ public class SimEngine {
 			FIODataPoint toForecast){
 		double latDiff = toLoc.getLat()-fromLoc.getLat();
 		double lonDiff = toLoc.getLon()-fromLoc.getLon();
-		double carDirection;//measured as angle in degrees, with 0 at north and measured clockwise
+		double carBearing;//measured as angle in degrees, with 0 at north and measured clockwise
 		double alpha = Math.atan(latDiff/lonDiff);
 		double alphaDegrees = alpha * 180.0 / Math.PI;
 		if(lonDiff>=0){
-			carDirection = 90.0 - alphaDegrees;
+			carBearing = 90.0 - alphaDegrees;
 		}else{
-			carDirection = 270.0 - alphaDegrees;
+			carBearing = 270.0 - alphaDegrees;
 		}
 		double windBearing = toForecast.windBearing();
 		double windSpeed = toForecast.windSpeed();
-		return 0.0;//TODO: put real return value
+		
+		double relativeVelocity = carSpeed*Math.sin(carBearing) - windSpeed*Math.sin(windBearing);
+		boolean isTailwind = false;
+		if(Math.abs(relativeVelocity) < Math.abs(carSpeed*Math.sin(carBearing)))
+			isTailwind = true;
+		double dragMag = 0.5 * GlobalValues.CAR_CROSS_SECTIONAL_AREA * GlobalValues.DRAG_COEFF * 
+				relativeVelocity * relativeVelocity;
+		if(isTailwind)
+			return -1*dragMag;
+		else
+			return dragMag;
 	}
 	
 	private double calculateBestSpeed(double lastCarSpeed, double elevationChange, double SoC) {
