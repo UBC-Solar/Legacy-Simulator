@@ -21,6 +21,8 @@ public class SimEngineTest {
 	GeoCoord testLocation1;
 	GeoCoord testLocation2;
 	
+	public static final double ERROR = 0.0000001;
+	
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -39,9 +41,9 @@ public class SimEngineTest {
 	@Test
 	public final void testGetInclinationAngle() {
 		// Positive angle
-		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation1, testLocation2) - 1.485144777554603) < 0.0000001);
+		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation1, testLocation2) - 1.485144777554603) < ERROR);
 		// Negative angle
-		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation2, testLocation1) + 1.485144777554603) < 0.0000001);
+		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation2, testLocation1) + 1.485144777554603) < ERROR);
 	}
 
 	/**
@@ -52,7 +54,7 @@ public class SimEngineTest {
 	public final void testGetGradientResistanceForce() {
 		double expectedAngle = mockSimEngine.getInclinationAngle(testLocation1, testLocation2);
 		double expectedForce = GlobalValues.CAR_MASS * 9.8 * Math.sin(expectedAngle);
-		assertTrue(Math.abs(mockSimEngine.getGradientResistanceForce(expectedAngle) - 9764.074650337221) < 0.0000001);
+		assertTrue(Math.abs(mockSimEngine.getGradientResistanceForce(expectedAngle) - 9764.074650337221) < ERROR);
 		
 	}
 
@@ -66,7 +68,7 @@ public class SimEngineTest {
 		double expectedAngle = mockSimEngine.getInclinationAngle(testLocation1, testLocation2);
 		double expectedTirePressure = 30;
 		double expectedVelocity = 10;
-		assertTrue(Math.abs(mockSimEngine.getRollingResistanceForce(expectedAngle, expectedTirePressure, expectedVelocity) - 4.473904107648733) < 0.0000001);
+		assertTrue(Math.abs(mockSimEngine.getRollingResistanceForce(expectedAngle, expectedTirePressure, expectedVelocity) - 4.473904107648733) < ERROR);
 	}
 
 }
