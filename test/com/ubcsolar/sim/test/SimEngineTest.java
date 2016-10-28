@@ -5,12 +5,21 @@ package com.ubcsolar.sim.test;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
+import com.github.dvdme.ForecastIOLib.FIODataPoint;
+import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.sim.SimEngine;
+import com.ubcsolar.weather.FIODataPointFactory;
+import com.ubcsolar.weather.ForecastIOFactory;
 
 /**
  * @author dust
@@ -20,6 +29,10 @@ public class SimEngineTest {
 	SimEngine mockSimEngine;
 	GeoCoord testLocation1;
 	GeoCoord testLocation2;
+	FIODataPoint mockDatapoint;
+	ForecastIO testForecast;
+	FIODataPoint point1FIO;
+	FIODataPoint point2FIO;
 	
 	/**
 	 * @throws java.lang.Exception
@@ -29,6 +42,22 @@ public class SimEngineTest {
 		mockSimEngine = new SimEngine();
 		testLocation1 = new GeoCoord(49.27474888, -123.23827744, 74);
 		testLocation2 = new GeoCoord(49.26914869, -123.22008133, 91);
+		
+		FIODataPointFactory datapointFactory = new FIODataPointFactory();
+		
+		JsonObject point1 = datapointFactory.time(0).build();
+		JsonObject point2 = datapointFactory.time(3600).build();
+		List<JsonObject> datapoints = new ArrayList<JsonObject>();
+		datapoints.add(point1);
+		datapoints.add(point2);
+		
+		ForecastIOFactory.addDatapoints(datapoints);
+		testForecast = ForecastIOFactory.build();
+		
+		point1FIO = new FIODataPoint(point1);
+		point2FIO = new FIODataPoint(point2);
+		point1FIO.setTimezone("PST");
+		point2FIO.setTimezone("PST");
 	}
 
 	/**
@@ -67,6 +96,18 @@ public class SimEngineTest {
 		double expectedTirePressure = 30;
 		double expectedVelocity = 10;
 		assertTrue(Math.abs(mockSimEngine.getRollingResistanceForce(expectedAngle, expectedTirePressure, expectedVelocity) - 4.473904107648733) < 0.0000001);
+	}
+	
+	
+	@Test
+	public final void testChooseReport(){
+		assertEquals(mockSimEngine.chooseReport(testForecast, 0).time(), point1FIO.time());
+		assertEquals(mockSimEngine.chooseReport(testForecast, 3600).time(), point2FIO.time());
+		assertEquals(mockSimEngine.chooseReport(testForecast, 1000).time(), point1FIO.time());
+		assertEquals(mockSimEngine.chooseReport(testForecast, -100).time(), point1FIO.time());
+		assertEquals(mockSimEngine.chooseReport(testForecast, 1801).time(), point2FIO.time());
+		assertEquals(mockSimEngine.chooseReport(testForecast, 1800).time(), point1FIO.time());
+		assertEquals(mockSimEngine.chooseReport(testForecast, 10000000).time(), point2FIO.time());
 	}
 
 }

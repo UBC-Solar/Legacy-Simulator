@@ -227,7 +227,8 @@ public class SimEngine {
 	 * @param lastSoC
 	 * @return
 	 */
-
+	
+	//TODO: change this method
 	private double generateSoC(double lastSoC, double elevationChange, double speed, double SoCFromSun) {
 		if (elevationChange < 0){
 			if (lastSoC+2+SoCFromSun>=100){
@@ -354,7 +355,8 @@ public class SimEngine {
 	 * @param timeFrame: time in ms since jan1 1970 (see System.currentTimeMillis)
 	 * @return an FIODataPoint containing the hourly forecast for the hour closest to timeFrame
 	 */
-	private FIODataPoint chooseReport(ForecastIO weather, double timeFrame) {
+	//TODO: change this back to private after JUnit testing
+	public FIODataPoint chooseReport(ForecastIO weather, double timeFrame) {
 		JsonObject hourly = weather.getHourly();
 		JsonArray hourlyData = (JsonArray)hourly.get("data");
 		int currTime = Integer.parseInt(((JsonObject)hourlyData.get(0)).get("time").toString());
@@ -418,6 +420,7 @@ public class SimEngine {
 			return dragMag;
 	}
 	
+	//TODO: change this method
 	private double calculateBestSpeed(double lastCarSpeed, double elevationChange, double SoC) {
 		double SpeedReturn;
 		double MaxCarSpeed=110;
