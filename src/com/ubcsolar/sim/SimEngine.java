@@ -405,10 +405,16 @@ public class SimEngine {
 		}else{
 			carBearing = 3.0 * Math.PI / 2.0 - alpha;
 		}
-		double windBearing = toForecast.windBearing() * Math.PI / 180;
+		
 		double windSpeed = toForecast.windSpeed() * GlobalValues.KMH_TO_MS_FACTOR;
 		double carSpeedInMS = carSpeed * GlobalValues.KMH_TO_MS_FACTOR;
-		double relativeVelocity = carSpeedInMS + windSpeed*Math.cos((windBearing-carBearing));
+		double relativeVelocity = carSpeedInMS;
+		if(windSpeed != 0){
+			//this if statement is necessary because windBearing() will be undefined if
+			//windSpeed() is 0
+			double windBearing = toForecast.windBearing() * Math.PI / 180;
+			relativeVelocity = carSpeedInMS + windSpeed*Math.cos((windBearing-carBearing));
+		}
 		boolean isTailwind = false;
 		if(Math.abs(relativeVelocity) < Math.abs(carSpeedInMS/**Math.sin(carBearing)*/))
 			isTailwind = true;

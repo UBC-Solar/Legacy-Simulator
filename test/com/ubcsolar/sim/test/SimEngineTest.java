@@ -140,6 +140,15 @@ public class SimEngineTest {
 		assertTrue(Math.abs(testDrag3-calculatedDrag3) <= 0.000001);
 		double testDrag4 = mockSimEngine.calculateDrag(testLocation3, testLocation4, 30, point3FIO);
 		assertTrue(testDrag4 == 0);
+		
+		FIODataPointFactory datapointFactory = new FIODataPointFactory();
+		JsonObject point4 = datapointFactory.time(2345).windSpeed(0).build();
+		FIODataPoint point4FIO = new FIODataPoint(point4);
+		
+		double testDrag5 = mockSimEngine.calculateDrag(testLocation3, testLocation4, 30, point4FIO);
+		double calculatedDrag5 = 0.5*GlobalValues.CAR_CROSS_SECTIONAL_AREA*GlobalValues.DRAG_COEFF*
+				(0.833333333) * (0.83333333);
+		assertTrue(Math.abs(testDrag5-calculatedDrag5) <= 0.000001);
 	}
 
 }
