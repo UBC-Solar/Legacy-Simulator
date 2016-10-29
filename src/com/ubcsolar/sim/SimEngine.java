@@ -412,8 +412,10 @@ public class SimEngine {
 		 * If heightDifference returns a positive number, this means that we are elevating from a lower starting point.
 		 * Thus, the inclinationAngle should be positive.
 		 */
+		
 		inclinationAngle = Math.atan(heightDifference/distance);
 		return inclinationAngle;
+		
 	}
 	
 	public double getGradientResistanceForce(double angle) {
