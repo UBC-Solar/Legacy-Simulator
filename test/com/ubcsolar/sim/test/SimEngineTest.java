@@ -29,10 +29,13 @@ public class SimEngineTest {
 	SimEngine mockSimEngine;
 	GeoCoord testLocation1;
 	GeoCoord testLocation2;
+	GeoCoord testLocation3;
+	GeoCoord testLocation4;
 	FIODataPoint mockDatapoint;
 	ForecastIO testForecast;
 	FIODataPoint point1FIO;
 	FIODataPoint point2FIO;
+	FIODataPoint point3FIO;
 	
 	/**
 	 * @throws java.lang.Exception
@@ -42,22 +45,29 @@ public class SimEngineTest {
 		mockSimEngine = new SimEngine();
 		testLocation1 = new GeoCoord(49.27474888, -123.23827744, 74);
 		testLocation2 = new GeoCoord(49.26914869, -123.22008133, 91);
+		testLocation3 = new GeoCoord(0, 0, 32);
+		testLocation4 = new GeoCoord(45, 45, 234);
 		
 		FIODataPointFactory datapointFactory = new FIODataPointFactory();
 		
-		JsonObject point1 = datapointFactory.time(0).build();
-		JsonObject point2 = datapointFactory.time(3600).build();
+		JsonObject point1 = datapointFactory.time(0).windBearing(90).windSpeed(20).build();
+		JsonObject point2 = datapointFactory.time(3600).windBearing(200).windSpeed(30).build();
+		JsonObject point3 = datapointFactory.time(7200).windBearing(45).windSpeed(30).build();
 		List<JsonObject> datapoints = new ArrayList<JsonObject>();
 		datapoints.add(point1);
 		datapoints.add(point2);
+		datapoints.add(point3);
 		
 		ForecastIOFactory.addDatapoints(datapoints);
+		ForecastIOFactory.changeLocation(testLocation2);
 		testForecast = ForecastIOFactory.build();
 		
 		point1FIO = new FIODataPoint(point1);
 		point2FIO = new FIODataPoint(point2);
+		point3FIO = new FIODataPoint(point3);
 		point1FIO.setTimezone("PST");
 		point2FIO.setTimezone("PST");
+		point3FIO.setTimezone("PST");
 	}
 
 	/**
@@ -107,7 +117,29 @@ public class SimEngineTest {
 		assertEquals(mockSimEngine.chooseReport(testForecast, -100).time(), point1FIO.time());
 		assertEquals(mockSimEngine.chooseReport(testForecast, 1801).time(), point2FIO.time());
 		assertEquals(mockSimEngine.chooseReport(testForecast, 1800).time(), point1FIO.time());
-		assertEquals(mockSimEngine.chooseReport(testForecast, 10000000).time(), point2FIO.time());
+		assertEquals(mockSimEngine.chooseReport(testForecast, 10000000).time(), point3FIO.time());
+		assertEquals(mockSimEngine.chooseReport(testForecast, 3601).time(), point2FIO.time());
+		assertEquals(mockSimEngine.chooseReport(testForecast, 5400).time(), point2FIO.time());
+		assertEquals(mockSimEngine.chooseReport(testForecast, 5401).time(), point3FIO.time());
+		assertEquals(mockSimEngine.chooseReport(testForecast, 7199).time(), point3FIO.time());
+	}
+	
+	@Test
+	public final void testCalculateDrag(){
+		double testDrag1 = mockSimEngine.calculateDrag(testLocation2, testLocation1, 20, point2FIO);
+		double calculatedDrag1 = -0.5*GlobalValues.CAR_CROSS_SECTIONAL_AREA*GlobalValues.DRAG_COEFF*
+				(0.5134923613) * (0.5134923613);//velocitie calculated by hand
+		assertTrue(Math.abs(testDrag1-calculatedDrag1) <= 0.000001);
+		double testDrag2 = mockSimEngine.calculateDrag(testLocation1, testLocation2, 20, point2FIO);
+		double calculatedDrag2 = 0.5*GlobalValues.CAR_CROSS_SECTIONAL_AREA*GlobalValues.DRAG_COEFF*
+				(0.5976187498) * (0.5976187498); //velocities calculated by hand
+		assertTrue(Math.abs(testDrag2-calculatedDrag2) <= 0.000001);
+		double testDrag3 = mockSimEngine.calculateDrag(testLocation4, testLocation3, 30, point3FIO);
+		double calculatedDrag3 = 0.5*GlobalValues.CAR_CROSS_SECTIONAL_AREA*GlobalValues.DRAG_COEFF*
+				(1.6666666667) * (1.666666667);
+		assertTrue(Math.abs(testDrag3-calculatedDrag3) <= 0.000001);
+		double testDrag4 = mockSimEngine.calculateDrag(testLocation3, testLocation4, 30, point3FIO);
+		assertTrue(testDrag4 == 0);
 	}
 
 }

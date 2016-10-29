@@ -385,32 +385,32 @@ public class SimEngine {
 	 *  interval from fromLoc to toLoc 
 	 * @param toLoc: breadcrumb that simulated car is traveling to
 	 * @param fromLoc: breadcrumb that simulated car is traveling from
-	 * @param carSpeed: the simulated car's current speed (from the previous breadcrumb)
+	 * @param carSpeed: the simulated car's current speed (from the previous breadcrumb) in km/h
 	 * @param toForecast: the weather forecast at the current time at the destination location,
 	 * 			used to find the headwind
 	 * @return the estimated resistive force acting on the car during the interval (fromLoc-toLoc)
 	 * 			This value will be positive if the drag is resisting the car's motion (i.e.
 	 * 			there is a headwind) or negative if it's assisting (tailwind) 
 	 */
-	
-	private double calculateDrag(GeoCoord toLoc, GeoCoord fromLoc, double carSpeed, 
+	//TODO: change to private after JUnit testing
+	public double calculateDrag(GeoCoord toLoc, GeoCoord fromLoc, double carSpeed, 
 			FIODataPoint toForecast){
 		double latDiff = toLoc.getLat()-fromLoc.getLat();
 		double lonDiff = toLoc.getLon()-fromLoc.getLon();
 		double carBearing;//measured as angle in degrees, with 0 at north and measured clockwise
 		double alpha = Math.atan(latDiff/lonDiff);
-		double alphaDegrees = alpha * 180.0 / Math.PI;
+		//double alphaDegrees = alpha * 180.0 / Math.PI;
 		if(lonDiff>=0){
-			carBearing = 90.0 - alphaDegrees;
+			carBearing = Math.PI / 2.0 - alpha;
 		}else{
-			carBearing = 270.0 - alphaDegrees;
+			carBearing = 3.0 * Math.PI / 2.0 - alpha;
 		}
-		double windBearing = toForecast.windBearing();
-		double windSpeed = toForecast.windSpeed();
-		
-		double relativeVelocity = carSpeed*Math.sin(carBearing) - windSpeed*Math.sin(windBearing);
+		double windBearing = toForecast.windBearing() * Math.PI / 180;
+		double windSpeed = toForecast.windSpeed() * GlobalValues.KMH_TO_MS_FACTOR;
+		double carSpeedInMS = carSpeed * GlobalValues.KMH_TO_MS_FACTOR;
+		double relativeVelocity = carSpeedInMS + windSpeed*Math.cos((windBearing-carBearing));
 		boolean isTailwind = false;
-		if(Math.abs(relativeVelocity) < Math.abs(carSpeed*Math.sin(carBearing)))
+		if(Math.abs(relativeVelocity) < Math.abs(carSpeedInMS/**Math.sin(carBearing)*/))
 			isTailwind = true;
 		double dragMag = 0.5 * GlobalValues.CAR_CROSS_SECTIONAL_AREA * GlobalValues.DRAG_COEFF * 
 				relativeVelocity * relativeVelocity;
