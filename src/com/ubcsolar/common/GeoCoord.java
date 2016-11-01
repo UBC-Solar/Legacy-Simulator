@@ -170,7 +170,9 @@ public static double haversine(
        Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) 
       * Math.sin(dLon / 2) * Math.sin(dLon / 2);
     double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+   // double c = Math.asin(Math.sqrt(a));
     double d = r * c;
+   
     return d;
 }
 

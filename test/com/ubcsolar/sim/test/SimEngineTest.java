@@ -32,11 +32,19 @@ public class SimEngineTest {
 	GeoCoord testLocation2;
 	GeoCoord testLocation3;
 	GeoCoord testLocation4;
-	FIODataPoint mockDatapoint;
+	GeoCoord testLocation5;
+	GeoCoord testLocation6;
+	
 	ForecastIO testForecast;
 	FIODataPoint point1FIO;
 	FIODataPoint point2FIO;
 	FIODataPoint point3FIO;
+
+	double expectedTirePressure = 30;
+	double expectedVelocity = 10;
+	
+	public static final double ERROR = 0.00001;
+
 	
 	/**
 	 * @throws java.lang.Exception
@@ -44,10 +52,12 @@ public class SimEngineTest {
 	@Before
 	public void setUp() throws Exception {
 		mockSimEngine = new SimEngine();
-		testLocation1 = new GeoCoord(49.27474888, -123.23827744, 74);
-		testLocation2 = new GeoCoord(49.26914869, -123.22008133, 91);
-		testLocation3 = new GeoCoord(0, 0, 32);
-		testLocation4 = new GeoCoord(45, 45, 234);
+		testLocation1 = new GeoCoord(49.274748, -123.238277, 74);
+		testLocation2 = new GeoCoord(49.269148, -123.220081, 91);
+		testLocation3 = new GeoCoord(23.123453, 45.591276, 45);
+		testLocation4 = new GeoCoord(-12.485890, -94.382364, 10);
+		testLocation5 = new GeoCoord(0, 0, 32);
+		testLocation6 = new GeoCoord(45, 45, 234);
 		
 		FIODataPointFactory datapointFactory = new FIODataPointFactory();
 		
@@ -69,6 +79,7 @@ public class SimEngineTest {
 		point1FIO.setTimezone("PST");
 		point2FIO.setTimezone("PST");
 		point3FIO.setTimezone("PST");
+
 	}
 
 	/**
@@ -78,10 +89,21 @@ public class SimEngineTest {
 	 */
 	@Test
 	public final void testGetInclinationAngle() {
-		// Positive angle
-		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation1, testLocation2) - 1.485144777554603) < 0.0000001);
-		// Negative angle
-		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation2, testLocation1) + 1.485144777554603) < 0.0000001);
+		
+		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation1, testLocation2) - 1.485145724) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation1, testLocation3) + 0.00243923742) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation1, testLocation4) + 0.008617019243) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation2, testLocation3) + 0.003869004564) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation2, testLocation4) + 0.01090753139) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation3, testLocation4) +0.002239073317) < ERROR);
+	
+		//magnitudes of the angles should be the same, only signs change
+		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation1, testLocation2) + mockSimEngine.getInclinationAngle(testLocation2, testLocation1)) == 0);
+		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation1, testLocation3) + mockSimEngine.getInclinationAngle(testLocation3, testLocation1)) == 0);
+		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation1, testLocation4) + mockSimEngine.getInclinationAngle(testLocation4, testLocation1)) == 0);
+		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation2, testLocation3) + mockSimEngine.getInclinationAngle(testLocation3, testLocation2)) == 0);
+		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation2, testLocation4) + mockSimEngine.getInclinationAngle(testLocation4, testLocation2)) == 0);
+		assertTrue(Math.abs(mockSimEngine.getInclinationAngle(testLocation3, testLocation4) + mockSimEngine.getInclinationAngle(testLocation4, testLocation3)) == 0);
 	}
 
 	/**
@@ -90,9 +112,19 @@ public class SimEngineTest {
 	 */
 	@Test
 	public final void testGetGradientResistanceForce() {
-		double expectedAngle = mockSimEngine.getInclinationAngle(testLocation1, testLocation2);
-		double expectedForce = GlobalValues.CAR_MASS * 9.8 * Math.sin(expectedAngle);
-		assertTrue(Math.abs(mockSimEngine.getGradientResistanceForce(expectedAngle) - 9764.074650337221) < 0.0000001);
+		assertTrue(Math.abs(mockSimEngine.getGradientResistanceForce(mockSimEngine.getInclinationAngle(testLocation1, testLocation2)) - 9764.075444) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getGradientResistanceForce(mockSimEngine.getInclinationAngle(testLocation1, testLocation3)) - (-23.90450301)) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getGradientResistanceForce(mockSimEngine.getInclinationAngle(testLocation1, testLocation4)) - (-84.44574351)) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getGradientResistanceForce(mockSimEngine.getInclinationAngle(testLocation2, testLocation3)) - (-37.91615013)) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getGradientResistanceForce(mockSimEngine.getInclinationAngle(testLocation2, testLocation4)) - (-106.891688)) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getGradientResistanceForce(mockSimEngine.getInclinationAngle(testLocation3, testLocation4)) - (-21.94290018)) < ERROR);
+	
+		assertTrue(Math.abs(mockSimEngine.getGradientResistanceForce(mockSimEngine.getInclinationAngle(testLocation2, testLocation1)) - (-9764.075444)) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getGradientResistanceForce(mockSimEngine.getInclinationAngle(testLocation3, testLocation1)) - 23.90450301) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getGradientResistanceForce(mockSimEngine.getInclinationAngle(testLocation4, testLocation1)) - 84.44574351) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getGradientResistanceForce(mockSimEngine.getInclinationAngle(testLocation3, testLocation2)) - 37.91615013) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getGradientResistanceForce(mockSimEngine.getInclinationAngle(testLocation4, testLocation2)) - 106.891688) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getGradientResistanceForce(mockSimEngine.getInclinationAngle(testLocation4, testLocation3)) - 21.94290018) < ERROR); 
 		
 	}
 
@@ -103,10 +135,33 @@ public class SimEngineTest {
 	 */
 	@Test
 	public final void testGetRollingResistanceForce() {
-		double expectedAngle = mockSimEngine.getInclinationAngle(testLocation1, testLocation2);
-		double expectedTirePressure = 30;
-		double expectedVelocity = 10;
-		assertTrue(Math.abs(mockSimEngine.getRollingResistanceForce(expectedAngle, expectedTirePressure, expectedVelocity) - 4.473904107648733) < 0.0000001);
+		assertTrue(Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation1, testLocation2), expectedTirePressure, expectedVelocity) - 4.47385478) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation1, testLocation3), expectedTirePressure, expectedVelocity) - 52.29754442) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation1, testLocation4), expectedTirePressure, expectedVelocity) - 52.29575838) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation2, testLocation3), expectedTirePressure, expectedVelocity) - 52.29730857) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation2, testLocation4), expectedTirePressure, expectedVelocity) - 52.29458899) < ERROR);
+		assertTrue(Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation3, testLocation4), expectedTirePressure, expectedVelocity) - 52.2975689) < ERROR);
+	
+		//Friction should always be positive, regardless of direction (uphill vs downhill)
+		//Friction on a slope should be the same, regardless of direction (uphill vs downhill)
+		assertTrue(Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation1, testLocation2), expectedTirePressure, expectedVelocity)) 
+					== 
+				   Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation2, testLocation1), expectedTirePressure, expectedVelocity)));
+		assertTrue(Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation1, testLocation3), expectedTirePressure, expectedVelocity)) 
+				   == 
+			       Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation3, testLocation1), expectedTirePressure, expectedVelocity)));
+		assertTrue(Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation1, testLocation4), expectedTirePressure, expectedVelocity)) 
+				   == 
+			       Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation4, testLocation1), expectedTirePressure, expectedVelocity)));
+		assertTrue(Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation2, testLocation3), expectedTirePressure, expectedVelocity)) 
+				   == 
+			       Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation3, testLocation2), expectedTirePressure, expectedVelocity)));
+		assertTrue(Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation2, testLocation4), expectedTirePressure, expectedVelocity)) 
+				   == 
+			       Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation4, testLocation2), expectedTirePressure, expectedVelocity)));
+		assertTrue(Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation3, testLocation4), expectedTirePressure, expectedVelocity)) 
+				   == 
+			       Math.abs(mockSimEngine.getRollingResistanceForce(mockSimEngine.getInclinationAngle(testLocation4, testLocation3), expectedTirePressure, expectedVelocity)));
 	}
 	
 	
@@ -130,26 +185,29 @@ public class SimEngineTest {
 		double testDrag1 = mockSimEngine.calculateDrag(testLocation2, testLocation1, 20, point2FIO);
 		double calculatedDrag1 = -0.5*GlobalValues.CAR_CROSS_SECTIONAL_AREA*GlobalValues.DRAG_COEFF*
 				(0.5134923613) * (0.5134923613);//velocities calculated by hand
-		assertTrue(Math.abs(testDrag1-calculatedDrag1) <= 0.000001);
+		assertTrue(Math.abs(testDrag1-calculatedDrag1) <= ERROR);
+		
 		double testDrag2 = mockSimEngine.calculateDrag(testLocation1, testLocation2, 20, point2FIO);
 		double calculatedDrag2 = 0.5*GlobalValues.CAR_CROSS_SECTIONAL_AREA*GlobalValues.DRAG_COEFF*
 				(0.5976187498) * (0.5976187498);
-		assertTrue(Math.abs(testDrag2-calculatedDrag2) <= 0.000001);
-		double testDrag3 = mockSimEngine.calculateDrag(testLocation4, testLocation3, 30, point3FIO);
+		assertTrue(Math.abs(testDrag2-calculatedDrag2) <= ERROR);
+		
+		double testDrag3 = mockSimEngine.calculateDrag(testLocation6, testLocation5, 30, point3FIO);
 		double calculatedDrag3 = 0.5*GlobalValues.CAR_CROSS_SECTIONAL_AREA*GlobalValues.DRAG_COEFF*
 				(1.6666666667) * (1.666666667);
-		assertTrue(Math.abs(testDrag3-calculatedDrag3) <= 0.000001);
-		double testDrag4 = mockSimEngine.calculateDrag(testLocation3, testLocation4, 30, point3FIO);
+		assertTrue(Math.abs(testDrag3-calculatedDrag3) <= ERROR);
+		
+		double testDrag4 = mockSimEngine.calculateDrag(testLocation5, testLocation6, 30, point3FIO);
 		assertTrue(testDrag4 == 0);
 		
 		FIODataPointFactory datapointFactory = new FIODataPointFactory();
 		JsonObject point4 = datapointFactory.time(2345).windSpeed(0).build();
 		FIODataPoint point4FIO = new FIODataPoint(point4);
 		
-		double testDrag5 = mockSimEngine.calculateDrag(testLocation3, testLocation4, 30, point4FIO);
+		double testDrag5 = mockSimEngine.calculateDrag(testLocation5, testLocation6, 30, point4FIO);
 		double calculatedDrag5 = 0.5*GlobalValues.CAR_CROSS_SECTIONAL_AREA*GlobalValues.DRAG_COEFF*
 				(0.833333333) * (0.83333333);
-		assertTrue(Math.abs(testDrag5-calculatedDrag5) <= 0.000001);
+		assertTrue(Math.abs(testDrag5-calculatedDrag5) <= ERROR);
 	}
 	
 	@Test
@@ -158,15 +216,15 @@ public class SimEngineTest {
 
 		double testPower1 = mockSimEngine.calculateSunPower(point1FIO);
 		double calculatedPower1 = GlobalValues.PANEL_EFFICIENCY * carArea * 990.0;
-		assertTrue(Math.abs(testPower1-calculatedPower1) <= 0.000001);
+		assertTrue(Math.abs(testPower1-calculatedPower1) <= ERROR);
 		
 		double testPower2 = mockSimEngine.calculateSunPower(point2FIO);
 		double calculatedPower2 = GlobalValues.PANEL_EFFICIENCY * carArea * 247.5;
-		assertTrue(Math.abs(testPower2-calculatedPower2) <= 0.000001);
+		assertTrue(Math.abs(testPower2-calculatedPower2) <= ERROR);
 		
 		double testPower3 = mockSimEngine.calculateSunPower(point3FIO);
 		double calculatedPower3 = GlobalValues.PANEL_EFFICIENCY * carArea * 930.9660525;
-		assertTrue(Math.abs(testPower3-calculatedPower3) <= 0.000001);
+		assertTrue(Math.abs(testPower3-calculatedPower3) <= ERROR);
 		
 	}
 

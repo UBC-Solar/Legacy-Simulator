@@ -497,13 +497,15 @@ public class SimEngine {
 		 * If heightDifference returns a positive number, this means that we are elevating from a lower starting point.
 		 * Thus, the inclinationAngle should be positive.
 		 */
+		
 		inclinationAngle = Math.atan(heightDifference/distance);
 		return inclinationAngle;
+		
 	}
 	
 	public double getGradientResistanceForce(double angle) {
 		// F = mgsin(theta)
-		double force = GlobalValues.CAR_MASS * 9.8 * Math.sin(angle);
+		double force = GlobalValues.CAR_MASS * 9.8 * Math.sin(angle); //force is positive if it opposes the direction of travel
 		return force;
 	}
 	
@@ -511,7 +513,7 @@ public class SimEngine {
 		double rollingCoefficient = 0.005 + (1/tirePressure)*(0.01+0.0095*Math.pow(velocity/100, 2));
 		// Normal Force = mgcos(theta)
 		double normalForce = GlobalValues.CAR_MASS * 9.8 * Math.cos(angle);
-		double force = rollingCoefficient * normalForce;
+		double force = rollingCoefficient * normalForce; //force is positive if it opposes the direction of travel
 		return force;
 	}
 }
