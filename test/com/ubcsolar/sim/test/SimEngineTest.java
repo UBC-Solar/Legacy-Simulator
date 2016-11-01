@@ -17,6 +17,7 @@ import com.github.dvdme.ForecastIOLib.FIODataPoint;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.GeoCoord;
+import com.ubcsolar.sim.DefaultCarModel;
 import com.ubcsolar.sim.SimEngine;
 import com.ubcsolar.weather.FIODataPointFactory;
 import com.ubcsolar.weather.ForecastIOFactory;
@@ -50,9 +51,9 @@ public class SimEngineTest {
 		
 		FIODataPointFactory datapointFactory = new FIODataPointFactory();
 		
-		JsonObject point1 = datapointFactory.time(0).windBearing(90).windSpeed(20).build();
-		JsonObject point2 = datapointFactory.time(3600).windBearing(200).windSpeed(30).build();
-		JsonObject point3 = datapointFactory.time(7200).windBearing(45).windSpeed(30).build();
+		JsonObject point1 = datapointFactory.time(0).windBearing(90).windSpeed(20).cloudCover(0).build();
+		JsonObject point2 = datapointFactory.time(3600).windBearing(200).windSpeed(30).cloudCover(1).build();
+		JsonObject point3 = datapointFactory.time(7200).windBearing(45).windSpeed(30).cloudCover(0.43).build();
 		List<JsonObject> datapoints = new ArrayList<JsonObject>();
 		datapoints.add(point1);
 		datapoints.add(point2);
@@ -128,11 +129,11 @@ public class SimEngineTest {
 	public final void testCalculateDrag(){
 		double testDrag1 = mockSimEngine.calculateDrag(testLocation2, testLocation1, 20, point2FIO);
 		double calculatedDrag1 = -0.5*GlobalValues.CAR_CROSS_SECTIONAL_AREA*GlobalValues.DRAG_COEFF*
-				(0.5134923613) * (0.5134923613);//velocitie calculated by hand
+				(0.5134923613) * (0.5134923613);//velocities calculated by hand
 		assertTrue(Math.abs(testDrag1-calculatedDrag1) <= 0.000001);
 		double testDrag2 = mockSimEngine.calculateDrag(testLocation1, testLocation2, 20, point2FIO);
 		double calculatedDrag2 = 0.5*GlobalValues.CAR_CROSS_SECTIONAL_AREA*GlobalValues.DRAG_COEFF*
-				(0.5976187498) * (0.5976187498); //velocities calculated by hand
+				(0.5976187498) * (0.5976187498);
 		assertTrue(Math.abs(testDrag2-calculatedDrag2) <= 0.000001);
 		double testDrag3 = mockSimEngine.calculateDrag(testLocation4, testLocation3, 30, point3FIO);
 		double calculatedDrag3 = 0.5*GlobalValues.CAR_CROSS_SECTIONAL_AREA*GlobalValues.DRAG_COEFF*
@@ -149,6 +150,24 @@ public class SimEngineTest {
 		double calculatedDrag5 = 0.5*GlobalValues.CAR_CROSS_SECTIONAL_AREA*GlobalValues.DRAG_COEFF*
 				(0.833333333) * (0.83333333);
 		assertTrue(Math.abs(testDrag5-calculatedDrag5) <= 0.000001);
+	}
+	
+	@Test
+	public final void testCalculateSunPower(){
+		double carArea = (new DefaultCarModel()).getSolarPanelArea();
+
+		double testPower1 = mockSimEngine.calculateSunPower(point1FIO);
+		double calculatedPower1 = GlobalValues.PANEL_EFFICIENCY * carArea * 990.0;
+		assertTrue(Math.abs(testPower1-calculatedPower1) <= 0.000001);
+		
+		double testPower2 = mockSimEngine.calculateSunPower(point2FIO);
+		double calculatedPower2 = GlobalValues.PANEL_EFFICIENCY * carArea * 247.5;
+		assertTrue(Math.abs(testPower2-calculatedPower2) <= 0.000001);
+		
+		double testPower3 = mockSimEngine.calculateSunPower(point3FIO);
+		double calculatedPower3 = GlobalValues.PANEL_EFFICIENCY * carArea * 930.9660525;
+		assertTrue(Math.abs(testPower3-calculatedPower3) <= 0.000001);
+		
 	}
 
 }

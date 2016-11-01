@@ -32,7 +32,7 @@ public class SimEngine {
 	private final int EFF_SOLAR_CONSTANT = 990;
 
 	public SimEngine() {
-
+		inUseCarModel = new DefaultCarModel();
 	}
 
 	private CarModel inUseCarModel;
@@ -45,7 +45,7 @@ public class SimEngine {
 		if(laps <= 0){
 			throw new IllegalArgumentException("Must go at least one lap");
 		}
-		inUseCarModel = new DefaultCarModel();
+
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "simulation starting");
 		List<SimFrame> listOfFrames = new ArrayList<SimFrame>(toTraverse.getTrailMarkers().size());
 		if(startLocationIndex == toTraverse.getTrailMarkers().size()-1){
@@ -301,9 +301,10 @@ public class SimEngine {
 	
 	//TODO: more sophisticated calculations, involving time of day/year, angle of incidence
 		// of sun, etc.
-	private double calculateSunPower(FIODataPoint forecastForPoint) {
+	//TODO: make this private after JUnit testing
+	public double calculateSunPower(FIODataPoint forecastForPoint) {
 		double cloudCover = forecastForPoint.cloudCover();
-		double cloudCoverFactor = 990.0*(1-0.75*cloudCover);
+		double cloudCoverFactor = 990.0*(1-0.75*cloudCover*cloudCover*cloudCover);
 		double panelArea = inUseCarModel.getSolarPanelArea();
 		double sunPower = panelArea * GlobalValues.PANEL_EFFICIENCY * cloudCoverFactor;
 		
