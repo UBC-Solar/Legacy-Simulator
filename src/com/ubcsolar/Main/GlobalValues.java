@@ -85,5 +85,8 @@ public class GlobalValues {
 	//TODO: Update car's mass once information available. (in kg) Dummy value right now.
 	
 	public static final double KMH_TO_MS_FACTOR = 1.0/36.0;
+	
+	public static final double TIRE_PRESSURE = 1;
+	//TODO: get a real value for this
 }
 

@@ -347,8 +347,6 @@ public class SimEngine {
 //^^^^^^^^^^^^^^^^^SOME GOOD IDEAS IN HERE, LIKE CHANGING SUNLIGHT WITH TIME OF DAY AND GETTING CLOUD COVER^^^^^^^^^^^^^^^^^^^^^^^^^
 //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 	
-	//TODO: test this
-	
 	/**
 	 * Helper function, picks the hourly report that is closest in time to timeFrame
 	 * @param ForecastIO with full selection of weather data, and a set of hourly forecasts that
@@ -456,29 +454,6 @@ public class SimEngine {
 			}
 		}
 
-		//return 22.0; // Chosen by fair dice roll, guaranteed to be random. https://xkcd.com/221/ 
-
-
-		/*
-		Random rng = new Random();
-		if(rng.nextInt(4)<=2){
-			return lastCarSpeed;
-		}
-		int deltaV = rng.nextInt(7);
-		double speedToReturn = lastCarSpeed;
-		if((lastCarSpeed-deltaV)<0){
-			speedToReturn = lastCarSpeed + deltaV; //don't want negative speed
-		}
-		else if(lastCarSpeed + deltaV>110){//max highway speed
-			speedToReturn = lastCarSpeed - deltaV;
-		}
-		else{
-			speedToReturn += (deltaV - 3); //to generate some negatives. 
-		}
-
-		return speedToReturn;
-		//TODO put real algo here. 
-		 */
 	}
 
 
@@ -515,5 +490,26 @@ public class SimEngine {
 		double normalForce = GlobalValues.CAR_MASS * 9.8 * Math.cos(angle);
 		double force = rollingCoefficient * normalForce; //force is positive if it opposes the direction of travel
 		return force;
+	}
+	
+	/**
+	 * Calculates total power coming from various resistive forces
+	 * @param currForecast: the FIODataPoint corresponding to the forecast at the destination location
+	 * 			at the current time for whichever simFrame is calling this method
+	 * @param toLoc: the end location of the simFrame calling this method
+	 * @param fromLoc: the start location of the car in the simFrame calling this method
+	 * @param carSpeed: the car's predicted speed in the simFrame calling this method
+	 * @return power loss/gain due to resistive forces during the given interval
+	 */
+	
+	public double calculateResistivePower(FIODataPoint currForecast, GeoCoord toLoc, GeoCoord fromLoc, 
+			double carSpeed){
+		double inclinationAngle = getInclinationAngle(fromLoc, toLoc);
+		double gradientForce = getGradientResistanceForce(inclinationAngle);
+		double frictionForce = getRollingResistanceForce(inclinationAngle, GlobalValues.TIRE_PRESSURE, carSpeed);
+		double dragForce = calculateDrag(toLoc, fromLoc, carSpeed, currForecast);
+		double timeDiff = fromLoc.calculateDistance(toLoc)/carSpeed;
+		double resistivePower = (gradientForce + frictionForce + dragForce)/timeDiff;
+		return resistivePower;
 	}
 }
