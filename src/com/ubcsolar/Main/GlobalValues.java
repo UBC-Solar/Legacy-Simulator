@@ -88,5 +88,11 @@ public class GlobalValues {
 	
 	public static final double TIRE_PRESSURE = 1;
 	//TODO: get a real value for this
+	
+	public static final double ENGINE_EFF = 0.9;
+	//TODO: determine a real value for this
+	
+	public static final double BATTERY_MAX_CHARGE = 20;
+	//this value is in units of amp-hours
 }
 

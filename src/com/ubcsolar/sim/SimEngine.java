@@ -56,17 +56,50 @@ public class SimEngine {
 	 * 	GeoCoord density)
 	 * @param carStartState: the car's telemetry data at the start of the simulated route chunk
 	 * @param speedProfile: A map that matches each GeoCoord between startLoc and endLoc with the
-	 * 	speed to be simulated during that interval. Currently, this is the limitation that prevents
+	 * 	speed (in km/h) to be simulated during that interval. Currently, this is the limitation that prevents
 	 * 	simulating multiple laps (to avoid double mapping GeoCoords)
+	 * @param startTime: The time at which the race will begin (in Unix format?)
+	 * @param lapNum: The lap that the simulation is simulating
 	 * @return a SimResult object, containing the simulated travel time, the final TelemDataPacket, 
 	 * 	and a list of the SimFrames used to do the simulation
 	 */
 	public SimResult runSimV2(Route toTraverse, GeoCoord startLoc, GeoCoord endLoc,
 			ForecastReport report, TelemDataPacket carStartState,
-			Map<GeoCoord,Double> speedProfile){
+			Map<GeoCoord,Double> speedProfile, long startTime, int lapNum){
+		
+		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim v2 starting");
+		
 		SimResult result = new SimResult(carStartState);
 		
-		//TODO: everything
+		int startingIndex = toTraverse.getIndexOfClosestPoint(startLoc);
+		int endingIndex = toTraverse.getIndexOfClosestPoint(endLoc);
+		
+		GeoCoord currPoint = toTraverse.getClosestPointOnRoute(startLoc);
+		
+		if(endingIndex < startingIndex){
+			throw new IllegalArgumentException("ending location must be after starting location");
+		}
+		
+		ForecastIO startWeather = report.getForecasts().get(startingIndex);
+		FIODataPoint startWeatherPoint = chooseReport(startWeather,startTime);
+		LocationReport startLocationReport = new LocationReport(currPoint, "Raven", "Simmed");
+		SimFrame startSimFrame = new SimFrame(startWeatherPoint,carStartState,startLocationReport,startTime,lapNum);
+		List<SimFrame> listOfFrames = new ArrayList<SimFrame>();
+		listOfFrames.add(startSimFrame);
+		GeoCoord prevPoint = currPoint;
+		double currTime = startTime;
+		for(int i = startingIndex+1; i < endingIndex; i++){
+			currPoint = toTraverse.getTrailMarkers().get(i);
+			
+			double speed = speedProfile.get(currPoint);
+			double distance = prevPoint.calculateDistance(currPoint);
+			double timeIncHr = distance/speed;
+			double timeIncSec = timeIncHr * 3600;
+			currTime += timeIncSec; 
+			
+			
+		}
+		
 		return result;
 		
 	}
@@ -227,6 +260,20 @@ public class SimEngine {
 		return toReturn;
 	}
 
+	
+	private TelemDataPacket calculateNewTelemPacket(TelemDataPacket prevStatus, GeoCoord startLoc,
+			GeoCoord endLoc, FIODataPoint forecastForPoint, double speed, double timeTaken){
+		double resistivePower = calculateResistivePower(forecastForPoint, endLoc, startLoc, speed);
+		double sunPower = calculateSunPower(forecastForPoint);
+		double netPower = sunPower - resistivePower;
+		
+		double netEnergy = netPower*timeTaken;
+		double changeInCharge = netEnergy/prevStatus.getTotalVoltage();
+		
+		//changeInCharge will be in Coulombs, need to convert to amp-hours to divide by max battery charge
+		
+	}
+	
 //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 	/**
 	 * Important helper method, calculates the state of the car after traverssing the last gap. 
@@ -542,8 +589,7 @@ public class SimEngine {
 		double gradientForce = getGradientResistanceForce(inclinationAngle);
 		double frictionForce = getRollingResistanceForce(inclinationAngle, GlobalValues.TIRE_PRESSURE, carSpeed);
 		double dragForce = calculateDrag(toLoc, fromLoc, carSpeed, currForecast);
-		double timeDiff = fromLoc.calculateDistance(toLoc)/carSpeed;
-		double resistivePower = (gradientForce + frictionForce + dragForce)/timeDiff;
+		double resistivePower = (gradientForce + frictionForce + dragForce)*carSpeed/GlobalValues.ENGINE_EFF;
 		return resistivePower;
 	}
 }
