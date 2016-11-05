@@ -36,7 +36,41 @@ public class SimEngine {
 	}
 
 	private CarModel inUseCarModel;
-
+	
+	
+	/**
+	 * Runs a simulation of the car's performance on the given portion of the provided route,
+	 * 	assuming that the car follows the speed profile provided. The method will return a
+	 * 	SimResult object (containing the time taken, the final TelemDataPacket, and a list of the
+	 * 	SimFrames used to do the simulation)
+	 * LIMITATION: Currently can only do one lap at a time. To do multiple laps, call this method
+	 * 	multiple times from the SimController (generally, all sims should be done in chunks anyway)
+	 * @param toTraverse: The complete route that the simulation is run on
+	 * @param startLoc: The starting location for the route chunk to be simulated. startLoc must
+	 * 	be part of toTraverse
+	 * @param endLoc: The ending location for the route chunk to be simulated. endLoc must be part
+	 * 	of toTraverse
+	 * @param report: The ForecastReport containing the forecasts for toTraverse. The report must
+	 * 	contain a ForecastIO for every GeoCoord in the route chunk that is being simulated. (Use
+	 * 	methods in WeatherController to interpolate forecasts if forecast density is less than
+	 * 	GeoCoord density)
+	 * @param carStartState: the car's telemetry data at the start of the simulated route chunk
+	 * @param speedProfile: A map that matches each GeoCoord between startLoc and endLoc with the
+	 * 	speed to be simulated during that interval. Currently, this is the limitation that prevents
+	 * 	simulating multiple laps (to avoid double mapping GeoCoords)
+	 * @return a SimResult object, containing the simulated travel time, the final TelemDataPacket, 
+	 * 	and a list of the SimFrames used to do the simulation
+	 */
+	public SimResult runSimV2(Route toTraverse, GeoCoord startLoc, GeoCoord endLoc,
+			ForecastReport report, TelemDataPacket carStartState,
+			Map<GeoCoord,Double> speedProfile){
+		SimResult result = new SimResult(carStartState);
+		
+		//TODO: everything
+		return result;
+		
+	}
+	
 	/*
 	 * Did RequestedSpeeds as a Map<CeoCoord point, Map<lap number, requested speed>>, to be able to 
 	 * request different speeds for different laps.  
