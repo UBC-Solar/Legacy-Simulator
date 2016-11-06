@@ -54,7 +54,7 @@ public class SimController extends ModuleController {
 			throw new IllegalArgumentException("Number of Laps too low, must go at least 1 lap");
 		}
 		//Compile all the information we need. 		
-		ForecastReport simmedForecastReport = this.mySession.getMyWeatherController().getSimmedForecastForEveryPointfForLoadedRoute();
+		ForecastReport simmedForecastReport = this.mySession.getMyWeatherController().getSimmedForecastForEveryPointForLoadedRoute();
 		LocationReport lastReported = this.mySession.getMapController().getLastReportedLocation();
 		if(lastReported == null){
 			throw new NoLocationReportedException();

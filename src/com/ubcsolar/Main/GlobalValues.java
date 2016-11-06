@@ -72,9 +72,18 @@ public class GlobalValues {
 	
 	public static final String WEATHER_LANG = ForecastIO.LANG_ENGLISH;
 	
-	/**
-	 * TODO: Update car's mass once information available. (in kg) Dummy value right now.
-	 */
+	public static final double PANEL_EFFICIENCY = 0.75;
+	//TODO: measure this somehow
+	
+	public static final double DRAG_COEFF = 1.0;
+	//TODO: get someone else to measure this
+	
+	public static final double CAR_CROSS_SECTIONAL_AREA = 1.0;
+	//TODO: get someone else to measure this
+
 	public static final double CAR_MASS = 1000;
+	//TODO: Update car's mass once information available. (in kg) Dummy value right now.
+	
+	public static final double KMH_TO_MS_FACTOR = 1.0/36.0;
 }
 

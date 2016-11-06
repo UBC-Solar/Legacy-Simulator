@@ -11,6 +11,8 @@ import java.util.Random;
 
 import org.jfree.data.Values;
 
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
 import com.github.dvdme.ForecastIOLib.FIOCurrently;
 import com.github.dvdme.ForecastIOLib.FIODataBlock;
 import com.github.dvdme.ForecastIOLib.FIODataPoint;
@@ -27,9 +29,10 @@ import com.ubcsolar.common.TelemDataPacket;
 
 public class SimEngine {
 	private final double RECHARGE_TIME_MS= 3*1000;
+	private final int EFF_SOLAR_CONSTANT = 990;
 
 	public SimEngine() {
-
+		inUseCarModel = new DefaultCarModel();
 	}
 
 	private CarModel inUseCarModel;
@@ -42,7 +45,7 @@ public class SimEngine {
 		if(laps <= 0){
 			throw new IllegalArgumentException("Must go at least one lap");
 		}
-		inUseCarModel = new DefaultCarModel();
+
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "simulation starting");
 		List<SimFrame> listOfFrames = new ArrayList<SimFrame>(toTraverse.getTrailMarkers().size());
 		if(startLocationIndex == toTraverse.getTrailMarkers().size()-1){
@@ -159,8 +162,7 @@ public class SimEngine {
 
 
 		FIODataPoint forecastForPoint = chooseReport(nextWeather, nextSimFrameTime);
-		double squareMetersOfPanel = inUseCarModel.getSolarPanelArea();
-		double sunPowerInWatts = calculateSunPower(nextPoint, forecastForPoint, (lastTimeStamp + (timeSinceLastFrame/2)), squareMetersOfPanel, lastFrame);
+		double sunPowerInWatts = calculateSunPower(forecastForPoint);
 
 
 		double SunCharge = (sunPowerInWatts*timeSinceLastFrameInHr)/(inUseCarModel.getMaxBatteryCap()); //divide watt hrs from the sun by max watt hrs to get the percentage of charge from the sun
@@ -225,7 +227,8 @@ public class SimEngine {
 	 * @param lastSoC
 	 * @return
 	 */
-
+	
+	//TODO: change this method
 	private double generateSoC(double lastSoC, double elevationChange, double speed, double SoCFromSun) {
 		if (elevationChange < 0){
 			if (lastSoC+2+SoCFromSun>=100){
@@ -286,63 +289,145 @@ public class SimEngine {
 	
 //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 	/**
-	 * Helper function; calculate the amount of solar power falling on the car during the frame. 
-	 * @param nextPoint - to get the lon/lat for sun elevation in degrees
-	 * @param forecastForPoint - the weather forecast for the point
-	 * @param squareMetersOfPanel - the total collection area of solar panels
-	 * @return
+	 * Calculates power gain from solar panels on the car, assuming it is experiencing
+	 * the weather given in forecastForPoint, according to formulas given at 
+	 * http://scool.larc.nasa.gov/lesson_plans/CloudCoverSolarRadiation.pdf
+	 * and at http://photovoltaic-software.com/PV-solar-energy-calculation.php
+	 * @param forecastForPoint: the forecast for the point you're trying to predict
+	 * 		power output at. 
+	 * @return the amount of power (in Watts) that the panels will produce in the given
+	 * 		situation
 	 */
-	private double calculateSunPower(GeoCoord nextPoint, FIODataPoint forecastForPoint, double timeOfDay, double squareMetersOfPanel, SimFrame lastFrame) {
-		Calendar rightNow = Calendar.getInstance();
-		rightNow.setTimeInMillis((long) timeOfDay);
-
-		int hour= rightNow.HOUR_OF_DAY;
-		// TODO Auto-generated method stub
-
-		//Get the sun elevation given the time of day and the latitude and longitude. 
-
-		double cloudCover = lastFrame.getForecast().cloudCover();
-
-
-
-		//assume 100 watts per square foot. (thanks random forum guy)
-		//10.7639 sq feet per sq. meter. 
-		double timeFactor=1;
-
-		//replace with sunrise equation later
-		if (hour<12 && hour>6){
-			timeFactor=(4-24/hour)/2; //calculations just meant to get a 0-1 scale
-		}
-		if (hour>12 && hour<21){
-			timeFactor=(1-hour/21)/.4286; //.4286 is a conversion factor to get on a scale of 0-1
-		}
-
-		double watts = 100*10.7639 * squareMetersOfPanel* timeFactor* cloudCover;
-
-		//calculate how much sun there is given the weather (cloudy? Probably not much). 
-		//I think there's actually a parameter in FIODataPoint for sun exposure. If not, use the cloudyness measurement. 
-
-		//assuming no weather at all right now. 
-
-		//because watts, don't need to include time. 
-		return watts; 
+	
+	//TODO: more sophisticated calculations, involving time of day/year, angle of incidence
+		// of sun, etc.
+	//TODO: make this private after JUnit testing
+	public double calculateSunPower(FIODataPoint forecastForPoint) {
+		double cloudCover = forecastForPoint.cloudCover();
+		double cloudCoverFactor = 990.0*(1-0.75*cloudCover*cloudCover*cloudCover);
+		double panelArea = inUseCarModel.getSolarPanelArea();
+		double sunPower = panelArea * GlobalValues.PANEL_EFFICIENCY * cloudCoverFactor;
+		
+		return sunPower;
+		
+		//		Calendar rightNow = Calendar.getInstance();
+//		rightNow.setTimeInMillis((long) timeOfDay);
+//
+//		int hour= rightNow.HOUR_OF_DAY;
+//		// TODO Auto-generated method stub
+//
+//		//Get the sun elevation given the time of day and the latitude and longitude. 
+//
+//		double cloudCover = lastFrame.getForecast().cloudCover();
+//
+//
+//
+//		//assume 100 watts per square foot. (thanks random forum guy)
+//		//10.7639 sq feet per sq. meter. 
+//		double timeFactor=1;
+//
+//		//replace with sunrise equation later
+//		if (hour<12 && hour>6){
+//			timeFactor=(4-24/hour)/2; //calculations just meant to get a 0-1 scale
+//		}
+//		if (hour>12 && hour<21){
+//			timeFactor=(1-hour/21)/.4286; //.4286 is a conversion factor to get on a scale of 0-1
+//		}
+//
+//		double watts = 100*10.7639 * squareMetersOfPanel* timeFactor* cloudCover;
+//
+//		//calculate how much sun there is given the weather (cloudy? Probably not much). 
+//		//I think there's actually a parameter in FIODataPoint for sun exposure. If not, use the cloudyness measurement. 
+//
+//		//assuming no weather at all right now. 
+//
+//		//because watts, don't need to include time. 
+//		return watts; 
 	}
 //^^^^^^^^^^^^^^^^^SOME GOOD IDEAS IN HERE, LIKE CHANGING SUNLIGHT WITH TIME OF DAY AND GETTING CLOUD COVER^^^^^^^^^^^^^^^^^^^^^^^^^
 //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+	
+	//TODO: test this
+	
 	/**
-	 * Helper function, picks the right report from a list of hourly reports and a time. 
-	 * @param weather
-	 * @param timeFrame ms since jan1 1970 (see System.currentTimeMillis)
-	 * @return
+	 * Helper function, picks the hourly report that is closest in time to timeFrame
+	 * @param ForecastIO with full selection of weather data, and a set of hourly forecasts that
+	 * 		is sorted by time
+	 * @param timeFrame: time in ms since jan1 1970 (see System.currentTimeMillis)
+	 * @return an FIODataPoint containing the hourly forecast for the hour closest to timeFrame
 	 */
-	private FIODataPoint chooseReport(ForecastIO weather, double timeFrame) {
-		//TODO actually make this choose something. 
-		FIODataPoint toReturn  = new FIODataBlock(weather.getHourly()).datapoint(0);
+	//TODO: change this back to private after JUnit testing
+	public FIODataPoint chooseReport(ForecastIO weather, double timeFrame) {
+		JsonObject hourly = weather.getHourly();
+		JsonArray hourlyData = (JsonArray)hourly.get("data");
+		int currTime = Integer.parseInt(((JsonObject)hourlyData.get(0)).get("time").toString());
+		int bestIndex = 0;
+		double smallestDiff = Math.abs(timeFrame-currTime);
+		double prevDiff = smallestDiff;
+		for(int i = 1; i < hourlyData.size(); i++){
+			currTime = Integer.parseInt(((JsonObject)hourlyData.get(i)).get("time").toString());
+			double currDiff = Math.abs(timeFrame-currTime);
+			if(currDiff < smallestDiff){
+				smallestDiff = currDiff;
+				bestIndex = i;
+			}
+			if(currDiff > prevDiff)
+				break;
+			prevDiff = currDiff;
+		}
+		FIODataPoint toReturn  = new FIODataBlock(weather.getHourly()).datapoint(bestIndex);
 		toReturn.setTimezone("PST");
 		return toReturn;
 	}
-//^^^^^^^^^^^^^^^^^^^^^^^^^^I THINK THIS IS GOOD TO KEEP^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+//^^^^^^^^^^^^^^^^^^^^^^^^^^THIS HAS BEEN UPDATED^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	
+	/**
+	 * Calculates the estimated resistive force due to air drag acting on the car in the
+	 *  interval from fromLoc to toLoc 
+	 * @param toLoc: breadcrumb that simulated car is traveling to
+	 * @param fromLoc: breadcrumb that simulated car is traveling from
+	 * @param carSpeed: the simulated car's current speed (from the previous breadcrumb) in km/h
+	 * @param toForecast: the weather forecast at the current time at the destination location,
+	 * 			used to find the headwind
+	 * @return the estimated resistive force acting on the car during the interval (fromLoc-toLoc)
+	 * 			This value will be positive if the drag is resisting the car's motion (i.e.
+	 * 			there is a headwind) or negative if it's assisting (tailwind) 
+	 */
+	//TODO: change to private after JUnit testing
+	public double calculateDrag(GeoCoord toLoc, GeoCoord fromLoc, double carSpeed, 
+			FIODataPoint toForecast){
+		double latDiff = toLoc.getLat()-fromLoc.getLat();
+		double lonDiff = toLoc.getLon()-fromLoc.getLon();
+		double carBearing;//measured as angle in degrees, with 0 at north and measured clockwise
+		double alpha = Math.atan(latDiff/lonDiff);
+		//double alphaDegrees = alpha * 180.0 / Math.PI;
+		if(lonDiff>=0){
+			carBearing = Math.PI / 2.0 - alpha;
+		}else{
+			carBearing = 3.0 * Math.PI / 2.0 - alpha;
+		}
+		
+		double windSpeed = toForecast.windSpeed() * GlobalValues.KMH_TO_MS_FACTOR;
+		double carSpeedInMS = carSpeed * GlobalValues.KMH_TO_MS_FACTOR;
+		double relativeVelocity = carSpeedInMS;
+		if(windSpeed != 0){
+			//this if statement is necessary because windBearing() will be undefined if
+			//windSpeed() is 0
+			double windBearing = toForecast.windBearing() * Math.PI / 180;
+			relativeVelocity = carSpeedInMS + windSpeed*Math.cos((windBearing-carBearing));
+		}
+		boolean isTailwind = false;
+		if(Math.abs(relativeVelocity) < Math.abs(carSpeedInMS/**Math.sin(carBearing)*/))
+			isTailwind = true;
+		double dragMag = 0.5 * GlobalValues.CAR_CROSS_SECTIONAL_AREA * GlobalValues.DRAG_COEFF * 
+				relativeVelocity * relativeVelocity;
+		if(isTailwind)
+			return -1*dragMag;
+		else
+			return dragMag;
+	}
+	
+	//TODO: change this method
 	private double calculateBestSpeed(double lastCarSpeed, double elevationChange, double SoC) {
 		double SpeedReturn;
 		double MaxCarSpeed=110;
