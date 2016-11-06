@@ -7,7 +7,9 @@ package com.ubcsolar.ui;
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.DefaultMapController;
@@ -48,6 +50,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JRadioButton;
 import javax.swing.JLabel;
 import java.awt.Font;
+import javax.swing.UIManager;
 
 public class CustomDisplayMap extends JMapViewer {
 	/**
@@ -56,27 +59,31 @@ public class CustomDisplayMap extends JMapViewer {
 	private static final long serialVersionUID = 1L;
 	private final Color defaultColorForThings = new Color(204, 0, 204);
 	private final Font defaultFontForThings = new Font("Tahoma", Font.BOLD, 13);
-	
-	private MapMarker carCurrentLocation; //car's current location
-	private boolean showCarLocation; //initial value set to equal checkbox
-	private List<MapMarker> forecasts; //route forecasts
-	private boolean showForecasts;//initial value set to equal checkbox
-	private List<MapMarker> routePOIs; //POIs (Mostly cities) along the route
-	private boolean showPOIs; //initial value set to equal checkbox
-	private MapPolygon routeBreadcrumbs; //the line that shows the trail
-	private boolean showRouteBreadcrumbs; //initial value set to equal checkbox
+
+	private MapMarker carCurrentLocation; // car's current location
+	private boolean showCarLocation; // initial value set to equal checkbox
+	private boolean showSpeeds;
+	private List<MapMarker> speeds;
+	private List<MapMarker> forecasts; // route forecasts
+	private boolean showForecasts;// initial value set to equal checkbox
+	private List<MapMarker> routePOIs; // POIs (Mostly cities) along the route
+	private boolean showPOIs; // initial value set to equal checkbox
+	private MapPolygon routeBreadcrumbs; // the line that shows the trail
+	private boolean showRouteBreadcrumbs; // initial value set to equal checkbox
 	private JRadioButton rdbtnSateliteoffline;
 	private JRadioButton rdbtnSattelite;
 	private JRadioButton rdbtnDefaultMapOffline;
 	private JRadioButton rdbtnDefaultMap;
-	
+
 	public CustomDisplayMap() {
-		super(new saveToDiskCache(),8); //8 is used in the default constructor
-		new  DefaultMapController(this); //not called in the second constructor... must be a bug?
-		//super();
-		//this.setTileSource(new OfflineOsmTileSource("File:///Users/Noah/Desktop/testMapFiles/",1,2));
+		super(new saveToDiskCache(), 8); // 8 is used in the default constructor
+		new DefaultMapController(this); // not called in the second
+										// constructor... must be a bug?
+		// super();
+		// this.setTileSource(new
+		// OfflineOsmTileSource("File:///Users/Noah/Desktop/testMapFiles/",1,2));
 		JCheckBox chckbxForecasts = new JCheckBox("Forecasts");
-		
+
 		chckbxForecasts.setForeground(defaultColorForThings);
 		chckbxForecasts.setFont(defaultFontForThings);
 		chckbxForecasts.setOpaque(false);
@@ -90,7 +97,7 @@ public class CustomDisplayMap extends JMapViewer {
 		showForecasts = chckbxForecasts.isSelected();
 		chckbxForecasts.setBounds(339, 10, 97, 23);
 		add(chckbxForecasts);
-		
+
 		JCheckBox chckbxCities = new JCheckBox("Cities");
 		chckbxCities.setSelected(true);
 		showPOIs = chckbxCities.isSelected();
@@ -103,10 +110,10 @@ public class CustomDisplayMap extends JMapViewer {
 		chckbxCities.setForeground(defaultColorForThings);
 		chckbxCities.setFont(defaultFontForThings);
 		chckbxCities.setOpaque(false);
-		
+
 		chckbxCities.setBounds(62, 10, 72, 23);
 		add(chckbxCities);
-		
+
 		JCheckBox chckbxCarLocation = new JCheckBox("Car Location");
 		chckbxCarLocation.setForeground(defaultColorForThings);
 		chckbxCarLocation.setFont(defaultFontForThings);
@@ -121,7 +128,7 @@ public class CustomDisplayMap extends JMapViewer {
 		});
 		chckbxCarLocation.setBounds(136, 10, 116, 23);
 		add(chckbxCarLocation);
-		
+
 		JCheckBox chckbxRoute = new JCheckBox("Route");
 		chckbxRoute.setForeground(defaultColorForThings);
 		chckbxRoute.setFont(defaultFontForThings);
@@ -136,19 +143,35 @@ public class CustomDisplayMap extends JMapViewer {
 		});
 		chckbxRoute.setBounds(254, 10, 83, 23);
 		add(chckbxRoute);
-		
+
 		rdbtnSattelite = new JRadioButton("Satellite");
 		rdbtnSattelite.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				updateTileSource(MapSource.MAPQUEST_SAT);
 			}
 		});
+
+		JCheckBox chckbxSpeeds = new JCheckBox("Recommended Speeds\r\n");
+		chckbxSpeeds.setForeground(defaultColorForThings);
+		chckbxSpeeds.setBounds(445, 10, 171, 23);
+		chckbxSpeeds.setFont(defaultFontForThings);
+		chckbxSpeeds.setOpaque(false);
+		chckbxSpeeds.setSelected(true);
+		showSpeeds = chckbxSpeeds.isSelected();
+		chckbxSpeeds.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				showSpeeds = chckbxSpeeds.isSelected();
+				refreshMap();
+			}
+		});
+		add(chckbxSpeeds);
+
 		rdbtnSattelite.setForeground(defaultColorForThings);
 		rdbtnSattelite.setFont(defaultFontForThings);
 		rdbtnSattelite.setOpaque(false);
 		rdbtnSattelite.setBounds(10, 259, 82, 23);
 		add(rdbtnSattelite);
-		
+
 		rdbtnDefaultMapOffline = new JRadioButton("Map (offline)");
 		rdbtnDefaultMapOffline.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -160,7 +183,7 @@ public class CustomDisplayMap extends JMapViewer {
 		rdbtnDefaultMapOffline.setOpaque(false);
 		rdbtnDefaultMapOffline.setBounds(10, 233, 124, 23);
 		add(rdbtnDefaultMapOffline);
-		
+
 		rdbtnDefaultMap = new JRadioButton("Map");
 		rdbtnDefaultMap.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -172,7 +195,7 @@ public class CustomDisplayMap extends JMapViewer {
 		rdbtnDefaultMap.setOpaque(false);
 		rdbtnDefaultMap.setBounds(10, 207, 52, 23);
 		add(rdbtnDefaultMap);
-		
+
 		rdbtnSateliteoffline = new JRadioButton("Satellite (offline)");
 		rdbtnSateliteoffline.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -184,199 +207,238 @@ public class CustomDisplayMap extends JMapViewer {
 		rdbtnSateliteoffline.setOpaque(false);
 		rdbtnSateliteoffline.setBounds(10, 285, 140, 23);
 		add(rdbtnSateliteoffline);
-		
+
 		JLabel lblTileSoure = new JLabel("Tile Soure");
 		lblTileSoure.setForeground(defaultColorForThings);
 		lblTileSoure.setFont(defaultFontForThings);
 		lblTileSoure.setBounds(10, 184, 82, 20);
 		add(lblTileSoure);
-		this.updateTileSource(MapSource.OSM_MAP); //default tiles
+		this.updateTileSource(MapSource.OSM_MAP); // default tiles
 	}
 
-	public void changeDrawnRoute(Route newRouteToLoad){
+	public void changeDrawnRoute(Route newRouteToLoad) {
 		this.removeAllMapPolygons();
 		this.removeAllMapMarkers();
 		this.addNewRouteToMap(newRouteToLoad);
+		//empty map just so it can compile, real map will be passed later
+		Map<GeoCoord, Double> speeds = new HashMap<GeoCoord, Double>();
+		this.addSpeedsToMap(speeds);
 	}
-	
-	public void addNewCarLocationToMap(LocationReport newLocation){
-		this.removeMapMarker(carCurrentLocation); //not sure if this should be here if we repaint anyway
+
+	public void addNewCarLocationToMap(LocationReport newLocation) {
+		this.removeMapMarker(carCurrentLocation); // not sure if this should be
+													// here if we repaint anyway
 		Style testStyle = new Style(Color.BLACK, Color.RED, null, this.defaultFontForThings);
-		MapMarkerDot newLocationDot = new MapMarkerDot(null,"THE CAR", new Coordinate(newLocation.getLocation().getLat(), newLocation.getLocation().getLon()), testStyle);
-		this.carCurrentLocation = newLocationDot; //so we can remove it next time. 
+		MapMarkerDot newLocationDot = new MapMarkerDot(null, "THE CAR",
+				new Coordinate(newLocation.getLocation().getLat(), newLocation.getLocation().getLon()), testStyle);
+		this.carCurrentLocation = newLocationDot; // so we can remove it next
+													// time.
 		this.refreshMap();
 	}
-	
-	public void addNewRouteToMap(Route newRouteToLoad){
+
+	public void addNewRouteToMap(Route newRouteToLoad) {
 		List<Coordinate> listForPolygon = new ArrayList<Coordinate>(newRouteToLoad.getTrailMarkers().size());
-		//remove the old one 
+		// remove the old one
 		this.removeMapPolygon(this.routeBreadcrumbs);
-		if(this.routePOIs != null){
-			for(MapMarker m : routePOIs){
+		if (this.routePOIs != null) {
+			for (MapMarker m : routePOIs) {
 				this.removeMapMarker(m);
 			}
 		}
-		
-		for(GeoCoord geo : newRouteToLoad.getTrailMarkers()){
+
+		for (GeoCoord geo : newRouteToLoad.getTrailMarkers()) {
 			listForPolygon.add(new Coordinate(geo.getLat(), geo.getLon()));
 		}
-		
-		//adding this in to make it a single line, otherwise it draws a line from end to start.
-		//There may be a better way of doing this...
-		for(int i = newRouteToLoad.getTrailMarkers().size()-1; i>=0; i--){
+
+		// adding this in to make it a single line, otherwise it draws a line
+		// from end to start.
+		// There may be a better way of doing this...
+		for (int i = newRouteToLoad.getTrailMarkers().size() - 1; i >= 0; i--) {
 			GeoCoord toAdd = newRouteToLoad.getTrailMarkers().get(i);
 			listForPolygon.add(new Coordinate(toAdd.getLat(), toAdd.getLon()));
 		}
-		
+
 		this.routeBreadcrumbs = new MapPolygonImpl(listForPolygon);
-		
+
 		this.routePOIs = new ArrayList<MapMarker>(newRouteToLoad.getPointsOfIntrest().size());
-		for(PointOfInterest temp : newRouteToLoad.getPointsOfIntrest()){
+		for (PointOfInterest temp : newRouteToLoad.getPointsOfIntrest()) {
 			GeoCoord newSpot = temp.getLocation();
-			String name = temp.getName().split(",")[0]; //don't need the whole "city, state, country, continent, earth" name
+			String name = temp.getName().split(",")[0]; // don't need the whole
+														// "city, state,
+														// country, continent,
+														// earth" name
 			routePOIs.add(new MapMarkerDot(name, new Coordinate(newSpot.getLat(), newSpot.getLon())));
 		}
-		this.refreshMap(); //will paint it on if it's supposed to be there
+		this.refreshMap(); // will paint it on if it's supposed to be there
 		this.repaint();
-		
+
 	}
-	
-	public void addForecastsToMap(ForecastReport theReport){
+
+	public void addForecastsToMap(ForecastReport theReport) {
 		Style forecastStyle = new Style(Color.black, Color.GREEN, null, this.defaultFontForThings);
-		
-		
-		if(this.forecasts != null){
-			for(MapMarker m : forecasts){
+
+		if (this.forecasts != null) {
+			for (MapMarker m : forecasts) {
 				this.removeMapMarker(m);
 			}
 		}
-		
+
 		forecasts = new ArrayList<MapMarker>(theReport.getForecasts().size());
-		for(int i= 0; i<theReport.getForecasts().size(); i++){
+		for (int i = 0; i < theReport.getForecasts().size(); i++) {
 			ForecastIO fc = theReport.getForecasts().get(i);
 			Coordinate location = new Coordinate(fc.getLatitude(), fc.getLongitude());
 			String name = new FIODataBlock(fc.getHourly()).icon();
-			MapMarkerDot newLocationDot = new MapMarkerDot(null,name,location, forecastStyle);
-			//newLocationDot.
+			MapMarkerDot newLocationDot = new MapMarkerDot(null, name, location, forecastStyle);
+			// newLocationDot.
 			forecasts.add(newLocationDot);
 		}
 		this.refreshMap();
 	}
+
+	// *****************************************************BETA******************************************************
 	
-	public void refreshMap(){
-		/* there's two ways to do this; one is compare each object and try
-		 * to add or remove it according to it's true/false value. 
-		 * The other way is to remove all of them and re-add everything that's supposed
-		 * to be there. 
-		 * The second choice is more computationally expensive, but less risk for bugs
-		 * (can't forget about anything). 
-		 * Should performance become an issue, this is a good method to optimize. 
+
+	public void addSpeedsToMap(Map<GeoCoord, Double> speeds) {
+		Style forecastStyle = new Style(Color.black, Color.BLUE, null, this.defaultFontForThings);
+		
+		if (this.speeds != null) {
+			for (MapMarker m : this.speeds) {
+				this.removeMapMarker(m);
+			}
+		}
+		
+		this.speeds = new ArrayList<MapMarker>();
+		for (GeoCoord g : speeds.keySet()) {
+			Coordinate location = new Coordinate(g.getLat(), g.getLon());
+			String speed = speeds.get(g).toString();
+			MapMarkerDot newLocationDot = new MapMarkerDot(null, speed, location, forecastStyle);
+			this.speeds.add(newLocationDot);
+		}
+		this.refreshMap();
+	}
+	// **************************************************************************************************************
+
+	public void refreshMap() {
+		/*
+		 * there's two ways to do this; one is compare each object and try to
+		 * add or remove it according to it's true/false value. The other way is
+		 * to remove all of them and re-add everything that's supposed to be
+		 * there. The second choice is more computationally expensive, but less
+		 * risk for bugs (can't forget about anything). Should performance
+		 * become an issue, this is a good method to optimize.
 		 */
 		this.removeAllMapMarkers();
 		this.removeAllMapPolygons();
 		this.removeAllMapRectangles();
 
-		if(this.showRouteBreadcrumbs && routeBreadcrumbs != null){
+		if (this.showRouteBreadcrumbs && routeBreadcrumbs != null) {
 			this.addMapPolygon(routeBreadcrumbs);
 		}
-		
-		if(this.showPOIs && routePOIs != null){
-			for(MapMarker m : routePOIs){
+
+		if (this.showPOIs && routePOIs != null) {
+			for (MapMarker m : routePOIs) {
 				this.addMapMarker(m);
 			}
 		}
-		
-		if(this.showForecasts && forecasts != null){
-			for(MapMarker m : forecasts){
+
+		if (this.showSpeeds && speeds != null) {
+			for (MapMarker m : speeds) {
 				this.addMapMarker(m);
 			}
 		}
-	
-		if(this.showCarLocation && carCurrentLocation != null){
+
+		if (this.showForecasts && forecasts != null) {
+			for (MapMarker m : forecasts) {
+				this.addMapMarker(m);
+			}
+		}
+
+		if (this.showCarLocation && carCurrentLocation != null) {
 			this.addMapMarker(carCurrentLocation);
 		}
 	}
-	
-	private void deselectAllComboBoxes(){
+
+	private void deselectAllComboBoxes() {
 		this.rdbtnDefaultMapOffline.setSelected(false);
 		this.rdbtnDefaultMap.setSelected(false);
 		this.rdbtnSateliteoffline.setSelected(false);
 		this.rdbtnSattelite.setSelected(false);
-		}
-	
-	private void updateTileSource(MapSource newSource){
-		switch(newSource){
-		case OSM_MAP: 
+	}
+
+	private void updateTileSource(MapSource newSource) {
+		switch (newSource) {
+		case OSM_MAP:
 			this.deselectAllComboBoxes();
 			this.rdbtnDefaultMap.setSelected(true);
-			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Tile source changed to standard map tiles");
+			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
+					"Tile source changed to standard map tiles");
 			this.setTileSource(new OsmTileSource.Mapnik());
 			this.getTileCache().clear();
 			break;
 		case OSM_MAP_OFFLINE:
 			this.deselectAllComboBoxes();
 			rdbtnDefaultMapOffline.setSelected(true);
-			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Tile Source switched to offline standard map tiles");
-			this.setTileSource(new OfflineOsmTileSource("File:///"+ GlobalValues.DEFAULT_TILE_SAVE_LOCATION + "mapnik/",1,19));
+			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
+					"Tile Source switched to offline standard map tiles");
+			this.setTileSource(
+					new OfflineOsmTileSource("File:///" + GlobalValues.DEFAULT_TILE_SAVE_LOCATION + "mapnik/", 1, 19));
 			this.getTileCache().clear();
 			break;
 		case MAPQUEST_SAT:
 			this.deselectAllComboBoxes();
 			this.rdbtnSattelite.setSelected(true);
-			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Tile source changed to BING Ariel tiles");
+			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
+					"Tile source changed to BING Ariel tiles");
 			this.setTileSource(new BingAerialTileSource());
 			this.getTileCache().clear();
 			break;
 		case MAPQUEST_SAT_OFFLINE:
 			this.deselectAllComboBoxes();
 			this.rdbtnSateliteoffline.setSelected(true);
-			this.setTileSource(new OfflineOsmTileSource("File:///" + GlobalValues.DEFAULT_TILE_SAVE_LOCATION + "Bing Aerial Maps/",1,19));
+			this.setTileSource(new OfflineOsmTileSource(
+					"File:///" + GlobalValues.DEFAULT_TILE_SAVE_LOCATION + "Bing Aerial Maps/", 1, 19));
 			this.getTileCache().clear();
 			break;
 		}
 	}
-	
-	
-	private static class saveToDiskCache extends MemoryTileCache{
+
+	private static class saveToDiskCache extends MemoryTileCache {
 		@Override
-		public Tile getTile(TileSource source, int x, int y, int z){
+		public Tile getTile(TileSource source, int x, int y, int z) {
 			Tile justGotten = super.getTile(source, x, y, z);
-			if(justGotten == null){
+			if (justGotten == null) {
 				return null;
 			}
-			if(justGotten.getSource().getName().equalsIgnoreCase("offline")){
+			if (justGotten.getSource().getName().equalsIgnoreCase("offline")) {
 				return justGotten;
 			}
 			String placeToSave = justGotten.getSource().getName() + "/";
 			placeToSave += justGotten.getZoom() + "/";
 			placeToSave += justGotten.getXtile() + "/";
-			//placeToSave += tile.getYtile() + "/"; //this is the tile name I think
+			// placeToSave += tile.getYtile() + "/"; //this is the tile name I
+			// think
 			String totalFilePath = GlobalValues.DEFAULT_TILE_SAVE_LOCATION + placeToSave;
 			File saveSpot = new File(totalFilePath);
-			if(!saveSpot.exists()){
+			if (!saveSpot.exists()) {
 				saveSpot.mkdirs();
 			}
 			String filename = totalFilePath + justGotten.getYtile() + ".png";
 			File outputfile = new File(filename);
-			if(!outputfile.exists() && justGotten.isLoaded()){
+			if (!outputfile.exists() && justGotten.isLoaded()) {
 				try {
 					// retrieve image
 					BufferedImage bi = justGotten.getImage();
 					ImageIO.write(bi, "png", outputfile);
 				} catch (IOException e) {
-					SolarLog.write(LogType.ERROR, System.currentTimeMillis(), "Unable to save tile image, IOException thrown");
+					SolarLog.write(LogType.ERROR, System.currentTimeMillis(),
+							"Unable to save tile image, IOException thrown");
 				}
 			}
 			return justGotten;
 		}
 	}
-	private enum MapSource{
-		OSM_MAP,
-		OSM_MAP_OFFLINE,
-		MAPQUEST_SAT,
-		MAPQUEST_SAT_OFFLINE
+
+	private enum MapSource {
+		OSM_MAP, OSM_MAP_OFFLINE, MAPQUEST_SAT, MAPQUEST_SAT_OFFLINE
 	}
 }
-
-
-
