@@ -26,6 +26,7 @@ import com.ubcsolar.common.Route;
 import com.ubcsolar.common.SimFrame;
 import com.ubcsolar.common.SolarLog;
 import com.ubcsolar.common.TelemDataPacket;
+import com.ubcsolar.exception.NotEnoughChargeException;
 
 public class SimEngine {
 	private final double RECHARGE_TIME_MS= 3*1000;
@@ -60,16 +61,19 @@ public class SimEngine {
 	 * 	simulating multiple laps (to avoid double mapping GeoCoords)
 	 * @param startTime: The time at which the race will begin (in Unix format?)
 	 * @param lapNum: The lap that the simulation is simulating
+	 * @param minCharge: The minimum percentage of charge that is acceptable at the end of this segment
+	 * 	of the race
 	 * @return a SimResult object, containing the simulated travel time, the final TelemDataPacket, 
 	 * 	and a list of the SimFrames used to do the simulation
+	 * @throws NotEnoughChargeException if the end charge is less than minCharge
 	 */
 	public SimResult runSimV2(Route toTraverse, GeoCoord startLoc, GeoCoord endLoc,
 			ForecastReport report, TelemDataPacket carStartState,
-			Map<GeoCoord,Double> speedProfile, long startTime, int lapNum){
+			Map<GeoCoord,Double> speedProfile, long startTime, int lapNum, double minCharge) throws NotEnoughChargeException{
 		
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim v2 starting");
 		
-		SimResult result = new SimResult(carStartState);
+		//SimResult result = new SimResult(carStartState);
 		
 		int startingIndex = toTraverse.getIndexOfClosestPoint(startLoc);
 		int endingIndex = toTraverse.getIndexOfClosestPoint(endLoc);
@@ -80,15 +84,18 @@ public class SimEngine {
 			throw new IllegalArgumentException("ending location must be after starting location");
 		}
 		
-		ForecastIO startWeather = report.getForecasts().get(startingIndex);
+		List<ForecastIO> forecastList = report.getForecasts(); 
+		ForecastIO startWeather = forecastList.get(startingIndex);
 		FIODataPoint startWeatherPoint = chooseReport(startWeather,startTime);
 		LocationReport startLocationReport = new LocationReport(currPoint, "Raven", "Simmed");
 		SimFrame startSimFrame = new SimFrame(startWeatherPoint,carStartState,startLocationReport,startTime,lapNum);
 		List<SimFrame> listOfFrames = new ArrayList<SimFrame>();
 		listOfFrames.add(startSimFrame);
 		GeoCoord prevPoint = currPoint;
-		double currTime = startTime;
-		for(int i = startingIndex+1; i < endingIndex; i++){
+		long currTime = startTime;
+		TelemDataPacket prevStatus = carStartState;
+		TelemDataPacket currStatus = prevStatus;
+		for(int i = startingIndex+1; i <= endingIndex; i++){
 			currPoint = toTraverse.getTrailMarkers().get(i);
 			
 			double speed = speedProfile.get(currPoint);
@@ -97,8 +104,27 @@ public class SimEngine {
 			double timeIncSec = timeIncHr * 3600;
 			currTime += timeIncSec; 
 			
+			ForecastIO currWeather = forecastList.get(i);
+			FIODataPoint currWeatherPoint = chooseReport(currWeather,currTime);
 			
+			currStatus = this.calculateNewTelemPacket(prevStatus, prevPoint, 
+					currPoint, currWeatherPoint, speed, timeIncHr);
+			
+			LocationReport currLocReport = new LocationReport(currPoint, "Raven", "Simmed");
+			
+			SimFrame currSimFrame = new SimFrame(currWeatherPoint,currStatus,currLocReport,currTime,lapNum);
+			listOfFrames.add(currSimFrame);
+			
+			prevPoint = currPoint;
+			prevStatus = currStatus;
 		}
+		
+		if(currStatus.getStateOfCharge()<minCharge){
+			String message = "Speed profile uses too much charge. Desired end charge is " + minCharge + ", actual end charge is" +  currStatus.getStateOfCharge(); 
+			throw new NotEnoughChargeException(currStatus.getStateOfCharge(), minCharge, message);
+		}
+		
+		SimResult result = new SimResult(listOfFrames,currTime,currStatus);
 		
 		return result;
 		
@@ -260,17 +286,22 @@ public class SimEngine {
 		return toReturn;
 	}
 
-	
+	//timeTaken is in hours
 	private TelemDataPacket calculateNewTelemPacket(TelemDataPacket prevStatus, GeoCoord startLoc,
 			GeoCoord endLoc, FIODataPoint forecastForPoint, double speed, double timeTaken){
 		double resistivePower = calculateResistivePower(forecastForPoint, endLoc, startLoc, speed);
 		double sunPower = calculateSunPower(forecastForPoint);
-		double netPower = sunPower - resistivePower;
+		double netPower = sunPower - resistivePower;//in Watts
 		
-		double netEnergy = netPower*timeTaken;
-		double changeInCharge = netEnergy/prevStatus.getTotalVoltage();
+		//double netEnergy = netPower*timeTaken;//in Newtons
+		double changeInCharge = netPower/prevStatus.getTotalVoltage()*timeTaken;//in amp-hours
+		double changeInChargePerCent = changeInCharge/GlobalValues.BATTERY_MAX_CHARGE;
+		double newCharge = prevStatus.getStateOfCharge()+changeInChargePerCent;
 		
-		//changeInCharge will be in Coulombs, need to convert to amp-hours to divide by max battery charge
+		TelemDataPacket newStatus = new TelemDataPacket(speed, prevStatus.getTotalVoltage(), 
+				prevStatus.getTemperatures(), prevStatus.getCellVoltages(), newCharge);
+		
+		return newStatus;
 		
 	}
 	
@@ -589,7 +620,8 @@ public class SimEngine {
 		double gradientForce = getGradientResistanceForce(inclinationAngle);
 		double frictionForce = getRollingResistanceForce(inclinationAngle, GlobalValues.TIRE_PRESSURE, carSpeed);
 		double dragForce = calculateDrag(toLoc, fromLoc, carSpeed, currForecast);
-		double resistivePower = (gradientForce + frictionForce + dragForce)*carSpeed/GlobalValues.ENGINE_EFF;
+		double resistivePower = (gradientForce + frictionForce + dragForce)*carSpeed
+				*GlobalValues.KMH_TO_MS_FACTOR/GlobalValues.ENGINE_EFF;
 		return resistivePower;
 	}
 }
