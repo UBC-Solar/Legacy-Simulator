@@ -72,13 +72,13 @@ public class GlobalValues {
 	
 	public static final String WEATHER_LANG = ForecastIO.LANG_ENGLISH;
 	
-	public static final double PANEL_EFFICIENCY = 0.75;
+	public static final double PANEL_EFFICIENCY = 0.5;
 	//TODO: measure this somehow
 	
-	public static final double DRAG_COEFF = 1.0;
+	public static final double DRAG_COEFF = 0.7;
 	//TODO: get someone else to measure this
 	
-	public static final double CAR_CROSS_SECTIONAL_AREA = 1.0;
+	public static final double CAR_CROSS_SECTIONAL_AREA = 2.5;
 	//TODO: get someone else to measure this
 
 	public static final double CAR_MASS = 1000;
@@ -89,7 +89,7 @@ public class GlobalValues {
 	public static final double TIRE_PRESSURE = 1;
 	//TODO: get a real value for this
 	
-	public static final double ENGINE_EFF = 0.9;
+	public static final double ENGINE_EFF = 0.85;
 	//TODO: determine a real value for this
 	
 	public static final double BATTERY_MAX_CHARGE = 20;

@@ -25,6 +25,7 @@ import com.ubcsolar.exception.NoCarStatusException;
 import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.exception.NoLocationReportedException;
+import com.ubcsolar.exception.NotEnoughChargeException;
 import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.NewSimulationReportNotification;
@@ -69,16 +70,17 @@ public class SimController extends ModuleController {
 			throw new NoCarStatusException();
 		}
 		
-		double startTimeNanos = System.nanoTime();
+		//TODO: restore block comment below after testing
+		/*double startTimeNanos = System.nanoTime();
 		//run the sim! 
 		GeoCoord startPoint = this.mySession.getMapController().findClosestPointOnRoute(lastReported.getLocation());
 		
-		/*int targetIndex = -1;
+		int targetIndex = -1;
 		for(int i=0; i<routeToTraverse.getTrailMarkers().size(); i++){ //TODO , in the findClosestPointOnRoute, u find the index on route. can't u use it here as well? instead of finding it again!!!!!
 			if(routeToTraverse.getTrailMarkers().get(i).equals(startPoint)){
 				targetIndex = i;
 			}
-		}*/
+		}
 		int targetIndex= this.mySession.getMapController().getClosestPointIndex();
 		
 		if(targetIndex == -1){
@@ -91,7 +93,31 @@ public class SimController extends ModuleController {
 		List<SimFrame> simFrames = new SimEngine().runSimulation(routeToTraverse, targetIndex, simmedForecastReport, lastCarReported, requestedSpeeds,laps);
 		
 		double endTimeNanos = System.nanoTime();
-		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim completed in " + ((endTimeNanos -startTimeNanos)/1000000) + "ms");
+		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim completed in " + ((endTimeNanos -startTimeNanos)/1000000) + "ms");*/
+		
+		//TODO: comment out testing between arrows:
+		//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+		List<GeoCoord> trailMarkers = routeToTraverse.getTrailMarkers();
+		GeoCoord startLoc = trailMarkers.get(0);
+		int numPoints = trailMarkers.size();
+		GeoCoord endLoc = trailMarkers.get(numPoints - 1);
+		Map<GeoCoord, Double> speedProfile = new HashMap<GeoCoord,Double>();
+		for(int i = 0; i < numPoints; i++){
+			speedProfile.put(trailMarkers.get(i), 10.0);
+		}
+		long startTime = System.currentTimeMillis();
+		
+		SimResult results = new SimResult(new ArrayList<SimFrame>(), 10, lastCarReported);
+		try {
+			results = new SimEngine().runSimV2(routeToTraverse, startLoc, endLoc, simmedForecastReport, lastCarReported, speedProfile, startTime, 1, 10);
+		} catch (NotEnoughChargeException e) {
+			System.out.println("Too low charge");
+			System.err.println(e.getMessage());
+			//e.printStackTrace();
+		}
+		List<SimFrame> simFrames = results.getListOfFrames();
+		//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+		
 		SimulationReport toSend = new SimulationReport(simFrames,requestedSpeeds, "some info");
 		this.mySession.sendNotification(new NewSimulationReportNotification(toSend));
 	}

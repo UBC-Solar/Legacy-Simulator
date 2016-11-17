@@ -59,7 +59,7 @@ public class SimEngine {
 	 * @param speedProfile: A map that matches each GeoCoord between startLoc and endLoc with the
 	 * 	speed (in km/h) to be simulated during that interval. Currently, this is the limitation that prevents
 	 * 	simulating multiple laps (to avoid double mapping GeoCoords)
-	 * @param startTime: The time at which the race will begin (in Unix format?)
+	 * @param startTime: The time at which the race will begin (in Unix format, i.e. ms from 1/1/70)
 	 * @param lapNum: The lap that the simulation is simulating
 	 * @param minCharge: The minimum percentage of charge that is acceptable at the end of this segment
 	 * 	of the race
@@ -101,12 +101,22 @@ public class SimEngine {
 			double speed = speedProfile.get(currPoint);
 			double distance = prevPoint.calculateDistance(currPoint);
 			double timeIncHr = distance/speed;
-			double timeIncSec = timeIncHr * 3600;
-			currTime += timeIncSec; 
+			double timeIncMS = timeIncHr * 36000;
+			currTime += timeIncMS; 
 			
 			ForecastIO currWeather = forecastList.get(i);
 			FIODataPoint currWeatherPoint = chooseReport(currWeather,currTime);
+			if(i == startingIndex+1){
+				System.out.println("Lat: " + currWeather.getLatitude());
+				System.out.println("Lon : " + currWeather.getLongitude());
+			}
 			
+			System.out.println("cloud cover : " + currWeatherPoint.cloudCover());
+			
+			if(i == startingIndex+1){
+				System.out.println("Lat: " + currWeather.getLatitude());
+				System.out.println("Lon : " + currWeather.getLongitude());
+			}
 			currStatus = this.calculateNewTelemPacket(prevStatus, prevPoint, 
 					currPoint, currWeatherPoint, speed, timeIncHr);
 			
@@ -290,13 +300,21 @@ public class SimEngine {
 	private TelemDataPacket calculateNewTelemPacket(TelemDataPacket prevStatus, GeoCoord startLoc,
 			GeoCoord endLoc, FIODataPoint forecastForPoint, double speed, double timeTaken){
 		double resistivePower = calculateResistivePower(forecastForPoint, endLoc, startLoc, speed);
+		//System.out.println("Resistive power is :" + resistivePower);
 		double sunPower = calculateSunPower(forecastForPoint);
+		System.out.println("Sun power is : " + sunPower);
 		double netPower = sunPower - resistivePower;//in Watts
+		//System.out.println("NetPower is : " + netPower);
 		
 		//double netEnergy = netPower*timeTaken;//in Newtons
 		double changeInCharge = netPower/prevStatus.getTotalVoltage()*timeTaken;//in amp-hours
 		double changeInChargePerCent = changeInCharge/GlobalValues.BATTERY_MAX_CHARGE;
+		//System.out.println("changInChargePerCent is : " + changeInChargePerCent);
 		double newCharge = prevStatus.getStateOfCharge()+changeInChargePerCent;
+		if(newCharge > 100)
+			newCharge = 100;
+		if(newCharge < 0)
+			newCharge = 0;
 		
 		TelemDataPacket newStatus = new TelemDataPacket(speed, prevStatus.getTotalVoltage(), 
 				prevStatus.getTemperatures(), prevStatus.getCellVoltages(), newCharge);
