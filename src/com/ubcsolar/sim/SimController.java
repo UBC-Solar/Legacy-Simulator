@@ -101,9 +101,15 @@ public class SimController extends ModuleController {
 		GeoCoord startLoc = trailMarkers.get(0);
 		int numPoints = trailMarkers.size();
 		GeoCoord endLoc = trailMarkers.get(numPoints - 1);
+		
+		double testSpeed = 10.0;
 		Map<GeoCoord, Double> speedProfile = new HashMap<GeoCoord,Double>();
+		Map<GeoCoord, Map<Integer,Double>> testRequestedSpeeds = new HashMap<GeoCoord,Map<Integer,Double>>();
+		Map<Integer,Double> testLap = new HashMap<Integer,Double>();
+		testLap.put(1, testSpeed);
 		for(int i = 0; i < numPoints; i++){
-			speedProfile.put(trailMarkers.get(i), 10.0);
+			speedProfile.put(trailMarkers.get(i), testSpeed);
+			testRequestedSpeeds.put(trailMarkers.get(i), testLap);
 		}
 		long startTime = System.currentTimeMillis();
 		
@@ -118,7 +124,7 @@ public class SimController extends ModuleController {
 		List<SimFrame> simFrames = results.getListOfFrames();
 		//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 		
-		SimulationReport toSend = new SimulationReport(simFrames,requestedSpeeds, "some info");
+		SimulationReport toSend = new SimulationReport(simFrames,testRequestedSpeeds, "some info");
 		this.mySession.sendNotification(new NewSimulationReportNotification(toSend));
 	}
 	

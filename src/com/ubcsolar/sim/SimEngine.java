@@ -106,19 +106,24 @@ public class SimEngine {
 			
 			ForecastIO currWeather = forecastList.get(i);
 			FIODataPoint currWeatherPoint = chooseReport(currWeather,currTime);
-			if(i == startingIndex+1){
-				System.out.println("Lat: " + currWeather.getLatitude());
-				System.out.println("Lon : " + currWeather.getLongitude());
-			}
-			
-			System.out.println("cloud cover : " + currWeatherPoint.cloudCover());
-			
-			if(i == startingIndex+1){
-				System.out.println("Lat: " + currWeather.getLatitude());
-				System.out.println("Lon : " + currWeather.getLongitude());
-			}
+//			if(i == startingIndex+1){
+//				System.out.println("Lat: " + currWeather.getLatitude());
+//				System.out.println("Lon : " + currWeather.getLongitude());
+//			}
+//			
+//			System.out.println("cloud cover : " + currWeatherPoint.cloudCover());
+//			
+//			if(i == startingIndex+1){
+//				System.out.println("Lat: " + currWeather.getLatitude());
+//				System.out.println("Lon : " + currWeather.getLongitude());
+//			}
 			currStatus = this.calculateNewTelemPacket(prevStatus, prevPoint, 
 					currPoint, currWeatherPoint, speed, timeIncHr);
+			
+			if(currStatus.getStateOfCharge()<minCharge){
+				String message = "Speed profile uses too much charge. Desired end charge is " + minCharge + ", actual end charge is" +  currStatus.getStateOfCharge(); 
+				throw new NotEnoughChargeException(currStatus.getStateOfCharge(), minCharge, message);
+			}
 			
 			LocationReport currLocReport = new LocationReport(currPoint, "Raven", "Simmed");
 			
@@ -127,11 +132,6 @@ public class SimEngine {
 			
 			prevPoint = currPoint;
 			prevStatus = currStatus;
-		}
-		
-		if(currStatus.getStateOfCharge()<minCharge){
-			String message = "Speed profile uses too much charge. Desired end charge is " + minCharge + ", actual end charge is" +  currStatus.getStateOfCharge(); 
-			throw new NotEnoughChargeException(currStatus.getStateOfCharge(), minCharge, message);
 		}
 		
 		SimResult result = new SimResult(listOfFrames,currTime,currStatus);
@@ -302,7 +302,7 @@ public class SimEngine {
 		double resistivePower = calculateResistivePower(forecastForPoint, endLoc, startLoc, speed);
 		//System.out.println("Resistive power is :" + resistivePower);
 		double sunPower = calculateSunPower(forecastForPoint);
-		System.out.println("Sun power is : " + sunPower);
+		//System.out.println("Sun power is : " + sunPower);
 		double netPower = sunPower - resistivePower;//in Watts
 		//System.out.println("NetPower is : " + netPower);
 		
