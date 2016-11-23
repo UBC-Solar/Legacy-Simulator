@@ -102,7 +102,7 @@ public class SimController extends ModuleController {
 		int numPoints = trailMarkers.size();
 		GeoCoord endLoc = trailMarkers.get(numPoints - 1);
 		
-		double testSpeed = 10.0;
+		double testSpeed = 50.0;
 		Map<GeoCoord, Double> speedProfile = new HashMap<GeoCoord,Double>();
 		Map<GeoCoord, Map<Integer,Double>> testRequestedSpeeds = new HashMap<GeoCoord,Map<Integer,Double>>();
 		Map<Integer,Double> testLap = new HashMap<Integer,Double>();

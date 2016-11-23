@@ -101,7 +101,7 @@ public class SimEngine {
 			double speed = speedProfile.get(currPoint);
 			double distance = prevPoint.calculateDistance(currPoint);
 			double timeIncHr = distance/speed;
-			double timeIncMS = timeIncHr * 36000;
+			double timeIncMS = timeIncHr * 3600000;
 			currTime += timeIncMS; 
 			
 			ForecastIO currWeather = forecastList.get(i);
