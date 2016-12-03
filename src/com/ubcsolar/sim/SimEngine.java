@@ -328,7 +328,7 @@ public class SimEngine {
 		double resistivePower = calculateResistivePower(forecastForPoint, endLoc, startLoc, speed);
 		
 		double sunPower = calculateSunPower(forecastForPoint);
-		
+		//System.out.println("Resistive power: " + resistivePower + " sunPower is : " + sunPower);
 		double netPower = sunPower - resistivePower;//in Watts
 		
 		double changeInCharge = netPower/totalCharge*timeTaken;//in amp-hours
@@ -626,7 +626,7 @@ public class SimEngine {
 	
 	public double getInclinationAngle(GeoCoord startPoint, GeoCoord endPoint) {
 		double inclinationAngle = 0;
-		double distance = startPoint.calculateDistance(endPoint);
+		double distance = startPoint.calculateDistance(endPoint)*1000;
 		double heightDifference = endPoint.getElevation() - startPoint.getElevation();
 		/*
 		 * If heightDifference returns a positive number, this means that we are elevating from a lower starting point.
