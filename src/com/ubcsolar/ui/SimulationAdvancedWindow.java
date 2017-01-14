@@ -554,15 +554,15 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				speedDataset.addSeries("Speed", generateSpeedSeries(simReport.getSimFrames(), startDistance));
 				final NumberAxis axis2 = new NumberAxis("speed (km/h)");
 				axis2.setAutoRangeIncludesZero(false);
-				SpeedPlot.setRangeAxis(1, axis2);
-				SpeedPlot.setDataset(1, speedDataset);
-				SpeedPlot.mapDatasetToRangeAxis(1, 1);
+				SpeedPlot.setRangeAxis(0, axis2);
+				SpeedPlot.setDataset(0, speedDataset);
+				SpeedPlot.mapDatasetToRangeAxis(0, 0);
 				final StandardXYItemRenderer renderer2 = new StandardXYItemRenderer();
 				renderer2.setSeriesPaint(0, Color.black);
 				//renderer.setBaseLegendTextFont(new Font("Helvetica", Font.BOLD, 11));
-				renderer2.setSeriesStroke(0, new BasicStroke(2));
+				renderer2.setSeriesStroke(0, new BasicStroke(2)); // The parameter in new BasicStroke specifies the thickness
 				//renderer2.setPlotShapes(true);
-				SpeedPlot.setRenderer(1, renderer2);
+				SpeedPlot.setRenderer(0, renderer2);
 			}
 		
 			if(this.showStateOfCharge){
@@ -570,14 +570,14 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				stateOfChargeDataSet.addSeries("State Of Charge", generateStateOfChargeSeries(simReport.getSimFrames(),startDistance));
 				final NumberAxis axis3 = new NumberAxis("SoC (%)");
 				axis3.setAutoRangeIncludesZero(false);
-				SoCPlot.setRangeAxis(2, axis3);
-				SoCPlot.setDataset(2, stateOfChargeDataSet);
-				SoCPlot.mapDatasetToRangeAxis(2,2);
+				SoCPlot.setRangeAxis(0, axis3);
+				SoCPlot.setDataset(0, stateOfChargeDataSet);
+				SoCPlot.mapDatasetToRangeAxis(0,0);
 				final StandardXYItemRenderer renderer3 = new StandardXYItemRenderer();
 				renderer3.setSeriesPaint(0, Color.blue);
 				renderer3.setSeriesStroke(0, new BasicStroke(2));
 				//renderer2.setPlotShapes(true);
-				SoCPlot.setRenderer(2, renderer3);
+				SoCPlot.setRenderer(0, renderer3);
 			}
 			
 			if(this.showElevation){
