@@ -69,7 +69,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	 * 
 	 */
 	private static final long serialVersionUID = 2684909507474196406L;
-	private static final String CHART_TITLE = "Sim Results";
 	private JPanel contentPane; //the root content holder
 	private GlobalController mySession; 
 	private GUImain parent; //TODO for loading frame
@@ -80,7 +79,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private final int yValues = 1; //for the Double[][] dataset
 	private JPanel buttonPanel; 
 	private final int MAX_NUM_OF_LAPS=30;//the max number of laps to put in the combo box. 30 picked arbitrarily
-	private ChartPanel mainDisplay; //the panel displaying the model
+	private ChartPanel SpeedChartPanel; //the panel displaying the model
+	private JFreeChart SpeedChart;
+	private ChartPanel SoCChartPanel;
+	private JFreeChart SoCChart;
 	private SimulationReport lastSimReport; //cache the last simReport
 	
 	
@@ -91,10 +93,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private boolean showCloud = true;
 	private boolean showElevation = true;
 	private boolean showTime = true;
-	private JScrollPane speedSlidersPanel;
-	private JTextField textField_1;
-	private JPanel SliderHoldingPanel;
-	private List<SliderSpinnerFrame> displayedSpeedSliderSpinners = new ArrayList<SliderSpinnerFrame>();
+	//private List<SliderSpinnerFrame> displayedSpeedSliderSpinners = new ArrayList<SliderSpinnerFrame>();
 
 	
 	private boolean showWelcomeMessageAgain = true;
@@ -103,6 +102,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			+"\n\n"+ "Note: You should Load the route before this.";
 	private JComboBox<Integer> lapSelectComboBox;
 	private JCheckBox checkBoxTime;
+	private JLabel lblTotalTimeTaken;
 
 	private void handleError(String message){
 		JOptionPane.showMessageDialog(this, message);
@@ -159,10 +159,18 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		contentPane.setLayout(new BorderLayout(0, 0));
+		GridBagLayout gbl_contentPane = new GridBagLayout();
+		gbl_contentPane.columnWidths = new int[]{0, 0};
+		gbl_contentPane.rowHeights = new int[]{30, 0, 0, 0, 0};
+		gbl_contentPane.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_contentPane.rowWeights = new double[]{0.0, 1.0, 1.0, 1.0, Double.MIN_VALUE};
+		contentPane.setLayout(gbl_contentPane);
+		//contentPane.setLayout(new BorderLayout(0, 0));
 		
 		buttonPanel = new JPanel();
-		contentPane.add(buttonPanel, BorderLayout.NORTH);
+		GridBagConstraints gbc_buttonPanel = new GridBagConstraints();
+		gbc_buttonPanel.insets = new Insets(0, 0, 5, 0);
+		contentPane.add(buttonPanel, gbc_buttonPanel);
 		
 		JButton btnNewSimulation = new JButton("New Simulation");
 		btnNewSimulation.addActionListener(new ActionListener() {
@@ -185,7 +193,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		buttonPanel.add(btnNewSimulation);
 		
-		JCheckBox chckbxSpeed = new JCheckBox("Speed");
+		/*JCheckBox chckbxSpeed = new JCheckBox("Speed");
 		chckbxSpeed.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showSpeed = chckbxSpeed.isSelected();
@@ -251,13 +259,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		});
 		buttonPanel.add(chckbxElevation);
 		
-		lapSelectComboBox = new JComboBox<Integer>();
-		lapSelectComboBox.setPreferredSize(new Dimension(39, 18));
-		lapSelectComboBox.setEditable(true);
-		for(int i = 1; i<=MAX_NUM_OF_LAPS; i++){
-			lapSelectComboBox.addItem(new Integer(i));
-		}
-		
 		checkBoxTime = new JCheckBox("Time");
 		checkBoxTime.setSelected(showTime);
 		checkBoxTime.addActionListener(new ActionListener() {
@@ -272,7 +273,14 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
-		buttonPanel.add(checkBoxTime);
+		buttonPanel.add(checkBoxTime);*/
+		
+		lapSelectComboBox = new JComboBox<Integer>();
+		lapSelectComboBox.setPreferredSize(new Dimension(39, 18));
+		lapSelectComboBox.setEditable(true);
+		for(int i = 1; i<=MAX_NUM_OF_LAPS; i++){
+			lapSelectComboBox.addItem(new Integer(i));
+		}
 		
 		lapSelectComboBox.setSelectedIndex(0);
 		buttonPanel.add(lapSelectComboBox);
@@ -280,208 +288,58 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		JLabel lblOfLaps = new JLabel("# Of Laps: ");
 		buttonPanel.add(lblOfLaps);
 		
-		JPanel chartHoldingPanel = new JPanel();
-		contentPane.add(chartHoldingPanel, BorderLayout.CENTER);
-		GridBagLayout gbl_chartHoldingPanel = new GridBagLayout();
-		gbl_chartHoldingPanel.columnWidths = new int[]{0, 0, 0};
-		gbl_chartHoldingPanel.rowHeights = new int[]{0, 0, 0};
-		gbl_chartHoldingPanel.columnWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
-		gbl_chartHoldingPanel.rowWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
-		chartHoldingPanel.setLayout(gbl_chartHoldingPanel);
+		lblTotalTimeTaken = new JLabel("Total Time Taken");
+		buttonPanel.add(lblTotalTimeTaken);
 		
-		setDefaultChart();
-		mainDisplay = new ChartPanel(simResults);
-		mainDisplay.setMouseZoomable(true);
-		mainDisplay.setMouseWheelEnabled(true);
-		GridBagConstraints gbc_mainDisplay = new GridBagConstraints();
-		gbc_mainDisplay.weighty = 1.0;
-		gbc_mainDisplay.weightx = 1.0;
-		gbc_mainDisplay.insets = new Insets(0, 0, 5, 5);
-		gbc_mainDisplay.fill = GridBagConstraints.BOTH;
-		gbc_mainDisplay.gridx = 0;
-		gbc_mainDisplay.gridy = 0;
-		chartHoldingPanel.add(mainDisplay, gbc_mainDisplay);
+//		JPanel SpeedChartHoldingPanel = new JPanel();
+//		contentPane.add(SpeedChartHoldingPanel, BorderLayout.CENTER);
+//		GridBagLayout gbl_SpeedChartHoldingPanel = new GridBagLayout();
+//		gbl_SpeedChartHoldingPanel.columnWidths = new int[]{0, 0, 0};
+//		gbl_SpeedChartHoldingPanel.rowHeights = new int[] {271, 0, 0};
+//		gbl_SpeedChartHoldingPanel.columnWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
+//		gbl_SpeedChartHoldingPanel.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+//		SpeedChartHoldingPanel.setLayout(gbl_SpeedChartHoldingPanel);
 		
-		JPanel panel_1 = new JPanel();
-		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
-		gbc_panel_1.insets = new Insets(0, 0, 5, 0);
-		gbc_panel_1.fill = GridBagConstraints.BOTH;
-		gbc_panel_1.gridx = 1;
-		gbc_panel_1.gridy = 0;
-		chartHoldingPanel.add(panel_1, gbc_panel_1);
+		JFreeChart SpeedChart = createChart(createBlankDataset(), "Speed");
+		SpeedChartPanel = new ChartPanel(SpeedChart);
+		SpeedChartPanel.setMouseZoomable(true);
+		SpeedChartPanel.setMouseWheelEnabled(true);
+		//SpeedChartPanel.setName("Speed");
+		//buildChart(createBlankDataset(), SpeedChartPanel);
+		GridBagConstraints gbc_SpeedChartPanel = new GridBagConstraints();
+		gbc_SpeedChartPanel.weighty = 10.0;
+		gbc_SpeedChartPanel.insets = new Insets(0, 0, 5, 0);
+		gbc_SpeedChartPanel.fill = GridBagConstraints.BOTH;
+		gbc_SpeedChartPanel.gridx = 0;
+		gbc_SpeedChartPanel.gridy = 1;
+		contentPane.add(SpeedChartPanel, gbc_SpeedChartPanel);
 		
-		JButton btnNewButton = new JButton("Reset Speeds");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				clearManualSpeedSettings();
-			}
-		});
-		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
-		gbc_btnNewButton.insets = new Insets(0, 0, 0, 5);
-		gbc_btnNewButton.gridx = 0;
-		gbc_btnNewButton.gridy = 1;
-		chartHoldingPanel.add(btnNewButton, gbc_btnNewButton);
+//		JPanel SoCChartHoldingPanel = new JPanel();
+//		contentPane.add(SoCChartHoldingPanel, BorderLayout.SOUTH);
+//		GridBagLayout gbl_SoCChartHoldingPanel = new GridBagLayout();
+//		gbl_SoCChartHoldingPanel.columnWidths = new int[]{0, 0, 0};
+//		gbl_SoCChartHoldingPanel.rowHeights = new int[] {271, 0, 0};
+//		gbl_SoCChartHoldingPanel.columnWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
+//		gbl_SoCChartHoldingPanel.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+//		SoCChartHoldingPanel.setLayout(gbl_SoCChartHoldingPanel);
 		
-		JPanel panel = new JPanel();
-		GridBagConstraints gbc_panel = new GridBagConstraints();
-		gbc_panel.fill = GridBagConstraints.BOTH;
-		gbc_panel.gridx = 1;
-		gbc_panel.gridy = 1;
-		chartHoldingPanel.add(panel, gbc_panel);
-		
-		speedSlidersPanel = new JScrollPane();
-		speedSlidersPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-		contentPane.add(speedSlidersPanel, BorderLayout.SOUTH);
-		
-		SliderHoldingPanel = new JPanel();
-		speedSlidersPanel.setViewportView(SliderHoldingPanel);
-		GridBagLayout gbl_SliderHoldingPanel = new GridBagLayout();
-		gbl_SliderHoldingPanel.columnWidths = new int[]{0, 0, 0, 0};
-		gbl_SliderHoldingPanel.rowHeights = new int[]{0, 0, 0};
-		gbl_SliderHoldingPanel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_SliderHoldingPanel.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
-		SliderHoldingPanel.setLayout(gbl_SliderHoldingPanel);
-		
-		
-		textField_1 = new JTextField();
-		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
-		gbc_textField_1.insets = new Insets(0, 0, 0, 5);
-		gbc_textField_1.gridx = 0;
-		gbc_textField_1.gridy = 2;
-		SliderHoldingPanel.add(textField_1, gbc_textField_1);
-		textField_1.setColumns(10);
-		setDefaultChart();
+		JFreeChart SoCChart = createChart(createBlankDataset(), "State of Charge");
+		SoCChartPanel = new ChartPanel(SoCChart);
+		SoCChartPanel.setMouseZoomable(true);
+		SoCChartPanel.setMouseWheelEnabled(true);
+		//SoCChartPanel.setName("State of Charge");
+		//buildChart(createBlankDataset(), SoCChartPanel);
+		GridBagConstraints gbc_SoCChartPanel = new GridBagConstraints();
+		gbc_SoCChartPanel.weighty = 10.0;
+		gbc_SoCChartPanel.insets = new Insets(0, 0, 5, 0);
+		gbc_SoCChartPanel.fill = GridBagConstraints.BOTH;
+		gbc_SoCChartPanel.gridx = 0;
+		gbc_SoCChartPanel.gridy = 2;
+		contentPane.add(SoCChartPanel, gbc_SoCChartPanel);
 		
 		setTitleAndLogo();
 		this.register();
 		}
-
-	
-	/**
-	 * To clear the manual speed settings. 
-	 */
-	protected void clearManualSpeedSettings() {
-		if(this.lastSimReport.getSimFrames().size() == 0){
-			this.clearAndLoadSpeedSliders(this.lastSimReport.getSimFrames(), KM_PER_SLIDER, new HashMap<GeoCoord, Map<Integer,Double>>(), 0.0);
-			return;
-		}
-		double startDistance;
-		try {
-			startDistance = mySession.getMapController().findDistanceAlongLoadedRoute(this.lastSimReport.getSimFrames().get(0).getGPSReport().getLocation());
-		} catch (NoLoadedRouteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			startDistance = 0.0;
-		}
-		this.clearAndLoadSpeedSliders(this.lastSimReport.getSimFrames(), KM_PER_SLIDER, new HashMap<GeoCoord,Map<Integer, Double>>(), startDistance );
-	}
-
-	private void clearAndLoadSpeedSliders(List<SimFrame> simResultValues, int KM_PER_SLIDER, Map<GeoCoord, Map<Integer, Double>> map, double startDistance) {
-	
-		SliderHoldingPanel.removeAll();
-		SliderHoldingPanel.validate();
-		SliderHoldingPanel.repaint();
-		
-		GridBagLayout gbl_SliderHoldingPanel = new GridBagLayout();
-		gbl_SliderHoldingPanel.columnWidths = new int[simResultValues.size()];
-		for(int i = 0; i<simResultValues.size(); i++){
-			gbl_SliderHoldingPanel.columnWidths[i] = 0;
-		}
-		gbl_SliderHoldingPanel.rowHeights = new int[]{0, 0};
-		
-		gbl_SliderHoldingPanel.columnWeights = new double[simResultValues.size()];
-		for(int i = 0; i<simResultValues.size(); i++){
-			gbl_SliderHoldingPanel.columnWeights[i] = 0; //don't want any slider column growing
-		} 
-		gbl_SliderHoldingPanel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
-		SliderHoldingPanel.setLayout(gbl_SliderHoldingPanel);
-		
-		
-		//add the panels dynamically
-		this.displayedSpeedSliderSpinners = new ArrayList<SliderSpinnerFrame>();
-		double runningTotalDistance= startDistance;
-		int lastAddedPointIndex = 0;
-		double lastAddedPointDistance = startDistance;
-		
-		//can't set the first speed anyway. 
-		for(int i = 1; i<simResultValues.size(); i++){
-			GeoCoord start = simResultValues.get(i-1).getGPSReport().getLocation();
-			GeoCoord end = simResultValues.get(i).getGPSReport().getLocation();
-			int startLapNumber = simResultValues.get(i-1).getLapNumber();
-			runningTotalDistance += start.calculateDistance(end);
-			
-			//NOTE: CHANGED THIS FROM THE DEFAULT INT THING AT THE TOP
-			if((runningTotalDistance-lastAddedPointDistance)>KM_PER_SLIDER_DOUBLE
-					|| i == simResultValues.size() - 1 ||
-					simResultValues.get(i).getLapNumber() != startLapNumber){ //each slider can have points from only one lap
-				List<GeoCoord> pointsToRepresent = new ArrayList<GeoCoord>();
-				double totalSpeed = 0;
-				for(int index = lastAddedPointIndex+1; index<i; index++){
-					//System.out.println("adding a speed: " + simResultValues.get(index).getCarStatus().getSpeed());
-					totalSpeed += simResultValues.get(index).getCarStatus().getSpeed();
-					pointsToRepresent.add(simResultValues.get(index).getGPSReport().getLocation());
-				}
-			
-				
-				double averageSpeed = totalSpeed/(double)(i-(lastAddedPointIndex+1)); //avg speed across all points represented
-			
-				String formattedKMOne = String.format("%.2f", lastAddedPointDistance); //to avoid having 16 digits
-				String formattedKMTwo = String.format("%.2f", runningTotalDistance);
-				String label = "KMs: " + formattedKMOne+"-"+formattedKMTwo;
-				//String label = lastAddedPointDistance+"km-"+runningTotalDistance+"km";
-				boolean isManuallySet = false;
-				for(GeoCoord g : pointsToRepresent){
-					//not sure to do if any of them, or if majority, or if all, etc. 
-					if(map.get(g)!=null && map.get(g).get(startLapNumber) != null){
-						isManuallySet = true;
-//						System.out.println("total speed: " + totalSpeed);
-//						System.out.println("Average speed: " + averageSpeed);
-//						System.out.println((i-(lastAddedPointIndex+1) + ""));
-					}
-//					if(averageSpeed <2 || totalSpeed <500 || (int) averageSpeed < 1){
-//						System.out.println("total speed: " + totalSpeed);
-//						System.out.println("Average speed: " + averageSpeed);
-//						System.out.println((i-(lastAddedPointIndex+1) + ""));
-//					}
-				}
-				
-				SliderSpinnerFrame toAddToPanel = new SliderSpinnerFrame(label ,
-										(int) averageSpeed, isManuallySet,pointsToRepresent,startLapNumber);
-				displayedSpeedSliderSpinners.add(toAddToPanel);
-				
-				lastAddedPointIndex = i;
-				lastAddedPointDistance = runningTotalDistance;
-			}			
-		}
-		
-		
-		
-		for(int i = 0; i<displayedSpeedSliderSpinners.size(); i++){
-			GridBagConstraints temp_gbc_panel = new GridBagConstraints();
-			temp_gbc_panel.insets = new Insets(0, 0, 0, 5);
-			temp_gbc_panel.fill = GridBagConstraints.BOTH;
-			temp_gbc_panel.gridx = i; //add it on the right
-			temp_gbc_panel.gridy = 0;
-			SliderHoldingPanel.add(displayedSpeedSliderSpinners.get(i), temp_gbc_panel);
-			SliderHoldingPanel.validate();
-			SliderHoldingPanel.repaint();
-		}
-		
-		//this text box is just to force it to be bigger so the scroll bar doesn't cover anything. 
-		textField_1 = new JTextField();
-		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
-		gbc_textField_1.insets = new Insets(0, 0, 0, 5);
-		gbc_textField_1.gridx = 0;
-		gbc_textField_1.gridy = 1;
-		SliderHoldingPanel.add(textField_1, gbc_textField_1);
-		textField_1.setColumns(5);
-		
-		
-		this.repaint();
-		this.SliderHoldingPanel.repaint();
-		this.speedSlidersPanel.repaint();
-		
-	}
 		
 		/**
 		 * Attempts to run a simulation with the loaded data. If there is needed data that
@@ -516,7 +374,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				}
 			}*/ //used this for testing. 
 			
-			for(SliderSpinnerFrame f : this.displayedSpeedSliderSpinners){
+			/*for(SliderSpinnerFrame f : this.displayedSpeedSliderSpinners){
 				if(f.isManuallySet()){
 					int lapNumber = f.getLapNumber();
 					for(GeoCoord g : f.getRepresentedCoordinates()){
@@ -532,7 +390,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 					}
 					System.out.println("Manually Requesting speed to: " + f.getValue());
 				}
-			}
+			}*/
 			
 			return toReturn;
 		}
@@ -544,7 +402,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			XYDataset ds = createBlankDataset();
 			this.simResults = 
 					ChartFactory.createXYLineChart(
-							CHART_TITLE,
+							"Default Chart",
 							X_AXIS_LABEL,
 							Y_AXIS_LABEL, 
 							ds,
@@ -554,7 +412,33 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			temp.clearRangeAxes();
 		}
 		
-		
+		private JFreeChart createChart(XYDataset ds, String chartName) {
+			JFreeChart chart = 
+					ChartFactory.createXYLineChart(
+							chartName,
+							X_AXIS_LABEL,
+							Y_AXIS_LABEL, 
+							ds,
+							PlotOrientation.VERTICAL, true, true, false);
+			
+			XYPlot temp = null;
+			switch (chartName) {
+			case "Speed": 
+				if(SpeedChart != null)
+					temp = SpeedChart.getXYPlot();
+				break;
+			case "State of Charge": 
+				if(SoCChart != null)
+					temp = SoCChart.getXYPlot();
+				break;
+			default: temp = null;
+			}
+			
+			if (temp != null)
+				temp.clearRangeAxes();
+			
+			return chart;
+		}
 		
 		/**
 		 * Makes an empty dataset for an empty chart. 
@@ -596,7 +480,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 						
 				
 				updateChart(test.getSimReport(), startDistance);
-				this.clearAndLoadSpeedSliders(lastSimReport.getSimFrames(), KM_PER_SLIDER, lastSimReport.getManuallyRequestedSpeeds(), startDistance);
 				this.validate();
 				this.repaint();
 				
@@ -617,25 +500,34 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		 */
 		private void updateChart(SimulationReport simReport, double startDistance) {
 			this.lastSimReport = simReport;
+			System.out.println("Time Taken: " + getTotalTimeTaken(simReport.getSimFrames()) + " minutes");
+			
+			// Rounded off to 2 decimal places
+			double roundedTime = Math.round(getTotalTimeTaken(simReport.getSimFrames())*100.0)/100.0;
+			lblTotalTimeTaken.setText("Total Time Taken: " + roundedTime + " minutes");
+			
 			if(simReport.getSimFrames().size() == 0){
-				this.setDefaultChart(); //last sim was deleted.
-				this.mainDisplay.setChart(this.simResults);
-				clearAndLoadSpeedSliders(new ArrayList<SimFrame>(),KM_PER_SLIDER,new HashMap<GeoCoord,Map<Integer, Double>>(), startDistance);
+				//this.setDefaultChart(); //last sim was deleted.
+				SpeedChart = createChart(createBlankDataset(), "Speed");
+				SoCChart = createChart(createBlankDataset(), "State of Charge");
+				this.SpeedChartPanel.setChart(SpeedChart);
+				this.SoCChartPanel.setChart(SoCChart);
 				
 				contentPane.repaint();
 				contentPane.validate();
-				mainDisplay.repaint();
-				mainDisplay.validate();
+				SpeedChartPanel.repaint();
+				SoCChartPanel.repaint();
+				SpeedChartPanel.validate();
+				SoCChartPanel.validate();
+				buttonPanel.repaint();
+				buttonPanel.validate();
 				this.repaint();
 				this.validate();	
-				this.SliderHoldingPanel.validate();
-				this.SliderHoldingPanel.repaint();
-				
 				return;
 			}
 			this.simResults = 
 					ChartFactory.createXYLineChart(
-							CHART_TITLE,
+							"Dummy Chart",
 							X_AXIS_LABEL,
 							Y_AXIS_LABEL,
 							null, //we'll add in all the values below so we can map to custom axis
@@ -645,20 +537,32 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			plot.setDomainPannable(true);
 			plot.clearRangeAxes();
 			
+			SpeedChart = createChart(createBlankDataset(), "Speed");
+			XYPlot SpeedPlot = SpeedChart.getXYPlot();
+			SpeedPlot.setRangePannable(true);
+			SpeedPlot.setDomainPannable(true);
+			SpeedPlot.clearRangeAxes();
+			
+			SoCChart = createChart(createBlankDataset(), "State of Charge");
+			XYPlot SoCPlot = SoCChart.getXYPlot();
+			SoCPlot.setRangePannable(true);
+			SoCPlot.setDomainPannable(true);
+			SoCPlot.clearRangeAxes();
+			
 			if(this.showSpeed){
 				DefaultXYDataset speedDataset = new DefaultXYDataset();
 				speedDataset.addSeries("Speed", generateSpeedSeries(simReport.getSimFrames(), startDistance));
 				final NumberAxis axis2 = new NumberAxis("speed (km/h)");
 				axis2.setAutoRangeIncludesZero(false);
-				plot.setRangeAxis(1, axis2);
-				plot.setDataset(1, speedDataset);
-				plot.mapDatasetToRangeAxis(1, 1);
+				SpeedPlot.setRangeAxis(0, axis2);
+				SpeedPlot.setDataset(0, speedDataset);
+				SpeedPlot.mapDatasetToRangeAxis(0, 0);
 				final StandardXYItemRenderer renderer2 = new StandardXYItemRenderer();
 				renderer2.setSeriesPaint(0, Color.black);
 				//renderer.setBaseLegendTextFont(new Font("Helvetica", Font.BOLD, 11));
-				renderer2.setSeriesStroke(0, new BasicStroke(2));
+				renderer2.setSeriesStroke(0, new BasicStroke(2)); // The parameter in new BasicStroke specifies the thickness
 				//renderer2.setPlotShapes(true);
-				plot.setRenderer(1, renderer2);
+				SpeedPlot.setRenderer(0, renderer2);
 			}
 		
 			if(this.showStateOfCharge){
@@ -666,14 +570,14 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				stateOfChargeDataSet.addSeries("State Of Charge", generateStateOfChargeSeries(simReport.getSimFrames(),startDistance));
 				final NumberAxis axis3 = new NumberAxis("SoC (%)");
 				axis3.setAutoRangeIncludesZero(false);
-				plot.setRangeAxis(2, axis3);
-				plot.setDataset(2, stateOfChargeDataSet);
-				plot.mapDatasetToRangeAxis(2,2);
+				SoCPlot.setRangeAxis(0, axis3);
+				SoCPlot.setDataset(0, stateOfChargeDataSet);
+				SoCPlot.mapDatasetToRangeAxis(0,0);
 				final StandardXYItemRenderer renderer3 = new StandardXYItemRenderer();
 				renderer3.setSeriesPaint(0, Color.blue);
 				renderer3.setSeriesStroke(0, new BasicStroke(2));
 				//renderer2.setPlotShapes(true);
-				plot.setRenderer(2, renderer3);
+				SoCPlot.setRenderer(0, renderer3);
 			}
 			
 			if(this.showElevation){
@@ -722,11 +626,16 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				plot.setRenderer(5, renderer5);
 			}
 			
-			this.mainDisplay.setChart(this.simResults);
+			this.SpeedChartPanel.setChart(SpeedChart);
+			this.SoCChartPanel.setChart(SoCChart);
 			contentPane.repaint();
 			contentPane.validate();
-			mainDisplay.repaint();
-			mainDisplay.validate();
+			SpeedChartPanel.repaint();
+			SoCChartPanel.repaint();
+			SpeedChartPanel.validate();
+			SoCChartPanel.validate();
+			buttonPanel.repaint();
+			buttonPanel.validate();
 			this.repaint();
 			this.validate();	
 		}
@@ -790,6 +699,19 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			}
 			
 			return toReturn;
+		}
+		
+		private double getTotalTimeTaken(List<SimFrame> simFrames) {
+			double timeTaken = 0;
+			double startTime = 0;
+			double endTime = 0;
+			if(simFrames!=null && simFrames.size() > 0)
+			{
+				startTime = simFrames.get(1).getRepresentedTime();			
+				endTime = simFrames.get((simFrames.size()-1)).getRepresentedTime();
+			}
+			timeTaken = ((endTime - startTime)/1000)/60;
+			return timeTaken;
 		}
 		
 		private double[][] generateElevationProfile(List<SimFrame> simFrames, double startDistance) {
