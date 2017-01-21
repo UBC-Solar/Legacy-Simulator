@@ -489,9 +489,17 @@ public class SimEngine {
 		return 0;
 	}
 	
-	public double getInclinationAngle(GeoCoord startPoint, GeoCoord endPoint) {
-		double inclinationAngle = 0;
+	/*public static double getGrade(GeoCoord startPoint, GeoCoord endPoint) {
 		double distance = startPoint.calculateDistance(endPoint);
+		double heightDifference = endPoint.getElevation() - startPoint.getElevation();
+	
+		return 100*(distance/heightDifference);
+		
+	}*/
+	
+	public static double getInclinationAngle(GeoCoord startPoint, GeoCoord endPoint) {
+		double inclinationAngle = 0;
+		double distance = startPoint.calculateDistance(endPoint)*1000;
 		double heightDifference = endPoint.getElevation() - startPoint.getElevation();
 		/*
 		 * If heightDifference returns a positive number, this means that we are elevating from a lower starting point.

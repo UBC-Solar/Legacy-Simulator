@@ -296,7 +296,7 @@ public class CustomDisplayMap extends JMapViewer {
 	}
 
 	// *****************************************************BETA******************************************************
-	
+
 
 	public void addSpeedsToMap(Map<GeoCoord, Double> speeds) {
 		Style forecastStyle = new Style(Color.black, Color.BLUE, null, this.defaultFontForThings);
