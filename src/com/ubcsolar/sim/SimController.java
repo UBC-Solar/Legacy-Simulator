@@ -150,4 +150,31 @@ public class SimController extends ModuleController {
 		this.mySession.register(this, NewMapLoadedNotification.class);
 
 	}
+	
+	public Map<GeoCoord, Double> getSpeedProfile() throws NoForecastReportException, NoLoadedRouteException, NoLocationReportedException, NoCarStatusException {
+		ForecastReport simmedForecastReport = this.mySession.getMyWeatherController().getSimmedForecastForEveryPointForLoadedRoute();
+		Route routeToTraverse = this.mySession.getMapController().getAllPoints();
+		TelemDataPacket lastCarReported = this.mySession.getMyCarController().getLastTelemDataPacket();
+		long startTime = System.currentTimeMillis();
+		List<GeoCoord> points = routeToTraverse.getTrailMarkers();
+		Map<GeoCoord, Double> testSpeedProfile = new HashMap<GeoCoord, Double>();
+		double testSpeed = 50.00;
+		for(int i = 0; i < points.size(); i+=50) {
+			GeoCoord startLoc = points.get(i);
+			GeoCoord endLoc = points.get(i+100);
+			testSpeedProfile.put(startLoc, testSpeed);
+			SimResult results = new SimResult(new ArrayList<SimFrame>(), 10, lastCarReported);
+			while(results == null) {
+				try {
+					results = new SimEngine().runSimV2(routeToTraverse, startLoc, endLoc, simmedForecastReport, lastCarReported, testSpeedProfile, startTime, 1, 10);
+				} catch (NotEnoughChargeException e) {
+					for(int j = i; j < points.size(); j++) {
+						if( testSpeed == 0 ) break;
+						testSpeedProfile.put(startLoc, testSpeed-10);
+					}
+				}
+			}	
+		}
+		return testSpeedProfile;
+	}
 }
