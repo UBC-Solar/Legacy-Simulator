@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
+import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
@@ -27,12 +29,15 @@ import com.ubcsolar.exception.NoLoadedRouteException;
 import com.ubcsolar.exception.NoLocationReportedException;
 import com.ubcsolar.exception.NotEnoughChargeException;
 import com.ubcsolar.notification.ExceptionNotification;
+import com.ubcsolar.notification.NewForecastReport;
 import com.ubcsolar.notification.NewMapLoadedNotification;
 import com.ubcsolar.notification.NewSimulationReportNotification;
 import com.ubcsolar.notification.Notification;
 
 public class SimController extends ModuleController {
-
+	
+	private ForecastReport currentForecastReport;
+	
 	public SimController(GlobalController toAdd) {
 		super(toAdd);
 	}
@@ -55,7 +60,7 @@ public class SimController extends ModuleController {
 			throw new IllegalArgumentException("Number of Laps too low, must go at least 1 lap");
 		}
 		//Compile all the information we need. 		
-		ForecastReport simmedForecastReport = this.mySession.getMyWeatherController().getSimmedForecastForEveryPointForLoadedRoute();
+		//ForecastReport simmedForecastReport = this.mySession.getMyWeatherController().getSimmedForecastForEveryPointForLoadedRoute();
 		LocationReport lastReported = this.mySession.getMapController().getLastReportedLocation();
 		if(lastReported == null){
 			throw new NoLocationReportedException();
@@ -114,8 +119,9 @@ public class SimController extends ModuleController {
 		long startTime = System.currentTimeMillis();
 		
 		SimResult results = new SimResult(new ArrayList<SimFrame>(), 10, lastCarReported);
+		TreeMap<Integer,ForecastIO> inflectionPoints = mySession.getMyWeatherController().findInflectionPoints(routeToTraverse, currentForecastReport.getForecasts());
 		try {
-			results = new SimEngine().runSimV2(routeToTraverse, startLoc, endLoc, simmedForecastReport, lastCarReported, speedProfile, startTime, 1, 10);
+			results = new SimEngine().runSimV2(routeToTraverse, startLoc, endLoc, currentForecastReport, lastCarReported, speedProfile, startTime, 1, 10, inflectionPoints);
 		} catch (NotEnoughChargeException e) {
 			System.out.println("Too low charge");
 			System.err.println(e.getMessage());
@@ -140,6 +146,10 @@ public class SimController extends ModuleController {
 			SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Deleted last run Sim because new route loaded");
 			this.mySession.sendNotification(new NewSimulationReportNotification(toSend));
 		}
+		if(n.getClass() == NewForecastReport.class){
+			NewForecastReport n2 = (NewForecastReport) n; 
+			currentForecastReport = n2.getTheReport();
+		}
 	}
 
 	/**
@@ -147,6 +157,7 @@ public class SimController extends ModuleController {
 	 */
 	@Override
 	public void register() {
+		mySession.register(this, NewForecastReport.class);
 		this.mySession.register(this, NewMapLoadedNotification.class);
 
 	}

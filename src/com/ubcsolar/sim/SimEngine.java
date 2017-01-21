@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 import org.jfree.data.Values;
 
@@ -70,7 +71,8 @@ public class SimEngine {
 	 */
 	public SimResult runSimV2(Route toTraverse, GeoCoord startLoc, GeoCoord endLoc,
 			ForecastReport report, TelemDataPacket carStartState,
-			Map<GeoCoord,Double> speedProfile, long startTime, int lapNum, double minCharge) throws NotEnoughChargeException{
+			Map<GeoCoord,Double> speedProfile, long startTime, int lapNum, double minCharge,
+			TreeMap<Integer,ForecastIO> inflectionPoints) throws NotEnoughChargeException{
 		
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim v2 starting");
 		
@@ -85,8 +87,9 @@ public class SimEngine {
 			throw new IllegalArgumentException("ending location must be after starting location");
 		}
 		
-		List<ForecastIO> forecastList = report.getForecasts(); 
-		ForecastIO startWeather = forecastList.get(startingIndex);
+		List<ForecastIO> forecastList = report.getForecasts();
+		
+		//ForecastIO startWeather = forecastList.get(startingIndex);
 		FIODataPoint startWeatherPoint = chooseReport(startWeather,startTime);
 		LocationReport startLocationReport = new LocationReport(currPoint, "Raven", "Simmed");
 		totalCharge = carStartState.getTotalVoltage();
