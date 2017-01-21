@@ -152,29 +152,59 @@ public class SimController extends ModuleController {
 	}
 	
 	public Map<GeoCoord, Double> getSpeedProfile() throws NoForecastReportException, NoLoadedRouteException, NoLocationReportedException, NoCarStatusException {
+		//things needed for simV2
 		ForecastReport simmedForecastReport = this.mySession.getMyWeatherController().getSimmedForecastForEveryPointForLoadedRoute();
 		Route routeToTraverse = this.mySession.getMapController().getAllPoints();
 		TelemDataPacket lastCarReported = this.mySession.getMyCarController().getLastTelemDataPacket();
 		long startTime = System.currentTimeMillis();
+		
 		List<GeoCoord> points = routeToTraverse.getTrailMarkers();
 		Map<GeoCoord, Double> testSpeedProfile = new HashMap<GeoCoord, Double>();
-		double testSpeed = 50.00;
-		for(int i = 0; i < points.size(); i+=50) {
-			GeoCoord startLoc = points.get(i);
-			GeoCoord endLoc = points.get(i+100);
-			testSpeedProfile.put(startLoc, testSpeed);
-			SimResult results = new SimResult(new ArrayList<SimFrame>(), 10, lastCarReported);
-			while(results == null) {
-				try {
-					results = new SimEngine().runSimV2(routeToTraverse, startLoc, endLoc, simmedForecastReport, lastCarReported, testSpeedProfile, startTime, 1, 10);
-				} catch (NotEnoughChargeException e) {
-					for(int j = i; j < points.size(); j++) {
-						if( testSpeed == 0 ) break;
-						testSpeedProfile.put(startLoc, testSpeed-10);
-					}
-				}
-			}	
-		}
+		
+		//for loop calls helper method that gets speed profiles for each small chunk of the route
+		for(int i = 0; i < points.size(); i += 50) {
+			if (i + 50 < points.size()) {
+				testSpeedProfile.putAll(getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + 50), simmedForecastReport, lastCarReported, startTime, 1, 10));
+			}
+			else {
+				testSpeedProfile.putAll(getSpeedProfileForChunk(routeToTraverse, points.subList(i, points.size()), simmedForecastReport, lastCarReported, startTime, 1, 10));
+				}							
+			}
+		
 		return testSpeedProfile;
 	}
+	
+	private Map<GeoCoord, Double> getSpeedProfileForChunk(Route routeToTraverse, List<GeoCoord> chunk,ForecastReport simmedForecastReport, 
+															TelemDataPacket lastCarReported, long startTime, int lapNum, double minCharge) {
+		Map<GeoCoord, Double> speeds = new HashMap<GeoCoord, Double>();
+		SimResult results = new SimResult(new ArrayList<SimFrame>(), 10, lastCarReported);
+		double speed = 50.0; //should probably turn this to a parameter to get different types of speed profiles (and in case car runs out of power, we can change this)
+		
+		//initialize every geo coord of the chunk with the same speed
+		for (GeoCoord g : chunk) {
+			speeds.put(g, speed);
+		}
+		boolean validprofile = false; //flag to check if the car will run out of charge
+		
+		//if car does run out of charge, speeds are lowered for this chunk until it works
+		while (!validprofile) {
+			//simV2 throws an exception if there is not enough charge, so use that to check
+			try {
+				results = new SimEngine().runSimV2(routeToTraverse, chunk.get(0), chunk.get(chunk.size() - 1), simmedForecastReport, lastCarReported, speeds, startTime, 1, 10);
+				validprofile = true; 
+			} 
+			
+			catch (NotEnoughChargeException e) {
+				//go through map and change speeds if theres not enough charge
+				for (GeoCoord g : speeds.keySet()) {
+					 //for now, we just break if theres no way the car can make it to the end of the chunk 
+					//given the amount of charge, should probably change this later
+					if (speed == 0 ) break;
+					speeds.replace(g, speed - 10);
+				}
+			}
+		}
+		return speeds;
+	}
 }
+	
