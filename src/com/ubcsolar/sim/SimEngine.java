@@ -7,7 +7,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.jfree.data.Values;
@@ -89,8 +91,17 @@ public class SimEngine {
 		
 		List<ForecastIO> forecastList = report.getForecasts();
 		
+		NavigableSet<Integer> inflectionIndices = inflectionPoints.navigableKeySet();
+		Integer inflectionIndex = inflectionIndices.first();
+		ForecastIO currWeather = inflectionPoints.get(inflectionIndex);
+		boolean checkNextForecast = true;
+		
+		inflectionIndex = inflectionIndices.higher(inflectionIndex);
+		if(inflectionIndex == null)
+			checkNextForecast = false;
+		
 		//ForecastIO startWeather = forecastList.get(startingIndex);
-		FIODataPoint startWeatherPoint = chooseReport(startWeather,startTime);
+		FIODataPoint startWeatherPoint = chooseReport(currWeather,startTime);
 		LocationReport startLocationReport = new LocationReport(currPoint, "Raven", "Simmed");
 		totalCharge = carStartState.getTotalVoltage();
 		SimFrame startSimFrame = new SimFrame(startWeatherPoint,carStartState,startLocationReport,startTime,lapNum);
@@ -111,7 +122,14 @@ public class SimEngine {
 			double timeIncMS = timeIncHr * 3600000;
 			currTime += timeIncMS; 
 			
-			ForecastIO currWeather = forecastList.get(i);
+			//ForecastIO currWeather = forecastList.get(i);
+			if(checkNextForecast && i >= inflectionIndex){
+				currWeather = inflectionPoints.get(inflectionIndex);
+				inflectionIndex = inflectionIndices.higher(inflectionIndex);
+				if(inflectionIndex == null)
+					checkNextForecast = false;
+			}
+			
 			
 			SimEngineHelper currThread = new SimEngineHelper(speed,prevPoint,currPoint,
 					currTime,currWeather,this,timeIncHr);
