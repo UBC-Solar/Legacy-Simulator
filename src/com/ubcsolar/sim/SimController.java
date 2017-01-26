@@ -107,13 +107,13 @@ public class SimController extends ModuleController {
 		int numPoints = trailMarkers.size();
 		GeoCoord endLoc = trailMarkers.get(numPoints - 1);
 		
-		double testSpeed = 50.0;
-		Map<GeoCoord, Double> speedProfile = new HashMap<GeoCoord,Double>();
+//		double testSpeed = 50.0;
+		Map<GeoCoord, Double> speedProfile = getSpeedProfile();
 		Map<GeoCoord, Map<Integer,Double>> testRequestedSpeeds = new HashMap<GeoCoord,Map<Integer,Double>>();
 		Map<Integer,Double> testLap = new HashMap<Integer,Double>();
-		testLap.put(1, testSpeed);
+//		testLap.put(1, testSpeed);
 		for(int i = 0; i < numPoints; i++){
-			speedProfile.put(trailMarkers.get(i), testSpeed);
+//			speedProfile.put(trailMarkers.get(i), testSpeed);
 			testRequestedSpeeds.put(trailMarkers.get(i), testLap);
 		}
 		long startTime = System.currentTimeMillis();
@@ -172,13 +172,15 @@ public class SimController extends ModuleController {
 		List<GeoCoord> points = routeToTraverse.getTrailMarkers();
 		Map<GeoCoord, Double> testSpeedProfile = new HashMap<GeoCoord, Double>();
 		
+		TreeMap<Integer,ForecastIO> inflectionPoints = mySession.getMyWeatherController().findInflectionPoints(routeToTraverse, currentForecastReport.getForecasts());
+		
 		//for loop calls helper method that gets speed profiles for each small chunk of the route
 		for(int i = 0; i < points.size(); i += 50) {
 			if (i + 50 < points.size()) {
-				testSpeedProfile.putAll(getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + 50), simmedForecastReport, lastCarReported, startTime, 1, 10));
+				testSpeedProfile.putAll(getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + 50), simmedForecastReport, lastCarReported, startTime, 1, 10, inflectionPoints));
 			}
 			else {
-				testSpeedProfile.putAll(getSpeedProfileForChunk(routeToTraverse, points.subList(i, points.size()), simmedForecastReport, lastCarReported, startTime, 1, 10));
+				testSpeedProfile.putAll(getSpeedProfileForChunk(routeToTraverse, points.subList(i, points.size()), simmedForecastReport, lastCarReported, startTime, 1, 10, inflectionPoints));
 				}							
 			}
 		
@@ -186,7 +188,8 @@ public class SimController extends ModuleController {
 	}
 	
 	private Map<GeoCoord, Double> getSpeedProfileForChunk(Route routeToTraverse, List<GeoCoord> chunk,ForecastReport simmedForecastReport, 
-															TelemDataPacket lastCarReported, long startTime, int lapNum, double minCharge) {
+															TelemDataPacket lastCarReported, long startTime, int lapNum, double minCharge,
+															TreeMap<Integer,ForecastIO> inflectionPoints) {
 		Map<GeoCoord, Double> speeds = new HashMap<GeoCoord, Double>();
 		SimResult results = new SimResult(new ArrayList<SimFrame>(), 10, lastCarReported);
 		double speed = 50.0; //should probably turn this to a parameter to get different types of speed profiles (and in case car runs out of power, we can change this)
@@ -201,7 +204,7 @@ public class SimController extends ModuleController {
 		while (!validprofile) {
 			//simV2 throws an exception if there is not enough charge, so use that to check
 			try {
-				results = new SimEngine().runSimV2(routeToTraverse, chunk.get(0), chunk.get(chunk.size() - 1), simmedForecastReport, lastCarReported, speeds, startTime, 1, 10);
+				results = new SimEngine().runSimV2(routeToTraverse, chunk.get(0), chunk.get(chunk.size() - 1), simmedForecastReport, lastCarReported, speeds, startTime, 1, 10, inflectionPoints);
 				validprofile = true; 
 			} 
 			
