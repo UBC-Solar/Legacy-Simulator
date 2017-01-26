@@ -72,7 +72,7 @@ public class GlobalValues {
 	
 	public static final String WEATHER_LANG = ForecastIO.LANG_ENGLISH;
 	
-	public static final double PANEL_EFFICIENCY = 0.5;
+	public static final double PANEL_EFFICIENCY = 0.001;
 	//TODO: measure this somehow
 	
 	public static final double DRAG_COEFF = 0.7;
