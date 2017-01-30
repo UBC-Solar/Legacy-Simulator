@@ -67,8 +67,6 @@ public class SimEngine {
 	 * @param lapNum: The lap that the simulation is simulating
 	 * @param minCharge: The minimum percentage of charge that is acceptable at the end of this segment
 	 * 	of the race
-	 * @param inflectionPoints: A map connecting route GeoCoord indices to the forecasts that will be used for
-	 * 	for those points. A forecast will be used for all points before the index it is associated with
 	 * @return a SimResult object, containing the simulated travel time, the final TelemDataPacket, 
 	 * 	and a list of the SimFrames used to do the simulation
 	 * @throws NotEnoughChargeException if the end charge is less than minCharge
@@ -352,12 +350,7 @@ public class SimEngine {
 		
 		double sunPower = calculateSunPower(forecastForPoint);
 		//System.out.println("Resistive power: " + resistivePower + " sunPower is : " + sunPower);
-		
-		if(resistivePower < 0) resistivePower = 0;
 		double netPower = sunPower - resistivePower;//in Watts
-		
-		System.out.println("netPower: " + netPower);
-		System.out.println();
 		
 		double changeInCharge = netPower/totalCharge*timeTaken;//in amp-hours
 		double changeInChargePerCent = changeInCharge/GlobalValues.BATTERY_MAX_CHARGE;
@@ -495,7 +488,7 @@ public class SimEngine {
 		double cloudCoverFactor = 990.0*(1-0.75*cloudCover*cloudCover*cloudCover);
 		double panelArea = inUseCarModel.getSolarPanelArea();
 		double sunPower = panelArea * GlobalValues.PANEL_EFFICIENCY * cloudCoverFactor;
-		System.out.println("sunPower: " + sunPower);
+		
 		return sunPower;
 		
 		//		Calendar rightNow = Calendar.getInstance();
@@ -652,15 +645,8 @@ public class SimEngine {
 		return 0;
 	}
 	
-	/**
-	 * 
-	 * @param startPoint
-	 * @param endPoint
-	 * @return inclination angle in radians
-	 */
 	public double getInclinationAngle(GeoCoord startPoint, GeoCoord endPoint) {
 		double inclinationAngle = 0;
-		//1000 is used to convert calculateDistance from km to m
 		double distance = startPoint.calculateDistance(endPoint)*1000;
 		double heightDifference = endPoint.getElevation() - startPoint.getElevation();
 		/*
@@ -669,7 +655,6 @@ public class SimEngine {
 		 */
 		
 		inclinationAngle = Math.atan(heightDifference/distance);
-		System.out.println("inclinationAngle: " + inclinationAngle);
 		return inclinationAngle;
 		
 	}
@@ -677,7 +662,6 @@ public class SimEngine {
 	public double getGradientResistanceForce(double angle) {
 		// F = mgsin(theta)
 		double force = GlobalValues.CAR_MASS * 9.8 * Math.sin(angle); //force is positive if it opposes the direction of travel
-		System.out.println("gradientResistanceForce: " + force);
 		return force;
 	}
 	
@@ -686,7 +670,6 @@ public class SimEngine {
 		// Normal Force = mgcos(theta)
 		double normalForce = GlobalValues.CAR_MASS * 9.8 * Math.cos(angle);
 		double force = rollingCoefficient * normalForce; //force is positive if it opposes the direction of travel
-		System.out.println("rollingResistanceForce: " + force);
 		return force;
 	}
 	
@@ -708,7 +691,6 @@ public class SimEngine {
 		double dragForce = calculateDrag(toLoc, fromLoc, carSpeed, currForecast);
 		double resistivePower = (gradientForce + frictionForce + dragForce)*carSpeed
 				*GlobalValues.KMH_TO_MS_FACTOR/GlobalValues.ENGINE_EFF;
-		System.out.println("resistivePower: " + resistivePower);
 		return resistivePower;
 	}
 }
