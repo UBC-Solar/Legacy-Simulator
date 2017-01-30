@@ -82,12 +82,12 @@ public class GlobalValues {
 	//TODO: get someone else to measure this
 
 	public static final double CAR_MASS = 250;
-	//TODO: Update car's mass once information available. (in kg) Dummy value right now.
+	//roughly weight of car+driver+ballast? estimate, not actually measured yet
 	
 	public static final double KMH_TO_MS_FACTOR = 1.0/36.0;
 	
-	public static final double TIRE_PRESSURE = 1;
-	//TODO: get a real value for this
+	public static final double TIRE_PRESSURE = 2.4137;
+	//in bars, equivalent to ~35 psi
 	
 	public static final double ENGINE_EFF = 0.85;
 	//TODO: determine a real value for this

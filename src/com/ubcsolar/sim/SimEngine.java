@@ -43,51 +43,6 @@ public class SimEngine {
 	private CarModel inUseCarModel;
 
 	/**
-<<<<<<< HEAD
-	 * Runs a simulation of the car's performance on the given portion of the
-	 * provided route, assuming that the car follows the speed profile provided.
-	 * The method will return a SimResult object (containing the time taken, the
-	 * final TelemDataPacket, and a list of the SimFrames used to do the
-	 * simulation) LIMITATION: Currently can only do one lap at a time. To do
-	 * multiple laps, call this method multiple times from the SimController
-	 * (generally, all sims should be done in chunks anyway)
-	 * 
-	 * @param toTraverse:
-	 *            The complete route that the simulation is run on
-	 * @param startLoc:
-	 *            The starting location for the route chunk to be simulated.
-	 *            startLoc must be part of toTraverse
-	 * @param endLoc:
-	 *            The ending location for the route chunk to be simulated.
-	 *            endLoc must be part of toTraverse
-	 * @param report:
-	 *            The ForecastReport containing the forecasts for toTraverse.
-	 *            The report must contain a ForecastIO for every GeoCoord in the
-	 *            route chunk that is being simulated. (Use methods in
-	 *            WeatherController to interpolate forecasts if forecast density
-	 *            is less than GeoCoord density)
-	 * @param carStartState:
-	 *            the car's telemetry data at the start of the simulated route
-	 *            chunk
-	 * @param speedProfile:
-	 *            A map that matches each GeoCoord between startLoc and endLoc
-	 *            with the speed (in km/h) to be simulated during that interval.
-	 *            Currently, this is the limitation that prevents simulating
-	 *            multiple laps (to avoid double mapping GeoCoords)
-	 * @param startTime:
-	 *            The time at which the race will begin (in Unix format, i.e. ms
-	 *            from 1/1/70)
-	 * @param lapNum:
-	 *            The lap that the simulation is simulating
-	 * @param minCharge:
-	 *            The minimum percentage of charge that is acceptable at the end
-	 *            of this segment of the race
-	 * @return a SimResult object, containing the simulated travel time, the
-	 *         final TelemDataPacket, and a list of the SimFrames used to do the
-	 *         simulation
-	 * @throws NotEnoughChargeException
-	 *             if the end charge is less than minCharge
-=======
 	 * Runs a simulation of the car's performance on the given portion of the provided route,
 	 * 	assuming that the car follows the speed profile provided. The method will return a
 	 * 	SimResult object (containing the time taken, the final TelemDataPacket, and a list of the
@@ -116,7 +71,6 @@ public class SimEngine {
 	 * @return a SimResult object, containing the simulated travel time, the final TelemDataPacket, 
 	 * 	and a list of the SimFrames used to do the simulation
 	 * @throws NotEnoughChargeException if the end charge is less than minCharge
->>>>>>> chris_sim_stuff
 	 */
 	public SimResult runSimV2(Route toTraverse, GeoCoord startLoc, GeoCoord endLoc, ForecastReport report,
 			TelemDataPacket carStartState, Map<GeoCoord, Double> speedProfile, long startTime, int lapNum,
@@ -249,6 +203,7 @@ public class SimEngine {
 		 */
 
 		inclinationAngle = Math.atan(heightDifference / distance);
+		
 		return inclinationAngle;
 	}
 	
@@ -257,13 +212,9 @@ public class SimEngine {
 		double resistivePower = calculateResistivePower(forecastForPoint, endLoc, startLoc, speed);
 		
 		double sunPower = calculateSunPower(forecastForPoint);
-		//System.out.println("Resistive power: " + resistivePower + " sunPower is : " + sunPower);
-		
+	
 		if(resistivePower < 0) resistivePower = 0;
 		double netPower = sunPower - resistivePower;//in Watts
-		
-		System.out.println("netPower: " + netPower);
-		System.out.println();
 		
 		double changeInCharge = netPower/totalCharge*timeTaken;//in amp-hours
 		double changeInChargePerCent = changeInCharge/GlobalValues.BATTERY_MAX_CHARGE;
@@ -272,15 +223,8 @@ public class SimEngine {
 
 	public double getGradientResistanceForce(double angle) {
 		// F = mgsin(theta)
-		double force = GlobalValues.CAR_MASS * 9.8 * Math.sin(angle); // force
-																		// is
-																		// positive
-																		// if it
-																		// opposes
-																		// the
-																		// direction
-																		// of
-																		// travel
+		double force = GlobalValues.CAR_MASS * 9.8 * Math.sin(angle); 
+		// force is positive if it opposes the direction of travel
 		return force;
 	}
 
@@ -288,10 +232,9 @@ public class SimEngine {
 		double rollingCoefficient = 0.005 + (1 / tirePressure) * (0.01 + 0.0095 * Math.pow(velocity / 100, 2));
 		// Normal Force = mgcos(theta)
 		double normalForce = GlobalValues.CAR_MASS * 9.8 * Math.cos(angle);
-		double force = rollingCoefficient * normalForce; // force is positive if
-															// it opposes the
-															// direction of
-															// travel
+		double force = rollingCoefficient * normalForce; 
+		// force is positive if opposes the direction of travel
+
 		return force;
 	}
 
@@ -347,7 +290,6 @@ public class SimEngine {
 		double panelArea = inUseCarModel.getSolarPanelArea();
 		double sunPower = panelArea * GlobalValues.PANEL_EFFICIENCY * cloudCoverFactor;
 
-		System.out.println("sunPower: " + sunPower);
 
 		return sunPower;
 
@@ -470,8 +412,7 @@ public class SimEngine {
 		double relativeVelocity = carSpeedInMS;
 		if (windSpeed != 0) {
 			// this if statement is necessary because windBearing() will be
-			// undefined if
-			// windSpeed() is 0
+			// undefined if windSpeed() is 0
 			double windBearing = toForecast.windBearing() * Math.PI / 180;
 			relativeVelocity = carSpeedInMS + windSpeed * Math.cos((windBearing - carBearing));
 		}

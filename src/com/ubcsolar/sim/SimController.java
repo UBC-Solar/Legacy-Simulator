@@ -192,7 +192,7 @@ public class SimController extends ModuleController {
 															TreeMap<Integer,ForecastIO> inflectionPoints) {
 		Map<GeoCoord, Double> speeds = new HashMap<GeoCoord, Double>();
 		SimResult results = new SimResult(new ArrayList<SimFrame>(), 10, lastCarReported);
-		double speed = 50.0; //should probably turn this to a parameter to get different types of speed profiles (and in case car runs out of power, we can change this)
+		double speed = 200.0; //should probably turn this to a parameter to get different types of speed profiles (and in case car runs out of power, we can change this)
 		
 		//initialize every geo coord of the chunk with the same speed
 		for (GeoCoord g : chunk) {
