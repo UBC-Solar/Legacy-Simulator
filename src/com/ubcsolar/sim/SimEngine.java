@@ -43,6 +43,7 @@ public class SimEngine {
 	private CarModel inUseCarModel;
 
 	/**
+<<<<<<< HEAD
 	 * Runs a simulation of the car's performance on the given portion of the
 	 * provided route, assuming that the car follows the speed profile provided.
 	 * The method will return a SimResult object (containing the time taken, the
@@ -86,6 +87,36 @@ public class SimEngine {
 	 *         simulation
 	 * @throws NotEnoughChargeException
 	 *             if the end charge is less than minCharge
+=======
+	 * Runs a simulation of the car's performance on the given portion of the provided route,
+	 * 	assuming that the car follows the speed profile provided. The method will return a
+	 * 	SimResult object (containing the time taken, the final TelemDataPacket, and a list of the
+	 * 	SimFrames used to do the simulation)
+	 * LIMITATION: Currently can only do one lap at a time. To do multiple laps, call this method
+	 * 	multiple times from the SimController (generally, all sims should be done in chunks anyway)
+	 * @param toTraverse: The complete route that the simulation is run on
+	 * @param startLoc: The starting location for the route chunk to be simulated. startLoc must
+	 * 	be part of toTraverse
+	 * @param endLoc: The ending location for the route chunk to be simulated. endLoc must be part
+	 * 	of toTraverse
+	 * @param report: The ForecastReport containing the forecasts for toTraverse. The report must
+	 * 	contain a ForecastIO for every GeoCoord in the route chunk that is being simulated. (Use
+	 * 	methods in WeatherController to interpolate forecasts if forecast density is less than
+	 * 	GeoCoord density)
+	 * @param carStartState: the car's telemetry data at the start of the simulated route chunk
+	 * @param speedProfile: A map that matches each GeoCoord between startLoc and endLoc with the
+	 * 	speed (in km/h) to be simulated during that interval. Currently, this is the limitation that prevents
+	 * 	simulating multiple laps (to avoid double mapping GeoCoords)
+	 * @param startTime: The time at which the race will begin (in Unix format, i.e. ms from 1/1/70)
+	 * @param lapNum: The lap that the simulation is simulating
+	 * @param minCharge: The minimum percentage of charge that is acceptable at the end of this segment
+	 * 	of the race
+	 * @param inflectionPoints: A map connecting route GeoCoord indices to the forecasts that will be used for
+	 * 	for those points. A forecast will be used for all points before the index it is associated with
+	 * @return a SimResult object, containing the simulated travel time, the final TelemDataPacket, 
+	 * 	and a list of the SimFrames used to do the simulation
+	 * @throws NotEnoughChargeException if the end charge is less than minCharge
+>>>>>>> chris_sim_stuff
 	 */
 	public SimResult runSimV2(Route toTraverse, GeoCoord startLoc, GeoCoord endLoc, ForecastReport report,
 			TelemDataPacket carStartState, Map<GeoCoord, Double> speedProfile, long startTime, int lapNum,
@@ -219,7 +250,24 @@ public class SimEngine {
 
 		inclinationAngle = Math.atan(heightDifference / distance);
 		return inclinationAngle;
-
+	}
+	
+	public double calculateChargeDiff(GeoCoord startLoc, GeoCoord endLoc, FIODataPoint forecastForPoint,
+			double speed, double timeTaken){
+		double resistivePower = calculateResistivePower(forecastForPoint, endLoc, startLoc, speed);
+		
+		double sunPower = calculateSunPower(forecastForPoint);
+		//System.out.println("Resistive power: " + resistivePower + " sunPower is : " + sunPower);
+		
+		if(resistivePower < 0) resistivePower = 0;
+		double netPower = sunPower - resistivePower;//in Watts
+		
+		System.out.println("netPower: " + netPower);
+		System.out.println();
+		
+		double changeInCharge = netPower/totalCharge*timeTaken;//in amp-hours
+		double changeInChargePerCent = changeInCharge/GlobalValues.BATTERY_MAX_CHARGE;
+		return changeInChargePerCent;
 	}
 
 	public double getGradientResistanceForce(double angle) {
@@ -275,21 +323,6 @@ public class SimEngine {
 		return resistivePower;
 	}
 
-	public double calculateChargeDiff(GeoCoord startLoc, GeoCoord endLoc, FIODataPoint forecastForPoint, double speed,
-			double timeTaken) {
-		double resistivePower = calculateResistivePower(forecastForPoint, endLoc, startLoc, speed);
-
-		double sunPower = calculateSunPower(forecastForPoint);
-		// System.out.println("Resistive power: " + resistivePower + " sunPower
-		// is : " + sunPower);
-		double netPower = sunPower - resistivePower;// in Watts
-
-		double changeInCharge = netPower / totalCharge * timeTaken;// in
-																	// amp-hours
-		double changeInChargePerCent = changeInCharge / GlobalValues.BATTERY_MAX_CHARGE;
-		return changeInChargePerCent;
-	}
-
 	/**
 	 * Calculates power gain from solar panels on the car, assuming it is
 	 * experiencing the weather given in forecastForPoint, according to formulas
@@ -313,6 +346,8 @@ public class SimEngine {
 		double cloudCoverFactor = 990.0 * (1 - 0.75 * cloudCover * cloudCover * cloudCover);
 		double panelArea = inUseCarModel.getSolarPanelArea();
 		double sunPower = panelArea * GlobalValues.PANEL_EFFICIENCY * cloudCoverFactor;
+
+		System.out.println("sunPower: " + sunPower);
 
 		return sunPower;
 
@@ -452,6 +487,7 @@ public class SimEngine {
 		else
 			return dragMag;
 	}
+}
 
 	// below is all old code
 
@@ -620,89 +656,10 @@ public class SimEngine {
 	 */
 	// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-	/**
-	 * Important helper method, calculates the state of the car after
-	 * traverssing the last gap.
-	 * 
-	 * @param lastCarStatus
-	 *            - th
-	 * @param distanceCovered
-	 * @param elevationChange
-	 * @param forecastForPoint
-	 * @param speedToDrive
-	 * @param sunPowerInWatts
-	 * @return
-	 */
-	/*
-	 * private TelemDataPacket calculateNewCarStatus(TelemDataPacket
-	 * lastCarStatus, double distanceCovered, double elevationChange,
-	 * FIODataPoint forecastForPoint, double speedToDrive, double SunCharge) {
-	 * //TODO actually calculate the car... //TODO review the state of charge
-	 * 
-	 * double generateSoC = generateSoC(lastCarStatus.getStateOfCharge(),
-	 * elevationChange, speedToDrive, SunCharge); TelemDataPacket toReturn = new
-	 * TelemDataPacket(speedToDrive, lastCarStatus.getTotalVoltage(),
-	 * lastCarStatus.getTemperatures(), lastCarStatus.getCellVoltages(),
-	 * generateSoC, (distanceCovered/(speedToDrive*1000)*60*60*1000));
-	 * 
-	 * return toReturn; }
-	 */
-	// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^KEEP ENCLOSED
-	// ABOVE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-	/**
-	 * May generate a value more than 100 or less than 0, but keeps it somewhere
-	 * within that. Max change is +/- 2% from last.
-	 * 
-	 * @param lastSoC
-	 * @return
-	 */
-	/*
-	 * //TODO: change this method private double generateSoC(double lastSoC,
-	 * double elevationChange, double speed, double SoCFromSun) { if
-	 * (elevationChange < 0){ if (lastSoC+2+SoCFromSun>=100){ lastSoC=100;
-	 * return lastSoC; } else{ return lastSoC+2+SoCFromSun; } } else
-	 * if(elevationChange >0){ if(lastSoC-speed/50.0+SoCFromSun<=0){ lastSoC=0;
-	 * return lastSoC; } else{ return lastSoC-speed/50.0+SoCFromSun; } } else
-	 * if(speed == 0){ if (lastSoC+1.5+SoCFromSun>=100){ lastSoC=100; return
-	 * lastSoC; } else{ return lastSoC+1.5+SoCFromSun; } } else{
-	 * if(lastSoC-speed/100.0+SoCFromSun<=0){ lastSoC=0; return lastSoC; } else{
-	 * return lastSoC-speed/100.0+SoCFromSun; } } }
-	 * 
-	 */
-
-	/*
-	 * private double generateRandomSoC(double lastSoC) { Random rng = new
-	 * Random(); int change = rng.nextInt(5); //up or down max 2% in a frame.
-	 * if(lastSoC<=0){ return lastSoC + change; } if(lastSoC>=100){ return
-	 * lastSoC-change; } else{ return lastSoC + change - 2; } }
-	 */
-
-	// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-
-	// ^^^^^^^^^^^^^^^^^SOME GOOD IDEAS IN HERE, LIKE CHANGING SUNLIGHT WITH
-	// TIME OF DAY AND GETTING CLOUD COVER^^^^^^^^^^^^^^^^^^^^^^^^^
-
-	/*
-	 * //TODO: change this method private double calculateBestSpeed(double
-	 * lastCarSpeed, double elevationChange, double SoC) { double SpeedReturn;
-	 * double MaxCarSpeed=110;
-	 * 
-	 * if (SoC<=0){ if(lastCarSpeed-2<0){ return 0; } else{
-	 * SpeedReturn=lastCarSpeed-2; return SpeedReturn; } } else
-	 * if(elevationChange<0 || elevationChange>0){ SpeedReturn=lastCarSpeed;
-	 * return SpeedReturn; } else{ if (lastCarSpeed+3>MaxCarSpeed){
-	 * SpeedReturn=MaxCarSpeed; return SpeedReturn; } else{
-	 * SpeedReturn=lastCarSpeed+3; return SpeedReturn; } }
-	 * 
-	 * }
-	 */
-
-	/*
-	 * //not sure if this does anything private int
-	 * getStartPos(ArrayList<GeoCoord> trailMarkers, GeoCoord location) { //
-	 * find the closest point and return the position number.
-	 * 
-	 * return 0; }
-	 */
-}
+//not sure if this does anything
+//	private int getStartPos(ArrayList<GeoCoord> trailMarkers, GeoCoord location) {
+//		// find the closest point and return the position number. 
+//		
+//		return 0;
+//	}
+	
