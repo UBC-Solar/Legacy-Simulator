@@ -102,7 +102,7 @@ public class SimController extends ModuleController {
 		
 		//TODO: comment out testing between arrows:
 		//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-		List<GeoCoord> trailMarkers = routeToTraverse.getTrailMarkers();
+/*		List<GeoCoord> trailMarkers = routeToTraverse.getTrailMarkers();
 		GeoCoord startLoc = trailMarkers.get(0);
 		int numPoints = trailMarkers.size();
 		GeoCoord endLoc = trailMarkers.get(numPoints - 1);
@@ -127,10 +127,18 @@ public class SimController extends ModuleController {
 			System.err.println(e.getMessage());
 			//e.printStackTrace();
 		}
-		List<SimFrame> simFrames = results.getListOfFrames();
+		List<SimFrame> simFrames = results.getListOfFrames();*/
 		//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 		
-		SimulationReport toSend = new SimulationReport(simFrames,testRequestedSpeeds, "some info");
+		
+		SpeedReport results = getSpeedReport();
+		Map<GeoCoord, Map<Integer,Double>> speedProfile = new HashMap<GeoCoord, Map<Integer,Double>>();
+		for(GeoCoord k : results.getSpeedProfile().keySet()){
+			Map<Integer,Double> lapSpeed = new HashMap<Integer,Double>();
+			lapSpeed.put(1, results.getSpeedProfile().get(k));
+			speedProfile.put(k, lapSpeed);
+		}
+		SimulationReport toSend = new SimulationReport(results.getSpeedResult().getListOfFrames(),speedProfile, "some info");
 		this.mySession.sendNotification(new NewSimulationReportNotification(toSend));
 	}
 	
