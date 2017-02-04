@@ -191,7 +191,7 @@ public class SimController extends ModuleController {
 		for(int i = 0; i < points.size(); i += 50) {
 			if (i + 50 < points.size()) {
 				report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + 50), simmedForecastReport, lastCarReported, startTime, 1, 10, inflectionPoints, currentSpeed);
-				currentSpeed = report.getSpeedProfile().get(points.get(i + 50)); //change current speed to the speed of the car at the end of the chunk
+				currentSpeed = report.getSpeed(); //change current speed to the speed of the car at the end of the chunk
 			}
 			else {
 				report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, points.size()), simmedForecastReport, lastCarReported, startTime, 1, 10, inflectionPoints, currentSpeed);
@@ -204,7 +204,7 @@ public class SimController extends ModuleController {
 			}
 		
 		//return Speed Report with all the speed profiles and sim result with all the frames and total time from each chunk
-		return new SpeedReport(testSpeedProfile, new SimResult(frames, time, lastCarReported)); 
+		return new SpeedReport(testSpeedProfile, new SimResult(frames, time, lastCarReported), currentSpeed); 
 	}
 	
 	/**
@@ -259,7 +259,7 @@ public class SimController extends ModuleController {
 				}
 			}
 		}
-		SpeedReport report = new SpeedReport(speeds, results);
+		SpeedReport report = new SpeedReport(speeds, results, speed);
 		return report;
 	}
 }
