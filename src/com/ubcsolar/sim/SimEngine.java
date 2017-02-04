@@ -208,10 +208,10 @@ public class SimEngine {
 	}
 	
 	public double calculateChargeDiff(GeoCoord startLoc, GeoCoord endLoc, FIODataPoint forecastForPoint,
-			double speed, double timeTaken){
+			double speed, double timeTaken, long sunriseTime, long sunsetTime, double latitude, long currTime){
 		double resistivePower = calculateResistivePower(forecastForPoint, endLoc, startLoc, speed);
 		
-		double sunPower = calculateSunPower(forecastForPoint);
+		double sunPower = calculateSunPower(forecastForPoint, sunriseTime, sunsetTime, latitude, currTime);
 	
 		if(resistivePower < 0) resistivePower = 0;
 		double netPower = sunPower - resistivePower;//in Watts
@@ -276,6 +276,7 @@ public class SimEngine {
 	 * @param forecastForPoint:
 	 *            the forecast for the point you're trying to predict power
 	 *            output at.
+	 * @param sunriseTime/sunsetTime: time given in UNIX time (seconds from 1/1/1970 00:00 GMT)
 	 * @return the amount of power (in Watts) that the panels will produce in
 	 *         the given situation
 	 */
@@ -284,57 +285,69 @@ public class SimEngine {
 	// of incidence
 	// of sun, etc.
 	// TODO: make this private after JUnit testing
-	public double calculateSunPower(FIODataPoint forecastForPoint) {
+	public double calculateSunPower(FIODataPoint forecastForPoint, long sunriseTime, long sunsetTime, double latitude, long currTime) {
+		if(currTime < sunriseTime || currTime > sunsetTime)
+			return 0;
+		
 		double cloudCover = forecastForPoint.cloudCover();
 		double cloudCoverFactor = 990.0 * (1 - 0.75 * cloudCover * cloudCover * cloudCover);
 		double panelArea = inUseCarModel.getSolarPanelArea();
-		double sunPower = panelArea * GlobalValues.PANEL_EFFICIENCY * cloudCoverFactor;
+		double sunAngle = calculateSunAltitudeAngle(sunriseTime, sunsetTime, latitude, currTime);
+		double sunPower = panelArea * GlobalValues.PANEL_EFFICIENCY * cloudCoverFactor * Math.cos(sunAngle);
 
 
 		return sunPower;
-
-		// Calendar rightNow = Calendar.getInstance();
-		// rightNow.setTimeInMillis((long) timeOfDay);
-		//
-		// int hour= rightNow.HOUR_OF_DAY;
-		// // TODO Auto-generated method stub
-		//
-		// //Get the sun elevation given the time of day and the latitude and
-		// longitude.
-		//
-		// double cloudCover = lastFrame.getForecast().cloudCover();
-		//
-		//
-		//
-		// //assume 100 watts per square foot. (thanks random forum guy)
-		// //10.7639 sq feet per sq. meter.
-		// double timeFactor=1;
-		//
-		// //replace with sunrise equation later
-		// if (hour<12 && hour>6){
-		// timeFactor=(4-24/hour)/2; //calculations just meant to get a 0-1
-		// scale
-		// }
-		// if (hour>12 && hour<21){
-		// timeFactor=(1-hour/21)/.4286; //.4286 is a conversion factor to get
-		// on a scale of 0-1
-		// }
-		//
-		// double watts = 100*10.7639 * squareMetersOfPanel* timeFactor*
-		// cloudCover;
-		//
-		// //calculate how much sun there is given the weather (cloudy? Probably
-		// not much).
-		// //I think there's actually a parameter in FIODataPoint for sun
-		// exposure. If not, use the cloudyness measurement.
-		//
-		// //assuming no weather at all right now.
-		//
-		// //because watts, don't need to include time.
-		// return watts;
 	}
-
-	// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+	
+	public double calculateSunAltitudeAngle(long sunriseTime, long sunsetTime, double latitude, long currTime){
+		long solarNoon = (sunriseTime + sunsetTime) / 2;
+		double hourAngle = (15.0 * Math.PI / 180.0) * (currTime - solarNoon) / 3600.0;
+		Date currDate = new Date(currTime*1000);//have to pass time in milliseconds to Date constructor
+		int dayOfMonth = currDate.getDate();
+		int month = currDate.getMonth();
+		int year = currDate.getYear();
+		int dayNumber = findDayNumber(dayOfMonth, month, year);
+		double declinationAngle = (Math.PI / 180.0) * 23.45 * Math.sin(360.0/365.0 * (284 + dayNumber));
+		double altitudeAngleFromHorizontal = (Math.cos(latitude) * Math.cos(declinationAngle) *
+				Math.cos(hourAngle)) + (Math.sin(latitude) * Math.sin(declinationAngle));
+		double altitudeAngleFromVertical = Math.PI / 2.0 - altitudeAngleFromHorizontal;
+		return altitudeAngleFromVertical;
+				
+	}
+	
+	public int findDayNumber(int dayOfMonth, int month, int year){
+		int monthCounter = 0;
+		int dayNumber = dayOfMonth;
+		while(monthCounter < month){
+			switch(month){
+			case 0: dayNumber += 31;
+					break;
+			case 1: dayNumber += 28;
+					if(year % 4 == 0)dayNumber++;
+					break;
+			case 2: dayNumber += 31;
+					break;
+			case 3: dayNumber += 30;
+					break;
+			case 4: dayNumber += 31;
+					break;
+			case 5: dayNumber += 30;
+					break;
+			case 6: dayNumber += 31;
+					break;
+			case 7: dayNumber += 31;
+					break;
+			case 8: dayNumber += 30;
+					break;
+			case 9: dayNumber += 31;
+					break;
+			case 10: dayNumber += 30;
+					break;
+			}
+			monthCounter++;
+		}
+		return dayNumber;
+	}
 
 	/**
 	 * Helper function, picks the hourly report that is closest in time to

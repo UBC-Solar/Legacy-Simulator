@@ -2,6 +2,9 @@ package com.ubcsolar.sim;
 
 import java.util.Map;
 
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 import com.github.dvdme.ForecastIOLib.FIODataPoint;
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.common.GeoCoord;
@@ -42,8 +45,12 @@ public class SimEngineHelper extends Thread{
 //		double timeIncMS = timeIncHr * 3600000; 
 //		currTime = prevTime + timeIncMS;
 		currWeatherPoint = parent.chooseReport(currWeather,currTime);
+		JsonObject dailyData = (JsonObject)((JsonArray)currWeather.getDaily().get("data")).get(0);
+		long sunriseTime = Long.parseLong(dailyData.get("sunriseTime").toString());
+		long sunsetTime = Long.parseLong(dailyData.get("sunsetTime").toString());
+		double latitude = currPoint.getLat();
 		chargeDiff = parent.calculateChargeDiff(prevPoint, currPoint, 
-				currWeatherPoint, speed, timeIncHr);
+				currWeatherPoint, speed, timeIncHr, sunriseTime, sunsetTime, latitude, currTime);
 		Thread.yield();
 	}
 	
