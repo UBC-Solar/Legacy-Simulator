@@ -191,16 +191,19 @@ public class SimController extends ModuleController {
 		ArrayList<SimFrame> frames = new ArrayList<SimFrame>(); //list to store the frames from the sim results of each chunk
 		double time = 0; //total time of all the sims of each chunk
 		SpeedReport report;
+		double currentSpeed = 50.0; //may turn this into a parameter later so we can set what the starting speed is 
 		
 		TreeMap<Integer,ForecastIO> inflectionPoints = mySession.getMyWeatherController().findInflectionPoints(routeToTraverse, currentForecastReport.getForecasts());
 		
 		//for loop calls helper method that gets speed profiles for each small chunk of the route
 		for(int i = 0; i < points.size(); i += 50) {
 			if (i + 50 < points.size()) {
-				report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + 50), simmedForecastReport, lastCarReported, startTime, 1, 10, inflectionPoints);
+				report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + 50), simmedForecastReport, lastCarReported, startTime, 1, 10, inflectionPoints, currentSpeed);
+				currentSpeed = report.getSpeedProfile().get(points.get(i + 50)); //change current speed to the speed of the car at the end of the chunk
 			}
 			else {
-				report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, points.size()), simmedForecastReport, lastCarReported, startTime, 1, 10, inflectionPoints);
+				report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, points.size()), simmedForecastReport, lastCarReported, startTime, 1, 10, inflectionPoints, currentSpeed);
+				//current speed is not updated since if branch is taken, it means we are at the last chunk of the road
 				}				
 			testSpeedProfile.putAll(report.getSpeedProfile()); //add new speed profiles to map
 			frames.addAll(report.getSpeedResult().getListOfFrames()); //add sim frames to list
@@ -226,14 +229,15 @@ public class SimController extends ModuleController {
 	 * @param lapNum: The lap that the simulation is simulating
 	 * @param minCharge: The minimum percentage of charge that is accpetable at the end of this sim race
 	 * @param inflectionPoints
+	 * @param startingSpeed: initial speed of the car
 	 * @return SpeedReport that has speed profile and sim results
 	 */
 	private SpeedReport getSpeedProfileForChunk(Route routeToTraverse, List<GeoCoord> chunk,ForecastReport simmedForecastReport, 
 															TelemDataPacket lastCarReported, long startTime, int lapNum, double minCharge,
-															TreeMap<Integer,ForecastIO> inflectionPoints) {
+															TreeMap<Integer,ForecastIO> inflectionPoints, double startingSpeed) {
 		Map<GeoCoord, Double> speeds = new HashMap<GeoCoord, Double>();
 		SimResult results = new SimResult(new ArrayList<SimFrame>(), 10, lastCarReported);
-		double speed = 50.0; //should probably turn this to a parameter to get different types of speed profiles (and in case car runs out of power, we can change this)
+		double speed = startingSpeed;
 		
 		//initialize every geo coord of the chunk with the same speed
 		for (GeoCoord g : chunk) {
@@ -257,7 +261,9 @@ public class SimController extends ModuleController {
 					if (speed <= 0 ) {
 						throw new IllegalArgumentException("speed cannot make it through the whole route");
 					}
-					speeds.replace(g, speed - 10);
+					speed -= 10;
+					speeds.replace(g, speed);
+					
 				}
 			}
 		}
