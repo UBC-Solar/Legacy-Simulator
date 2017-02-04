@@ -108,7 +108,7 @@ public class SimController extends ModuleController {
 		GeoCoord endLoc = trailMarkers.get(numPoints - 1);
 		
 //		double testSpeed = 50.0;
-		Map<GeoCoord, Double> speedProfile = getSpeedProfile();
+		Map<GeoCoord, Double> speedProfile = getSpeedReport().getSpeedProfile();
 		Map<GeoCoord, Map<Integer,Double>> testRequestedSpeeds = new HashMap<GeoCoord,Map<Integer,Double>>();
 		Map<Integer,Double> testLap = new HashMap<Integer,Double>();
 //		testLap.put(1, testSpeed);
@@ -162,32 +162,65 @@ public class SimController extends ModuleController {
 
 	}
 	
-	public Map<GeoCoord, Double> getSpeedProfile() throws NoForecastReportException, NoLoadedRouteException, NoLocationReportedException, NoCarStatusException {
+	/**
+	 * Method runs the simulation on the whole route and returns the Speed Report of the whole run
+	 * 
+	 * @return: Speed Report of the whole run
+	 * @throws NoForecastReportException
+	 * @throws NoLoadedRouteException
+	 * @throws NoLocationReportedException
+	 * @throws NoCarStatusException
+	 */
+	public SpeedReport getSpeedReport() throws NoForecastReportException, NoLoadedRouteException, NoLocationReportedException, NoCarStatusException {
 		//things needed for simV2
 		ForecastReport simmedForecastReport = this.mySession.getMyWeatherController().getSimmedForecastForEveryPointForLoadedRoute();
 		Route routeToTraverse = this.mySession.getMapController().getAllPoints();
 		TelemDataPacket lastCarReported = this.mySession.getMyCarController().getLastTelemDataPacket();
 		long startTime = System.currentTimeMillis();
 		
-		List<GeoCoord> points = routeToTraverse.getTrailMarkers();
-		Map<GeoCoord, Double> testSpeedProfile = new HashMap<GeoCoord, Double>();
+		List<GeoCoord> points = routeToTraverse.getTrailMarkers(); //the GeoCoords of the route
+		Map<GeoCoord, Double> testSpeedProfile = new HashMap<GeoCoord, Double>(); //map to store speed profile
+		ArrayList<SimFrame> frames = new ArrayList<SimFrame>(); //list to store the frames from the sim results of each chunk
+		double time = 0; //total time of all the sims of each chunk
+		SpeedReport report;
 		
 		TreeMap<Integer,ForecastIO> inflectionPoints = mySession.getMyWeatherController().findInflectionPoints(routeToTraverse, currentForecastReport.getForecasts());
 		
 		//for loop calls helper method that gets speed profiles for each small chunk of the route
 		for(int i = 0; i < points.size(); i += 50) {
 			if (i + 50 < points.size()) {
-				testSpeedProfile.putAll(getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + 50), simmedForecastReport, lastCarReported, startTime, 1, 10, inflectionPoints));
+				report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + 50), simmedForecastReport, lastCarReported, startTime, 1, 10, inflectionPoints);
 			}
 			else {
-				testSpeedProfile.putAll(getSpeedProfileForChunk(routeToTraverse, points.subList(i, points.size()), simmedForecastReport, lastCarReported, startTime, 1, 10, inflectionPoints));
-				}							
+				report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, points.size()), simmedForecastReport, lastCarReported, startTime, 1, 10, inflectionPoints);
+				}				
+			testSpeedProfile.putAll(report.getSpeedProfile()); //add new speed profiles to map
+			frames.addAll(report.getSpeedResult().getListOfFrames()); //add sim frames to list
+			time += report.getSpeedResult().getTravelTime(); //increment total time
+			lastCarReported = this.mySession.getMyCarController().getLastTelemDataPacket(); //update data packet after each chunk
 			}
 		
-		return testSpeedProfile;
+		//return Speed Report with all the speed profiles and sim result with all the frames and total time from each chunk
+		return new SpeedReport(testSpeedProfile, new SimResult(frames, time, lastCarReported)); 
 	}
 	
-	private Map<GeoCoord, Double> getSpeedProfileForChunk(Route routeToTraverse, List<GeoCoord> chunk,ForecastReport simmedForecastReport, 
+	/**
+	 * Method runs the simulation on a small chunk of the route and returns the speed report for that simulation.
+	 * Currently, it has the car travel at 50 km/hr and if the car cannot finish the whole chunk at that speed, 
+	 * it will decelerate by 10 km/hr. If the car cannot make it through the chunk given the current charge, 
+	 * method throws an exception.  
+	 * 
+	 * @param routeToTraverse: The complete route the sim runs on
+	 * @param chunk: The list of GeoCoords that the method runs the sim on
+	 * @param simmedForecastReport: The Forecast Report containing forecasts for toTransverse 
+	 * @param lastCarReported:  the car's telemetry data at the start of the simulated route chunk
+	 * @param startTime: The time at which the race will begin
+	 * @param lapNum: The lap that the simulation is simulating
+	 * @param minCharge: The minimum percentage of charge that is accpetable at the end of this sim race
+	 * @param inflectionPoints
+	 * @return SpeedReport that has speed profile and sim results
+	 */
+	private SpeedReport getSpeedProfileForChunk(Route routeToTraverse, List<GeoCoord> chunk,ForecastReport simmedForecastReport, 
 															TelemDataPacket lastCarReported, long startTime, int lapNum, double minCharge,
 															TreeMap<Integer,ForecastIO> inflectionPoints) {
 		Map<GeoCoord, Double> speeds = new HashMap<GeoCoord, Double>();
@@ -204,6 +237,7 @@ public class SimController extends ModuleController {
 		while (!validprofile) {
 			//simV2 throws an exception if there is not enough charge, so use that to check
 			try {
+				//run sim from start of chunk to end of chunk
 				results = new SimEngine().runSimV2(routeToTraverse, chunk.get(0), chunk.get(chunk.size() - 1), simmedForecastReport, lastCarReported, speeds, startTime, 1, 10, inflectionPoints);
 				validprofile = true; 
 			} 
@@ -211,14 +245,16 @@ public class SimController extends ModuleController {
 			catch (NotEnoughChargeException e) {
 				//go through map and change speeds if theres not enough charge
 				for (GeoCoord g : speeds.keySet()) {
-					 //for now, we just break if theres no way the car can make it to the end of the chunk 
-					//given the amount of charge, should probably change this later
-					if (speed == 0 ) break;
+					 //if the speed is at 0 (there is no way for the car to make it through the chunk given the amount of charge), throw an exception
+					if (speed <= 0 ) {
+						throw new IllegalArgumentException("speed cannot make it through the whole route");
+					}
 					speeds.replace(g, speed - 10);
 				}
 			}
 		}
-		return speeds;
+		SpeedReport report = new SpeedReport(speeds, results);
+		return report;
 	}
 }
 	
