@@ -414,11 +414,11 @@ public class SimEngine {
 			// this if statement is necessary because windBearing() will be
 			// undefined if windSpeed() is 0
 			double windBearing = toForecast.windBearing() * Math.PI / 180;
-			relativeVelocity = carSpeedInMS + windSpeed * Math.cos((windBearing - carBearing));
+			relativeVelocity = carSpeedInMS - windSpeed * Math.cos((windBearing - carBearing));
 		}
 		boolean isTailwind = false;
 		if (Math.abs(relativeVelocity) < Math
-				.abs(carSpeedInMS/** Math.sin(carBearing) */
+				.abs(carSpeedInMS/* * Math.sin(carBearing) */
 		))
 			isTailwind = true;
 		double dragMag = 0.5 * GlobalValues.CAR_CROSS_SECTIONAL_AREA * GlobalValues.DRAG_COEFF * relativeVelocity

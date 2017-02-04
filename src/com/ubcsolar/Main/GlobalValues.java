@@ -84,7 +84,7 @@ public class GlobalValues {
 	public static final double CAR_MASS = 250;
 	//roughly weight of car+driver+ballast? estimate, not actually measured yet
 	
-	public static final double KMH_TO_MS_FACTOR = 1.0/36.0;
+	public static final double KMH_TO_MS_FACTOR = 10.0/36.0;
 	
 	public static final double TIRE_PRESSURE = 2.4137;
 	//in bars, equivalent to ~35 psi
