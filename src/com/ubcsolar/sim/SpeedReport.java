@@ -8,10 +8,18 @@ import com.ubcsolar.common.GeoCoord;
 public class SpeedReport {
 	private Map<GeoCoord, Double> SpeedProfile;
 	private SimResult Result;
+	private double speed;
 	
-	public SpeedReport(Map<GeoCoord, Double> profile, SimResult result) {
+	public SpeedReport(Map<GeoCoord, Double> profile, SimResult result, double speed) {
 		this.SpeedProfile = new HashMap<GeoCoord, Double>(profile);
 		this.Result = result;
+		this.speed = speed;
+	}
+	
+	public SpeedReport(SpeedReport report) {
+		this.SpeedProfile = new HashMap<GeoCoord, Double>(report.getSpeedProfile());
+		this.Result = report.getSpeedResult();
+		this.speed = report.getSpeed();
 	}
 	
 	public Map<GeoCoord,Double> getSpeedProfile() {
@@ -20,6 +28,9 @@ public class SpeedReport {
 	
 	public SimResult getSpeedResult() {
 		return this.Result;
+	}
+	public double getSpeed() {
+		return this.speed;
 	}
 			
 }
