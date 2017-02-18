@@ -82,40 +82,36 @@ public class SimController extends ModuleController {
 		if (lastCarReported == null) {
 			throw new NoCarStatusException();
 		}
-
-		// TODO: restore block comment below after testing
-		/*
-		 * double startTimeNanos = System.nanoTime(); //run the sim! GeoCoord
-		 * startPoint =
-		 * this.mySession.getMapController().findClosestPointOnRoute(
-		 * lastReported.getLocation());
-		 * 
-		 * int targetIndex = -1; for(int i=0;
-		 * i<routeToTraverse.getTrailMarkers().size(); i++){ //TODO , in the
-		 * findClosestPointOnRoute, u find the index on route. can't u use it
-		 * here as well? instead of finding it again!!!!!
-		 * if(routeToTraverse.getTrailMarkers().get(i).equals(startPoint)){
-		 * targetIndex = i; } } int targetIndex=
-		 * this.mySession.getMapController().getClosestPointIndex();
-		 * 
-		 * if(targetIndex == -1){ throw new IllegalArgumentException(); }
-		 * if(targetIndex >= routeToTraverse.getTrailMarkers().size()-1){
-		 * this.mySession.sendNotification(new ExceptionNotification(new
-		 * IndexOutOfBoundsException(),
-		 * "ERROR: Simulation started at last point")); //can still let it go
-		 * through and calculate an empty simulation. } List<SimFrame> simFrames
-		 * = new SimEngine().runSimulation(routeToTraverse, targetIndex,
-		 * simmedForecastReport, lastCarReported, requestedSpeeds,laps);
-		 * 
-		 * double endTimeNanos = System.nanoTime();
-		 * SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(),
-		 * "Sim completed in " + ((endTimeNanos -startTimeNanos)/1000000) +
-		 * "ms");
-		 */
-
-		// TODO: comment out testing between arrows:
-		// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-		List<GeoCoord> trailMarkers = routeToTraverse.getTrailMarkers();
+		
+		//TODO: restore block comment below after testing
+		/*double startTimeNanos = System.nanoTime();
+		//run the sim! 
+		GeoCoord startPoint = this.mySession.getMapController().findClosestPointOnRoute(lastReported.getLocation());
+		
+		int targetIndex = -1;
+		for(int i=0; i<routeToTraverse.getTrailMarkers().size(); i++){ //TODO , in the findClosestPointOnRoute, u find the index on route. can't u use it here as well? instead of finding it again!!!!!
+			if(routeToTraverse.getTrailMarkers().get(i).equals(startPoint)){
+				targetIndex = i;
+			}
+		}
+		int targetIndex= this.mySession.getMapController().getClosestPointIndex();
+		
+		if(targetIndex == -1){
+			throw new IllegalArgumentException();
+		}
+		if(targetIndex >= routeToTraverse.getTrailMarkers().size()-1){
+			this.mySession.sendNotification(new ExceptionNotification(new IndexOutOfBoundsException(), "ERROR: Simulation started at last point"));
+			//can still let it go through and calculate an empty simulation.
+		}
+		List<SimFrame> simFrames = new SimEngine().runSimulation(routeToTraverse, targetIndex, simmedForecastReport, lastCarReported, requestedSpeeds,laps);
+		
+		double endTimeNanos = System.nanoTime();
+		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim completed in " + ((endTimeNanos -startTimeNanos)/1000000) + "ms");*/
+		
+		//TODO: comment out testing between arrows:
+		//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+/*		List<GeoCoord> trailMarkers = routeToTraverse.getTrailMarkers();
+>>>>>>> 674937bf1feab61d90248738463fea34b7c24874
 		GeoCoord startLoc = trailMarkers.get(0);
 		int numPoints = trailMarkers.size();
 		GeoCoord endLoc = trailMarkers.get(numPoints - 1);
@@ -142,10 +138,25 @@ public class SimController extends ModuleController {
 			System.err.println(e.getMessage());
 			// e.printStackTrace();
 		}
+<<<<<<< HEAD
 		List<SimFrame> simFrames = results.getListOfFrames();
 		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 		SimulationReport toSend = new SimulationReport(simFrames, testRequestedSpeeds, "some info");
+=======
+		List<SimFrame> simFrames = results.getListOfFrames();*/
+		//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+		
+		
+		SpeedReport results = getSpeedReport();
+		Map<GeoCoord, Map<Integer,Double>> speedProfile = new HashMap<GeoCoord, Map<Integer,Double>>();
+		for(GeoCoord k : results.getSpeedProfile().keySet()){
+			Map<Integer,Double> lapSpeed = new HashMap<Integer,Double>();
+			lapSpeed.put(1, results.getSpeedProfile().get(k));
+			speedProfile.put(k, lapSpeed);
+		}
+		SimulationReport toSend = new SimulationReport(results.getSpeedResult().getListOfFrames(),speedProfile, "some info");
+
 		this.mySession.sendNotification(new NewSimulationReportNotification(toSend));
 	}
 
