@@ -2,6 +2,12 @@
 bin/
 .settings/
 
+# IntelliJ
+.idea/
+out/
+*.iml
+*.csv
+
 # OSX
 .DS_Store
 /Output/
