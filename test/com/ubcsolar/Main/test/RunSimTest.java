@@ -34,7 +34,7 @@ public class RunSimTest {
 		theProgram = new GlobalController(true);
 		
 		theProgram.getMapController().load(new File(file));
-		theProgram.getMyWeatherController().downloadNewForecastsForRoute(10);
+		theProgram.getMyWeatherController().downloadNewForecastsForRoute(100);
 		
 		
 		theProgram.getMyCarController().adviseOfNewCarReport(RandomObjectGenerator.generateNewTelemDataPack());
