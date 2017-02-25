@@ -26,17 +26,21 @@ import com.ubcsolar.testAssistanceFiles.RandomObjectGenerator;
 
 public class RunSimTest {
 	private static GlobalController theProgram;
+	private static String file = "res\\HopeToMerritt.kml";
 	
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException, JDOMException, NoForecastReportException, NoLoadedRouteException, NoLocationReportedException, NoCarStatusException{
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Application started");
+		
 		theProgram = new GlobalController(true);
 		
-		theProgram.getMapController().load(new File("res\\UBC_to_Coquitlam.kml"));
+		theProgram.getMapController().load(new File(file));
 		theProgram.getMyWeatherController().downloadNewForecastsForRoute(10);
+		
+		
 		theProgram.getMyCarController().adviseOfNewCarReport(RandomObjectGenerator.generateNewTelemDataPack());
-		LocationReport carLocationReported = new LocationReport(new GeoCoord(49.26068,-123.24576,97.41090393066406), "raven", "generated");
+		LocationReport carLocationReported = new LocationReport(/*new GeoCoord(49.26068,-123.24576,97.41090393066406)*/theProgram.getMapController().getAllPoints().getTrailMarkers().get(0), "raven", "generated");
 		theProgram.getMapController().recordNewCarLocation(carLocationReported);
-		theProgram.getMySimController().runSimulation(new HashMap<GeoCoord, Map<Integer, Double>>(),1);
+		//theProgram.getMySimController().runSimulation(new HashMap<GeoCoord, Map<Integer, Double>>(),1);
 		
 	}
 	

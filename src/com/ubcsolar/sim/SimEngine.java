@@ -152,7 +152,6 @@ public class SimEngine {
 			prevPoint = currPoint;
 //			prevStatus = currStatus;
 		}
-		
 		double currCharge = carStartState.getStateOfCharge();
 		for(int i = 0; i < threadList.size(); i++){
 			SimEngineHelper currThread = threadList.get(i);

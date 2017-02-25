@@ -66,6 +66,7 @@ public class Route extends DataUnit{
 		this.title = title;
 		this.pointsOfIntrest = new ArrayList<PointOfInterest>(pointsOfIntrest);
 		timeCreated = System.currentTimeMillis();
+		System.out.println(trailMarkers.get(0));
 	}
 
 	public ArrayList<GeoCoord> getTrailMarkers() {
