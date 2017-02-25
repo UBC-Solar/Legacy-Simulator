@@ -86,10 +86,10 @@ public class GlobalValues {
 	
 	public static final double KMH_TO_MS_FACTOR = 10.0/36.0;
 	
-	public static final double TIRE_PRESSURE = 2.4137;
+	public static final double TIRE_PRESSURE = 1.7;
 	//in bars, equivalent to ~35 psi
 	
-	public static final double ENGINE_EFF = 0.85;
+	public static final double ENGINE_EFF = 0.4;
 	//TODO: determine a real value for this
 	
 	public static final double BATTERY_MAX_CHARGE = 20;
