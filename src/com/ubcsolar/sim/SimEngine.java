@@ -354,7 +354,7 @@ public class SimEngine {
 		
 		double changeInCharge = netPower/totalCharge*timeTaken;//in amp-hours
 		double changeInChargePerCent = changeInCharge/GlobalValues.BATTERY_MAX_CHARGE;
-		return changeInChargePerCent;
+		return changeInChargePerCent*100;
 	}
 	
 	//timeTaken is in hours
