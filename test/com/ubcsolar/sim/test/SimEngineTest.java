@@ -210,7 +210,7 @@ public class SimEngineTest {
 		assertTrue(Math.abs(testDrag5-calculatedDrag5) <= ERROR);
 	}
 	
-	@Test
+/*	@Test
 	public final void testCalculateSunPower(){
 		double carArea = (new DefaultCarModel()).getSolarPanelArea();
 
@@ -226,6 +226,6 @@ public class SimEngineTest {
 		double calculatedPower3 = GlobalValues.PANEL_EFFICIENCY * carArea * 930.9660525;
 		assertTrue(Math.abs(testPower3-calculatedPower3) <= ERROR);
 		
-	}
+	}*/
 
 }
