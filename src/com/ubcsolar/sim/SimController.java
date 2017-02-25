@@ -207,7 +207,7 @@ public class SimController extends ModuleController {
 		ArrayList<SimFrame> frames = new ArrayList<SimFrame>(); // list to store the frames from the sim results of each chunk
 		double time = 0; // total time of all the sims of each chunk
 		SpeedReport report;
-		double currentSpeed = 50.0; // may turn this into a parameter later so
+		double currentSpeed = 30.0; // may turn this into a parameter later so
 									// we can set what the starting speed is
 		int chunkNum = points.size()/50;
 		TreeMap<Integer, ForecastIO> inflectionPoints = mySession.getMyWeatherController()
@@ -217,7 +217,7 @@ public class SimController extends ModuleController {
 		testSpeedProfile.put(points.get(0), 0.0);
 		// for loop calls helper method that gets speed profiles for each small
 		// chunk of the route
-		//try{
+		try{
 			for (int i = 1; i < points.size(); i += 50) {
 				if (i + 50 < points.size()) {
 					report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + 50), simmedForecastReport,
@@ -234,9 +234,10 @@ public class SimController extends ModuleController {
 				//time += report.getSpeedResult().getTravelTime(); // increment total time
 				startTime = (long) (report.getSpeedResult().getTravelTime());
 			}
-		//}
-		//catch(IllegalArgumentException e) {//System.out.println(report.getSpeedResult());}
-		//}
+		}
+		catch(IllegalArgumentException e) {//System.out.println(report.getSpeedResult());}
+			System.out.println("Starting speed cannot make it through route");
+		}
 			
 
 		// return Speed Report with all the speed profiles and sim result with

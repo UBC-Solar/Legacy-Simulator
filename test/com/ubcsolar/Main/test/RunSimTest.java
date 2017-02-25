@@ -26,7 +26,7 @@ import com.ubcsolar.testAssistanceFiles.RandomObjectGenerator;
 
 public class RunSimTest {
 	private static GlobalController theProgram;
-	private static String file = "res\\HopeToMerritt.kml";
+	private static String file = "res\\EDC to Calgary Elevated.kml";
 	
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException, JDOMException, NoForecastReportException, NoLoadedRouteException, NoLocationReportedException, NoCarStatusException{
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Application started");
