@@ -6,11 +6,7 @@
 
 package com.ubcsolar.sim;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
@@ -200,7 +196,12 @@ public class SimController extends ModuleController {
 				.getSimmedForecastForEveryPointForLoadedRoute();
 		Route routeToTraverse = this.mySession.getMapController().getAllPoints();
 		TelemDataPacket lastCarReported = this.mySession.getMyCarController().getLastTelemDataPacket();
-		long startTime = System.currentTimeMillis() / 1000L;
+
+		long startTime = System.currentTimeMillis();
+		long currTime = System.currentTimeMillis();
+		Date currDate = new Date(currTime);
+		Date desiredDate = new Date(currDate.getYear(),currDate.getMonth(),currDate.getDate()+1,8,0);
+		long nextStartTime = desiredDate.getTime();
 
 		List<GeoCoord> points = routeToTraverse.getTrailMarkers(); // the GeoCoords of the route
 		Map<GeoCoord, Double> testSpeedProfile = new HashMap<GeoCoord, Double>(); // map to store speed profile
@@ -221,12 +222,13 @@ public class SimController extends ModuleController {
 			for (int i = 1; i < points.size(); i += 50) {
 				if (i + 50 < points.size()) {
 					report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + 50), simmedForecastReport,
-							lastCarReported, startTime, 100 - i/50*100/chunkNum, 10, inflectionPoints, currentSpeed);
+							lastCarReported, nextStartTime, 100 - i/50*100/chunkNum, 10, inflectionPoints, currentSpeed);
 					currentSpeed = report.getSpeed(); // change current speed to the speed of the car at the end of the chunk
 					lastCarReported = report.getSpeedResult().getFinalTelemData();
+					nextStartTime += report.getSpeedResult().getTravelTime();
 				} else {
 					report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, points.size()),
-							simmedForecastReport, lastCarReported, startTime, 0, 10, inflectionPoints, currentSpeed);
+							simmedForecastReport, lastCarReported, nextStartTime, 0, 10, inflectionPoints, currentSpeed);
 					// current speed is not updated since if branch is taken, it means we are at the last chunk of the road
 				}
 				testSpeedProfile.putAll(report.getSpeedProfile()); // add new speed profiles to map
