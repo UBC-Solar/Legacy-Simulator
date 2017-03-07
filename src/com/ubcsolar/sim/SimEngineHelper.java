@@ -37,10 +37,6 @@ public class SimEngineHelper extends Thread{
 	
 	@Override
 	public void run() {
-//		double distance = prevPoint.calculateDistance(currPoint);
-//		double timeIncHr = distance/speed;
-//		double timeIncMS = timeIncHr * 3600000; 
-//		currTime = prevTime + timeIncMS;
 		currWeatherPoint = parent.chooseReport(currWeather,currTime);
 		chargeDiff = parent.calculateChargeDiff(prevPoint, currPoint, 
 				currWeatherPoint, speed, timeIncHr);

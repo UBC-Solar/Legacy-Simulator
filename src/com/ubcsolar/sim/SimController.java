@@ -197,11 +197,9 @@ public class SimController extends ModuleController {
 		Route routeToTraverse = this.mySession.getMapController().getAllPoints();
 		TelemDataPacket lastCarReported = this.mySession.getMyCarController().getLastTelemDataPacket();
 
-		long startTime = System.currentTimeMillis();
-		long currTime = System.currentTimeMillis();
-		Date currDate = new Date(currTime);
-		Date desiredDate = new Date(currDate.getYear(),currDate.getMonth(),currDate.getDate()+1,8,0);
-		long nextStartTime = desiredDate.getTime();
+		Calendar currCalendar = Calendar.getInstance();
+		currCalendar.set(currCalendar.get(Calendar.YEAR), currCalendar.get(Calendar.MONTH), currCalendar.get(Calendar.DAY_OF_MONTH)+1, 8, 0);
+		long nextStartTime = currCalendar.getTimeInMillis() / 1000L;
 
 		List<GeoCoord> points = routeToTraverse.getTrailMarkers(); // the GeoCoords of the route
 		Map<GeoCoord, Double> testSpeedProfile = new HashMap<GeoCoord, Double>(); // map to store speed profile
@@ -210,6 +208,7 @@ public class SimController extends ModuleController {
 		SpeedReport report;
 		double currentSpeed = 30.0; // may turn this into a parameter later so
 									// we can set what the starting speed is
+									// also it's in km/h
 		int chunkNum = points.size()/50;
 		TreeMap<Integer, ForecastIO> inflectionPoints = mySession.getMyWeatherController()
 				.findInflectionPoints(routeToTraverse, currentForecastReport.getForecasts());
@@ -234,7 +233,7 @@ public class SimController extends ModuleController {
 				testSpeedProfile.putAll(report.getSpeedProfile()); // add new speed profiles to map
 				frames.addAll(report.getSpeedResult().getListOfFrames()); // add sim frames to list
 				//time += report.getSpeedResult().getTravelTime(); // increment total time
-				startTime = (long) (report.getSpeedResult().getTravelTime());
+				//startTime = (long) (report.getSpeedResult().getTravelTime());
 			}
 		}
 		catch(IllegalArgumentException e) {//System.out.println(report.getSpeedResult());}
