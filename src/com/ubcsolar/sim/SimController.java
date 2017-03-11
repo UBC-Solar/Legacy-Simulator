@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.TreeMap;
 
 import com.github.dvdme.ForecastIOLib.ForecastIO;
@@ -207,39 +208,53 @@ public class SimController extends ModuleController {
 		ArrayList<SimFrame> frames = new ArrayList<SimFrame>(); // list to store the frames from the sim results of each chunk
 		double time = 0; // total time of all the sims of each chunk
 		SpeedReport report;
-		double currentSpeed = 30.0; // may turn this into a parameter later so
+		double currentSpeed = 50.0; // may turn this into a parameter later so
 									// we can set what the starting speed is
-		int chunkNum = points.size()/50;
+		int chunk_per_forecast = 5; 
+		
+		int chunkStart = 0;
 		TreeMap<Integer, ForecastIO> inflectionPoints = mySession.getMyWeatherController()
 				.findInflectionPoints(routeToTraverse, currentForecastReport.getForecasts());
-		
 
 		testSpeedProfile.put(points.get(0), 0.0);
-		// for loop calls helper method that gets speed profiles for each small
-		// chunk of the route
-		try{
-			for (int i = 1; i < points.size(); i += 50) {
-				if (i + 50 < points.size()) {
-					report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + 50), simmedForecastReport,
-							lastCarReported, startTime, 100 - i/50*100/chunkNum, 10, inflectionPoints, currentSpeed);
+	try{
+			for (int chunkEnd : inflectionPoints.keySet()) {
+				int points_per_chunk = (chunkEnd - chunkStart + 1)/chunk_per_forecast;
+				
+				for (int i = chunkStart; i < chunkEnd; i += points_per_chunk ) {
+					if (i + points_per_chunk < chunkEnd) {
+						report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + points_per_chunk), simmedForecastReport,
+								lastCarReported, startTime, 1, 10, inflectionPoints.get(chunkEnd), currentSpeed);
+					}
+					else {
+						report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, chunkEnd), simmedForecastReport,
+								lastCarReported, startTime, 1, 10, inflectionPoints.get(chunkEnd), currentSpeed);
+					}
+					
 					currentSpeed = report.getSpeed(); // change current speed to the speed of the car at the end of the chunk
 					lastCarReported = report.getSpeedResult().getFinalTelemData();
-				} else {
-					report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, points.size()),
-							simmedForecastReport, lastCarReported, startTime, 0, 10, inflectionPoints, currentSpeed);
-					// current speed is not updated since if branch is taken, it means we are at the last chunk of the road
+					testSpeedProfile.putAll(report.getSpeedProfile()); // add new speed profiles to map
+					frames.addAll(report.getSpeedResult().getListOfFrames()); // add sim frames to list
+					//time += report.getSpeedResult().getTravelTime(); // increment total time
+					startTime = (long) (report.getSpeedResult().getTravelTime());
 				}
-				testSpeedProfile.putAll(report.getSpeedProfile()); // add new speed profiles to map
-				frames.addAll(report.getSpeedResult().getListOfFrames()); // add sim frames to list
-				//time += report.getSpeedResult().getTravelTime(); // increment total time
-				startTime = (long) (report.getSpeedResult().getTravelTime());
+				chunkStart = chunkEnd;	
 			}
-		}
-		catch(IllegalArgumentException e) {//System.out.println(report.getSpeedResult());}
-			System.out.println("Starting speed cannot make it through route");
-		}
 			
-
+			if (inflectionPoints.size() != 1) {
+			report = getSpeedProfileForChunk(routeToTraverse, points.subList(chunkStart, points.size() - 1), simmedForecastReport,
+					lastCarReported, startTime, 1, 10, currentForecastReport.getForecasts().get(inflectionPoints.size()), currentSpeed);
+			lastCarReported = report.getSpeedResult().getFinalTelemData();
+			testSpeedProfile.putAll(report.getSpeedProfile()); // add new speed profiles to map
+			frames.addAll(report.getSpeedResult().getListOfFrames()); // add sim frames to list
+			//time += report.getSpeedResult().getTravelTime(); // increment total time
+			}
+			
+		}
+		catch(NotEnoughChargeException e) {
+			System.err.println("Starting speed cannot make it through route");
+		}
+		
 		// return Speed Report with all the speed profiles and sim result with
 		// all the frames and total time from each chunk
 		return new SpeedReport(testSpeedProfile, new SimResult(frames, time, lastCarReported), currentSpeed);
@@ -272,10 +287,11 @@ public class SimController extends ModuleController {
 	 * @param startingSpeed:
 	 *            initial speed of the car
 	 * @return SpeedReport that has speed profile and sim results
+	 * @throws NotEnoughChargeException 
 	 */
 	private SpeedReport getSpeedProfileForChunk(Route routeToTraverse, List<GeoCoord> chunk,
 		ForecastReport simmedForecastReport, TelemDataPacket lastCarReported, long startTime, int lapNum,
-		double minCharge, TreeMap<Integer, ForecastIO> inflectionPoints, double startingSpeed) {
+		double minCharge, /*TreeMap<Integer, ForecastIO> inflectionPoints*/ ForecastIO inflectionPoint, double startingSpeed) throws NotEnoughChargeException {
 		
 		Map<GeoCoord, Double> speeds = new HashMap<GeoCoord, Double>();
 		SimResult results = new SimResult(new ArrayList<SimFrame>(), 10, lastCarReported);
@@ -294,7 +310,7 @@ public class SimController extends ModuleController {
 			try {
 				// run sim from start of chunk to end of chunk
 				results = new SimEngine().runSimV2(routeToTraverse, chunk.get(0), chunk.get(chunk.size() - 1),
-						simmedForecastReport, lastCarReported, speeds, startTime, 1, 10, inflectionPoints);
+						simmedForecastReport, lastCarReported, speeds, startTime, 1, 10, inflectionPoint);
 				validprofile = true;
 			}
 
@@ -303,8 +319,8 @@ public class SimController extends ModuleController {
 				for (GeoCoord g : speeds.keySet()) {
 					// if the speed is at 0 (there is no way for the car to make it through the chunk given the amount of charge), throw an exception
 					if (speed <= 0) {
-						throw new IllegalArgumentException("speed cannot make it through the whole route");
-					}
+						throw new NotEnoughChargeException(0,0, "speed cannot make it through the whole route");
+				 	}
 					
 					speed -= 10;
 					System.out.println("DECELERATING TO " + speed);
