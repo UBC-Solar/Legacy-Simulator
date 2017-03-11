@@ -113,6 +113,7 @@ public class SimEngine {
 		TelemDataPacket prevStatus = carStartState;
 		TelemDataPacket currStatus = prevStatus;
 		List<SimEngineHelper> threadList = new ArrayList<SimEngineHelper>();
+		double currCharge = carStartState.getStateOfCharge();
 		for (int i = startingIndex + 1; i <= endingIndex; i++) {
 			currPoint = toTraverse.getTrailMarkers().get(i);
 
@@ -130,38 +131,19 @@ public class SimEngine {
 					checkNextForecast = false;
 			}
 
-			SimEngineHelper currThread = new SimEngineHelper(speed, prevPoint, currPoint, currTime, currWeather, this,
-					timeIncHr);
-			currThread.run();
-			threadList.add(currThread);
-			// FIODataPoint currWeatherPoint =
-			// chooseReport(currWeather,currTime);
-			// currStatus = this.calculateNewTelemPacket(prevStatus, prevPoint,
-			// currPoint, currWeatherPoint, speed, timeIncHr);
-			//
-			// if(currStatus.getStateOfCharge()<minCharge){
-			// String message = "Speed profile uses too much charge. Desired end
-			// charge is " + minCharge + ", actual end charge is" +
-			// currStatus.getStateOfCharge();
-			// throw new NotEnoughChargeException(currStatus.getStateOfCharge(),
-			// minCharge, message);
-			// }
-
-			// LocationReport currLocReport = new LocationReport(currPoint,
-			// "Raven", "Simmed");
-			//
-			// SimFrame currSimFrame = new
-			// SimFrame(currWeatherPoint,currStatus,currLocReport,currTime,lapNum);
-			// listOfFrames.add(currSimFrame);
-
-			prevPoint = currPoint;
-			// prevStatus = currStatus;
-		}
-
-		double currCharge = carStartState.getStateOfCharge();
-		for (int i = 0; i < threadList.size(); i++) {
-			SimEngineHelper currThread = threadList.get(i);
-			currCharge += currThread.getChargeDiff();
+//			SimEngineHelper currThread = new SimEngineHelper(speed, prevPoint, currPoint, currTime, currWeather, this,
+//					timeIncHr);
+//			currThread.run();
+//			threadList.add(currThread);
+			FIODataPoint currWeatherPoint = chooseReport(currWeather, currTime);
+			JsonObject dailyData = (JsonObject) ((JsonArray) currWeather.getDaily().get("data")).get(0);
+			long sunriseTime = Long.parseLong(dailyData.get("sunriseTime").toString());
+			long sunsetTime = Long.parseLong(dailyData.get("sunsetTime").toString());
+			double latitude = currPoint.getLat();
+			double chargeDiff = calculateChargeDiff(prevPoint, currPoint,
+					currWeatherPoint, speed, timeIncHr, sunriseTime, sunsetTime, latitude, currTime);
+			currCharge += chargeDiff;
+			System.out.println("i: " + i + " chargeDiff: " + chargeDiff);
 			if (currCharge > 100)
 				currCharge = 100;
 			if (currCharge < 0)
@@ -170,21 +152,45 @@ public class SimEngine {
 				String message = "Speed profile uses too much charge. Drops below minimum charge of " + minCharge;
 				throw new NotEnoughChargeException(currCharge, minCharge, message);
 			}
-			if (i % 20 == 0 || i == threadList.size() - 1) {
-				currStatus = new TelemDataPacket(currThread.getSpeed(), carStartState.getTotalVoltage(),
-						carStartState.getTemperatures(), carStartState.getCellVoltages(), currCharge);
-				LocationReport currLocReport = new LocationReport(currThread.getCurrPoint(), "Raven", "Simmed");
-				SimFrame currSimFrame = new SimFrame(currThread.getWeatherPoint(), currStatus, currLocReport,
-						currThread.getNewTime(), lapNum);
-				listOfFrames.add(currSimFrame);
-			}
-			try {
-				currThread.join();
-			} catch (InterruptedException e) {
-				System.err.println("there was a thread problem in RunSimV2 (something got interrupted by something)");
-				e.printStackTrace();
-			}
+
+			currStatus = new TelemDataPacket(speed, carStartState.getTotalVoltage(), carStartState.getTemperatures(),
+					carStartState.getCellVoltages(), currCharge);
+
+			LocationReport currLocReport = new LocationReport(currPoint, "Raven", "Simmed");
+
+			SimFrame currSimFrame = new SimFrame(currWeatherPoint, currStatus, currLocReport, currTime, lapNum);
+			listOfFrames.add(currSimFrame);
+
+			prevPoint = currPoint;
 		}
+
+//		double currCharge = carStartState.getStateOfCharge();
+//		for (int i = 0; i < threadList.size(); i++) {
+//			SimEngineHelper currThread = threadList.get(i);
+//			currCharge += currThread.getChargeDiff();
+//			if (currCharge > 100)
+//				currCharge = 100;
+//			if (currCharge < 0)
+//				currCharge = 0;
+//			if (currCharge <= minCharge) {
+//				String message = "Speed profile uses too much charge. Drops below minimum charge of " + minCharge;
+//				throw new NotEnoughChargeException(currCharge, minCharge, message);
+//			}
+//			if (i % 20 == 0 || i == threadList.size() - 1) {
+//				currStatus = new TelemDataPacket(currThread.getSpeed(), carStartState.getTotalVoltage(),
+//						carStartState.getTemperatures(), carStartState.getCellVoltages(), currCharge);
+//				LocationReport currLocReport = new LocationReport(currThread.getCurrPoint(), "Raven", "Simmed");
+//				SimFrame currSimFrame = new SimFrame(currThread.getWeatherPoint(), currStatus, currLocReport,
+//						currThread.getNewTime(), lapNum);
+//				listOfFrames.add(currSimFrame);
+//			}
+//			try {
+//				currThread.join();
+//			} catch (InterruptedException e) {
+//				System.err.println("there was a thread problem in RunSimV2 (something got interrupted by something)");
+//				e.printStackTrace();
+//			}
+//		}
 
 		SimResult result = new SimResult(listOfFrames, currTime, currStatus);
 
