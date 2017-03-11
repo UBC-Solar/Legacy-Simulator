@@ -7,6 +7,7 @@
 package com.ubcsolar.sim;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -201,7 +202,10 @@ public class SimController extends ModuleController {
 				.getSimmedForecastForEveryPointForLoadedRoute();
 		Route routeToTraverse = this.mySession.getMapController().getAllPoints();
 		TelemDataPacket lastCarReported = this.mySession.getMyCarController().getLastTelemDataPacket();
-		long startTime = System.currentTimeMillis() / 1000L;
+
+		Calendar currCalendar = Calendar.getInstance();
+		currCalendar.set(currCalendar.get(Calendar.YEAR), currCalendar.get(Calendar.MONTH), currCalendar.get(Calendar.DAY_OF_MONTH)+1, 8, 0);
+		long nextStartTime = currCalendar.getTimeInMillis() / 1000L;
 
 		List<GeoCoord> points = routeToTraverse.getTrailMarkers(); // the GeoCoords of the route
 		Map<GeoCoord, Double> testSpeedProfile = new HashMap<GeoCoord, Double>(); // map to store speed profile
@@ -210,13 +214,16 @@ public class SimController extends ModuleController {
 		SpeedReport report;
 		double currentSpeed = 50.0; // may turn this into a parameter later so
 									// we can set what the starting speed is
+
 		int chunk_per_forecast = 5; 
 		
 		int chunkStart = 0;
+
 		TreeMap<Integer, ForecastIO> inflectionPoints = mySession.getMyWeatherController()
 				.findInflectionPoints(routeToTraverse, currentForecastReport.getForecasts());
 
 		testSpeedProfile.put(points.get(0), 0.0);
+
 	try{
 			for (int chunkEnd : inflectionPoints.keySet()) {
 				int points_per_chunk = (chunkEnd - chunkStart + 1)/chunk_per_forecast;
