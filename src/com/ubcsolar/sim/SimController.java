@@ -200,11 +200,12 @@ public class SimController extends ModuleController {
 		Calendar currCalendar = Calendar.getInstance();
 		currCalendar.set(currCalendar.get(Calendar.YEAR), currCalendar.get(Calendar.MONTH), currCalendar.get(Calendar.DAY_OF_MONTH)+1, 8, 0);
 		long nextStartTime = currCalendar.getTimeInMillis() / 1000L;
+		long lastStartTime;
 
 		List<GeoCoord> points = routeToTraverse.getTrailMarkers(); // the GeoCoords of the route
 		Map<GeoCoord, Double> testSpeedProfile = new HashMap<GeoCoord, Double>(); // map to store speed profile
 		ArrayList<SimFrame> frames = new ArrayList<SimFrame>(); // list to store the frames from the sim results of each chunk
-		double time = 0; // total time of all the sims of each chunk
+		long time = 0; // total time of all the sims of each chunk
 		SpeedReport report;
 		double currentSpeed = 30.0; // may turn this into a parameter later so
 									// we can set what the starting speed is
@@ -220,11 +221,13 @@ public class SimController extends ModuleController {
 		try{
 			for (int i = 1; i < points.size(); i += 50) {
 				if (i + 50 < points.size()) {
+					System.out.println(nextStartTime);
 					report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + 50), simmedForecastReport,
 							lastCarReported, nextStartTime, 100 - i/50*100/chunkNum, 10, inflectionPoints, currentSpeed);
 					currentSpeed = report.getSpeed(); // change current speed to the speed of the car at the end of the chunk
 					lastCarReported = report.getSpeedResult().getFinalTelemData();
-					nextStartTime += report.getSpeedResult().getTravelTime();
+					lastStartTime = nextStartTime;
+					nextStartTime += (report.getSpeedResult().getTravelTime()-lastStartTime);
 				} else {
 					report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, points.size()),
 							simmedForecastReport, lastCarReported, nextStartTime, 0, 10, inflectionPoints, currentSpeed);
@@ -233,7 +236,7 @@ public class SimController extends ModuleController {
 				testSpeedProfile.putAll(report.getSpeedProfile()); // add new speed profiles to map
 				frames.addAll(report.getSpeedResult().getListOfFrames()); // add sim frames to list
 				//time += report.getSpeedResult().getTravelTime(); // increment total time
-				//startTime = (long) (report.getSpeedResult().getTravelTime());
+				//nextStartTime = (long) (report.getSpeedResult().getTravelTime());
 			}
 		}
 		catch(IllegalArgumentException e) {//System.out.println(report.getSpeedResult());}
