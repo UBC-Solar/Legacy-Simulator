@@ -734,7 +734,7 @@ public class WeatherController extends ModuleController {
 		TreeMap<Integer,ForecastIO> inflectionPoints = new TreeMap<Integer,ForecastIO>();
 		List<GeoCoord> routePoints = toTraverse.getTrailMarkers();
 		if(forecasts.size()==1){
-			inflectionPoints.put(routePoints.size(), forecasts.get(0));
+			inflectionPoints.put(routePoints.size() - 1, forecasts.get(0));
 			return inflectionPoints;
 		}
 	
@@ -758,6 +758,9 @@ public class WeatherController extends ModuleController {
 				if(forecastIndex==forecasts.size()){
 					break;
 				}
+				currForecastPoint = nextForecastPoint;
+				nextForecast = forecasts.get(forecastIndex);
+				nextForecastPoint = new GeoCoord(nextForecast.getLatitude(),nextForecast.getLongitude(),0);
 			}
 		}
 		if(forecastIndex < forecasts.size()){

@@ -74,7 +74,7 @@ public class SimEngine {
 	public SimResult runSimV2(Route toTraverse, GeoCoord startLoc, GeoCoord endLoc,
 			ForecastReport report, TelemDataPacket carStartState,
 			Map<GeoCoord,Double> speedProfile, long startTime, int lapNum, double minCharge,
-			TreeMap<Integer,ForecastIO> inflectionPoints) throws NotEnoughChargeException{
+			ForecastIO inflectionPoint) throws NotEnoughChargeException{
 		
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim v2 starting");
 		
@@ -88,17 +88,8 @@ public class SimEngine {
 		}
 		
 		List<ForecastIO> forecastList = report.getForecasts();
-		
-		NavigableSet<Integer> inflectionIndices = inflectionPoints.navigableKeySet();
-		Integer inflectionIndex = inflectionIndices.first();
-		ForecastIO currWeather = inflectionPoints.get(inflectionIndex);
-		boolean checkNextForecast = true;
-		
-		inflectionIndex = inflectionIndices.higher(inflectionIndex);
-		if(inflectionIndex == null)
-			checkNextForecast = false;
 
-		FIODataPoint startWeatherPoint = chooseReport(currWeather,startTime);
+		FIODataPoint startWeatherPoint = chooseReport(inflectionPoint,startTime);
 		LocationReport startLocationReport = new LocationReport(currPoint, "Raven", "Simmed");
 		totalCharge = carStartState.getTotalVoltage();
 		SimFrame startSimFrame = new SimFrame(startWeatherPoint,carStartState,startLocationReport,startTime,lapNum);
@@ -118,16 +109,10 @@ public class SimEngine {
 			double timeIncHr = distance/speed;
 			double timeIncMS = timeIncHr * 3600000;
 			currTime += timeIncMS;
-			if(checkNextForecast && i >= inflectionIndex){
-				currWeather = inflectionPoints.get(inflectionIndex);
-				inflectionIndex = inflectionIndices.higher(inflectionIndex);
-				if(inflectionIndex == null)
-					checkNextForecast = false;
-			}
 			
 			
 			SimEngineHelper currThread = new SimEngineHelper(speed,prevPoint,currPoint,
-					currTime,currWeather,this,timeIncHr);
+					currTime,inflectionPoint,this,timeIncHr);
 			currThread.run();
 			threadList.add(currThread);
 //			FIODataPoint currWeatherPoint = chooseReport(currWeather,currTime);
