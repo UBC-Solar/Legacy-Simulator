@@ -786,7 +786,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				GeoCoord thisPosition = temp.getGPSReport().getLocation();
 				runningTotalDistance += lastPosition.calculateDistance(thisPosition);
 				toReturn[xValues][i] = runningTotalDistance;
-				toReturn[yValues][i] = (((temp.getRepresentedTime() - startTime)/1000)/60);
+				toReturn[yValues][i] = (((temp.getRepresentedTime() - startTime))/60);
 			}
 			
 			return toReturn;
