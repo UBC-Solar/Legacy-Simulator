@@ -199,7 +199,7 @@ public class SimController extends ModuleController {
 
 		Calendar currCalendar = Calendar.getInstance();
 		currCalendar.set(currCalendar.get(Calendar.YEAR), currCalendar.get(Calendar.MONTH), currCalendar.get(Calendar.DAY_OF_MONTH)+1, 8, 0);
-		long nextStartTime = currCalendar.getTimeInMillis() / 1000L;
+		long nextStartTime = currCalendar.getTimeInMillis();
 
 		List<GeoCoord> points = routeToTraverse.getTrailMarkers(); // the GeoCoords of the route
 		Map<GeoCoord, Double> testSpeedProfile = new HashMap<GeoCoord, Double>(); // map to store speed profile
@@ -232,8 +232,6 @@ public class SimController extends ModuleController {
 				testSpeedProfile.putAll(report.getSpeedProfile()); // add new speed profiles to map
 				frames.addAll(report.getSpeedResult().getListOfFrames()); // add sim frames to list
 				totalTime += report.getSpeedResult().getTravelTime();
-				//time += report.getSpeedResult().getTravelTime(); // increment total time
-				//nextStartTime = (long) (report.getSpeedResult().getTravelTime());
 			}
 		}
 		catch(IllegalArgumentException e) {
@@ -243,7 +241,7 @@ public class SimController extends ModuleController {
 
 		// return Speed Report with all the speed profiles and sim result with
 		// all the frames and total time from each chunk
-		return new SpeedReport(testSpeedProfile, new SimResult(frames, totalTime*1000L, lastCarReported), currentSpeed);
+		return new SpeedReport(testSpeedProfile, new SimResult(frames, totalTime, lastCarReported), currentSpeed);
 	}
 
 	/**

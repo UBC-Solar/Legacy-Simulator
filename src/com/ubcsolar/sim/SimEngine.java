@@ -78,8 +78,6 @@ public class SimEngine {
 		
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim v2 starting");
 		
-		//SimResult result = new SimResult(carStartState);
-		
 		int startingIndex = toTraverse.getIndexOfClosestPoint(startLoc);
 		int endingIndex = toTraverse.getIndexOfClosestPoint(endLoc);
 		
@@ -99,8 +97,7 @@ public class SimEngine {
 		inflectionIndex = inflectionIndices.higher(inflectionIndex);
 		if(inflectionIndex == null)
 			checkNextForecast = false;
-		
-		//ForecastIO startWeather = forecastList.get(startingIndex);
+
 		FIODataPoint startWeatherPoint = chooseReport(currWeather,startTime);
 		LocationReport startLocationReport = new LocationReport(currPoint, "Raven", "Simmed");
 		totalCharge = carStartState.getTotalVoltage();
@@ -118,13 +115,9 @@ public class SimEngine {
 			
 			double speed = speedProfile.get(currPoint);
 			double distance = prevPoint.calculateDistance(currPoint);
-			System.out.println("distance: " + distance);
 			double timeIncHr = distance/speed;
-			double timeIncSec = timeIncHr * 3600;
-			System.out.println("timeIncSec: " + timeIncSec);
-			currTime += timeIncSec;
-			System.out.println("currTime: " + currTime);
-			//ForecastIO currWeather = forecastList.get(i);
+			double timeIncMS = timeIncHr * 3600000;
+			currTime += timeIncMS;
 			if(checkNextForecast && i >= inflectionIndex){
 				currWeather = inflectionPoints.get(inflectionIndex);
 				inflectionIndex = inflectionIndices.higher(inflectionIndex);
