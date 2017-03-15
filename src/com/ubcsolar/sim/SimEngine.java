@@ -63,7 +63,7 @@ public class SimEngine {
 	 * @param speedProfile: A map that matches each GeoCoord between startLoc and endLoc with the
 	 * 	speed (in km/h) to be simulated during that interval. Currently, this is the limitation that prevents
 	 * 	simulating multiple laps (to avoid double mapping GeoCoords)
-	 * @param startTime: The time at which the race will begin (in Unix format, i.e. ms from 1/1/70)
+	 * @param startTime: The time at which the race will begin (in Unix format, i.e. s from 1/1/70)
 	 * @param lapNum: The lap that the simulation is simulating
 	 * @param minCharge: The minimum percentage of charge that is acceptable at the end of this segment
 	 * 	of the race
@@ -118,10 +118,12 @@ public class SimEngine {
 			
 			double speed = speedProfile.get(currPoint);
 			double distance = prevPoint.calculateDistance(currPoint);
+			System.out.println("distance: " + distance);
 			double timeIncHr = distance/speed;
 			double timeIncSec = timeIncHr * 3600;
+			System.out.println("timeIncSec: " + timeIncSec);
 			currTime += timeIncSec;
-			
+			System.out.println("currTime: " + currTime);
 			//ForecastIO currWeather = forecastList.get(i);
 			if(checkNextForecast && i >= inflectionIndex){
 				currWeather = inflectionPoints.get(inflectionIndex);
@@ -180,7 +182,7 @@ public class SimEngine {
 			}
 		}
 		
-		SimResult result = new SimResult(listOfFrames,currTime,currStatus);
+		SimResult result = new SimResult(listOfFrames,currTime-startTime,currStatus);
 		
 		return result;
 		
