@@ -828,7 +828,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				toReturn[xValues][i] = runningTotalDistance;
 				Double value = temp.getForecast().cloudCover()*100; //convert to %.
 				toReturn[yValues][i] = value.intValue(); //to drop unneeded digits in scale
-				System.out.println(runningTotalDistance + "\t" + value.intValue());
 			}
 			
 			return toReturn;

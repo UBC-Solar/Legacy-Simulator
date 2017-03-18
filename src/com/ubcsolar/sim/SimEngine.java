@@ -74,8 +74,6 @@ public class SimEngine {
 			ForecastReport report, TelemDataPacket carStartState,
 			Map<GeoCoord,Double> speedProfile, long startTime, int lapNum, double minCharge,
 			ForecastIO inflectionPoint) throws NotEnoughChargeException{
-		
-		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim v2 starting");
 
 		int startingIndex = toTraverse.getIndexOfClosestPoint(startLoc);
 		int endingIndex = toTraverse.getIndexOfClosestPoint(endLoc);
