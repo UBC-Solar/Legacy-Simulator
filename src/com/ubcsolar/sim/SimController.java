@@ -214,7 +214,7 @@ public class SimController extends ModuleController {
 		double currentSpeed = 50.0; // may turn this into a parameter later so
 									// we can set what the starting speed is
 		
-		int chunk_per_forecast = 5; 
+		int chunk_per_forecast = 50; 
 		
 		int chunkStart = 0;
 
