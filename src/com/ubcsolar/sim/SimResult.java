@@ -8,10 +8,10 @@ import com.ubcsolar.common.TelemDataPacket;
 
 public class SimResult {
 	private List<SimFrame> listOfFrames;
-	private double travelTime;
+	private long travelTime;
 	private TelemDataPacket endTelemData;
 	
-	public SimResult(List<SimFrame> frameList, double totalTime, TelemDataPacket endPacket){
+	public SimResult(List<SimFrame> frameList, long totalTime, TelemDataPacket endPacket){
 		listOfFrames = frameList;
 		travelTime = totalTime;
 		endTelemData = endPacket;
@@ -21,7 +21,7 @@ public class SimResult {
 		return listOfFrames;
 	}
 	
-	public double getTravelTime(){
+	public long getTravelTime(){
 		return travelTime;
 	}
 	

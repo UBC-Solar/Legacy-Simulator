@@ -63,7 +63,7 @@ public class SimEngine {
 	 * @param speedProfile: A map that matches each GeoCoord between startLoc and endLoc with the
 	 * 	speed (in km/h) to be simulated during that interval. Currently, this is the limitation that prevents
 	 * 	simulating multiple laps (to avoid double mapping GeoCoords)
-	 * @param startTime: The time at which the race will begin (in Unix format, i.e. ms from 1/1/70)
+	 * @param startTime: The time at which the race will begin (in Unix format, i.e. s from 1/1/70)
 	 * @param lapNum: The lap that the simulation is simulating
 	 * @param minCharge: The minimum percentage of charge that is acceptable at the end of this segment
 	 * 	of the race
@@ -78,8 +78,6 @@ public class SimEngine {
 		
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim v2 starting");
 		
-		//SimResult result = new SimResult(carStartState);
-		
 		int startingIndex = toTraverse.getIndexOfClosestPoint(startLoc);
 		int endingIndex = toTraverse.getIndexOfClosestPoint(endLoc);
 		
@@ -90,17 +88,7 @@ public class SimEngine {
 		}
 		
 		List<ForecastIO> forecastList = report.getForecasts();
-		/*
-		NavigableSet<Integer> inflectionIndices = inflectionPoints.navigableKeySet();
-		Integer inflectionIndex = inflectionIndices.first();
-		ForecastIO currWeather = inflectionPoints.get(inflectionIndex);
-		boolean checkNextForecast = true;
-		
-		inflectionIndex = inflectionIndices.higher(inflectionIndex);
-		if(inflectionIndex == null)
-			checkNextForecast = false;
-		*/
-		//ForecastIO startWeather = forecastList.get(startingIndex);
+
 		FIODataPoint startWeatherPoint = chooseReport(inflectionPoint,startTime);
 		LocationReport startLocationReport = new LocationReport(currPoint, "Raven", "Simmed");
 		totalCharge = carStartState.getTotalVoltage();
@@ -119,17 +107,8 @@ public class SimEngine {
 			double speed = speedProfile.get(currPoint);
 			double distance = prevPoint.calculateDistance(currPoint);
 			double timeIncHr = distance/speed;
-
-			double timeIncSec = timeIncHr * 3600;
-			currTime += timeIncSec;
-			/*
-			//ForecastIO currWeather = forecastList.get(i);
-			if(checkNextForecast && i >= inflectionIndex){
-				currWeather = inflectionPoints.get(inflectionIndex);
-				inflectionIndex = inflectionIndices.higher(inflectionIndex);
-				if(inflectionIndex == null)
-					checkNextForecast = false;
-			}*/
+			double timeIncMS = timeIncHr * 3600000;
+			currTime += timeIncMS;
 			
 			
 			SimEngineHelper currThread = new SimEngineHelper(speed,prevPoint,currPoint,
@@ -181,7 +160,7 @@ public class SimEngine {
 			}
 		}
 		
-		SimResult result = new SimResult(listOfFrames,currTime,currStatus);
+		SimResult result = new SimResult(listOfFrames,currTime-startTime,currStatus);
 		
 		return result;
 		
