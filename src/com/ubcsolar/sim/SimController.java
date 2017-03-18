@@ -214,30 +214,33 @@ public class SimController extends ModuleController {
 		SpeedReport report;
 		double currentSpeed = 50.0; // may turn this into a parameter later so
 									// we can set what the starting speed is
-
+		
 		int chunk_per_forecast = 5; 
 		
 		int chunkStart = 0;
 
 		TreeMap<Integer, ForecastIO> inflectionPoints = mySession.getMyWeatherController()
 				.findInflectionPoints(routeToTraverse, currentForecastReport.getForecasts());
-
+		
 		testSpeedProfile.put(points.get(0), 0.0);
-
-	try{
+		points.subList(0, points.size());
+	
+		try{
 			for (int chunkEnd : inflectionPoints.keySet()) {
 				int points_per_chunk = (chunkEnd - chunkStart + 1)/chunk_per_forecast;
+				int remainder = (chunkEnd - chunkStart + 1)%points_per_chunk;
 				
 				for (int i = chunkStart; i < chunkEnd; i += points_per_chunk ) {
-					if (i + points_per_chunk < chunkEnd) {
+					if (remainder > 0) {
+						report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + points_per_chunk + 1), simmedForecastReport,
+								lastCarReported, startTime, 1, 10, inflectionPoints.get(chunkEnd), currentSpeed);
+						i++;
+						remainder--;
+					}
+					else {
 						report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + points_per_chunk), simmedForecastReport,
 								lastCarReported, startTime, 1, 10, inflectionPoints.get(chunkEnd), currentSpeed);
 					}
-					else {
-						report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, chunkEnd), simmedForecastReport,
-								lastCarReported, startTime, 1, 10, inflectionPoints.get(chunkEnd), currentSpeed);
-					}
-					
 					currentSpeed = report.getSpeed(); // change current speed to the speed of the car at the end of the chunk
 					lastCarReported = report.getSpeedResult().getFinalTelemData();
 					testSpeedProfile.putAll(report.getSpeedProfile()); // add new speed profiles to map
@@ -245,11 +248,11 @@ public class SimController extends ModuleController {
 					//time += report.getSpeedResult().getTravelTime(); // increment total time
 					startTime = (long) (report.getSpeedResult().getTravelTime());
 				}
-				chunkStart = chunkEnd;	
+				chunkStart = ++chunkEnd;	
 			}
 			
 			if (inflectionPoints.size() != 1) {
-			report = getSpeedProfileForChunk(routeToTraverse, points.subList(chunkStart, points.size() - 1), simmedForecastReport,
+			report = getSpeedProfileForChunk(routeToTraverse, points.subList(chunkStart, points.size()), simmedForecastReport,
 					lastCarReported, startTime, 1, 10, currentForecastReport.getForecasts().get(inflectionPoints.size()), currentSpeed);
 			lastCarReported = report.getSpeedResult().getFinalTelemData();
 			testSpeedProfile.putAll(report.getSpeedProfile()); // add new speed profiles to map
