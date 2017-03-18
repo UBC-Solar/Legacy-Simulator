@@ -327,13 +327,12 @@ public class SimController extends ModuleController {
 			catch (NotEnoughChargeException e) {
 				// go through map and change speeds if theres not enough charge
 				speed -= .5;
+				System.out.println("DECELERATING TO " + speed);
 				for (GeoCoord g : speeds.keySet()) {
 					// if the speed is at 0 (there is no way for the car to make it through the chunk given the amount of charge), throw an exception
 					if (speed <= 0) {
 						throw new NotEnoughChargeException(0,0, "speed cannot make it through the whole route");
 				 	}
-					
-					System.out.println("DECELERATING TO " + speed);
 					speeds.replace(g, speed);
 				}
 			}

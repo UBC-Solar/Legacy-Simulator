@@ -32,11 +32,9 @@ public class RunSimTest {
 		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Application started");
 		
 		theProgram = new GlobalController(true);
-		
+
 		theProgram.getMapController().load(new File(file));
 		theProgram.getMyWeatherController().downloadNewForecastsForRoute(100);
-		
-		
 		theProgram.getMyCarController().adviseOfNewCarReport(RandomObjectGenerator.generateNewTelemDataPack());
 		LocationReport carLocationReported = new LocationReport(/*new GeoCoord(49.26068,-123.24576,97.41090393066406)*/theProgram.getMapController().getAllPoints().getTrailMarkers().get(0), "raven", "generated");
 		theProgram.getMapController().recordNewCarLocation(carLocationReported);
