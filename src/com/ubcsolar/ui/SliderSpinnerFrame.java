@@ -99,9 +99,9 @@ public class SliderSpinnerFrame extends JPanel {
 		topLabel.setText(labelAtTheTop);
 		panel.add(topLabel, BorderLayout.NORTH);
 		updateSelectors();
-		if(currentValue < 1){
-			System.out.println("Slider pane initial value: " + initialValue);
-		}
+//		if(currentValue < 1){
+//			System.out.println("Slider pane initial value: " + initialValue);
+//		}
 	}
 
 	public int getValue(){

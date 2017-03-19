@@ -71,19 +71,28 @@ public class GlobalValues {
 	public static final String WEATHER_UNITS = ForecastIO.UNITS_CA;
 	
 	public static final String WEATHER_LANG = ForecastIO.LANG_ENGLISH;
-	
-	public static final double PANEL_EFFICIENCY = 0.75;
+
+	public static final double PANEL_EFFICIENCY = 0.1;
 	//TODO: measure this somehow
 	
-	public static final double DRAG_COEFF = 1.0;
+	public static final double DRAG_COEFF = 0.7;
 	//TODO: get someone else to measure this
 	
-	public static final double CAR_CROSS_SECTIONAL_AREA = 1.0;
+	public static final double CAR_CROSS_SECTIONAL_AREA = 2.5;
 	//TODO: get someone else to measure this
 
-	public static final double CAR_MASS = 1000;
-	//TODO: Update car's mass once information available. (in kg) Dummy value right now.
+	public static final double CAR_MASS = 350;
+	//roughly weight of car+driver+ballast? estimate (in kg), not actually measured yet
 	
-	public static final double KMH_TO_MS_FACTOR = 1.0/36.0;
+	public static final double KMH_TO_MS_FACTOR = 10.0/36.0;
+	
+	public static final double TIRE_PRESSURE = 1.7;
+	//in bars, equivalent to ~35 psi
+	
+	public static final double ENGINE_EFF = 0.4;
+	//TODO: determine a real value for this
+	
+	public static final double BATTERY_MAX_CHARGE = 20;
+	//this value is in units of amp-hours
 }
 

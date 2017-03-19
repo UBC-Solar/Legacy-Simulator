@@ -77,11 +77,11 @@ public class Route extends DataUnit {
 /******************************************************************************************************************************/
 		Set<GeoCoord> bridge = new HashSet<GeoCoord>(); //keeps track of all coordinates that are on a bridge
 		Boolean onBridge = false; //keeps track on whether or not the checked point is part of a bridge
-		
+		SimEngine anEngine = new SimEngine();
 		
 		for (int i = 1; i < this.trailMarkers.size(); i++) { 
 			//get angle of inclination of current point relative to previous point
-			double angle = SimEngine.getInclinationAngle(this.trailMarkers.get(i - 1), this.trailMarkers.get(i))*(180.0/Math.PI);
+			double angle = anEngine.getInclinationAngle(this.trailMarkers.get(i - 1), this.trailMarkers.get(i))*(180.0/Math.PI);
 			
 			//check if angle of inclination is more than 20 degrees (downwards) and point is not on bridge
 			if (angle < -20 && onBridge == false) {
@@ -115,6 +115,7 @@ public class Route extends DataUnit {
 		this.title = title;
 		this.pointsOfIntrest = new ArrayList<PointOfInterest>(pointsOfIntrest);
 		timeCreated = System.currentTimeMillis();
+		System.out.println(trailMarkers.get(0));
 	}
 
 	public ArrayList<GeoCoord> getTrailMarkers() {
@@ -154,6 +155,20 @@ public class Route extends DataUnit {
 			}
 		}
 		return trailMarkers.get(minimumIndex);
+	}
+	
+	//TODO: maybe do a better version of this
+	public int getIndexOfClosestPoint(GeoCoord location){
+		double minimumDistance = location.calculateDistance(trailMarkers.get(0));
+		int minimumIndex = 0;
+		for(int i = 1; i < trailMarkers.size(); i++){
+			double currentDistance = location.calculateDistance(trailMarkers.get(i));
+			if(currentDistance < minimumDistance){
+				minimumDistance = currentDistance;
+				minimumIndex = i;
+			}
+		}
+		return minimumIndex;
 	}
 
 }

@@ -180,7 +180,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				JFrame frame = new LoadingWindow(mySession);
 				frame.setVisible(true);
 				
-				runSimultion();
+				runSimulation();
 				
 				frame.setVisible(false);
 				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -345,7 +345,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		 * Attempts to run a simulation with the loaded data. If there is needed data that
 		 * is not loaded, displays an error message to end user. 
 		 */
-		protected void runSimultion() {
+		protected void runSimulation() {
 			int numLaps = lapSelectComboBox.getSelectedIndex() +1; //0 based index.
 			Map<GeoCoord,Map<Integer, Double>> requestedSpeeds = generateRequestedSpeedMap();
 			try {

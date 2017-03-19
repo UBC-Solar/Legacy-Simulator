@@ -7,7 +7,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
@@ -724,5 +727,47 @@ public class WeatherController extends ModuleController {
 		}
 		this.mySession.sendNotification(new NewForecastReport(temp));
 	}
+	
+	
+	
+	public TreeMap<Integer,ForecastIO> findInflectionPoints(Route toTraverse, List<ForecastIO> forecasts){
+		TreeMap<Integer,ForecastIO> inflectionPoints = new TreeMap<Integer,ForecastIO>();
+		List<GeoCoord> routePoints = toTraverse.getTrailMarkers();
+		if(forecasts.size()==1){
+			inflectionPoints.put(routePoints.size() - 1, forecasts.get(0));
+			return inflectionPoints;
+		}
+	
+		int forecastIndex = 0;
+		ForecastIO currForecast = forecasts.get(forecastIndex);
+		GeoCoord currForecastPoint = new GeoCoord(currForecast.getLatitude(),currForecast.getLongitude(),0);
+		double currDistance;
+		forecastIndex++;
+		
+		ForecastIO nextForecast = forecasts.get(forecastIndex);
+		GeoCoord nextForecastPoint = new GeoCoord(nextForecast.getLatitude(),nextForecast.getLongitude(),0);
+		double nextDistance;
+		
+		for(int i = 0; i < routePoints.size(); i++){
+			GeoCoord thisPoint = routePoints.get(i);
+			currDistance = thisPoint.calculateDistance(currForecastPoint);
+			nextDistance = thisPoint.calculateDistance(nextForecastPoint);
+			if(nextDistance < currDistance){
+				inflectionPoints.put(i, forecasts.get(forecastIndex-1));
+				forecastIndex++;
+				if(forecastIndex==forecasts.size()){
+					break;
+				}
+				currForecastPoint = nextForecastPoint;
+				nextForecast = forecasts.get(forecastIndex);
+				nextForecastPoint = new GeoCoord(nextForecast.getLatitude(),nextForecast.getLongitude(),0);
+			}
+		}
+		if(forecastIndex < forecasts.size()){
+			inflectionPoints.put(routePoints.size(), forecasts.get(forecastIndex));
+		}
+		return inflectionPoints;
+	}
+	
 
 }

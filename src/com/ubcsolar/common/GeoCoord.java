@@ -136,7 +136,7 @@ public boolean equals(Object toCheck){
 }
 
 /**
- * calculate absolute distance between this point and another. 
+ * calculate absolute distance (in km) between this point and another. 
  * @param ending - the end point (or start point)
  * @param unit - the unit the distance should be reported in
  * @return the absolute distance between this point and another
