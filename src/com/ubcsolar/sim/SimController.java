@@ -62,7 +62,7 @@ public class SimController extends ModuleController {
 	 * @throws IllegalArgumentException
 	 *             - if laps <= 0.
 	 */
-	public void runSimulation(Map<GeoCoord, Map<Integer, Double>> requestedSpeeds, int laps)
+	public void runSimulation(Map<GeoCoord, Map<Integer, Double>> requestedSpeeds, int laps, long startTime)
 			throws NoForecastReportException, NoLoadedRouteException, NoLocationReportedException,
 			NoCarStatusException {
 		if (laps <= 0) {
@@ -143,7 +143,7 @@ public class SimController extends ModuleController {
 		//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 		
 		
-		SpeedReport results = getSpeedReport();
+		SpeedReport results = getSpeedReport(startTime);
 		Map<GeoCoord, Map<Integer,Double>> speedProfile = new HashMap<GeoCoord, Map<Integer,Double>>();
 		for(GeoCoord k : results.getSpeedProfile().keySet()){
 			Map<Integer,Double> lapSpeed = new HashMap<Integer,Double>();
@@ -195,7 +195,7 @@ public class SimController extends ModuleController {
 	 * @throws NoLocationReportedException
 	 * @throws NoCarStatusException
 	 */
-	public SpeedReport getSpeedReport() throws NoForecastReportException, NoLoadedRouteException,
+	public SpeedReport getSpeedReport(long startTime) throws NoForecastReportException, NoLoadedRouteException,
 			NoLocationReportedException, NoCarStatusException {
 		// things needed for simV2
 		ForecastReport simmedForecastReport = this.mySession.getMyWeatherController()
@@ -203,9 +203,7 @@ public class SimController extends ModuleController {
 		Route routeToTraverse = this.mySession.getMapController().getAllPoints();
 		TelemDataPacket lastCarReported = this.mySession.getMyCarController().getLastTelemDataPacket();
 
-		Calendar currCalendar = Calendar.getInstance();
-		currCalendar.set(currCalendar.get(Calendar.YEAR), currCalendar.get(Calendar.MONTH), currCalendar.get(Calendar.DAY_OF_MONTH)+1, 8, 0);
-		long nextStartTime = currCalendar.getTimeInMillis();
+		long nextStartTime = startTime;
 
 		List<GeoCoord> points = routeToTraverse.getTrailMarkers(); // the GeoCoords of the route
 		Map<GeoCoord, Double> testSpeedProfile = new HashMap<GeoCoord, Double>(); // map to store speed profile

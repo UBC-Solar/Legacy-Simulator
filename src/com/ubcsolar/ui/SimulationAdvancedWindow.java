@@ -46,6 +46,7 @@ import javax.swing.JButton;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -401,8 +402,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		protected void runSimulation() {
 			int numLaps = lapSelectComboBox.getSelectedIndex() +1; //0 based index.
 			Map<GeoCoord,Map<Integer, Double>> requestedSpeeds = generateRequestedSpeedMap();
+			long startTimeMillis = getStartTimeInMillis();
 			try {
-				mySession.getMySimController().runSimulation(requestedSpeeds,numLaps);
+				mySession.getMySimController().runSimulation(requestedSpeeds, numLaps, startTimeMillis);
 			} catch (NoForecastReportException e) {
 				this.handleError("No Forcecasts Loaded");
 				return;
@@ -417,6 +419,55 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				return;
 			}
 	}
+		
+		private long getStartTimeInMillis(){
+			Calendar theCalendar = Calendar.getInstance();
+			int selectedMonth;
+			switch((String)monthComboBox.getSelectedItem()){
+			case "January": 
+				selectedMonth = Calendar.JANUARY;
+				break; 
+			case "February":
+				selectedMonth = Calendar.FEBRUARY;
+				break;
+			case "March":
+				selectedMonth = Calendar.MARCH;
+				break;
+			case "April":
+				selectedMonth = Calendar.APRIL;
+				break;
+			case "May":
+				selectedMonth = Calendar.MAY;
+				break;
+			case "June":
+				selectedMonth = Calendar.JUNE;
+				break;
+			case "July":
+				selectedMonth = Calendar.JULY;
+				break;
+			case "August":
+				selectedMonth = Calendar.AUGUST;
+				break;
+			case "September":
+				selectedMonth = Calendar.SEPTEMBER;
+				break;
+			case "October":
+				selectedMonth = Calendar.OCTOBER;
+				break;
+			case "November":
+				selectedMonth = Calendar.NOVEMBER;
+				break;
+			case "December":
+				selectedMonth = Calendar.DECEMBER;
+				break;
+			default:
+				selectedMonth = theCalendar.get(Calendar.MONTH);
+				break;
+			}
+			theCalendar.set(theCalendar.get(Calendar.YEAR), selectedMonth, (Integer)dateSpinner.getValue(), 
+					(Integer)hourSpinner.getValue(), (Integer)minuteSpinner.getValue());
+			return theCalendar.getTimeInMillis();
+		}
 		
 		private Map<GeoCoord,Map<Integer, Double>> generateRequestedSpeedMap() {
 			HashMap<GeoCoord,Map<Integer, Double>> toReturn = new HashMap<GeoCoord, Map<Integer,Double>>();
