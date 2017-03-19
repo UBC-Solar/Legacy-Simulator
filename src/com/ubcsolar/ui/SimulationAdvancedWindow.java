@@ -62,6 +62,8 @@ import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 public class SimulationAdvancedWindow extends JFrame implements Listener{
 
@@ -103,6 +105,16 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private JComboBox<Integer> lapSelectComboBox;
 	private JCheckBox checkBoxTime;
 	private JLabel lblTotalTimeTaken;
+	private JPanel chooseStartTimePanel;
+	private JLabel lblDesiredSimStart;
+	private JLabel lblMonth;
+	private JComboBox monthComboBox;
+	private JLabel lblDate;
+	private JLabel lblHour;
+	private JLabel lblMinute;
+	private JSpinner dateSpinner;
+	private JSpinner hourSpinner;
+	private JSpinner minuteSpinner;
 
 	private void handleError(String message){
 		JOptionPane.showMessageDialog(this, message);
@@ -160,16 +172,18 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
-		gbl_contentPane.columnWidths = new int[]{0, 0};
-		gbl_contentPane.rowHeights = new int[]{30, 0, 0, 0, 0};
-		gbl_contentPane.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{0.0, 1.0, 1.0, 1.0, Double.MIN_VALUE};
+		gbl_contentPane.columnWidths = new int[]{0, 0, 0};
+		gbl_contentPane.rowHeights = new int[]{30, 0, 0, 0, 0, 0};
+		gbl_contentPane.columnWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
+		gbl_contentPane.rowWeights = new double[]{0.0, 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 		//contentPane.setLayout(new BorderLayout(0, 0));
 		
 		buttonPanel = new JPanel();
 		GridBagConstraints gbc_buttonPanel = new GridBagConstraints();
-		gbc_buttonPanel.insets = new Insets(0, 0, 5, 0);
+		gbc_buttonPanel.gridx = 0;
+		gbc_buttonPanel.gridy = 0;
+		gbc_buttonPanel.insets = new Insets(0, 0, 5, 5);
 		contentPane.add(buttonPanel, gbc_buttonPanel);
 		
 		JButton btnNewSimulation = new JButton("New Simulation");
@@ -301,6 +315,45 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 //		SpeedChartHoldingPanel.setLayout(gbl_SpeedChartHoldingPanel);
 		
 		JFreeChart SpeedChart = createChart(createBlankDataset(), "Speed");
+		
+		chooseStartTimePanel = new JPanel();
+		GridBagConstraints gbc_chooseStartTimePanel = new GridBagConstraints();
+		gbc_chooseStartTimePanel.insets = new Insets(0, 0, 5, 5);
+		gbc_chooseStartTimePanel.fill = GridBagConstraints.BOTH;
+		gbc_chooseStartTimePanel.gridx = 0;
+		gbc_chooseStartTimePanel.gridy = 1;
+		contentPane.add(chooseStartTimePanel, gbc_chooseStartTimePanel);
+		
+		lblDesiredSimStart = new JLabel("Desired sim start time:");
+		chooseStartTimePanel.add(lblDesiredSimStart);
+		
+		lblMonth = new JLabel("Month:");
+		chooseStartTimePanel.add(lblMonth);
+		
+		monthComboBox = new JComboBox();
+		monthComboBox.setModel(new DefaultComboBoxModel(new String[] {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "December"}));
+		chooseStartTimePanel.add(monthComboBox);
+		
+		lblDate = new JLabel("Date:");
+		chooseStartTimePanel.add(lblDate);
+		
+		dateSpinner = new JSpinner();
+		dateSpinner.setModel(new SpinnerNumberModel(1, 1, 31, 1));
+		chooseStartTimePanel.add(dateSpinner);
+		
+		lblHour = new JLabel("Hour:");
+		chooseStartTimePanel.add(lblHour);
+		
+		hourSpinner = new JSpinner();
+		hourSpinner.setModel(new SpinnerNumberModel(8, 0, 23, 1));
+		chooseStartTimePanel.add(hourSpinner);
+		
+		lblMinute = new JLabel("Minute:");
+		chooseStartTimePanel.add(lblMinute);
+		
+		minuteSpinner = new JSpinner();
+		minuteSpinner.setModel(new SpinnerNumberModel(0, 0, 59, 1));
+		chooseStartTimePanel.add(minuteSpinner);
 		SpeedChartPanel = new ChartPanel(SpeedChart);
 		SpeedChartPanel.setMouseZoomable(true);
 		SpeedChartPanel.setMouseWheelEnabled(true);
@@ -308,10 +361,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		//buildChart(createBlankDataset(), SpeedChartPanel);
 		GridBagConstraints gbc_SpeedChartPanel = new GridBagConstraints();
 		gbc_SpeedChartPanel.weighty = 10.0;
-		gbc_SpeedChartPanel.insets = new Insets(0, 0, 5, 0);
+		gbc_SpeedChartPanel.insets = new Insets(0, 0, 5, 5);
 		gbc_SpeedChartPanel.fill = GridBagConstraints.BOTH;
 		gbc_SpeedChartPanel.gridx = 0;
-		gbc_SpeedChartPanel.gridy = 1;
+		gbc_SpeedChartPanel.gridy = 2;
 		contentPane.add(SpeedChartPanel, gbc_SpeedChartPanel);
 		
 //		JPanel SoCChartHoldingPanel = new JPanel();
@@ -331,10 +384,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		//buildChart(createBlankDataset(), SoCChartPanel);
 		GridBagConstraints gbc_SoCChartPanel = new GridBagConstraints();
 		gbc_SoCChartPanel.weighty = 10.0;
-		gbc_SoCChartPanel.insets = new Insets(0, 0, 5, 0);
+		gbc_SoCChartPanel.insets = new Insets(0, 0, 5, 5);
 		gbc_SoCChartPanel.fill = GridBagConstraints.BOTH;
 		gbc_SoCChartPanel.gridx = 0;
-		gbc_SoCChartPanel.gridy = 2;
+		gbc_SoCChartPanel.gridy = 3;
 		contentPane.add(SoCChartPanel, gbc_SoCChartPanel);
 		
 		setTitleAndLogo();
