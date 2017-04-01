@@ -215,7 +215,7 @@ public class SimController extends ModuleController {
 									// we can set what the starting speed is
 		
 		int chunk_per_forecast = 50; 
-		int chunkStart = 0;
+		int chunkStart = 1;
 
 		TreeMap<Integer, ForecastIO> inflectionPoints = mySession.getMyWeatherController()
 				.findInflectionPoints(routeToTraverse, currentForecastReport.getForecasts());
@@ -264,9 +264,9 @@ public class SimController extends ModuleController {
 		catch(NotEnoughChargeException e) {
 			System.err.println("Starting speed cannot make it through route");
 		}
-		
+	
 		// return Speed Report with all the speed profiles and sim result with
-		// all the frames and total time from each chunk
+		// all the frames and total time from each chunk	
 		return new SpeedReport(testSpeedProfile, new SimResult(frames, totalTime, lastCarReported), currentSpeed);
 	}
 
