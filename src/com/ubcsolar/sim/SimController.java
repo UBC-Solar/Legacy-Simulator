@@ -38,6 +38,9 @@ import com.ubcsolar.notification.NewSimulationReportNotification;
 import com.ubcsolar.notification.Notification;
 
 public class SimController extends ModuleController {
+	
+	private static double maxChargeCount = 0.0;
+	private static double maxChargeStepPerChunk = 10.0;
 
 	private ForecastReport currentForecastReport;
 
@@ -231,7 +234,7 @@ public class SimController extends ModuleController {
 			int remainder = (chunkEnd - chunkStart + 1)%points_per_chunk;
 			
 			for (int i = chunkStart; i < chunkEnd; i += points_per_chunk ) {
-				minCharge = 10;	
+				minCharge = getMinCharge();	
 				if (remainder > 0) {
 					report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + points_per_chunk + 1), simmedForecastReport,
 							lastCarReported, nextStartTime, lapNum, minCharge, inflectionPoints.get(chunkEnd), currentSpeed);
@@ -248,8 +251,9 @@ public class SimController extends ModuleController {
 				frames.addAll(report.getSpeedResult().getListOfFrames()); // add sim frames to list
                 nextStartTime += (report.getSpeedResult().getTravelTime());
                 totalTime += report.getSpeedResult().getTravelTime();
+    			maxChargeCount++;
 			}
-			chunkStart = ++chunkEnd;	
+			chunkStart = ++chunkEnd;
 		}
 		minCharge = 0;
 		if (inflectionPoints.size() != 1) {
@@ -259,15 +263,29 @@ public class SimController extends ModuleController {
 		testSpeedProfile.putAll(report.getSpeedProfile()); // add new speed profiles to map
 		frames.addAll(report.getSpeedResult().getListOfFrames()); // add sim frames to list
 		}
-
 	}
 		catch(NotEnoughChargeException e) {
 			System.err.println("Starting speed cannot make it through route");
 		}
 	
 		// return Speed Report with all the speed profiles and sim result with
+<<<<<<< HEAD
 		// all the frames and total time from each chunk	
+=======
+		// all the frames and total time from each chunk
+		maxChargeCount = 0;
+>>>>>>> d714765fb1be8367a909435843137204cd709e1c
 		return new SpeedReport(testSpeedProfile, new SimResult(frames, totalTime, lastCarReported), currentSpeed);
+	}
+	
+	double getMinCharge()
+	{
+		double minCharge = 70-maxChargeCount*maxChargeStepPerChunk;
+		if (minCharge < 0)
+		{
+			return 0;
+		}
+		return minCharge;
 	}
 
 	/**
