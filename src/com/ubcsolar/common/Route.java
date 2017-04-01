@@ -85,7 +85,7 @@ public class Route extends DataUnit {
 			
 			//check if angle of inclination is more than 20 degrees (downwards) and point is not on bridge
 			if (angle < -20 && onBridge == false) {
-				System.out.println("on bridge: " + angle + ": " + this.trailMarkers.get(i).getCSVEntry());
+				//System.out.println("on bridge: " + angle + ": " + this.trailMarkers.get(i).getCSVEntry());
 				//point is probably start of bridge
 				onBridge = true;
 				bridge.add(this.trailMarkers.get(i));

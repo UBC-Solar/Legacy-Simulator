@@ -65,7 +65,6 @@ public class CustomDisplayMap extends JMapViewer {
 	private boolean showSpeeds;
 	private List<MapMarker> speeds;
 	private List<MapMarker> forecasts; // route forecasts
-	private List<GeoCoord> points;
 	private boolean showForecasts;// initial value set to equal checkbox
 	private List<MapMarker> routePOIs; // POIs (Mostly cities) along the route
 	private boolean showPOIs; // initial value set to equal checkbox
@@ -215,7 +214,6 @@ public class CustomDisplayMap extends JMapViewer {
 		lblTileSoure.setBounds(10, 184, 82, 20);
 		add(lblTileSoure);
 		this.updateTileSource(MapSource.OSM_MAP); // default tiles
-		this.points = new ArrayList<GeoCoord>();
 	}
 
 	public void changeDrawnRoute(Route newRouteToLoad) {
@@ -237,7 +235,6 @@ public class CustomDisplayMap extends JMapViewer {
 	}
 
 	public void addNewRouteToMap(Route newRouteToLoad) {
-		this.points = new ArrayList<GeoCoord>(newRouteToLoad.getTrailMarkers());
 		List<Coordinate> listForPolygon = new ArrayList<Coordinate>(newRouteToLoad.getTrailMarkers().size());
 		// remove the old one
 		this.removeMapPolygon(this.routeBreadcrumbs);
@@ -304,7 +301,7 @@ public class CustomDisplayMap extends JMapViewer {
 		//int i = 0;
 		int filter_constant = 100;
 		double
-		filter_distance = 0.5;
+		filter_distance = 5;
 		GeoCoord last_marker = null;
 		double last_speed = 0;
 		
@@ -315,55 +312,22 @@ public class CustomDisplayMap extends JMapViewer {
 		}
 		
 		this.speeds = new ArrayList<MapMarker>();
-		/*
+		
+		/*Filter by distance*/
 		for (GeoCoord g : speed_profile.keySet()) {
-			if (last_marker == null || g.calculateDistance(last_marker) > filter_distance) {
+			if (last_marker == null || g.calculateDistance(last_marker) > filter_distance || speed_profile.get(g).get(1) != last_speed) {
 				Coordinate location = new Coordinate(g.getLat(), g.getLon());
 				String speed = speed_profile.get(g).get(1).toString();
+				last_speed = speed_profile.get(g).get(1);
 				MapMarkerDot newLocationDot = new MapMarkerDot(null, speed , location, forecastStyle);
 				this.speeds.add(newLocationDot);
 				last_marker = g;
 			}
 			
-		}*/
+		}
 		
-		/*filter by index
-		for (int i = 0; i < this.points.size(); i++) { 
-			GeoCoord g = points.get(i);
-			if (i%filter_constant == 0 || speed_profile.get(g).get(1) != last_speed) {
-				Coordinate location = new Coordinate(g.getLat(), g.getLon());
-				String speed = speed_profile.get(g).get(1).toString();
-				last_speed = speed_profile.get(g).get(1);
-				MapMarkerDot newLocationDot = new MapMarkerDot(null, speed, location, forecastStyle);
-				this.speeds.add(newLocationDot);
-			}
-		}*/
-		/*filter by distance*//*
-		if (points.size() > 0) {
-			last_marker = points.get(0);
-			Coordinate location = new Coordinate(points.get(0).getLat(), points.get(0).getLon());
-			last_speed = speed_profile.get(points.get(0)).get(1);
-			String speed = Double.toString(last_speed);
-			MapMarkerDot newLocationDot = new MapMarkerDot(null, speed, location, forecastStyle);
-			this.speeds.add(newLocationDot);
-			
-			for (int i = 1; i < this.points.size(); i++) {
-				GeoCoord g = points.get(i);
-				if (g.calculateDistance(last_marker) > filter_distance || speed_profile.get(g).get(1) != last_speed) {
-					last_marker = new GeoCoord(g.getLat(), g.getLon(), g.getElevation());
-					location = new Coordinate(g.getLat(), g.getLon());
-					speed = speed_profile.get(g).get(1).toString();
-					last_speed = speed_profile.get(g).get(1);
-					newLocationDot = new MapMarkerDot(null, speed, location, forecastStyle);
-					this.speeds.add(newLocationDot);
-				}
-			}
-		}*/
-		
-		
-		/*filter by distance*/
+		/*Filter by index*//*
 		int i = 0;
-		
 		for (GeoCoord g : speed_profile.keySet()) {
 			//System.out.println(g.toString());
 			if (i%filter_constant == 0 || speed_profile.get(g).get(1) != last_speed) {
@@ -374,7 +338,7 @@ public class CustomDisplayMap extends JMapViewer {
 				this.speeds.add(newLocationDot);
 			}
 			i++;
-		}
+		}*/
 		this.refreshMap();
 	}
 	// **************************************************************************************************************

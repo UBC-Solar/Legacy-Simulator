@@ -9,6 +9,7 @@ package com.ubcsolar.sim;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
@@ -147,9 +148,9 @@ public class SimController extends ModuleController {
 		
 		
 		SpeedReport results = getSpeedReport();
-		Map<GeoCoord, Map<Integer,Double>> speedProfile = new HashMap<GeoCoord, Map<Integer,Double>>();
+		Map<GeoCoord, Map<Integer,Double>> speedProfile = new LinkedHashMap<GeoCoord, Map<Integer,Double>>();
 		for(GeoCoord k : results.getSpeedProfile().keySet()){
-			Map<Integer,Double> lapSpeed = new HashMap<Integer,Double>();
+			Map<Integer,Double> lapSpeed = new LinkedHashMap<Integer,Double>();
 			lapSpeed.put(1, results.getSpeedProfile().get(k));
 			speedProfile.put(k, lapSpeed);
 		}
@@ -211,12 +212,12 @@ public class SimController extends ModuleController {
 		long nextStartTime = currCalendar.getTimeInMillis();
 
 		List<GeoCoord> points = routeToTraverse.getTrailMarkers(); // the GeoCoords of the route
-		Map<GeoCoord, Double> testSpeedProfile = new HashMap<GeoCoord, Double>(); // map to store speed profile
+		Map<GeoCoord, Double> testSpeedProfile = new LinkedHashMap<GeoCoord, Double>(); // map to store speed profile
 		ArrayList<SimFrame> frames = new ArrayList<SimFrame>(); // list to store the frames from the sim results of each chunk
 		SpeedReport report;
 		double currentSpeed = 50.0; // may turn this into a parameter later so
 									// we can set what the starting speed is
-		
+		System.out.println("FIRST POINT: " + points.get(0));
 		int chunk_per_forecast = 50; 
 		int chunkStart = 1;
 
@@ -316,10 +317,10 @@ public class SimController extends ModuleController {
 		ForecastReport simmedForecastReport, TelemDataPacket lastCarReported, long startTime, int lapNum,
 		double minCharge, ForecastIO inflectionPoint, double startingSpeed) throws NotEnoughChargeException {
 		
-		Map<GeoCoord, Double> speeds = new HashMap<GeoCoord, Double>();
+		Map<GeoCoord, Double> speeds = new LinkedHashMap<GeoCoord, Double>();
 		SimResult results = new SimResult(new ArrayList<SimFrame>(), 10, lastCarReported);
 		double speed = startingSpeed;
-
+		
 		// initialize every geo coord of the chunk with the same speed
 		for (GeoCoord g : chunk) {
 			speeds.put(g, speed);
@@ -346,7 +347,7 @@ public class SimController extends ModuleController {
 					if (speed <= 0) {
 						throw new NotEnoughChargeException(0,0, "speed cannot make it through the whole route");
 				 	}
-					speeds.replace(g, speed);
+					speeds.put(g, speed);
 				}
 			}
 		}
