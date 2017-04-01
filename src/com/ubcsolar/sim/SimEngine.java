@@ -85,8 +85,6 @@ public class SimEngine {
 			throw new IllegalArgumentException("ending location must be after starting location");
 		}
 
-		List<ForecastIO> forecastList = report.getForecasts();
-
 		FIODataPoint startWeatherPoint = chooseReport(inflectionPoint, startTime);
 		LocationReport startLocationReport = new LocationReport(currPoint, "Raven", "Simmed");
 		totalCharge = carStartState.getTotalVoltage();
@@ -390,14 +388,16 @@ public class SimEngine {
 	 */
 
 	public FIODataPoint chooseReport(ForecastIO weather, double timeFrame) {
+		System.out.println("timeFrame: " + timeFrame);
 		JsonObject hourly = weather.getHourly();
 		JsonArray hourlyData = (JsonArray) hourly.get("data");
-		int currTime = Integer.parseInt(((JsonObject) hourlyData.get(0)).get("time").toString());
+		int currTime = Integer.parseInt(((JsonObject) hourlyData.get(0)).get("time").toString())*1000;
 		int bestIndex = 0;
 		double smallestDiff = Math.abs(timeFrame - currTime);
 		double prevDiff = smallestDiff;
 		for (int i = 1; i < hourlyData.size(); i++) {
-			currTime = Integer.parseInt(((JsonObject) hourlyData.get(i)).get("time").toString());
+			currTime = Integer.parseInt(((JsonObject) hourlyData.get(i)).get("time").toString())*1000;
+			System.out.println("i: " + i + " currTime: " + currTime);
 			double currDiff = Math.abs(timeFrame - currTime);
 			if (currDiff < smallestDiff) {
 				smallestDiff = currDiff;

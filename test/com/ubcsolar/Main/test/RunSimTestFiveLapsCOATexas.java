@@ -36,7 +36,7 @@ public class RunSimTestFiveLapsCOATexas {
 		theProgram.getMyCarController().adviseOfNewCarReport(RandomObjectGenerator.generateNewTelemDataPack());
 		LocationReport carLocationReported = new LocationReport(new GeoCoord(30.131831,-97.6398,155.8408355712891), "raven", "generated");
 		theProgram.getMapController().recordNewCarLocation(carLocationReported);
-		theProgram.getMySimController().runSimulation(new HashMap<GeoCoord, Map<Integer, Double>>(),5);
+		//theProgram.getMySimController().runSimulation(new HashMap<GeoCoord, Map<Integer, Double>>(),5);
 	}
 	
 	
