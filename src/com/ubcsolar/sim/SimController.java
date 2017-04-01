@@ -269,12 +269,7 @@ public class SimController extends ModuleController {
 		}
 	
 		// return Speed Report with all the speed profiles and sim result with
-<<<<<<< HEAD
-		// all the frames and total time from each chunk	
-=======
-		// all the frames and total time from each chunk
-		maxChargeCount = 0;
->>>>>>> d714765fb1be8367a909435843137204cd709e1c
+
 		return new SpeedReport(testSpeedProfile, new SimResult(frames, totalTime, lastCarReported), currentSpeed);
 	}
 	

@@ -338,7 +338,7 @@ public class CustomDisplayMap extends JMapViewer {
 				this.speeds.add(newLocationDot);
 			}
 		}*/
-		/*filter by distance*/
+		/*filter by distance*//*
 		if (points.size() > 0) {
 			last_marker = points.get(0);
 			Coordinate location = new Coordinate(points.get(0).getLat(), points.get(0).getLon());
@@ -358,13 +358,13 @@ public class CustomDisplayMap extends JMapViewer {
 					this.speeds.add(newLocationDot);
 				}
 			}
-		}
+		}*/
 		
 		
 		/*filter by distance*/
+		int i = 0;
 		
-		
-		/*for (GeoCoord g : speed_profile.keySet()) {
+		for (GeoCoord g : speed_profile.keySet()) {
 			//System.out.println(g.toString());
 			if (i%filter_constant == 0 || speed_profile.get(g).get(1) != last_speed) {
 				Coordinate location = new Coordinate(g.getLat(), g.getLon());
@@ -374,7 +374,7 @@ public class CustomDisplayMap extends JMapViewer {
 				this.speeds.add(newLocationDot);
 			}
 			i++;
-		}*/
+		}
 		this.refreshMap();
 	}
 	// **************************************************************************************************************
