@@ -28,6 +28,7 @@ import com.ubcsolar.notification.ExceptionNotification;
 import com.ubcsolar.notification.NewForecastReport;
 import com.ubcsolar.notification.NewLocationReportNotification;
 import com.ubcsolar.notification.NewMapLoadedNotification;
+import com.ubcsolar.notification.NewSimulationReportNotification;
 import com.ubcsolar.notification.Notification;
 
 import java.awt.event.ActionEvent;
@@ -114,6 +115,7 @@ public class GUImain implements Listener {
 		mySession.register(this, NewMapLoadedNotification.class);
 		mySession.register(this, NewLocationReportNotification.class);
 		mySession.register(this, NewForecastReport.class);
+		mySession.register(this,  NewSimulationReportNotification.class);
 		// mySession.register(this, ); TODO for loading frame
 	}
 
@@ -139,6 +141,10 @@ public class GUImain implements Listener {
 		if (n.getClass() == NewForecastReport.class) {
 			NewForecastReport temp = (NewForecastReport) n;
 			mainPanel.addForecastsToMap(temp.getTheReport());
+		}
+		if (n.getClass() == NewSimulationReportNotification.class) {
+			NewSimulationReportNotification temp = (NewSimulationReportNotification) n;
+			mainPanel.addSpeedsToMap(temp.getSimReport().getManuallyRequestedSpeeds());
 		}
 
 		// if(n.getClass() == ) //TODO for loadingFrame

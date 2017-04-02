@@ -221,8 +221,6 @@ public class CustomDisplayMap extends JMapViewer {
 		this.removeAllMapMarkers();
 		this.addNewRouteToMap(newRouteToLoad);
 		//empty map just so it can compile, real map will be passed later
-		Map<GeoCoord, Double> speeds = new HashMap<GeoCoord, Double>();
-		this.addSpeedsToMap(speeds);
 	}
 
 	public void addNewCarLocationToMap(LocationReport newLocation) {
@@ -298,8 +296,14 @@ public class CustomDisplayMap extends JMapViewer {
 	// *****************************************************BETA******************************************************
 
 
-	public void addSpeedsToMap(Map<GeoCoord, Double> speeds) {
+	public void addSpeedsToMap(Map<GeoCoord, Map<Integer,Double>> speed_profile) {
 		Style forecastStyle = new Style(Color.black, Color.BLUE, null, this.defaultFontForThings);
+		//int i = 0;
+		int filter_constant = 100;
+		double
+		filter_distance = 5;
+		GeoCoord last_marker = null;
+		double last_speed = 0;
 		
 		if (this.speeds != null) {
 			for (MapMarker m : this.speeds) {
@@ -308,12 +312,33 @@ public class CustomDisplayMap extends JMapViewer {
 		}
 		
 		this.speeds = new ArrayList<MapMarker>();
-		for (GeoCoord g : speeds.keySet()) {
-			Coordinate location = new Coordinate(g.getLat(), g.getLon());
-			String speed = speeds.get(g).toString();
-			MapMarkerDot newLocationDot = new MapMarkerDot(null, speed, location, forecastStyle);
-			this.speeds.add(newLocationDot);
+		
+		/*Filter by distance*/
+		for (GeoCoord g : speed_profile.keySet()) {
+			if (last_marker == null || g.calculateDistance(last_marker) > filter_distance || speed_profile.get(g).get(1) != last_speed) {
+				Coordinate location = new Coordinate(g.getLat(), g.getLon());
+				String speed = speed_profile.get(g).get(1).toString();
+				last_speed = speed_profile.get(g).get(1);
+				MapMarkerDot newLocationDot = new MapMarkerDot(null, speed , location, forecastStyle);
+				this.speeds.add(newLocationDot);
+				last_marker = g;
+			}
+			
 		}
+		
+		/*Filter by index*//*
+		int i = 0;
+		for (GeoCoord g : speed_profile.keySet()) {
+			//System.out.println(g.toString());
+			if (i%filter_constant == 0 || speed_profile.get(g).get(1) != last_speed) {
+				Coordinate location = new Coordinate(g.getLat(), g.getLon());
+				String speed = speed_profile.get(g).get(1).toString();
+				last_speed = speed_profile.get(g).get(1);
+				MapMarkerDot newLocationDot = new MapMarkerDot(null, speed, location, forecastStyle);
+				this.speeds.add(newLocationDot);
+			}
+			i++;
+		}*/
 		this.refreshMap();
 	}
 	// **************************************************************************************************************
