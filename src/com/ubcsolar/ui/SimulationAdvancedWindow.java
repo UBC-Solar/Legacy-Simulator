@@ -394,52 +394,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	}
 		
 		private long getStartTimeInMillis(){
-			Calendar theCalendar = Calendar.getInstance();
-			int selectedMonth;
-			switch((String)monthComboBox.getSelectedItem()){
-			case "January": 
-				selectedMonth = Calendar.JANUARY;
-				break; 
-			case "February":
-				selectedMonth = Calendar.FEBRUARY;
-				break;
-			case "March":
-				selectedMonth = Calendar.MARCH;
-				break;
-			case "April":
-				selectedMonth = Calendar.APRIL;
-				break;
-			case "May":
-				selectedMonth = Calendar.MAY;
-				break;
-			case "June":
-				selectedMonth = Calendar.JUNE;
-				break;
-			case "July":
-				selectedMonth = Calendar.JULY;
-				break;
-			case "August":
-				selectedMonth = Calendar.AUGUST;
-				break;
-			case "September":
-				selectedMonth = Calendar.SEPTEMBER;
-				break;
-			case "October":
-				selectedMonth = Calendar.OCTOBER;
-				break;
-			case "November":
-				selectedMonth = Calendar.NOVEMBER;
-				break;
-			case "December":
-				selectedMonth = Calendar.DECEMBER;
-				break;
-			default:
-				selectedMonth = theCalendar.get(Calendar.MONTH);
-				break;
-			}
-			theCalendar.set(theCalendar.get(Calendar.YEAR), selectedMonth, (Integer)dateSpinner.getValue(), 
-					(Integer)hourSpinner.getValue(), (Integer)minuteSpinner.getValue());
-			return theCalendar.getTimeInMillis();
+			long currTime = System.currentTimeMillis();
+			long startTime = currTime + (Integer)hourSpinner.getValue()*3600000;
+			System.out.println("startTime: " + startTime);
+			return startTime;
 		}
 		
 		private Map<GeoCoord,Map<Integer, Double>> generateRequestedSpeedMap() {
