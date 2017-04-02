@@ -108,14 +108,8 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private JLabel lblTotalTimeTaken;
 	private JPanel chooseStartTimePanel;
 	private JLabel lblDesiredSimStart;
-	private JLabel lblMonth;
-	private JComboBox monthComboBox;
-	private JLabel lblDate;
 	private JLabel lblHour;
-	private JLabel lblMinute;
-	private JSpinner dateSpinner;
 	private JSpinner hourSpinner;
-	private JSpinner minuteSpinner;
 
 	private void handleError(String message){
 		JOptionPane.showMessageDialog(this, message);
@@ -328,33 +322,12 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		lblDesiredSimStart = new JLabel("Desired sim start time:");
 		chooseStartTimePanel.add(lblDesiredSimStart);
 		
-		lblMonth = new JLabel("Month:");
-		chooseStartTimePanel.add(lblMonth);
-		
-		monthComboBox = new JComboBox();
-		monthComboBox.setModel(new DefaultComboBoxModel(new String[] {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "December"}));
-		chooseStartTimePanel.add(monthComboBox);
-		
-		lblDate = new JLabel("Date:");
-		chooseStartTimePanel.add(lblDate);
-		
-		dateSpinner = new JSpinner();
-		dateSpinner.setModel(new SpinnerNumberModel(1, 1, 31, 1));
-		chooseStartTimePanel.add(dateSpinner);
-		
-		lblHour = new JLabel("Hour:");
-		chooseStartTimePanel.add(lblHour);
-		
 		hourSpinner = new JSpinner();
-		hourSpinner.setModel(new SpinnerNumberModel(8, 0, 23, 1));
+		hourSpinner.setModel(new SpinnerNumberModel(0, 0, 47, 1));
 		chooseStartTimePanel.add(hourSpinner);
 		
-		lblMinute = new JLabel("Minute:");
-		chooseStartTimePanel.add(lblMinute);
-		
-		minuteSpinner = new JSpinner();
-		minuteSpinner.setModel(new SpinnerNumberModel(0, 0, 59, 1));
-		chooseStartTimePanel.add(minuteSpinner);
+		lblHour = new JLabel("hours from now");
+		chooseStartTimePanel.add(lblHour);
 		SpeedChartPanel = new ChartPanel(SpeedChart);
 		SpeedChartPanel.setMouseZoomable(true);
 		SpeedChartPanel.setMouseWheelEnabled(true);
