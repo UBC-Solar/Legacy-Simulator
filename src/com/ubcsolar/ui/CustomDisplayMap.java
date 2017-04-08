@@ -300,8 +300,7 @@ public class CustomDisplayMap extends JMapViewer {
 		Style forecastStyle = new Style(Color.black, Color.BLUE, null, this.defaultFontForThings);
 		//int i = 0;
 		int filter_constant = 100;
-		double
-		filter_distance = 5;
+		double filter_distance = 0.5;
 		GeoCoord last_marker = null;
 		double last_speed = 0;
 		

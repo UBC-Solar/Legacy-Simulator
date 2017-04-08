@@ -217,7 +217,6 @@ public class SimController extends ModuleController {
 		SpeedReport report;
 		double currentSpeed = 50.0; // may turn this into a parameter later so
 									// we can set what the starting speed is
-		System.out.println("FIRST POINT: " + points.get(0));
 		int chunk_per_forecast = 50; 
 		int chunkStart = 1;
 
