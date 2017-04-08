@@ -85,8 +85,6 @@ public class SimEngine {
 			throw new IllegalArgumentException("ending location must be after starting location");
 		}
 
-		List<ForecastIO> forecastList = report.getForecasts();
-
 		FIODataPoint startWeatherPoint = chooseReport(inflectionPoint, startTime);
 		LocationReport startLocationReport = new LocationReport(currPoint, "Raven", "Simmed");
 		totalCharge = carStartState.getTotalVoltage();
@@ -99,8 +97,8 @@ public class SimEngine {
 		TelemDataPacket prevStatus = carStartState;
 		TelemDataPacket currStatus = prevStatus;
 		JsonObject dailyData = (JsonObject) ((JsonArray) inflectionPoint.getDaily().get("data")).get(0);
-		long sunriseTime = Long.parseLong(dailyData.get("sunriseTime").toString());
-		long sunsetTime = Long.parseLong(dailyData.get("sunsetTime").toString());
+		long sunriseTime = Long.parseLong(dailyData.get("sunriseTime").toString())*1000;
+		long sunsetTime = Long.parseLong(dailyData.get("sunsetTime").toString())*1000;
 		double currCharge = carStartState.getStateOfCharge();
 		for (int i = startingIndex + 1; i <= endingIndex; i++) {
 			currPoint = toTraverse.getTrailMarkers().get(i);
@@ -234,9 +232,7 @@ public class SimEngine {
 	public double calculateChargeDiff(GeoCoord startLoc, GeoCoord endLoc, FIODataPoint forecastForPoint,
 									  double speed, double timeTaken, long sunriseTime, long sunsetTime, double latitude, long currTime) {
 		double resistivePower = calculateResistivePower(forecastForPoint, endLoc, startLoc, speed);
-
 		double sunPower = calculateSunPower(forecastForPoint, sunriseTime, sunsetTime, latitude, currTime);
-
 		if (resistivePower < 0) resistivePower = 0;
 		double netPower = sunPower - resistivePower;//in Watts
 
@@ -313,17 +309,18 @@ public class SimEngine {
 		double panelArea = inUseCarModel.getSolarPanelArea();
 		double sunAngle = calculateSunAltitudeAngle(sunriseTime, sunsetTime, latitude, currTime);
 		double sunPower = panelArea * GlobalValues.PANEL_EFFICIENCY * cloudCoverFactor * Math.cos(sunAngle);
-
 		return sunPower;
 	}
 
 	public double calculateSunAltitudeAngle(long sunriseTime, long sunsetTime, double latitude, long currTime) {
 		long solarNoon = (sunriseTime + sunsetTime) / 2;
-		double hourAngle = (15.0 * Math.PI / 180.0) * (currTime - solarNoon) / 3600.0;
-		Date currDate = new Date(currTime * 1000);//have to pass time in milliseconds to Date constructor
-		int dayOfMonth = currDate.getDate();
-		int month = currDate.getMonth();
-		int year = currDate.getYear();
+		double hourAngle = (15.0 * Math.PI / 180.0) * (currTime - solarNoon) / 3600000.0;
+
+		Calendar currCalendar = Calendar.getInstance();
+		currCalendar.setTimeInMillis(currTime);
+		int dayOfMonth = currCalendar.get(Calendar.DAY_OF_MONTH);
+		int month = currCalendar.get(Calendar.MONTH);
+		int year = currCalendar.get(Calendar.YEAR);
 		int dayNumber = findDayNumber(dayOfMonth, month, year);
 		double declinationAngle = (Math.PI / 180.0) * 23.45 * Math.sin(360.0 / 365.0 * (284 + dayNumber));
 		double altitudeAngleFromHorizontal = (Math.cos(latitude) * Math.cos(declinationAngle) *
@@ -392,12 +389,12 @@ public class SimEngine {
 	public FIODataPoint chooseReport(ForecastIO weather, double timeFrame) {
 		JsonObject hourly = weather.getHourly();
 		JsonArray hourlyData = (JsonArray) hourly.get("data");
-		int currTime = Integer.parseInt(((JsonObject) hourlyData.get(0)).get("time").toString());
+		long currTime = Long.parseLong(((JsonObject) hourlyData.get(0)).get("time").toString())*1000;
 		int bestIndex = 0;
 		double smallestDiff = Math.abs(timeFrame - currTime);
 		double prevDiff = smallestDiff;
 		for (int i = 1; i < hourlyData.size(); i++) {
-			currTime = Integer.parseInt(((JsonObject) hourlyData.get(i)).get("time").toString());
+			currTime = Long.parseLong(((JsonObject) hourlyData.get(i)).get("time").toString())*1000;
 			double currDiff = Math.abs(timeFrame - currTime);
 			if (currDiff < smallestDiff) {
 				smallestDiff = currDiff;

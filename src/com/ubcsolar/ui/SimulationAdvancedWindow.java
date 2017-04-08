@@ -46,6 +46,7 @@ import javax.swing.JButton;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +63,8 @@ import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 public class SimulationAdvancedWindow extends JFrame implements Listener{
 
@@ -103,6 +106,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private JComboBox<Integer> lapSelectComboBox;
 	private JCheckBox checkBoxTime;
 	private JLabel lblTotalTimeTaken;
+	private JPanel chooseStartTimePanel;
+	private JLabel lblDesiredSimStart;
+	private JLabel lblHour;
+	private JSpinner hourSpinner;
 
 	private void handleError(String message){
 		JOptionPane.showMessageDialog(this, message);
@@ -160,16 +167,18 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
-		gbl_contentPane.columnWidths = new int[]{0, 0};
-		gbl_contentPane.rowHeights = new int[]{30, 0, 0, 0, 0};
-		gbl_contentPane.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{0.0, 1.0, 1.0, 1.0, Double.MIN_VALUE};
+		gbl_contentPane.columnWidths = new int[]{0, 0, 0};
+		gbl_contentPane.rowHeights = new int[]{30, 0, 0, 0, 0, 0};
+		gbl_contentPane.columnWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
+		gbl_contentPane.rowWeights = new double[]{0.0, 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 		//contentPane.setLayout(new BorderLayout(0, 0));
 		
 		buttonPanel = new JPanel();
 		GridBagConstraints gbc_buttonPanel = new GridBagConstraints();
-		gbc_buttonPanel.insets = new Insets(0, 0, 5, 0);
+		gbc_buttonPanel.gridx = 0;
+		gbc_buttonPanel.gridy = 0;
+		gbc_buttonPanel.insets = new Insets(0, 0, 5, 5);
 		contentPane.add(buttonPanel, gbc_buttonPanel);
 		
 		JButton btnNewSimulation = new JButton("New Simulation");
@@ -301,6 +310,24 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 //		SpeedChartHoldingPanel.setLayout(gbl_SpeedChartHoldingPanel);
 		
 		JFreeChart SpeedChart = createChart(createBlankDataset(), "Speed");
+		
+		chooseStartTimePanel = new JPanel();
+		GridBagConstraints gbc_chooseStartTimePanel = new GridBagConstraints();
+		gbc_chooseStartTimePanel.insets = new Insets(0, 0, 5, 5);
+		gbc_chooseStartTimePanel.fill = GridBagConstraints.BOTH;
+		gbc_chooseStartTimePanel.gridx = 0;
+		gbc_chooseStartTimePanel.gridy = 1;
+		contentPane.add(chooseStartTimePanel, gbc_chooseStartTimePanel);
+		
+		lblDesiredSimStart = new JLabel("Desired sim start time:");
+		chooseStartTimePanel.add(lblDesiredSimStart);
+		
+		hourSpinner = new JSpinner();
+		hourSpinner.setModel(new SpinnerNumberModel(0, 0, 47, 1));
+		chooseStartTimePanel.add(hourSpinner);
+		
+		lblHour = new JLabel("hours from now");
+		chooseStartTimePanel.add(lblHour);
 		SpeedChartPanel = new ChartPanel(SpeedChart);
 		SpeedChartPanel.setMouseZoomable(true);
 		SpeedChartPanel.setMouseWheelEnabled(true);
@@ -308,10 +335,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		//buildChart(createBlankDataset(), SpeedChartPanel);
 		GridBagConstraints gbc_SpeedChartPanel = new GridBagConstraints();
 		gbc_SpeedChartPanel.weighty = 10.0;
-		gbc_SpeedChartPanel.insets = new Insets(0, 0, 5, 0);
+		gbc_SpeedChartPanel.insets = new Insets(0, 0, 5, 5);
 		gbc_SpeedChartPanel.fill = GridBagConstraints.BOTH;
 		gbc_SpeedChartPanel.gridx = 0;
-		gbc_SpeedChartPanel.gridy = 1;
+		gbc_SpeedChartPanel.gridy = 2;
 		contentPane.add(SpeedChartPanel, gbc_SpeedChartPanel);
 		
 //		JPanel SoCChartHoldingPanel = new JPanel();
@@ -331,10 +358,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		//buildChart(createBlankDataset(), SoCChartPanel);
 		GridBagConstraints gbc_SoCChartPanel = new GridBagConstraints();
 		gbc_SoCChartPanel.weighty = 10.0;
-		gbc_SoCChartPanel.insets = new Insets(0, 0, 5, 0);
+		gbc_SoCChartPanel.insets = new Insets(0, 0, 5, 5);
 		gbc_SoCChartPanel.fill = GridBagConstraints.BOTH;
 		gbc_SoCChartPanel.gridx = 0;
-		gbc_SoCChartPanel.gridy = 2;
+		gbc_SoCChartPanel.gridy = 3;
 		contentPane.add(SoCChartPanel, gbc_SoCChartPanel);
 		
 		setTitleAndLogo();
@@ -348,8 +375,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		protected void runSimulation() {
 			int numLaps = lapSelectComboBox.getSelectedIndex() +1; //0 based index.
 			Map<GeoCoord,Map<Integer, Double>> requestedSpeeds = generateRequestedSpeedMap();
+			long startTimeMillis = getStartTimeInMillis();
 			try {
-				mySession.getMySimController().runSimulation(requestedSpeeds,numLaps);
+				mySession.getMySimController().runSimulation(requestedSpeeds, numLaps, startTimeMillis);
 			} catch (NoForecastReportException e) {
 				this.handleError("No Forcecasts Loaded");
 				return;
@@ -364,6 +392,13 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				return;
 			}
 	}
+		
+		private long getStartTimeInMillis(){
+			long currTime = System.currentTimeMillis();
+			long startTime = currTime + (Integer)hourSpinner.getValue()*3600000;
+			System.out.println("startTime: " + startTime);
+			return startTime;
+		}
 		
 		private Map<GeoCoord,Map<Integer, Double>> generateRequestedSpeedMap() {
 			HashMap<GeoCoord,Map<Integer, Double>> toReturn = new HashMap<GeoCoord, Map<Integer,Double>>();
