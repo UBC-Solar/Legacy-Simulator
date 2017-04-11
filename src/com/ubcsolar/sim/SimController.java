@@ -215,32 +215,33 @@ public class SimController extends ModuleController {
 		SpeedReport report;
 		double currentSpeed = 50.0; // may turn this into a parameter later so
 									// we can set what the starting speed is
-		int chunk_per_forecast = 50; 
-		int chunkStart = 1;
+		int subchunkPerForecast = 50;
+		int chunkStart = 1; //set to 1 so it doesn't override point 0 with 0 velocity
 
 		TreeMap<Integer, ForecastIO> inflectionPoints = mySession.getMyWeatherController()
 				.findInflectionPoints(routeToTraverse, currentForecastReport.getForecasts());
 		
 		testSpeedProfile.put(points.get(0), 0.0);
+		//TODO: parameterize starting velocity
 		long totalTime = 0;
-		int lapNum = 1;
+		int lapNum = 1; //TODO: parameterize this
 		
 	try{
 		double minCharge;
 		for (int chunkEnd : inflectionPoints.keySet()) {
-			int points_per_chunk = (chunkEnd - chunkStart + 1)/chunk_per_forecast;
-			int remainder = (chunkEnd - chunkStart + 1)%points_per_chunk;
+			int pointsPerSubChunk = (chunkEnd - chunkStart + 1) / subchunkPerForecast;
+			int remainder = (chunkEnd - chunkStart + 1) % pointsPerSubChunk;
 			
-			for (int i = chunkStart; i < chunkEnd; i += points_per_chunk ) {
+			for (int i = chunkStart; i < chunkEnd; i += pointsPerSubChunk ) {
 				minCharge = getMinCharge();	
 				if (remainder > 0) {
-					report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + points_per_chunk + 1), simmedForecastReport,
+					report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + pointsPerSubChunk + 1), simmedForecastReport,
 							lastCarReported, nextStartTime, lapNum, minCharge, inflectionPoints.get(chunkEnd), currentSpeed);
 					i++;
 					remainder--;
 				}
 				else {
-					report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + points_per_chunk), simmedForecastReport,
+					report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + pointsPerSubChunk), simmedForecastReport,
 							lastCarReported, nextStartTime, lapNum, minCharge, inflectionPoints.get(chunkEnd), currentSpeed);
 				}
 				currentSpeed = report.getSpeed(); // change current speed to the speed of the car at the end of the chunk
@@ -255,11 +256,11 @@ public class SimController extends ModuleController {
 		}
 		minCharge = 0;
 		if (inflectionPoints.size() != 1) {
-		report = getSpeedProfileForChunk(routeToTraverse, points.subList(chunkStart, points.size() - 1), simmedForecastReport,
-				lastCarReported, nextStartTime, 1, minCharge, currentForecastReport.getForecasts().get(inflectionPoints.size()), currentSpeed);
-		lastCarReported = report.getSpeedResult().getFinalTelemData();
-		testSpeedProfile.putAll(report.getSpeedProfile()); // add new speed profiles to map
-		frames.addAll(report.getSpeedResult().getListOfFrames()); // add sim frames to list
+			report = getSpeedProfileForChunk(routeToTraverse, points.subList(chunkStart, points.size() - 1), simmedForecastReport,
+					lastCarReported, nextStartTime, 1, minCharge, currentForecastReport.getForecasts().get(inflectionPoints.size()), currentSpeed);
+			lastCarReported = report.getSpeedResult().getFinalTelemData();
+			testSpeedProfile.putAll(report.getSpeedProfile()); // add new speed profiles to map
+			frames.addAll(report.getSpeedResult().getListOfFrames()); // add sim frames to list
 		}
 	}
 		catch(NotEnoughChargeException e) {
