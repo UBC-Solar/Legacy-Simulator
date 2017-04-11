@@ -39,9 +39,8 @@ import com.ubcsolar.notification.NewSimulationReportNotification;
 import com.ubcsolar.notification.Notification;
 
 public class SimController extends ModuleController {
-	
-	private static double maxChargeCount = 0.0;
-	private static double maxChargeStepPerChunk = 10.0;
+
+	private static double minFinalCharge = 5.0;
 
 	private ForecastReport currentForecastReport;
 
@@ -215,11 +214,16 @@ public class SimController extends ModuleController {
 		SpeedReport report;
 		double currentSpeed = 50.0; // may turn this into a parameter later so
 									// we can set what the starting speed is
-		int subchunkPerForecast = 50;
+		int subchunksPerForecast = 1;
 		int chunkStart = 1; //set to 1 so it doesn't override point 0 with 0 velocity
+		int currentSubChunk = 1;
+
 
 		TreeMap<Integer, ForecastIO> inflectionPoints = mySession.getMyWeatherController()
 				.findInflectionPoints(routeToTraverse, currentForecastReport.getForecasts());
+
+		int totalNumSubChunks = subchunksPerForecast * inflectionPoints.keySet().size();
+		System.out.println("totalNumSubChunks: " + totalNumSubChunks);
 		
 		testSpeedProfile.put(points.get(0), 0.0);
 		//TODO: parameterize starting velocity
@@ -229,11 +233,12 @@ public class SimController extends ModuleController {
 	try{
 		double minCharge;
 		for (int chunkEnd : inflectionPoints.keySet()) {
-			int pointsPerSubChunk = (chunkEnd - chunkStart + 1) / subchunkPerForecast;
-			int remainder = (chunkEnd - chunkStart + 1) % pointsPerSubChunk;
+			int pointsPerSubChunk = (chunkEnd - chunkStart + 1) / subchunksPerForecast;
+			int remainder = (chunkEnd - chunkStart + 1) % subchunksPerForecast;
 			
 			for (int i = chunkStart; i < chunkEnd; i += pointsPerSubChunk ) {
-				minCharge = getMinCharge();	
+				minCharge = getMinCharge(totalNumSubChunks, currentSubChunk);
+				System.out.println("minCharge: " + minCharge);
 				if (remainder > 0) {
 					report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + pointsPerSubChunk + 1), simmedForecastReport,
 							lastCarReported, nextStartTime, lapNum, minCharge, inflectionPoints.get(chunkEnd), currentSpeed);
@@ -250,7 +255,7 @@ public class SimController extends ModuleController {
 				frames.addAll(report.getSpeedResult().getListOfFrames()); // add sim frames to list
                 nextStartTime += (report.getSpeedResult().getTravelTime());
                 totalTime += report.getSpeedResult().getTravelTime();
-    			maxChargeCount++;
+    			currentSubChunk++;
 			}
 			chunkStart = ++chunkEnd;
 		}
@@ -272,9 +277,10 @@ public class SimController extends ModuleController {
 		return new SpeedReport(testSpeedProfile, new SimResult(frames, totalTime, lastCarReported), currentSpeed);
 	}
 	
-	double getMinCharge()
+	double getMinCharge(int numSubChunks, int currentSubChunk)
 	{
-		double minCharge = 70-maxChargeCount*maxChargeStepPerChunk;
+		double chargePerChunk = (100 - minFinalCharge) / numSubChunks;
+		double minCharge = 100 - chargePerChunk * currentSubChunk;
 		if (minCharge < 0)
 		{
 			return 0;
