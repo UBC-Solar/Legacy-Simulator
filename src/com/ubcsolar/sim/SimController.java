@@ -87,64 +87,6 @@ public class SimController extends ModuleController {
 		if (lastCarReported == null) {
 			throw new NoCarStatusException();
 		}
-		
-		//TODO: restore block comment below after testing
-		/*double startTimeNanos = System.nanoTime();
-		//run the sim! 
-		GeoCoord startPoint = this.mySession.getMapController().findClosestPointOnRoute(lastReported.getLocation());
-		
-		int targetIndex = -1;
-		for(int i=0; i<routeToTraverse.getTrailMarkers().size(); i++){ //TODO , in the findClosestPointOnRoute, u find the index on route. can't u use it here as well? instead of finding it again!!!!!
-			if(routeToTraverse.getTrailMarkers().get(i).equals(startPoint)){
-				targetIndex = i;
-			}
-		}
-		int targetIndex= this.mySession.getMapController().getClosestPointIndex();
-		
-		if(targetIndex == -1){
-			throw new IllegalArgumentException();
-		}
-		if(targetIndex >= routeToTraverse.getTrailMarkers().size()-1){
-			this.mySession.sendNotification(new ExceptionNotification(new IndexOutOfBoundsException(), "ERROR: Simulation started at last point"));
-			//can still let it go through and calculate an empty simulation.
-		}
-		List<SimFrame> simFrames = new SimEngine().runSimulation(routeToTraverse, targetIndex, simmedForecastReport, lastCarReported, requestedSpeeds,laps);
-		
-		double endTimeNanos = System.nanoTime();
-		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "Sim completed in " + ((endTimeNanos -startTimeNanos)/1000000) + "ms");*/
-		
-		//TODO: comment out testing between arrows:
-		//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-/*		List<GeoCoord> trailMarkers = routeToTraverse.getTrailMarkers();
-		GeoCoord startLoc = trailMarkers.get(0);
-		int numPoints = trailMarkers.size();
-		GeoCoord endLoc = trailMarkers.get(numPoints - 1);
-
-		// double testSpeed = 50.0;
-		Map<GeoCoord, Double> speedProfile = getSpeedReport().getSpeedProfile();
-		Map<GeoCoord, Map<Integer, Double>> testRequestedSpeeds = new HashMap<GeoCoord, Map<Integer, Double>>();
-		Map<Integer, Double> testLap = new HashMap<Integer, Double>();
-		// testLap.put(1, testSpeed);
-		for (int i = 0; i < numPoints; i++) {
-			// speedProfile.put(trailMarkers.get(i), testSpeed);
-			testRequestedSpeeds.put(trailMarkers.get(i), testLap);
-		}
-		long startTime = System.currentTimeMillis();
-
-		SimResult results = new SimResult(new ArrayList<SimFrame>(), 10, lastCarReported);
-		TreeMap<Integer, ForecastIO> inflectionPoints = mySession.getMyWeatherController()
-				.findInflectionPoints(routeToTraverse, currentForecastReport.getForecasts());
-		try {
-			results = new SimEngine().runSimV2(routeToTraverse, startLoc, endLoc, currentForecastReport,
-					lastCarReported, speedProfile, startTime, 1, 10, inflectionPoints);
-		} catch (NotEnoughChargeException e) {
-			System.out.println("Too low charge");
-			System.err.println(e.getMessage());
-			// e.printStackTrace();
-		}
-		List<SimFrame> simFrames = results.getListOfFrames();*/
-		//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-		
 
 		SpeedReport results = getSpeedReport(startTime);
 		Map<GeoCoord, Map<Integer,Double>> speedProfile = new LinkedHashMap<GeoCoord, Map<Integer,Double>>();
@@ -214,7 +156,7 @@ public class SimController extends ModuleController {
 		SpeedReport report;
 		double currentSpeed = 50.0; // may turn this into a parameter later so
 									// we can set what the starting speed is
-		int subchunksPerForecast = 1;
+		int subchunksPerForecast = 2;
 		int chunkStart = 1; //set to 1 so it doesn't override point 0 with 0 velocity
 		int currentSubChunk = 1;
 
@@ -259,7 +201,7 @@ public class SimController extends ModuleController {
 			}
 			chunkStart = ++chunkEnd;
 		}
-		minCharge = 0;
+		minCharge = minFinalCharge;
 		if (inflectionPoints.size() != 1) {
 			report = getSpeedProfileForChunk(routeToTraverse, points.subList(chunkStart, points.size() - 1), simmedForecastReport,
 					lastCarReported, nextStartTime, 1, minCharge, currentForecastReport.getForecasts().get(inflectionPoints.size()), currentSpeed);
@@ -333,6 +275,7 @@ public class SimController extends ModuleController {
 										// of charge
 
 		// if car does run out of charge, speeds are lowered for this chunk until it works
+		int numRetries = 0;
 		while (!validprofile) {
 			// simV2 throws an exception if there is not enough charge, so use that to check
 			try {
@@ -340,12 +283,20 @@ public class SimController extends ModuleController {
 				results = new SimEngine().runSimV2(routeToTraverse, chunk.get(0), chunk.get(chunk.size() - 1),
 						simmedForecastReport, lastCarReported, speeds, startTime, lapNum, minCharge, inflectionPoint);
 				validprofile = true;
+				if(results.getFinalTelemData().getStateOfCharge() > (minCharge + 2) && numRetries < 10) {
+					System.out.println("retrying");
+					speed += 5;
+					for (GeoCoord g : chunk) {
+						speeds.put(g, speed);
+					}
+					validprofile = false;
+					numRetries++;
+				}
 			}
 
 			catch (NotEnoughChargeException e) {
 				// go through map and change speeds if theres not enough charge
 				speed -= .5;
-				System.out.println("DECELERATING TO " + speed);
 				for (GeoCoord g : speeds.keySet()) {
 					// if the speed is at 0 (there is no way for the car to make it through the chunk given the amount of charge), throw an exception
 					if (speed <= 0) {
