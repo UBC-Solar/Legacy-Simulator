@@ -94,5 +94,8 @@ public class GlobalValues {
 	
 	public static final double BATTERY_MAX_CHARGE = 20;
 	//this value is in units of amp-hours
+
+	public static final double MAX_SPEED = 55;
+	//this value is in units of km/h, also needs to be verified with mech team
 }
 

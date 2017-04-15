@@ -10,7 +10,7 @@ public class RandomObjectGenerator {
 	public static TelemDataPacket generateNewTelemDataPack(){
 		Random rng = new Random();
 		int speed = 30;
-		int stateOfCharge = 85;
+		int stateOfCharge = 100;
 		double totalV = rng.nextFloat()*0.2 - 0.1;
 		totalV = totalV > 50 ? 50 : totalV < 40 ? 40 : totalV;
 		double temps[] = new double[6];

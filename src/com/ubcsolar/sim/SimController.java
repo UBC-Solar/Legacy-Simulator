@@ -17,6 +17,7 @@ import java.util.TreeMap;
 
 import com.github.dvdme.ForecastIOLib.ForecastIO;
 import com.ubcsolar.Main.GlobalController;
+import com.ubcsolar.Main.GlobalValues;
 import com.ubcsolar.common.ForecastReport;
 import com.ubcsolar.common.GeoCoord;
 import com.ubcsolar.common.LocationReport;
@@ -156,7 +157,7 @@ public class SimController extends ModuleController {
 		SpeedReport report;
 		double currentSpeed = 50.0; // may turn this into a parameter later so
 									// we can set what the starting speed is
-		int subchunksPerForecast = 2;
+		int subchunksPerForecast = 10;
 		int chunkStart = 1; //set to 1 so it doesn't override point 0 with 0 velocity
 		int currentSubChunk = 1;
 
@@ -283,9 +284,10 @@ public class SimController extends ModuleController {
 				results = new SimEngine().runSimV2(routeToTraverse, chunk.get(0), chunk.get(chunk.size() - 1),
 						simmedForecastReport, lastCarReported, speeds, startTime, lapNum, minCharge, inflectionPoint);
 				validprofile = true;
-				if(results.getFinalTelemData().getStateOfCharge() > (minCharge + 2) && numRetries < 10) {
+				if(results.getFinalTelemData().getStateOfCharge() > (minCharge + 2) && numRetries < 10
+						&& speed < GlobalValues.MAX_SPEED) {
 					System.out.println("retrying");
-					speed += 5;
+					speed += 2;
 					for (GeoCoord g : chunk) {
 						speeds.put(g, speed);
 					}
