@@ -373,11 +373,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		 * is not loaded, displays an error message to end user. 
 		 */
 		protected void runSimulation() {
-			int numLaps = lapSelectComboBox.getSelectedIndex() +1; //0 based index.
-			Map<GeoCoord,Map<Integer, Double>> requestedSpeeds = generateRequestedSpeedMap();
+			int numLaps = lapSelectComboBox.getSelectedIndex() + 1; //0 based index.
 			long startTimeMillis = getStartTimeInMillis();
 			try {
-				mySession.getMySimController().runSimulation(requestedSpeeds, numLaps, startTimeMillis);
+				mySession.getMySimController().runSimulation(numLaps, startTimeMillis);
 			} catch (NoForecastReportException e) {
 				this.handleError("No Forcecasts Loaded");
 				return;

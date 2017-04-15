@@ -66,7 +66,7 @@ public class SimController extends ModuleController {
 	 * @throws IllegalArgumentException
 	 *             - if laps <= 0.
 	 */
-	public void runSimulation(Map<GeoCoord, Map<Integer, Double>> requestedSpeeds, int laps, long startTime)
+	public void runSimulation(int laps, long startTime)
 			throws NoForecastReportException, NoLoadedRouteException, NoLocationReportedException,
 			NoCarStatusException {
 		if (laps <= 0) {
@@ -89,7 +89,7 @@ public class SimController extends ModuleController {
 			throw new NoCarStatusException();
 		}
 
-		SpeedReport results = getSpeedReport(startTime);
+		SpeedReport results = getSpeedReport(startTime, 1, 50.0);
 		Map<GeoCoord, Map<Integer,Double>> speedProfile = new LinkedHashMap<GeoCoord, Map<Integer,Double>>();
 		for(GeoCoord k : results.getSpeedProfile().keySet()){
 			Map<Integer,Double> lapSpeed = new LinkedHashMap<Integer,Double>();
@@ -141,7 +141,7 @@ public class SimController extends ModuleController {
 	 * @throws NoLocationReportedException
 	 * @throws NoCarStatusException
 	 */
-	public SpeedReport getSpeedReport(long startTime) throws NoForecastReportException, NoLoadedRouteException,
+	public SpeedReport getSpeedReport(long startTime, int lapNum, double startingVelocity) throws NoForecastReportException, NoLoadedRouteException,
 			NoLocationReportedException, NoCarStatusException {
 		// things needed for simV2
 		ForecastReport simmedForecastReport = this.mySession.getMyWeatherController()
@@ -155,7 +155,7 @@ public class SimController extends ModuleController {
 		Map<GeoCoord, Double> testSpeedProfile = new LinkedHashMap<GeoCoord, Double>(); // map to store speed profile
 		ArrayList<SimFrame> frames = new ArrayList<SimFrame>(); // list to store the frames from the sim results of each chunk
 		SpeedReport report;
-		double currentSpeed = 50.0; // may turn this into a parameter later so
+		double currentSpeed = startingVelocity; // may turn this into a parameter later so
 									// we can set what the starting speed is
 		int subchunksPerForecast = 10;
 		int chunkStart = 1; //set to 1 so it doesn't override point 0 with 0 velocity
@@ -166,12 +166,11 @@ public class SimController extends ModuleController {
 				.findInflectionPoints(routeToTraverse, currentForecastReport.getForecasts());
 
 		int totalNumSubChunks = subchunksPerForecast * inflectionPoints.keySet().size();
-		System.out.println("totalNumSubChunks: " + totalNumSubChunks);
 		
 		testSpeedProfile.put(points.get(0), 0.0);
 		//TODO: parameterize starting velocity
 		long totalTime = 0;
-		int lapNum = 1; //TODO: parameterize this
+		//int lapNum = 1; //TODO: parameterize this
 		
 	try{
 		double minCharge;
@@ -205,7 +204,7 @@ public class SimController extends ModuleController {
 		minCharge = minFinalCharge;
 		if (inflectionPoints.size() != 1) {
 			report = getSpeedProfileForChunk(routeToTraverse, points.subList(chunkStart, points.size() - 1), simmedForecastReport,
-					lastCarReported, nextStartTime, 1, minCharge, currentForecastReport.getForecasts().get(inflectionPoints.size()), currentSpeed);
+					lastCarReported, nextStartTime, lapNum, minCharge, currentForecastReport.getForecasts().get(inflectionPoints.size()), currentSpeed);
 			lastCarReported = report.getSpeedResult().getFinalTelemData();
 			testSpeedProfile.putAll(report.getSpeedProfile()); // add new speed profiles to map
 			frames.addAll(report.getSpeedResult().getListOfFrames()); // add sim frames to list
