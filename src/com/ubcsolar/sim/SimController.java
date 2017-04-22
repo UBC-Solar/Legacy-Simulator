@@ -89,31 +89,30 @@ public class SimController extends ModuleController {
 			throw new NoCarStatusException();
 		}
 
+		TelemDataPacket prevCarStatus = lastCarReported;
 		double startingVelocity = 50.0;
-		int numSubchunksPerForecast = 10;
+		int numSubchunksPerForecast = 5;
 		SpeedReport results;
 		Map<GeoCoord, Map<Integer,Double>> speedProfile = new LinkedHashMap<GeoCoord, Map<Integer,Double>>();
 		List<SimFrame> resultFrames = new ArrayList<SimFrame>();
 
 		for (int i = 1; i <= laps; i++) {
-		    results = getSpeedReport(startTime, i, startingVelocity, numSubchunksPerForecast, laps);
+		    results = getSpeedReport(startTime, i, startingVelocity, numSubchunksPerForecast, laps, prevCarStatus);
             for(GeoCoord k : results.getSpeedProfile().keySet()){
-                Map<Integer,Double> lapSpeed = new LinkedHashMap<Integer,Double>();
+                Map<Integer,Double> lapSpeed;
+                if(i == 1) {
+                    lapSpeed = new LinkedHashMap<Integer,Double>();
+                } else {
+                    lapSpeed = speedProfile.get(k);
+                }
                 lapSpeed.put(i, results.getSpeedProfile().get(k));
                 speedProfile.put(k, lapSpeed);
             }
             resultFrames.addAll(results.getSpeedResult().getListOfFrames());
             startingVelocity = results.getSpeed();
-            System.out.println("new starting velocity: " + startingVelocity);
+            startTime += results.getSpeedResult().getTravelTime();
+            prevCarStatus = results.getSpeedResult().getFinalTelemData();
         }
-//
-//		SpeedReport results = getSpeedReport(startTime, 1, 50.0, 10, laps);
-//		Map<GeoCoord, Map<Integer,Double>> speedProfile = new LinkedHashMap<GeoCoord, Map<Integer,Double>>();
-//		for(GeoCoord k : results.getSpeedProfile().keySet()){
-//			Map<Integer,Double> lapSpeed = new LinkedHashMap<Integer,Double>();
-//			lapSpeed.put(1, results.getSpeedProfile().get(k));
-//			speedProfile.put(k, lapSpeed);
-//		}
 		SimulationReport toSend = new SimulationReport(resultFrames, speedProfile, "some info");
 
 		this.mySession.sendNotification(new NewSimulationReportNotification(toSend));
@@ -160,14 +159,13 @@ public class SimController extends ModuleController {
 	 * @throws NoCarStatusException
 	 */
 	public SpeedReport getSpeedReport(long startTime, int lapNum, double startingVelocity, int numSubchunksPerForecast,
-                                      int totalNumLaps)
+                                      int totalNumLaps, TelemDataPacket prevCarStatus)
 			throws NoForecastReportException, NoLoadedRouteException,
 			NoLocationReportedException, NoCarStatusException {
 		// things needed for simV2
 		ForecastReport simmedForecastReport = this.mySession.getMyWeatherController()
 				.getSimmedForecastForEveryPointForLoadedRoute();
 		Route routeToTraverse = this.mySession.getMapController().getAllPoints();
-		TelemDataPacket lastCarReported = this.mySession.getMyCarController().getLastTelemDataPacket();
 
 		long nextStartTime = startTime;
 
@@ -184,12 +182,14 @@ public class SimController extends ModuleController {
 		TreeMap<Integer, ForecastIO> inflectionPoints = mySession.getMyWeatherController()
 				.findInflectionPoints(routeToTraverse, currentForecastReport.getForecasts());
 
-		int totalNumSubChunks = subchunksPerForecast * inflectionPoints.keySet().size();
-		
-		testSpeedProfile.put(points.get(0), 0.0);
-		//TODO: parameterize starting velocity
+		int numSubchunksPerLap = subchunksPerForecast * inflectionPoints.keySet().size();
+
+		if (lapNum == 1) {
+            testSpeedProfile.put(points.get(0), 0.0);
+        } else {
+		    testSpeedProfile.put(points.get(0), startingVelocity);
+        }
 		long totalTime = 0;
-		//int lapNum = 1; //TODO: parameterize this
 		
 	try{
 		double minCharge;
@@ -198,20 +198,20 @@ public class SimController extends ModuleController {
 			int remainder = (chunkEnd - chunkStart + 1) % subchunksPerForecast;
 			
 			for (int i = chunkStart; i < chunkEnd; i += pointsPerSubChunk ) {
-				minCharge = getMinCharge(totalNumSubChunks, currentSubChunk);
-				System.out.println("minCharge: " + minCharge);
+				minCharge = getMinCharge(numSubchunksPerLap * totalNumLaps,
+                        (currentSubChunk + (lapNum - 1) * numSubchunksPerLap));
 				if (remainder > 0) {
 					report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + pointsPerSubChunk + 1), simmedForecastReport,
-							lastCarReported, nextStartTime, lapNum, minCharge, inflectionPoints.get(chunkEnd), currentSpeed);
+							prevCarStatus, nextStartTime, lapNum, minCharge, inflectionPoints.get(chunkEnd), currentSpeed);
 					i++;
 					remainder--;
 				}
 				else {
 					report = getSpeedProfileForChunk(routeToTraverse, points.subList(i, i + pointsPerSubChunk), simmedForecastReport,
-							lastCarReported, nextStartTime, lapNum, minCharge, inflectionPoints.get(chunkEnd), currentSpeed);
+							prevCarStatus, nextStartTime, lapNum, minCharge, inflectionPoints.get(chunkEnd), currentSpeed);
 				}
 				currentSpeed = report.getSpeed(); // change current speed to the speed of the car at the end of the chunk
-				lastCarReported = report.getSpeedResult().getFinalTelemData();
+				prevCarStatus = report.getSpeedResult().getFinalTelemData();
 				testSpeedProfile.putAll(report.getSpeedProfile()); // add new speed profiles to map
 				frames.addAll(report.getSpeedResult().getListOfFrames()); // add sim frames to list
                 nextStartTime += (report.getSpeedResult().getTravelTime());
@@ -220,11 +220,11 @@ public class SimController extends ModuleController {
 			}
 			chunkStart = ++chunkEnd;
 		}
-		minCharge = minFinalCharge;
+		minCharge = 100 - ((100 - minFinalCharge) / totalNumLaps * lapNum);
 		if (inflectionPoints.size() != 1) {
 			report = getSpeedProfileForChunk(routeToTraverse, points.subList(chunkStart, points.size() - 1), simmedForecastReport,
-					lastCarReported, nextStartTime, lapNum, minCharge, currentForecastReport.getForecasts().get(inflectionPoints.size()), currentSpeed);
-			lastCarReported = report.getSpeedResult().getFinalTelemData();
+					prevCarStatus, nextStartTime, lapNum, minCharge, currentForecastReport.getForecasts().get(inflectionPoints.size()), currentSpeed);
+			prevCarStatus = report.getSpeedResult().getFinalTelemData();
 			testSpeedProfile.putAll(report.getSpeedProfile()); // add new speed profiles to map
 			frames.addAll(report.getSpeedResult().getListOfFrames()); // add sim frames to list
 		}
@@ -235,7 +235,7 @@ public class SimController extends ModuleController {
 	
 		// return Speed Report with all the speed profiles and sim result with
 
-		return new SpeedReport(testSpeedProfile, new SimResult(frames, totalTime, lastCarReported), currentSpeed);
+		return new SpeedReport(testSpeedProfile, new SimResult(frames, totalTime, prevCarStatus), currentSpeed);
 	}
 	
 	double getMinCharge(int numSubChunks, int currentSubChunk)
@@ -282,13 +282,13 @@ public class SimController extends ModuleController {
 		ForecastReport simmedForecastReport, TelemDataPacket lastCarReported, long startTime, int lapNum,
 		double minCharge, ForecastIO inflectionPoint, double startingSpeed) throws NotEnoughChargeException {
 		
-		Map<GeoCoord, Double> speeds = new LinkedHashMap<GeoCoord, Double>();
+		Map<GeoCoord, Double> speedMap = new LinkedHashMap<GeoCoord, Double>();
 		SimResult results = new SimResult(new ArrayList<SimFrame>(), 10, lastCarReported);
 		double speed = startingSpeed;
 		
 		// initialize every geo coord of the chunk with the same speed
 		for (GeoCoord g : chunk) {
-			speeds.put(g, speed);
+			speedMap.put(g, speed);
 		}
 		boolean validprofile = false; // flag to check if the car will run out
 										// of charge
@@ -300,14 +300,13 @@ public class SimController extends ModuleController {
 			try {
 				// run sim from start of chunk to end of chunk
 				results = new SimEngine().runSimV2(routeToTraverse, chunk.get(0), chunk.get(chunk.size() - 1),
-						simmedForecastReport, lastCarReported, speeds, startTime, lapNum, minCharge, inflectionPoint);
+						simmedForecastReport, lastCarReported, speedMap, startTime, lapNum, minCharge, inflectionPoint);
 				validprofile = true;
 				if(results.getFinalTelemData().getStateOfCharge() > (minCharge + 2) && numRetries < 10
 						&& speed < GlobalValues.MAX_SPEED) {
-					System.out.println("retrying");
 					speed += 2;
 					for (GeoCoord g : chunk) {
-						speeds.put(g, speed);
+						speedMap.put(g, speed);
 					}
 					validprofile = false;
 					numRetries++;
@@ -317,16 +316,16 @@ public class SimController extends ModuleController {
 			catch (NotEnoughChargeException e) {
 				// go through map and change speeds if theres not enough charge
 				speed -= .5;
-				for (GeoCoord g : speeds.keySet()) {
+				for (GeoCoord g : speedMap.keySet()) {
 					// if the speed is at 0 (there is no way for the car to make it through the chunk given the amount of charge), throw an exception
 					if (speed <= 0) {
 						throw new NotEnoughChargeException(0,0, "speed cannot make it through the whole route");
 				 	}
-					speeds.put(g, speed);
+					speedMap.put(g, speed);
 				}
 			}
 		}
-		SpeedReport report = new SpeedReport(speeds, results, speed);
+		SpeedReport report = new SpeedReport(speedMap, results, speed);
 		return report;
 	}
 }
