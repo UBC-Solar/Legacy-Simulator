@@ -89,14 +89,32 @@ public class SimController extends ModuleController {
 			throw new NoCarStatusException();
 		}
 
-		SpeedReport results = getSpeedReport(startTime, 1, 50.0);
+		double startingVelocity = 50.0;
+		int numSubchunksPerForecast = 10;
+		SpeedReport results;
 		Map<GeoCoord, Map<Integer,Double>> speedProfile = new LinkedHashMap<GeoCoord, Map<Integer,Double>>();
-		for(GeoCoord k : results.getSpeedProfile().keySet()){
-			Map<Integer,Double> lapSpeed = new LinkedHashMap<Integer,Double>();
-			lapSpeed.put(1, results.getSpeedProfile().get(k));
-			speedProfile.put(k, lapSpeed);
-		}
-		SimulationReport toSend = new SimulationReport(results.getSpeedResult().getListOfFrames(),speedProfile, "some info");
+		List<SimFrame> resultFrames = new ArrayList<SimFrame>();
+
+		for (int i = 1; i <= laps; i++) {
+		    results = getSpeedReport(startTime, i, startingVelocity, numSubchunksPerForecast, laps);
+            for(GeoCoord k : results.getSpeedProfile().keySet()){
+                Map<Integer,Double> lapSpeed = new LinkedHashMap<Integer,Double>();
+                lapSpeed.put(i, results.getSpeedProfile().get(k));
+                speedProfile.put(k, lapSpeed);
+            }
+            resultFrames.addAll(results.getSpeedResult().getListOfFrames());
+            startingVelocity = results.getSpeed();
+            System.out.println("new starting velocity: " + startingVelocity);
+        }
+//
+//		SpeedReport results = getSpeedReport(startTime, 1, 50.0, 10, laps);
+//		Map<GeoCoord, Map<Integer,Double>> speedProfile = new LinkedHashMap<GeoCoord, Map<Integer,Double>>();
+//		for(GeoCoord k : results.getSpeedProfile().keySet()){
+//			Map<Integer,Double> lapSpeed = new LinkedHashMap<Integer,Double>();
+//			lapSpeed.put(1, results.getSpeedProfile().get(k));
+//			speedProfile.put(k, lapSpeed);
+//		}
+		SimulationReport toSend = new SimulationReport(resultFrames, speedProfile, "some info");
 
 		this.mySession.sendNotification(new NewSimulationReportNotification(toSend));
 	}
@@ -141,7 +159,9 @@ public class SimController extends ModuleController {
 	 * @throws NoLocationReportedException
 	 * @throws NoCarStatusException
 	 */
-	public SpeedReport getSpeedReport(long startTime, int lapNum, double startingVelocity) throws NoForecastReportException, NoLoadedRouteException,
+	public SpeedReport getSpeedReport(long startTime, int lapNum, double startingVelocity, int numSubchunksPerForecast,
+                                      int totalNumLaps)
+			throws NoForecastReportException, NoLoadedRouteException,
 			NoLocationReportedException, NoCarStatusException {
 		// things needed for simV2
 		ForecastReport simmedForecastReport = this.mySession.getMyWeatherController()
@@ -155,9 +175,8 @@ public class SimController extends ModuleController {
 		Map<GeoCoord, Double> testSpeedProfile = new LinkedHashMap<GeoCoord, Double>(); // map to store speed profile
 		ArrayList<SimFrame> frames = new ArrayList<SimFrame>(); // list to store the frames from the sim results of each chunk
 		SpeedReport report;
-		double currentSpeed = startingVelocity; // may turn this into a parameter later so
-									// we can set what the starting speed is
-		int subchunksPerForecast = 10;
+		double currentSpeed = startingVelocity;
+		int subchunksPerForecast = numSubchunksPerForecast;
 		int chunkStart = 1; //set to 1 so it doesn't override point 0 with 0 velocity
 		int currentSubChunk = 1;
 
