@@ -2,15 +2,7 @@ package com.ubcsolar.sim;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableSet;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.jfree.data.Values;
 
@@ -72,8 +64,8 @@ public class SimEngine {
 	 * @throws NotEnoughChargeException if the end charge is less than minCharge
 	 */
 	public SimResult runSimV2(Route toTraverse, GeoCoord startLoc, GeoCoord endLoc,
-							  ForecastReport report, TelemDataPacket carStartState,
-							  Map<GeoCoord, Double> speedProfile, long startTime, int lapNum, double minCharge,
+							  TelemDataPacket carStartState,
+							  double startSpeed, double endSpeed, long startTime, int lapNum, double minCharge,
 							  ForecastIO inflectionPoint) throws NotEnoughChargeException {
 
 		int startingIndex = toTraverse.getIndexOfClosestPoint(startLoc);
@@ -88,14 +80,17 @@ public class SimEngine {
 		FIODataPoint startWeatherPoint = chooseReport(inflectionPoint, startTime);
 		LocationReport startLocationReport = new LocationReport(currPoint, "Raven", "Simmed");
 		totalCharge = carStartState.getTotalVoltage();
-		SimFrame startSimFrame = new SimFrame(startWeatherPoint, carStartState, startLocationReport, startTime, lapNum);
+		SimFrame startSimFrame = new SimFrame(startWeatherPoint, carStartState, 0, startLocationReport, startTime, lapNum);
 
 		List<SimFrame> listOfFrames = new ArrayList<SimFrame>();
 		listOfFrames.add(startSimFrame);
 		GeoCoord prevPoint = currPoint;
 		long currTime = startTime;
+		long prevTime = startTime;
 		TelemDataPacket prevStatus = carStartState;
 		TelemDataPacket currStatus = prevStatus;
+		Map<GeoCoord, Double> speedProfile = new LinkedHashMap<GeoCoord, Double>();
+		speedProfile.put(toTraverse.getTrailMarkers().get(startingIndex), startSpeed);
 		JsonObject dailyData = (JsonObject) ((JsonArray) inflectionPoint.getDaily().get("data")).get(0);
 		long sunriseTime = Long.parseLong(dailyData.get("sunriseTime").toString())*1000;
 		long sunsetTime = Long.parseLong(dailyData.get("sunsetTime").toString())*1000;
@@ -103,11 +98,12 @@ public class SimEngine {
 		for (int i = startingIndex + 1; i <= endingIndex; i++) {
 			currPoint = toTraverse.getTrailMarkers().get(i);
 
-			double speed = speedProfile.get(currPoint);
+			double speed = startSpeed;
+			speedProfile.put(currPoint, speed);
 			double distance = prevPoint.calculateDistance(currPoint);
 			double timeIncHr = distance / speed;
-			double timeIncMS = timeIncHr * 3600000;
-			currTime += timeIncMS;
+			double timeIncMillis = timeIncHr * 3600000;
+			currTime += timeIncMillis;
 
 			FIODataPoint currWeatherPoint = chooseReport(inflectionPoint, currTime);
 
@@ -128,13 +124,13 @@ public class SimEngine {
 
 			LocationReport currLocReport = new LocationReport(currPoint, "Raven", "Simmed");
 
-			SimFrame currSimFrame = new SimFrame(currWeatherPoint, currStatus, currLocReport, currTime, lapNum);
+			SimFrame currSimFrame = new SimFrame(currWeatherPoint, currStatus, (currTime-prevTime), currLocReport, currTime, lapNum);
 			listOfFrames.add(currSimFrame);
-
+			prevTime = currTime;
 			prevPoint = currPoint;
 		}
 
-		SimResult result = new SimResult(listOfFrames, currTime - startTime, currStatus);
+		SimResult result = new SimResult(listOfFrames, currTime - startTime, currStatus, speedProfile);
 
 		return result;
 	}

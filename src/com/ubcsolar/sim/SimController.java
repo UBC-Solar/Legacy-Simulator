@@ -172,7 +172,10 @@ public class SimController extends ModuleController {
 		List<GeoCoord> points = routeToTraverse.getTrailMarkers(); // the GeoCoords of the route
 		Map<GeoCoord, Double> testSpeedProfile = new LinkedHashMap<GeoCoord, Double>(); // map to store speed profile
 		ArrayList<SimFrame> frames = new ArrayList<SimFrame>(); // list to store the frames from the sim results of each chunk
-		SpeedReport report;
+		SpeedReport report = new SpeedReport(new LinkedHashMap<GeoCoord,Double>(),
+				new SimResult(new ArrayList<SimFrame>(), 0,
+						prevCarStatus, new LinkedHashMap<GeoCoord, Double>()),
+				0);
 		double currentSpeed = startingVelocity;
 		int subchunksPerForecast = numSubchunksPerForecast;
 		int chunkStart = 1; //set to 1 so it doesn't override point 0 with 0 velocity
@@ -235,7 +238,7 @@ public class SimController extends ModuleController {
 	
 		// return Speed Report with all the speed profiles and sim result with
 
-		return new SpeedReport(testSpeedProfile, new SimResult(frames, totalTime, prevCarStatus), currentSpeed);
+		return new SpeedReport(testSpeedProfile, new SimResult(frames, totalTime, prevCarStatus, report.getSpeedProfile()), currentSpeed);
 	}
 	
 	double getMinCharge(int numSubChunks, int currentSubChunk)
@@ -281,15 +284,13 @@ public class SimController extends ModuleController {
 	private SpeedReport getSpeedProfileForChunk(Route routeToTraverse, List<GeoCoord> chunk,
 		ForecastReport simmedForecastReport, TelemDataPacket lastCarReported, long startTime, int lapNum,
 		double minCharge, ForecastIO inflectionPoint, double startingSpeed) throws NotEnoughChargeException {
-		
-		Map<GeoCoord, Double> speedMap = new LinkedHashMap<GeoCoord, Double>();
-		SimResult results = new SimResult(new ArrayList<SimFrame>(), 10, lastCarReported);
-		double speed = startingSpeed;
+
+		SimResult results = new SimResult(new ArrayList<SimFrame>(), 0,
+				lastCarReported, new LinkedHashMap<GeoCoord, Double>());
+		double finalSpeed = startingSpeed;
+		double currSpeed = finalSpeed;
 		
 		// initialize every geo coord of the chunk with the same speed
-		for (GeoCoord g : chunk) {
-			speedMap.put(g, speed);
-		}
 		boolean validprofile = false; // flag to check if the car will run out
 										// of charge
 
@@ -300,32 +301,27 @@ public class SimController extends ModuleController {
 			try {
 				// run sim from start of chunk to end of chunk
 				results = new SimEngine().runSimV2(routeToTraverse, chunk.get(0), chunk.get(chunk.size() - 1),
-						simmedForecastReport, lastCarReported, speedMap, startTime, lapNum, minCharge, inflectionPoint);
+						lastCarReported, startingSpeed, finalSpeed, startTime, lapNum, minCharge, inflectionPoint);
 				validprofile = true;
 				if(results.getFinalTelemData().getStateOfCharge() > (minCharge + 2) && numRetries < 10
-						&& speed < GlobalValues.MAX_SPEED) {
-					speed += 2;
-					for (GeoCoord g : chunk) {
-						speedMap.put(g, speed);
-					}
+						&& finalSpeed < GlobalValues.MAX_SPEED) {
+					finalSpeed += 2;
+					startingSpeed = finalSpeed; //TODO: fix this when you actually calculate stuff
 					validprofile = false;
 					numRetries++;
 				}
 			}
 
 			catch (NotEnoughChargeException e) {
-				// go through map and change speeds if theres not enough charge
-				speed -= .5;
-				for (GeoCoord g : speedMap.keySet()) {
-					// if the speed is at 0 (there is no way for the car to make it through the chunk given the amount of charge), throw an exception
-					if (speed <= 0) {
-						throw new NotEnoughChargeException(0,0, "speed cannot make it through the whole route");
-				 	}
-					speedMap.put(g, speed);
+				finalSpeed -= .5;
+				startingSpeed = finalSpeed; //TODO: fix this when you calculate
+				if (finalSpeed <= 0) {
+					throw new NotEnoughChargeException(0,0, "speed cannot make it through the whole route");
 				}
 			}
 		}
-		SpeedReport report = new SpeedReport(speedMap, results, speed);
+
+		SpeedReport report = new SpeedReport(results.getSpeedProfile(), results, finalSpeed);
 		return report;
 	}
 }
