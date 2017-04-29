@@ -38,30 +38,6 @@ public class SimFrame extends DataUnit{ //implements Runnable{
 	
 	}
 	
-	/*
-	@Override
-	public void run() {
-		String frameToPrint = "";
-		frameToPrint += actualDateFormat.format (this.getRepresentedTime())+ "," ;
-		frameToPrint += excelDateFormat.format(this.getRepresentedTime()) + reportSeparation ;
-		//frameToPrint += this.getForecast().getCSVEntry() + reportSeparation; //TODO
-		frameToPrint += this.getCarStatus().getCSVEntry() + reportSeparation;
-		frameToPrint += this.getGPSReport().getCSVEntry() + ",";
-		
-		String frameEntry = ""+frame;
-		parent.notifyOfResult(frameEntry,frameToPrint);
-
-		
-	}
-	
-	private int frame;
-	private SimulationReport parent;
-	SimFrame(int entry,SimulationReport temp ){
-		this.frame=entry;
-		parent=temp;
-		
-	}*/
-	
 	
 	/**
 	 * gets the column headings as a csv row
@@ -88,23 +64,26 @@ public class SimFrame extends DataUnit{ //implements Runnable{
 	private  final TelemDataPacket carStatus;
 	private  final LocationReport GPSReport;
 	private final int lapNumber;
+	private final long travelTime;
 	
 	
-	public SimFrame(FIODataPoint forecast, TelemDataPacket carStatus, LocationReport GPSReport, long timeRepresented, int lapNumber) {
+	public SimFrame(FIODataPoint forecast, TelemDataPacket carStatus, long travelTime, LocationReport GPSReport, long timeRepresented, int lapNumber) {
 		this.forecast = forecast;
 		this.carStatus = carStatus;
 		this.GPSReport = GPSReport;	
 		this.representedTime = timeRepresented;
 		this.timeCreated = System.currentTimeMillis();
 		this.lapNumber = lapNumber;
+		this.travelTime = travelTime;
 	}
-	public SimFrame(FIODataPoint forecast, TelemDataPacket carStatus, LocationReport GPSReport, long timeRepresented, int lapNumber, long timeCreated) {
+	public SimFrame(FIODataPoint forecast, TelemDataPacket carStatus, long travelTime, LocationReport GPSReport, long timeRepresented, int lapNumber, long timeCreated) {
 		this.forecast = forecast;
 		this.carStatus = carStatus;
 		this.GPSReport = GPSReport;
 		this.representedTime = timeRepresented;
 		this.timeCreated = timeCreated;	
 		this.lapNumber = lapNumber;
+		this.travelTime = travelTime;
 	}
 
 	@Override
@@ -132,6 +111,8 @@ public class SimFrame extends DataUnit{ //implements Runnable{
 	public long getRepresentedTime() {
 		return representedTime;
 	}
+
+	public long getTravelTime(){ return travelTime;}
 
 	public int getLapNumber() {
 		return this.lapNumber;

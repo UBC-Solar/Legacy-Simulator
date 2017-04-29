@@ -2,15 +2,7 @@ package com.ubcsolar.sim;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableSet;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.jfree.data.Values;
 
@@ -55,14 +47,7 @@ public class SimEngine {
 	 *                       be part of toTraverse
 	 * @param endLoc:        The ending location for the route chunk to be simulated. endLoc must be part
 	 *                       of toTraverse
-	 * @param report:        The ForecastReport containing the forecasts for toTraverse. The report must
-	 *                       contain a ForecastIO for every GeoCoord in the route chunk that is being simulated. (Use
-	 *                       methods in WeatherController to interpolate forecasts if forecast density is less than
-	 *                       GeoCoord density)
 	 * @param carStartState: the car's telemetry data at the start of the simulated route chunk
-	 * @param speedProfile:  A map that matches each GeoCoord between startLoc and endLoc with the
-	 *                       speed (in km/h) to be simulated during that interval. Currently, this is the limitation that prevents
-	 *                       simulating multiple laps (to avoid double mapping GeoCoords)
 	 * @param startTime:     The time at which the race will begin (in Unix format, i.e. s from 1/1/70)
 	 * @param lapNum:        The lap that the simulation is simulating
 	 * @param minCharge:     The minimum percentage of charge that is acceptable at the end of this segment
@@ -72,9 +57,9 @@ public class SimEngine {
 	 * @throws NotEnoughChargeException if the end charge is less than minCharge
 	 */
 	public SimResult runSimV2(Route toTraverse, GeoCoord startLoc, GeoCoord endLoc,
-							  ForecastReport report, TelemDataPacket carStartState,
-							  Map<GeoCoord, Double> speedProfile, long startTime, int lapNum, double minCharge,
-							  ForecastIO inflectionPoint) throws NotEnoughChargeException {
+							  TelemDataPacket carStartState,
+							  double startSpeed, double endSpeed, long startTime, int lapNum, double minCharge,
+							  ForecastIO inflectionPoint) {
 
 		int startingIndex = toTraverse.getIndexOfClosestPoint(startLoc);
 		int endingIndex = toTraverse.getIndexOfClosestPoint(endLoc);
@@ -88,32 +73,64 @@ public class SimEngine {
 		FIODataPoint startWeatherPoint = chooseReport(inflectionPoint, startTime);
 		LocationReport startLocationReport = new LocationReport(currPoint, "Raven", "Simmed");
 		totalCharge = carStartState.getTotalVoltage();
-		SimFrame startSimFrame = new SimFrame(startWeatherPoint, carStartState, startLocationReport, startTime, lapNum);
+		SimFrame startSimFrame = new SimFrame(startWeatherPoint, carStartState, 0, startLocationReport, startTime, lapNum);
 
 		List<SimFrame> listOfFrames = new ArrayList<SimFrame>();
 		listOfFrames.add(startSimFrame);
 		GeoCoord prevPoint = currPoint;
+
 		long currTime = startTime;
+		long prevTime = startTime;
+
 		TelemDataPacket prevStatus = carStartState;
 		TelemDataPacket currStatus = prevStatus;
+
+		Map<GeoCoord, Double> speedProfile = new LinkedHashMap<GeoCoord, Double>();
+		double currSpeed = startSpeed;
+		speedProfile.put(toTraverse.getTrailMarkers().get(startingIndex), currSpeed);
+
 		JsonObject dailyData = (JsonObject) ((JsonArray) inflectionPoint.getDaily().get("data")).get(0);
 		long sunriseTime = Long.parseLong(dailyData.get("sunriseTime").toString())*1000;
 		long sunsetTime = Long.parseLong(dailyData.get("sunsetTime").toString())*1000;
+
 		double currCharge = carStartState.getStateOfCharge();
+
+		boolean runSuccessful = true;
+
 		for (int i = startingIndex + 1; i <= endingIndex; i++) {
+			//System.out.println("currSpeed is: " + currSpeed);
+			//System.out.println("currCharge: " + currCharge);
 			currPoint = toTraverse.getTrailMarkers().get(i);
 
-			double speed = speedProfile.get(currPoint);
+			speedProfile.put(currPoint, currSpeed);
+
 			double distance = prevPoint.calculateDistance(currPoint);
-			double timeIncHr = distance / speed;
-			double timeIncMS = timeIncHr * 3600000;
-			currTime += timeIncMS;
+			double timeIncHr = distance / currSpeed;
+			//System.out.println("timeIncHr: " + timeIncHr);
+			double timeIncMillis = timeIncHr * 3600000;
+			currTime += timeIncMillis;
+
+			if (currSpeed != endSpeed) {
+				double speedDiff = GlobalValues.MAX_ACCELERATION_KMH2 * timeIncHr;
+				System.out.println("timeIncMin: " + timeIncHr*60);
+				System.out.println("timeIncSec: " + timeIncHr*3600);
+				System.out.println("speedDiff is : " + speedDiff);
+				if (currSpeed < endSpeed) {
+					currSpeed += speedDiff;
+					if(currSpeed > endSpeed)
+						currSpeed = endSpeed;
+				} else if (currSpeed > endSpeed) {
+					currSpeed -= speedDiff;
+					if(currSpeed < endSpeed)
+						currSpeed = endSpeed;
+				}
+			}
 
 			FIODataPoint currWeatherPoint = chooseReport(inflectionPoint, currTime);
 
 			double latitude = currPoint.getLat();
 			double chargeDiff = calculateChargeDiff(prevPoint, currPoint,
-					currWeatherPoint, speed, timeIncHr, sunriseTime, sunsetTime, latitude, currTime);
+					currWeatherPoint, currSpeed, timeIncHr, sunriseTime, sunsetTime, latitude, currTime);
 			currCharge += chargeDiff;
 			if (currCharge > 100)
 				currCharge = 100;
@@ -121,20 +138,22 @@ public class SimEngine {
 				currCharge = 0;
 			if (currCharge <= minCharge) {
 				String message = "Speed profile uses too much charge. Drops below minimum charge of " + minCharge;
-				throw new NotEnoughChargeException(currCharge, minCharge, message);
+				runSuccessful = false;
+				break;
+				//throw new NotEnoughChargeException(currCharge, minCharge, message);
 			}
-			currStatus = new TelemDataPacket(speed, carStartState.getTotalVoltage(), carStartState.getTemperatures(),
+			currStatus = new TelemDataPacket(currSpeed, carStartState.getTotalVoltage(), carStartState.getTemperatures(),
 					carStartState.getCellVoltages(), currCharge);
 
 			LocationReport currLocReport = new LocationReport(currPoint, "Raven", "Simmed");
 
-			SimFrame currSimFrame = new SimFrame(currWeatherPoint, currStatus, currLocReport, currTime, lapNum);
+			SimFrame currSimFrame = new SimFrame(currWeatherPoint, currStatus, (currTime-prevTime), currLocReport, currTime, lapNum);
 			listOfFrames.add(currSimFrame);
-
+			prevTime = currTime;
 			prevPoint = currPoint;
 		}
 
-		SimResult result = new SimResult(listOfFrames, currTime - startTime, currStatus);
+		SimResult result = new SimResult(listOfFrames, currTime - startTime, currStatus, speedProfile, runSuccessful);
 
 		return result;
 	}
