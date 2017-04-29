@@ -5,9 +5,11 @@
 package com.ubcsolar.ui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +53,13 @@ import javax.swing.JRadioButton;
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.JButton;
+import javax.swing.JTextPane;
 
 public class CustomDisplayMap extends JMapViewer {
 	/**
@@ -70,10 +79,12 @@ public class CustomDisplayMap extends JMapViewer {
 	private boolean showPOIs; // initial value set to equal checkbox
 	private MapPolygon routeBreadcrumbs; // the line that shows the trail
 	private boolean showRouteBreadcrumbs; // initial value set to equal checkbox
+	private Map<GeoCoord, Map<Integer, Double>> simResult; //map to hold results of most recent simulation
 	private JRadioButton rdbtnSateliteoffline;
 	private JRadioButton rdbtnSattelite;
 	private JRadioButton rdbtnDefaultMapOffline;
 	private JRadioButton rdbtnDefaultMap;
+	private JSpinner spinner; //spinner for lap number displayed
 
 	public CustomDisplayMap() {
 		super(new saveToDiskCache(), 8); // 8 is used in the default constructor
@@ -95,7 +106,7 @@ public class CustomDisplayMap extends JMapViewer {
 		});
 		chckbxForecasts.setSelected(true);
 		showForecasts = chckbxForecasts.isSelected();
-		chckbxForecasts.setBounds(339, 10, 97, 23);
+		chckbxForecasts.setBounds(268, 10, 97, 23);
 		add(chckbxForecasts);
 
 		JCheckBox chckbxCities = new JCheckBox("Cities");
@@ -111,7 +122,7 @@ public class CustomDisplayMap extends JMapViewer {
 		chckbxCities.setFont(defaultFontForThings);
 		chckbxCities.setOpaque(false);
 
-		chckbxCities.setBounds(62, 10, 72, 23);
+		chckbxCities.setBounds(26, 10, 72, 23);
 		add(chckbxCities);
 
 		JCheckBox chckbxCarLocation = new JCheckBox("Car Location");
@@ -126,7 +137,7 @@ public class CustomDisplayMap extends JMapViewer {
 				refreshMap();
 			}
 		});
-		chckbxCarLocation.setBounds(136, 10, 116, 23);
+		chckbxCarLocation.setBounds(90, 10, 116, 23);
 		add(chckbxCarLocation);
 
 		JCheckBox chckbxRoute = new JCheckBox("Route");
@@ -141,7 +152,7 @@ public class CustomDisplayMap extends JMapViewer {
 				refreshMap();
 			}
 		});
-		chckbxRoute.setBounds(254, 10, 83, 23);
+		chckbxRoute.setBounds(197, 10, 83, 23);
 		add(chckbxRoute);
 
 		rdbtnSattelite = new JRadioButton("Satellite");
@@ -151,9 +162,9 @@ public class CustomDisplayMap extends JMapViewer {
 			}
 		});
 
-		JCheckBox chckbxSpeeds = new JCheckBox("Recommended Speeds\r\n");
+		JCheckBox chckbxSpeeds = new JCheckBox("Recommended Speeds    Lap Number:\n");
 		chckbxSpeeds.setForeground(defaultColorForThings);
-		chckbxSpeeds.setBounds(445, 10, 171, 23);
+		chckbxSpeeds.setBounds(361, 10, 267, 23);
 		chckbxSpeeds.setFont(defaultFontForThings);
 		chckbxSpeeds.setOpaque(false);
 		chckbxSpeeds.setSelected(true);
@@ -213,7 +224,27 @@ public class CustomDisplayMap extends JMapViewer {
 		lblTileSoure.setFont(defaultFontForThings);
 		lblTileSoure.setBounds(10, 184, 82, 20);
 		add(lblTileSoure);
+		
+		this.simResult = new LinkedHashMap<GeoCoord, Map<Integer, Double>>(); //initialize the map for sim result
+	
+		spinner = new JSpinner();
+		spinner.setModel(new SpinnerNumberModel(0, 0, 0, 1)); //set spinner to 0
+		spinner.setBounds(629, 12, 44, 20);
+		add(spinner);
+		
+		JTextPane textPane = new JTextPane();
+		textPane.setBounds(667, 10, 6, 20);
+		add(textPane);
+		
+		spinner.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				addSpeedsToMap();
+			}
+		});
+		
+		
 		this.updateTileSource(MapSource.OSM_MAP); // default tiles
+		
 	}
 
 	public void changeDrawnRoute(Route newRouteToLoad) {
@@ -294,16 +325,23 @@ public class CustomDisplayMap extends JMapViewer {
 	}
 
 	// *****************************************************BETA******************************************************
-
-
-	public void addSpeedsToMap(Map<GeoCoord, Map<Integer,Double>> speed_profile) {
-		Style forecastStyle = new Style(Color.black, Color.BLUE, null, this.defaultFontForThings);
-		//int i = 0;
-		int filter_constant = 100;
-		double filter_distance = 0.5;
-		GeoCoord last_marker = null;
-		double last_speed = 0;
+	//function will be called when new sim is loaded
+	public void GetNewSimData(Map<GeoCoord, Map<Integer, Double>> speed_profile) {
+		this.simResult = new LinkedHashMap<GeoCoord, Map<Integer, Double>>(speed_profile); //copy the new sim results to the sim result field
+		if (this.simResult.size() != 0) {
+			this.spinner.setModel((new SpinnerNumberModel(1, 1, ((Map) simResult.values().toArray()[0]).size(), 1))); //set new bounds for spinner, set to 1
+		}
+		addSpeedsToMap(); //add speeds to map
+	}
+	//function adds speed markers to map
+	private void addSpeedsToMap() {
+		Style forecastStyle = new Style(Color.black, Color.BLUE, null, this.defaultFontForThings); 
+		int lap_number = (int) this.spinner.getValue(); //get value of spinner
+		double filter_distance = 0.5; //distance between points shown
+		GeoCoord last_marker = null; //variable to keep track of last marker displayed
+		double last_speed = 0; //variable to keep track of last speed displayed
 		
+		//if markers exist already, remove
 		if (this.speeds != null) {
 			for (MapMarker m : this.speeds) {
 				this.removeMapMarker(m);
@@ -313,31 +351,19 @@ public class CustomDisplayMap extends JMapViewer {
 		this.speeds = new ArrayList<MapMarker>();
 		
 		/*Filter by distance*/
-		for (GeoCoord g : speed_profile.keySet()) {
-			if (last_marker == null || g.calculateDistance(last_marker) > filter_distance || speed_profile.get(g).get(1) != last_speed) {
+		for (GeoCoord g : this.simResult.keySet()) {
+			//only display point and speed if threshold distance is reached between current point and previous point
+			//or there is a speed change
+			if (last_marker == null || g.calculateDistance(last_marker) > filter_distance || this.simResult.get(g).get(lap_number) != last_speed) {
 				Coordinate location = new Coordinate(g.getLat(), g.getLon());
-				String speed = speed_profile.get(g).get(1).toString();
-				last_speed = speed_profile.get(g).get(1);
+				String speed = this.simResult.get(g).get(lap_number).toString(); 
+				last_speed = this.simResult.get(g).get(lap_number);
 				MapMarkerDot newLocationDot = new MapMarkerDot(null, speed , location, forecastStyle);
 				this.speeds.add(newLocationDot);
 				last_marker = g;
 			}
 			
 		}
-		
-		/*Filter by index*//*
-		int i = 0;
-		for (GeoCoord g : speed_profile.keySet()) {
-			//System.out.println(g.toString());
-			if (i%filter_constant == 0 || speed_profile.get(g).get(1) != last_speed) {
-				Coordinate location = new Coordinate(g.getLat(), g.getLon());
-				String speed = speed_profile.get(g).get(1).toString();
-				last_speed = speed_profile.get(g).get(1);
-				MapMarkerDot newLocationDot = new MapMarkerDot(null, speed, location, forecastStyle);
-				this.speeds.add(newLocationDot);
-			}
-			i++;
-		}*/
 		this.refreshMap();
 	}
 	// **************************************************************************************************************

@@ -46,6 +46,8 @@ import javax.swing.JButton;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
 
 public class GUImain implements Listener {
 
@@ -144,7 +146,7 @@ public class GUImain implements Listener {
 		}
 		if (n.getClass() == NewSimulationReportNotification.class) {
 			NewSimulationReportNotification temp = (NewSimulationReportNotification) n;
-			mainPanel.addSpeedsToMap(temp.getSimReport().getManuallyRequestedSpeeds());
+			mainPanel.GetNewSimData(temp.getSimReport().getManuallyRequestedSpeeds());
 		}
 
 		// if(n.getClass() == ) //TODO for loadingFrame
@@ -472,5 +474,4 @@ public class GUImain implements Listener {
 		WeatherAdvancedWindow weatherWindow = (WeatherAdvancedWindow) weatherFrame;
 		weatherWindow.clearWindow();
 	}
-
 }
