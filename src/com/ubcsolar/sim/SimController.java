@@ -50,12 +50,7 @@ public class SimController extends ModuleController {
 	}
 
 	/**
-	 * 
-	 * @param requestedSpeeds
-	 *            a map of geoCoordinates and requested speeds for the frames
-	 *            ending at those geocoordinates. Used to override the sim's
-	 *            best-guess. NOTE: not guaranteed that the speed will be
-	 *            achieved; may be limited due to acceleration, power, etc.
+	 *
 	 * @param laps
 	 *            - number of laps for the car to complete. Must be >=1 (1
 	 *            implies finishing the existing lap).
@@ -73,8 +68,7 @@ public class SimController extends ModuleController {
 			throw new IllegalArgumentException("Number of Laps too low, must go at least 1 lap");
 		}
 		// Compile all the information we need.
-		// ForecastReport simmedForecastReport =
-		// this.mySession.getMyWeatherController().getSimmedForecastForEveryPointForLoadedRoute();
+
 		LocationReport lastReported = this.mySession.getMapController().getLastReportedLocation();
 		if (lastReported == null) {
 			throw new NoLocationReportedException();
@@ -90,7 +84,7 @@ public class SimController extends ModuleController {
 		}
 
 		TelemDataPacket prevCarStatus = lastCarReported;
-		double startingVelocity = 50.0;
+		double startingVelocity = 1;
 		int numSubchunksPerForecast = 5;
 		SpeedReport results;
 		Map<GeoCoord, Map<Integer,Double>> speedProfile = new LinkedHashMap<GeoCoord, Map<Integer,Double>>();
@@ -174,7 +168,7 @@ public class SimController extends ModuleController {
 		ArrayList<SimFrame> frames = new ArrayList<SimFrame>(); // list to store the frames from the sim results of each chunk
 		SpeedReport report = new SpeedReport(new LinkedHashMap<GeoCoord,Double>(),
 				new SimResult(new ArrayList<SimFrame>(), 0,
-						prevCarStatus, new LinkedHashMap<GeoCoord, Double>()),
+						prevCarStatus, new LinkedHashMap<GeoCoord, Double>(), false),
 				0);
 		double currentSpeed = startingVelocity;
 		int subchunksPerForecast = numSubchunksPerForecast;
@@ -238,7 +232,10 @@ public class SimController extends ModuleController {
 	
 		// return Speed Report with all the speed profiles and sim result with
 
-		return new SpeedReport(testSpeedProfile, new SimResult(frames, totalTime, prevCarStatus, report.getSpeedProfile()), currentSpeed);
+		return new SpeedReport(
+				testSpeedProfile,
+				new SimResult(frames, totalTime, prevCarStatus, report.getSpeedProfile(), true),
+				currentSpeed);
 	}
 	
 	double getMinCharge(int numSubChunks, int currentSubChunk)
@@ -286,7 +283,7 @@ public class SimController extends ModuleController {
 		double minCharge, ForecastIO inflectionPoint, double startingSpeed) throws NotEnoughChargeException {
 
 		SimResult results = new SimResult(new ArrayList<SimFrame>(), 0,
-				lastCarReported, new LinkedHashMap<GeoCoord, Double>());
+				lastCarReported, new LinkedHashMap<GeoCoord, Double>(), false);
 		double finalSpeed = startingSpeed;
 		double currSpeed = finalSpeed;
 		
@@ -297,31 +294,29 @@ public class SimController extends ModuleController {
 		// if car does run out of charge, speeds are lowered for this chunk until it works
 		int numRetries = 0;
 		while (!validprofile) {
-			// simV2 throws an exception if there is not enough charge, so use that to check
-			try {
-				// run sim from start of chunk to end of chunk
-				results = new SimEngine().runSimV2(routeToTraverse, chunk.get(0), chunk.get(chunk.size() - 1),
-						lastCarReported, startingSpeed, finalSpeed, startTime, lapNum, minCharge, inflectionPoint);
-				validprofile = true;
-				if(results.getFinalTelemData().getStateOfCharge() > (minCharge + 2) && numRetries < 10
-						&& finalSpeed < GlobalValues.MAX_SPEED) {
-					finalSpeed += 2;
-					startingSpeed = finalSpeed; //TODO: fix this when you actually calculate stuff
-					validprofile = false;
-					numRetries++;
-				}
-			}
 
-			catch (NotEnoughChargeException e) {
+			// run sim from start of chunk to end of chunk
+			results = new SimEngine().runSimV2(routeToTraverse, chunk.get(0), chunk.get(chunk.size() - 1),
+					lastCarReported, startingSpeed, finalSpeed, startTime, lapNum, minCharge, inflectionPoint);
+			validprofile = results.wasRunSuccessful();
+
+			if(!validprofile) {
 				finalSpeed -= .5;
-				startingSpeed = finalSpeed; //TODO: fix this when you calculate
 				if (finalSpeed <= 0) {
 					throw new NotEnoughChargeException(0,0, "speed cannot make it through the whole route");
 				}
 			}
+			if(results.getFinalTelemData().getStateOfCharge() > (minCharge + 2) && numRetries < 10
+					&& finalSpeed < GlobalValues.MAX_SPEED && validprofile) {
+				finalSpeed += 2;
+				if(finalSpeed > GlobalValues.MAX_SPEED)
+					finalSpeed = GlobalValues.MAX_SPEED;
+				validprofile = false;
+				numRetries++;
+			}
 		}
 
-		SpeedReport report = new SpeedReport(results.getSpeedProfile(), results, finalSpeed);
+		SpeedReport report = new SpeedReport(results.getSpeedProfile(), results, results.getFinalTelemData().getSpeed());
 		return report;
 	}
 }

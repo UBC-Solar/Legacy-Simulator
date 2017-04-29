@@ -98,10 +98,10 @@ public class GlobalValues {
 	public static final double MAX_SPEED = 55;
 	//this value is in units of km/h, also needs to be verified with mech team
 
-	public static final double MAX_ACCELERATION_MS2 = 10;
+	public static final double MAX_ACCELERATION_MS2 = 1;
 	//this value is in units of m/s^2
 
-	public static final double MS2_TO_KMH2_FACTOR = 10 / 1000 * 3600 * 3600;
+	public static final double MS2_TO_KMH2_FACTOR = 12960;
 
 	public static final double MAX_ACCELERATION_KMH2 = MAX_ACCELERATION_MS2 * MS2_TO_KMH2_FACTOR;
 }
