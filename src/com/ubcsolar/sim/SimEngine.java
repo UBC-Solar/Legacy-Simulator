@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import jdk.nashorn.internal.objects.Global;
 import org.jfree.data.Values;
 
 import com.eclipsesource.json.JsonArray;
@@ -96,31 +97,29 @@ public class SimEngine {
 		double currCharge = carStartState.getStateOfCharge();
 
 		boolean runSuccessful = true;
+		int isAccelerating = 0; //0 = not accelerating, 1 = increasing speed, -1 = decreasing speed
 
 		for (int i = startingIndex + 1; i <= endingIndex; i++) {
-			//System.out.println("currSpeed is: " + currSpeed);
-			//System.out.println("currCharge: " + currCharge);
 			currPoint = toTraverse.getTrailMarkers().get(i);
 
 			speedProfile.put(currPoint, currSpeed);
 
 			double distance = prevPoint.calculateDistance(currPoint);
 			double timeIncHr = distance / currSpeed;
-			//System.out.println("timeIncHr: " + timeIncHr);
 			double timeIncMillis = timeIncHr * 3600000;
 			currTime += timeIncMillis;
 
+			isAccelerating = 0;
 			if (currSpeed != endSpeed) {
 				double speedDiff = GlobalValues.MAX_ACCELERATION_KMH2 * timeIncHr;
-				System.out.println("timeIncMin: " + timeIncHr*60);
-				System.out.println("timeIncSec: " + timeIncHr*3600);
-				System.out.println("speedDiff is : " + speedDiff);
 				if (currSpeed < endSpeed) {
 					currSpeed += speedDiff;
+					isAccelerating = 1;
 					if(currSpeed > endSpeed)
 						currSpeed = endSpeed;
 				} else if (currSpeed > endSpeed) {
 					currSpeed -= speedDiff;
+					isAccelerating = -1;
 					if(currSpeed < endSpeed)
 						currSpeed = endSpeed;
 				}
@@ -130,17 +129,15 @@ public class SimEngine {
 
 			double latitude = currPoint.getLat();
 			double chargeDiff = calculateChargeDiff(prevPoint, currPoint,
-					currWeatherPoint, currSpeed, timeIncHr, sunriseTime, sunsetTime, latitude, currTime);
+					currWeatherPoint, currSpeed, timeIncHr, sunriseTime, sunsetTime, latitude, currTime, isAccelerating);
 			currCharge += chargeDiff;
 			if (currCharge > 100)
 				currCharge = 100;
 			if (currCharge < 0)
 				currCharge = 0;
 			if (currCharge <= minCharge) {
-				String message = "Speed profile uses too much charge. Drops below minimum charge of " + minCharge;
 				runSuccessful = false;
 				break;
-				//throw new NotEnoughChargeException(currCharge, minCharge, message);
 			}
 			currStatus = new TelemDataPacket(currSpeed, carStartState.getTotalVoltage(), carStartState.getTemperatures(),
 					carStartState.getCellVoltages(), currCharge);
@@ -158,81 +155,6 @@ public class SimEngine {
 		return result;
 	}
 
-	/*
-	 * Did RequestedSpeeds as a Map<CeoCoord point, Map<lap number, requested speed>>, to be able to 
-	 * request different speeds for different laps.  
-	 */
-/*	public List<SimFrame> runSimulation(Route toTraverse, int startLocationIndex, ForecastReport weatherReports, TelemDataPacket carStartingCondition, Map<GeoCoord,Map<Integer,Double>> requestedSpeeds, int laps){
-		if(laps <= 0){
-			throw new IllegalArgumentException("Must go at least one lap");
-		}
-
-		SolarLog.write(LogType.SYSTEM_REPORT, System.currentTimeMillis(), "simulation starting");
-		List<SimFrame> listOfFrames = new ArrayList<SimFrame>(toTraverse.getTrailMarkers().size());
-		if(startLocationIndex == toTraverse.getTrailMarkers().size()-1){
-			return new ArrayList<SimFrame>(); //can't simulate if at end of race.
-		}
-		
-		ForecastIO weather = weatherReports.getForecasts().get(startLocationIndex); //assumes that the number of forecasts in weatherReports = number in Route.
-		GeoCoord start = toTraverse.getTrailMarkers().get(startLocationIndex);
-		GeoCoord next = toTraverse.getTrailMarkers().get(startLocationIndex + 1); //won't index out of range because of check above. 
-		if(requestedSpeeds.get(start) != null && requestedSpeeds.get(start).get(1) != null){
-			Double reqSpeed = requestedSpeeds.get(start).get(1);//first lap
-		}
-		TelemDataPacket startCondition = carStartingCondition;
-		FIODataPoint startWeather = new FIODataBlock(weather.getHourly()).datapoint(0);
-		LocationReport simmedStartPoint = new LocationReport(toTraverse.getTrailMarkers().get(startLocationIndex), "Raven", "Simmed");
-		SimFrame startFrame = new SimFrame(startWeather, startCondition, simmedStartPoint, System.currentTimeMillis(), 1); //starting frame is current.
-		listOfFrames.add(startFrame);
-
-		SimFrame lastFrame = startFrame;
-		int numOfPoints = toTraverse.getTrailMarkers().size();
-		int currentLap = 1; 
-		for(int i = startLocationIndex+1; i<(numOfPoints*laps); i++){ 
-
-			*//*
-			 * By starting at startPos, we calculate the jump from car's current location to the next breadcrumb, rather
-			 * than just assuming that it's actually at the last breadcrumb. 
-			 * This way may produce errors if the car is actually far off the trail, but the alternative is to advance the car
-			 * magically to next breadcrumb, and if the gap between breadcrumbs is big, it may produce an error.  
-			 *//*
-
-			ForecastIO nextWeather;
-			GeoCoord nextPoint;
-			if (lastFrame.getCarStatus().getSpeed()<=0){
-				i--; //if the speed is zero then we need to redo the frame because the car is not moving, and thus is in the same place
-				if(i%numOfPoints == 0){
-					currentLap--;//was adjusted earlier above, shouldn't have been. 
-				}
-				if(i<0){
-					nextWeather = weatherReports.getForecasts().get(startLocationIndex);
-				}
-				else{
-					nextWeather = weatherReports.getForecasts().get(i%numOfPoints);
-				}
-
-				nextPoint = lastFrame.getGPSReport().getLocation();
-			}
-			else{
-				nextWeather = weatherReports.getForecasts().get(i%numOfPoints);
-				nextPoint = toTraverse.getTrailMarkers().get(i%numOfPoints);
-			}
-			Double requestedSpeedTemp = null;
-			if(requestedSpeeds.get(nextPoint) != null){
-				requestedSpeedTemp = requestedSpeeds.get(nextPoint).get(currentLap);
-			}
-			SimFrame nextFrame = this.generateNextFrame(lastFrame, nextPoint, nextWeather, requestedSpeedTemp,currentLap);
-		
-			lastFrame = nextFrame;
-			listOfFrames.add(nextFrame);
-			if(i%numOfPoints == (numOfPoints-1)){ //if it's the last point in the lap
-				currentLap++; //say we're going to the next lap! 
-			}
-		}	
-
-		return listOfFrames;
-	}*/
-
 	public double getInclinationAngle(GeoCoord startPoint, GeoCoord endPoint) {
 		double inclinationAngle = 0;
 		double distance = startPoint.calculateDistance(endPoint) * 1000;
@@ -249,11 +171,15 @@ public class SimEngine {
 	}
 
 	public double calculateChargeDiff(GeoCoord startLoc, GeoCoord endLoc, FIODataPoint forecastForPoint,
-									  double speed, double timeTaken, long sunriseTime, long sunsetTime, double latitude, long currTime) {
+									  double speed, double timeTaken, long sunriseTime, long sunsetTime, double latitude,
+									  long currTime, int isAccelerating) {
 		double resistivePower = calculateResistivePower(forecastForPoint, endLoc, startLoc, speed);
+		double accelerationPower = calculateAccelerationPower(speed, isAccelerating);
 		double sunPower = calculateSunPower(forecastForPoint, sunriseTime, sunsetTime, latitude, currTime);
-		if (resistivePower < 0) resistivePower = 0;
-		double netPower = sunPower - resistivePower;//in Watts
+
+		double netAccelerationPower = accelerationPower + resistivePower;
+		if (netAccelerationPower < 0) netAccelerationPower = 0;
+		double netPower = sunPower - netAccelerationPower;//in Watts
 
 		double changeInCharge = netPower / totalCharge * timeTaken;//in amp-hours
 		double changeInChargePerCent = changeInCharge / GlobalValues.BATTERY_MAX_CHARGE;
@@ -301,6 +227,12 @@ public class SimEngine {
 		return resistivePower;
 	}
 
+	public double calculateAccelerationPower(double carSpeed, int isAccelerating) {
+		double accelerationForce = GlobalValues.CAR_MASS * GlobalValues.MAX_ACCELERATION_MS2;
+		double accelerationPower = accelerationForce * carSpeed * GlobalValues.KMH_TO_MS_FACTOR / GlobalValues.ENGINE_EFF;
+		return accelerationPower * isAccelerating;
+	}
+
 	/**
 	 * Calculates power gain from solar panels on the car, assuming it is
 	 * experiencing the weather given in forecastForPoint, according to formulas
@@ -315,9 +247,6 @@ public class SimEngine {
 	 * the given situation
 	 */
 
-	// TODO: more sophisticated calculations, involving time of day/year, angle
-	// of incidence
-	// of sun, etc.
 	// TODO: make this private after JUnit testing
 	public double calculateSunPower(FIODataPoint forecastForPoint, long sunriseTime, long sunsetTime, double latitude, long currTime) {
 		if (currTime < sunriseTime || currTime > sunsetTime)
@@ -328,6 +257,7 @@ public class SimEngine {
 		double panelArea = inUseCarModel.getSolarPanelArea();
 		double sunAngle = calculateSunAltitudeAngle(sunriseTime, sunsetTime, latitude, currTime);
 		double sunPower = panelArea * GlobalValues.PANEL_EFFICIENCY * cloudCoverFactor * Math.cos(sunAngle);
+		if(sunPower < 0) sunPower = 0;
 		return sunPower;
 	}
 

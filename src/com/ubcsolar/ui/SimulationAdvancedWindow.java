@@ -395,7 +395,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		private long getStartTimeInMillis(){
 			long currTime = System.currentTimeMillis();
 			long startTime = currTime + (Integer)hourSpinner.getValue()*3600000;
-			System.out.println("startTime: " + startTime);
 			return startTime;
 		}
 		
