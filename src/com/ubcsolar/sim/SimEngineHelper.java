@@ -45,8 +45,8 @@ public class SimEngineHelper extends Thread{
 		long sunriseTime = Long.parseLong(dailyData.get("sunriseTime").toString());
 		long sunsetTime = Long.parseLong(dailyData.get("sunsetTime").toString());
 		double latitude = currPoint.getLat();
-		chargeDiff = parent.calculateChargeDiff(prevPoint, currPoint, 
-				currWeatherPoint, speed, timeIncHr, sunriseTime, sunsetTime, latitude, currTime);
+//		chargeDiff = parent.calculateChargeDiff(prevPoint, currPoint,
+//				currWeatherPoint, speed, timeIncHr, sunriseTime, sunsetTime, latitude, currTime);
 		Thread.yield();
 	}
 	

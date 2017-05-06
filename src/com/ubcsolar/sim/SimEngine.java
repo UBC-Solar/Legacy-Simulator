@@ -97,6 +97,7 @@ public class SimEngine {
 		double currCharge = carStartState.getStateOfCharge();
 
 		boolean runSuccessful = true;
+		int isAccelerating = 0; //0 = not accelerating, 1 = increasing speed, -1 = decreasing speed
 
 		for (int i = startingIndex + 1; i <= endingIndex; i++) {
 			currPoint = toTraverse.getTrailMarkers().get(i);
@@ -108,14 +109,17 @@ public class SimEngine {
 			double timeIncMillis = timeIncHr * 3600000;
 			currTime += timeIncMillis;
 
+			isAccelerating = 0;
 			if (currSpeed != endSpeed) {
 				double speedDiff = GlobalValues.MAX_ACCELERATION_KMH2 * timeIncHr;
 				if (currSpeed < endSpeed) {
 					currSpeed += speedDiff;
+					isAccelerating = 1;
 					if(currSpeed > endSpeed)
 						currSpeed = endSpeed;
 				} else if (currSpeed > endSpeed) {
 					currSpeed -= speedDiff;
+					isAccelerating = -1;
 					if(currSpeed < endSpeed)
 						currSpeed = endSpeed;
 				}
@@ -125,7 +129,7 @@ public class SimEngine {
 
 			double latitude = currPoint.getLat();
 			double chargeDiff = calculateChargeDiff(prevPoint, currPoint,
-					currWeatherPoint, currSpeed, timeIncHr, sunriseTime, sunsetTime, latitude, currTime);
+					currWeatherPoint, currSpeed, timeIncHr, sunriseTime, sunsetTime, latitude, currTime, isAccelerating);
 			currCharge += chargeDiff;
 			if (currCharge > 100)
 				currCharge = 100;
@@ -167,19 +171,15 @@ public class SimEngine {
 	}
 
 	public double calculateChargeDiff(GeoCoord startLoc, GeoCoord endLoc, FIODataPoint forecastForPoint,
-									  double speed, double timeTaken, long sunriseTime, long sunsetTime, double latitude, long currTime) {
+									  double speed, double timeTaken, long sunriseTime, long sunsetTime, double latitude,
+									  long currTime, int isAccelerating) {
 		double resistivePower = calculateResistivePower(forecastForPoint, endLoc, startLoc, speed);
-		double accelerationPower = calculateAccelerationPower(speed);
+		double accelerationPower = calculateAccelerationPower(speed, isAccelerating);
 		double sunPower = calculateSunPower(forecastForPoint, sunriseTime, sunsetTime, latitude, currTime);
 
 		double netAccelerationPower = accelerationPower + resistivePower;
 		if (netAccelerationPower < 0) netAccelerationPower = 0;
 		double netPower = sunPower - netAccelerationPower;//in Watts
-
-		System.out.println("resistivePower: " + resistivePower);
-		System.out.println("accelerationPower: " + accelerationPower);
-		System.out.println("sunPower: " + sunPower);
-		System.out.println("netPower: " + netPower);
 
 		double changeInCharge = netPower / totalCharge * timeTaken;//in amp-hours
 		double changeInChargePerCent = changeInCharge / GlobalValues.BATTERY_MAX_CHARGE;
@@ -227,10 +227,10 @@ public class SimEngine {
 		return resistivePower;
 	}
 
-	public double calculateAccelerationPower(double carSpeed) {
+	public double calculateAccelerationPower(double carSpeed, int isAccelerating) {
 		double accelerationForce = GlobalValues.CAR_MASS * GlobalValues.MAX_ACCELERATION_MS2;
 		double accelerationPower = accelerationForce * carSpeed * GlobalValues.KMH_TO_MS_FACTOR / GlobalValues.ENGINE_EFF;
-		return accelerationPower;
+		return accelerationPower * isAccelerating;
 	}
 
 	/**
@@ -257,6 +257,7 @@ public class SimEngine {
 		double panelArea = inUseCarModel.getSolarPanelArea();
 		double sunAngle = calculateSunAltitudeAngle(sunriseTime, sunsetTime, latitude, currTime);
 		double sunPower = panelArea * GlobalValues.PANEL_EFFICIENCY * cloudCoverFactor * Math.cos(sunAngle);
+		if(sunPower < 0) sunPower = 0;
 		return sunPower;
 	}
 
