@@ -89,7 +89,7 @@ public class GlobalValues {
 	public static final double TIRE_PRESSURE = 1.7;
 	//in bars, equivalent to ~35 psi
 	
-	public static final double ENGINE_EFF = 0.4;
+	public static final double ENGINE_EFF = 0.8;
 	//TODO: determine a real value for this
 	
 	public static final double BATTERY_MAX_CHARGE = 20;
