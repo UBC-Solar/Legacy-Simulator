@@ -4,14 +4,18 @@
 
 package com.ubcsolar.ui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
+import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.DefaultMapController;
@@ -80,6 +84,8 @@ public class CustomDisplayMap extends JMapViewer {
 	private MapPolygon routeBreadcrumbs; // the line that shows the trail
 	private boolean showRouteBreadcrumbs; // initial value set to equal checkbox
 	private Map<GeoCoord, Map<Integer, Double>> simResult; //map to hold results of most recent simulation
+	private Set<MapPolygon> accelBreadcrumbs;//lines that will show when to accel
+	private Set<MapPolygon> deccelBreadcrumbs;
 	private JRadioButton rdbtnSateliteoffline;
 	private JRadioButton rdbtnSattelite;
 	private JRadioButton rdbtnDefaultMapOffline;
@@ -333,14 +339,44 @@ public class CustomDisplayMap extends JMapViewer {
 		}
 		addSpeedsToMap(); //add speeds to map
 	}
+	/**
+	 * a way to classify points based on their relative speeds when visually displaying the simulation
+	 * 
+	 * ACCEL_START: start of acceleration (speed at prev point == speed at current point < speed at next point)
+	 * ACCEL: accelerating (speed at prev point < speed at curr point < speed at next point)
+	 * ACCEL_END: end of acceleration (speed at prev point < speed at curr point == speed at next point)
+	 * 
+	 * DECCEL_START: start of deceleration (speed at prev point == speed at curr point > speed at next point)
+	 * DECCEL: decelerating (speed at prev point > speed at curr point > speed at next point)
+	 * DECCEL_END: end of deceleration (speed at prev point > speed at curr point == speed at next point)
+	 * 
+	 * CONST: constant speed (speed at prev point == speed at curr point == speed at next point)
+	 * INFLECT: sudden change in acceleration (speed at prev point < speed at current point > speed at next point) or
+	 *                                        (speed at prev point > speed at current point < speed at next point)
+	 */
+	enum point_type {ACCEL_START, ACCEL, ACCEL_END, DECCEL_START, DECCEL, DECCEL_END, CONST, INFLECT};
+	double DELTA = 0.000001; //for comparison of doubles
+	
 	//function adds speed markers to map
 	private void addSpeedsToMap() {
-		Style forecastStyle = new Style(Color.black, Color.BLUE, null, this.defaultFontForThings); 
+		Style speedStyle = new Style(Color.black, Color.BLUE, null, this.defaultFontForThings); 
 		int lap_number = (int) this.spinner.getValue(); //get value of spinner
 		double filter_distance = 0.5; //distance between points shown
 		GeoCoord last_marker = null; //variable to keep track of last marker displayed
-		double last_speed = 0; //variable to keep track of last speed displayed
 		
+		//if route chunks already exist, remove
+		if (this.accelBreadcrumbs != null) {
+			for (MapPolygon mapPoly : this.accelBreadcrumbs) {
+				this.removeMapPolygon(mapPoly);
+			}
+		}
+		
+		if (this.deccelBreadcrumbs != null) {
+			for (MapPolygon mapPoly : this.deccelBreadcrumbs) {
+				this.removeMapPolygon(mapPoly);
+			}
+			
+		}
 		//if markers exist already, remove
 		if (this.speeds != null) {
 			for (MapMarker m : this.speeds) {
@@ -348,23 +384,129 @@ public class CustomDisplayMap extends JMapViewer {
 			}
 		}
 		
+		//empty all the old collections of points
 		this.speeds = new ArrayList<MapMarker>();
+		this.accelBreadcrumbs = new HashSet<MapPolygon>();
+		this.deccelBreadcrumbs = new HashSet<MapPolygon>();
 		
-		/*Filter by distance*/
-		for (GeoCoord g : this.simResult.keySet()) {
-			//only display point and speed if threshold distance is reached between current point and previous point
-			//or there is a speed change
-			if (last_marker == null || g.calculateDistance(last_marker) > filter_distance || this.simResult.get(g).get(lap_number) != last_speed) {
-				Coordinate location = new Coordinate(g.getLat(), g.getLon());
-				String speed = this.simResult.get(g).get(lap_number).toString(); 
-				last_speed = this.simResult.get(g).get(lap_number);
-				MapMarkerDot newLocationDot = new MapMarkerDot(null, speed , location, forecastStyle);
+		//instantiate lists to hold points for route chunks
+		List<Coordinate> list_for_accel_polygon = null;
+		List<Coordinate> list_for_deccel_polygon = null;
+		
+		for (int i = 0; i < this.simResult.size();i++) {
+			GeoCoord curr = (GeoCoord) this.simResult.keySet().toArray()[i];
+			if ((getPointInfo(i, lap_number) == point_type.CONST && (last_marker == null ||
+					curr.calculateDistance(last_marker)  > filter_distance)) ||
+					(getPointInfo(i, lap_number) != point_type.CONST && getPointInfo(i, lap_number) != point_type.ACCEL &&
+			         getPointInfo(i, lap_number) != point_type.DECCEL)) {
+				Coordinate location = new Coordinate(curr.getLat(), curr.getLon());
+				String speed = this.simResult.get(curr).get(lap_number).toString(); 
+				MapMarkerDot newLocationDot = new MapMarkerDot(null, speed , location, speedStyle);
 				this.speeds.add(newLocationDot);
-				last_marker = g;
+				last_marker = curr;
 			}
-			
+			if (getPointInfo(i, lap_number) == point_type.ACCEL_START) {
+				list_for_accel_polygon = new ArrayList<Coordinate>();
+				list_for_accel_polygon.add(new Coordinate(curr.getLat(), curr.getLon()));
+			}
+			else if (getPointInfo(i, lap_number) == point_type.DECCEL_START) {
+				list_for_deccel_polygon = new ArrayList<Coordinate>();
+				list_for_deccel_polygon.add(new Coordinate(curr.getLat(), curr.getLon()));
+			}
+			else if (getPointInfo(i, lap_number) == point_type.ACCEL) {
+				list_for_accel_polygon.add(new Coordinate(curr.getLat(), curr.getLon()));
+			}
+			else if (getPointInfo(i, lap_number) == point_type.DECCEL) {
+				list_for_deccel_polygon.add(new Coordinate(curr.getLat(), curr.getLon()));
+			}
+			else if (getPointInfo(i, lap_number) == point_type.ACCEL_END) {
+				list_for_accel_polygon.add(new Coordinate(curr.getLat(), curr.getLon()));
+				completeLinePolygon(list_for_accel_polygon);
+				this.accelBreadcrumbs.add(new MapPolygonImpl(list_for_accel_polygon));
+			}
+			else if (getPointInfo(i, lap_number) == point_type.DECCEL_END) {
+				list_for_deccel_polygon.add(new Coordinate(curr.getLat(), curr.getLon()));
+				completeLinePolygon(list_for_deccel_polygon);
+				this.deccelBreadcrumbs.add(new MapPolygonImpl(list_for_deccel_polygon));
+			}
 		}
+		
 		this.refreshMap();
+	}
+	
+	private void completeLinePolygon(List<Coordinate> incomplete_list) {
+		for (int i = incomplete_list.size() - 1; i >= 0; i-- ) {
+			incomplete_list.add(incomplete_list.get(i));
+		}
+	}
+	
+	//function classifies the point at the index of the traveled route
+	//returns the proper "point type"
+	private point_type getPointInfo(int point_index, int lap_number) {
+		//points that are used to classify
+		GeoCoord curr = (GeoCoord) this.simResult.keySet().toArray()[point_index]; 
+		GeoCoord prev;
+		GeoCoord next;
+		
+		//if the first point of the route is checked, assume at the previous point, 
+		//the speed was the same
+		if (point_index == 0) {
+			prev = curr;
+		}
+		else {
+			prev = (GeoCoord) this.simResult.keySet().toArray()[point_index - 1];
+		}
+		
+		//if the last point of the route is checked, assume at the next point, 
+		//the speed will be the same
+		if (point_index == (this.simResult.size() - 1)) {
+			next = curr;
+		}
+		else {
+			next = (GeoCoord) this.simResult.keySet().toArray()[point_index + 1];
+		}
+		
+		//start classifying
+		//if curr point speed == prev point speed....
+		if (Math.abs(this.simResult.get(curr).get(lap_number) - this.simResult.get(prev).get(lap_number)) < DELTA) {
+			//.. and curr point speed == next point speed, point is type CONST
+			if (Math.abs(this.simResult.get(curr).get(lap_number) - this.simResult.get(next).get(lap_number)) < DELTA) {
+				return point_type.CONST;
+			}
+			//.. and curr point speed  > next point speed, point is type DECCEL_START
+			else if (this.simResult.get(curr).get(lap_number) > this.simResult.get(next).get(lap_number)) {
+				return point_type.DECCEL_START;
+			}
+			//.. and curr point speed < next point speed, point is type ACCEL_START
+			else {
+				return point_type.ACCEL_START;
+			}
+		}
+		
+		//if curr point speed > prev point speed
+		else if (this.simResult.get(curr).get(lap_number) > this.simResult.get(prev).get(lap_number)) {
+			if (Math.abs(this.simResult.get(curr).get(lap_number) - this.simResult.get(next).get(lap_number)) < DELTA) {
+				return point_type.ACCEL_END;
+			}
+			else if (this.simResult.get(curr).get(lap_number) < this.simResult.get(next).get(lap_number)) {
+				return point_type.ACCEL;
+			}
+			else {
+				return point_type.INFLECT;
+			}
+		}
+		
+		else {
+			if (Math.abs(this.simResult.get(curr).get(lap_number) - this.simResult.get(next).get(lap_number)) < DELTA) {
+				return point_type.DECCEL_END;
+			}
+			else if (this.simResult.get(curr).get(lap_number) < this.simResult.get(next).get(lap_number)) {
+				return point_type.INFLECT;
+			}
+			else {
+				return point_type.DECCEL;
+			}
+		}
 	}
 	// **************************************************************************************************************
 
@@ -391,9 +533,19 @@ public class CustomDisplayMap extends JMapViewer {
 			}
 		}
 
-		if (this.showSpeeds && speeds != null) {
+		if (this.showSpeeds && speeds != null && accelBreadcrumbs != null && deccelBreadcrumbs != null) {
 			for (MapMarker m : speeds) {
 				this.addMapMarker(m);
+			}
+			for (MapPolygon chunk : this.accelBreadcrumbs) {
+				((MapObjectImpl) chunk).setColor(Color.green);
+				((MapObjectImpl) chunk).setStroke(new BasicStroke(5));
+				this.addMapPolygon(chunk);
+			}
+			for (MapPolygon chunk : this.deccelBreadcrumbs) {
+				((MapObjectImpl) chunk).setColor(Color.RED);
+				((MapObjectImpl) chunk).setStroke(new BasicStroke(5));
+				this.addMapPolygon(chunk);
 			}
 		}
 

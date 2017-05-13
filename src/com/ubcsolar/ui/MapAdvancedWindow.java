@@ -248,6 +248,14 @@ public class MapAdvancedWindow extends JFrame implements Listener {
 				
 			}
 		});
+		
+		JMenuItem mntmConnectFakeCar = new JMenuItem("Connect Fake Car");
+		mntmConnectFakeCar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mySession.getMapController().connectToFakeCar();
+			}
+		});
+		mnLoadMap.add(mntmConnectFakeCar);
 		mntmDisconnectCellPhone.setHorizontalAlignment(SwingConstants.CENTER);
 		mnLoadMap.add(mntmDisconnectCellPhone);
 		contentPane = new JPanel();
