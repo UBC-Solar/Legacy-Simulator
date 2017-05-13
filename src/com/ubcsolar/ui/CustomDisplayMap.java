@@ -393,8 +393,16 @@ public class CustomDisplayMap extends JMapViewer {
 		List<Coordinate> list_for_accel_polygon = null;
 		List<Coordinate> list_for_deccel_polygon = null;
 		
-		for (int i = 0; i < this.simResult.size();i++) {
+		//the loop iterates through the points
+		for (int i = 0; i < this.simResult.size(); i++) {
+			//Since this class does not hold any records of the route in a list,
+			//points can only be accessed through the key set of the sim result
 			GeoCoord curr = (GeoCoord) this.simResult.keySet().toArray()[i];
+			
+			//create a map marker to be posted on the map if the current point is:
+			// - CONST and is the first point of the route (last marker is null), or the last time a point was posted was a certain distance away
+			// - not CONST, ACCEL, or DECCEL (only post points that are start/end of acceleration/deceleration for user to see from where to where 
+			// to accelerate/decelerate to)
 			if ((getPointInfo(i, lap_number) == point_type.CONST && (last_marker == null ||
 					curr.calculateDistance(last_marker)  > filter_distance)) ||
 					(getPointInfo(i, lap_number) != point_type.CONST && getPointInfo(i, lap_number) != point_type.ACCEL &&
@@ -402,28 +410,39 @@ public class CustomDisplayMap extends JMapViewer {
 				Coordinate location = new Coordinate(curr.getLat(), curr.getLon());
 				String speed = this.simResult.get(curr).get(lap_number).toString(); 
 				MapMarkerDot newLocationDot = new MapMarkerDot(null, speed , location, speedStyle);
-				this.speeds.add(newLocationDot);
-				last_marker = curr;
+				this.speeds.add(newLocationDot); //add map marker to list that will be posted
+				last_marker = curr; //keep track of last posted point (for filtering by distance)
 			}
+			//if point is the start of acceleration, create a new list to hold all the points to be connected in a line
+			//the line will represent the acceleration, so all the points between ACCEL_START and ACCEL_END
+			//will be added into this
 			if (getPointInfo(i, lap_number) == point_type.ACCEL_START) {
 				list_for_accel_polygon = new ArrayList<Coordinate>();
 				list_for_accel_polygon.add(new Coordinate(curr.getLat(), curr.getLon()));
 			}
+			//same for start of deceleration
 			else if (getPointInfo(i, lap_number) == point_type.DECCEL_START) {
 				list_for_deccel_polygon = new ArrayList<Coordinate>();
 				list_for_deccel_polygon.add(new Coordinate(curr.getLat(), curr.getLon()));
 			}
+			//if point is acceleration, add the point to the current list of acceleration
+			//if point is acceleration, it should be between an acceleration start and acceleration end
 			else if (getPointInfo(i, lap_number) == point_type.ACCEL) {
 				list_for_accel_polygon.add(new Coordinate(curr.getLat(), curr.getLon()));
 			}
+			//same for deceleration
 			else if (getPointInfo(i, lap_number) == point_type.DECCEL) {
 				list_for_deccel_polygon.add(new Coordinate(curr.getLat(), curr.getLon()));
 			}
+			//if point is acceleration end, add the point to the current list of acceleration and
+			//add call a function that turns the list into a list that generates a line
+			//then, turn the line into a polygon and add it to the set of route chunks to be displayed
 			else if (getPointInfo(i, lap_number) == point_type.ACCEL_END) {
 				list_for_accel_polygon.add(new Coordinate(curr.getLat(), curr.getLon()));
 				completeLinePolygon(list_for_accel_polygon);
 				this.accelBreadcrumbs.add(new MapPolygonImpl(list_for_accel_polygon));
 			}
+			//same for deceleration
 			else if (getPointInfo(i, lap_number) == point_type.DECCEL_END) {
 				list_for_deccel_polygon.add(new Coordinate(curr.getLat(), curr.getLon()));
 				completeLinePolygon(list_for_deccel_polygon);
@@ -434,7 +453,14 @@ public class CustomDisplayMap extends JMapViewer {
 		this.refreshMap();
 	}
 	
+	//function takes a list of points and turns it into a list that generates a line (same idea as noah)
 	private void completeLinePolygon(List<Coordinate> incomplete_list) {
+		//essentially, the function copies the entries of the list and append them to the end of the list
+		//in reversed order. The function used to generate the line is actually a function that draws a 
+		//polygon using a list of coordinates (it connects the coordinates in the list in the order they are 
+		//in the list). by adding the same points to the end, the polygon produced is basically a 2d line
+		//(after connecting all the points in the order of the route, the last point is then connected back
+		//to the second last point etc all the way back to the first point)
 		for (int i = incomplete_list.size() - 1; i >= 0; i-- ) {
 			incomplete_list.add(incomplete_list.get(i));
 		}
@@ -483,26 +509,33 @@ public class CustomDisplayMap extends JMapViewer {
 			}
 		}
 		
-		//if curr point speed > prev point speed
+		//if curr point speed > prev point speed....
 		else if (this.simResult.get(curr).get(lap_number) > this.simResult.get(prev).get(lap_number)) {
+			//.. and curr point speed == next point speed, point is type ACCEL_END
 			if (Math.abs(this.simResult.get(curr).get(lap_number) - this.simResult.get(next).get(lap_number)) < DELTA) {
 				return point_type.ACCEL_END;
 			}
+			//.. and curr point speed < next point speed, point is type ACCEL
 			else if (this.simResult.get(curr).get(lap_number) < this.simResult.get(next).get(lap_number)) {
 				return point_type.ACCEL;
 			}
+			//.. and curr point speed > next point speed, point is type INFLECT (car should never be able to do this)
 			else {
 				return point_type.INFLECT;
 			}
 		}
 		
+		//if curr point speed < prev point speed ...
 		else {
+			//.. and curr point speed == prev point speed, point is type DECCEL_END
 			if (Math.abs(this.simResult.get(curr).get(lap_number) - this.simResult.get(next).get(lap_number)) < DELTA) {
 				return point_type.DECCEL_END;
 			}
+			//..and curr point speed < next point speed, point is type INFLECT (car should never be able to do this)
 			else if (this.simResult.get(curr).get(lap_number) < this.simResult.get(next).get(lap_number)) {
 				return point_type.INFLECT;
 			}
+			//..and curr point speed > next point speed, point is type DECCEL
 			else {
 				return point_type.DECCEL;
 			}
