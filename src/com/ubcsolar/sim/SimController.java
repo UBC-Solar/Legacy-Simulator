@@ -301,7 +301,7 @@ public class SimController extends ModuleController {
 		int numRetries = 0;
 		while (!validprofile) {
 			// run sim from start of chunk to end of chunk
-			results = new SimEngine().runSimV2(routeToTraverse, chunk.get(0), chunk.get(chunk.size() - 1),
+			results = newsdfsdfsdfsdf SimEngine().runSimV2(routeToTraverse, chunk.get(0), chunk.get(chunk.size() - 1),
 					lastCarReported, startingSpeed, finalSpeed, startTime, lapNum, minCharge, inflectionPoint);
 			validprofile = results.wasRunSuccessful();
 

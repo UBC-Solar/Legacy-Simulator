@@ -34,7 +34,7 @@ public class SimEngineHelper extends Thread{
 		this.currWeather = currWeather;
 		this.currTime = currTime;
 		this.parent = parent;
-		this.timeIncHr = timeIncHr;
+		this.timeIncHr = timeIncHr; dumbdumbdumb
 		
 	}
 	
