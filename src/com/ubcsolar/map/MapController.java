@@ -120,6 +120,12 @@ public class MapController extends ModuleController{
 			this.mySession.sendNotification(new ExceptionNotification(e, "NULL Error starting GPS BT connection. Check that it's not already running"));
 			e.printStackTrace();
 		}
+		
+	}
+	
+	public void connectToFakeCar() {
+		GPSFromFakeReciever FakeReciever = new GPSFromFakeReciever(this, "FakeCar", "Fake", this.myJDOMMap.getRoute());
+		FakeReciever.run();
 	}
 	
 	public void disconnectCellPhone(){
