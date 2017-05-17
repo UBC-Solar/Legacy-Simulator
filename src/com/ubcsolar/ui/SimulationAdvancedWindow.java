@@ -10,6 +10,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import com.ubcsolar.common.*;
+import com.ubcsolar.notification.NewMapLoadedNotification;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -23,10 +25,6 @@ import org.jfree.data.xy.XYDataset;
 
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.Main.GlobalValues;
-import com.ubcsolar.common.GeoCoord;
-import com.ubcsolar.common.Listener;
-import com.ubcsolar.common.SimFrame;
-import com.ubcsolar.common.SimulationReport;
 import com.ubcsolar.exception.NoCarStatusException;
 import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.exception.NoLoadedRouteException;
@@ -84,6 +82,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private ChartPanel SoCChartPanel;
 	private JFreeChart SoCChart;
 	private SimulationReport lastSimReport; //cache the last simReport
+	private Route currentRoute;
 	
 
 	private boolean showSpeed = true;
@@ -269,7 +268,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		
 		btnManuallySetSpeeds.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFrame frame = new SimChangeSpeedsWindow(mySession, thisWindow);
+				JFrame frame = new SimChangeSpeedsWindow(mySession, thisWindow, lastSimReport, currentRoute);
 				frame.setVisible(true);
 			}	
 		});
@@ -401,7 +400,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				updateChart(test.getSimReport(), startDistance);
 				this.validate();
 				this.repaint();
-				
+			}
+			if(n.getClass() == NewMapLoadedNotification.class){
+				NewMapLoadedNotification theMapNotification = (NewMapLoadedNotification) n;
+				this.currentRoute = theMapNotification.getRoute();
 			}
 			
 		}
