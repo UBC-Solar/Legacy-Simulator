@@ -155,6 +155,104 @@ public class SimEngine {
 		return result;
 	}
 
+	public SimResult runManualSim(Route toTraverse, GeoCoord startLoc, GeoCoord endLoc,
+							  TelemDataPacket carStartState,
+							  double startSpeed, double endSpeed, long startTime, int lapNum, double minCharge,
+							  ForecastIO inflectionPoint, Map<GeoCoord, Double> suggestedSpeeds) {
+
+		int startingIndex = toTraverse.getIndexOfClosestPoint(startLoc);
+		int endingIndex = toTraverse.getIndexOfClosestPoint(endLoc);
+
+		GeoCoord currPoint = toTraverse.getClosestPointOnRoute(startLoc);
+
+		if (endingIndex < startingIndex) {
+			throw new IllegalArgumentException("ending location must be after starting location");
+		}
+
+		FIODataPoint startWeatherPoint = chooseReport(inflectionPoint, startTime);
+		LocationReport startLocationReport = new LocationReport(currPoint, "Raven", "Simmed");
+		totalCharge = carStartState.getTotalVoltage();
+		SimFrame startSimFrame = new SimFrame(startWeatherPoint, carStartState, 0, startLocationReport, startTime, lapNum);
+
+		List<SimFrame> listOfFrames = new ArrayList<SimFrame>();
+		listOfFrames.add(startSimFrame);
+		GeoCoord prevPoint = currPoint;
+
+		long currTime = startTime;
+		long prevTime = startTime;
+
+		TelemDataPacket prevStatus = carStartState;
+		TelemDataPacket currStatus = prevStatus;
+
+		Map<GeoCoord, Double> speedProfile = new LinkedHashMap<GeoCoord, Double>();
+		double currSpeed = startSpeed;
+		speedProfile.put(toTraverse.getTrailMarkers().get(startingIndex), currSpeed);
+
+		JsonObject dailyData = (JsonObject) ((JsonArray) inflectionPoint.getDaily().get("data")).get(0);
+		long sunriseTime = Long.parseLong(dailyData.get("sunriseTime").toString())*1000;
+		long sunsetTime = Long.parseLong(dailyData.get("sunsetTime").toString())*1000;
+
+		double currCharge = carStartState.getStateOfCharge();
+
+		boolean runSuccessful = true;
+		int isAccelerating = 0; //0 = not accelerating, 1 = increasing speed, -1 = decreasing speed
+
+		for (int i = startingIndex + 1; i <= endingIndex; i++) {
+			currPoint = toTraverse.getTrailMarkers().get(i);
+
+			speedProfile.put(currPoint, currSpeed);
+
+			double distance = prevPoint.calculateDistance(currPoint);
+			double timeIncHr = distance / currSpeed;
+			double timeIncMillis = timeIncHr * 3600000;
+			currTime += timeIncMillis;
+
+			isAccelerating = 0;
+			if (currSpeed != endSpeed) {
+				double speedDiff = GlobalValues.MAX_ACCELERATION_KMH2 * timeIncHr;
+				if (currSpeed < endSpeed) {
+					currSpeed += speedDiff;
+					isAccelerating = 1;
+					if(currSpeed > endSpeed)
+						currSpeed = endSpeed;
+				} else if (currSpeed > endSpeed) {
+					currSpeed -= speedDiff;
+					isAccelerating = -1;
+					if(currSpeed < endSpeed)
+						currSpeed = endSpeed;
+				}
+			}
+
+			FIODataPoint currWeatherPoint = chooseReport(inflectionPoint, currTime);
+
+			double latitude = currPoint.getLat();
+			double chargeDiff = calculateChargeDiff(prevPoint, currPoint,
+					currWeatherPoint, currSpeed, timeIncHr, sunriseTime, sunsetTime, latitude, currTime, isAccelerating);
+			currCharge += chargeDiff;
+			if (currCharge > 100)
+				currCharge = 100;
+			if (currCharge < 0)
+				currCharge = 0;
+			if (currCharge <= minCharge) {
+				runSuccessful = false;
+				break;
+			}
+			currStatus = new TelemDataPacket(currSpeed, carStartState.getTotalVoltage(), carStartState.getTemperatures(),
+					carStartState.getCellVoltages(), currCharge);
+
+			LocationReport currLocReport = new LocationReport(currPoint, "Raven", "Simmed");
+
+			SimFrame currSimFrame = new SimFrame(currWeatherPoint, currStatus, (currTime-prevTime), currLocReport, currTime, lapNum);
+			listOfFrames.add(currSimFrame);
+			prevTime = currTime;
+			prevPoint = currPoint;
+		}
+
+		SimResult result = new SimResult(listOfFrames, currTime - startTime, currStatus, speedProfile, runSuccessful);
+
+		return result;
+	}
+
 	public double getInclinationAngle(GeoCoord startPoint, GeoCoord endPoint) {
 		double inclinationAngle = 0;
 		double distance = startPoint.calculateDistance(endPoint) * 1000;
