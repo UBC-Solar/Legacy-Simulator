@@ -679,5 +679,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		@Override
 		public void register() {
 			mySession.register(this, NewSimulationReportNotification.class);
+			mySession.register(this, NewMapLoadedNotification.class);
 		}
 }
