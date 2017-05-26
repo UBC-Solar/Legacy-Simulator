@@ -115,6 +115,101 @@ public class SimController extends ModuleController {
 
 		this.mySession.sendNotification(new NewSimulationReportNotification(toSend));
 	}
+	
+	public void runSimulationWithManualSpeeds(int laps, long startTime, Map<GeoCoord, Map<Integer, Double>> manualSpeedProfile)
+			throws NoForecastReportException, NoLoadedRouteException, NoLocationReportedException,
+			NoCarStatusException {
+		if (laps <= 0) {
+			throw new IllegalArgumentException("Number of Laps too low, must go at least 1 lap");
+		}
+		// Compile all the information we need.
+		LocationReport lastReported = this.mySession.getMapController().getLastReportedLocation();
+		if (lastReported == null) {
+			throw new NoLocationReportedException();
+		}
+		Route routeToTraverse = this.mySession.getMapController().getAllPoints();
+
+		if (routeToTraverse == null) {
+			throw new NoLoadedRouteException();
+		}
+		TelemDataPacket lastCarReported = this.mySession.getMyCarController().getLastTelemDataPacket();
+		if (lastCarReported == null) {
+			throw new NoCarStatusException();
+		}
+
+		SimResult result = null;
+		List<SimFrame> resultFrames = new ArrayList<SimFrame>(); //list of sim frames
+		//idea is to use runSimV2 for every part of the route where the car travels at constant speed until the speed change
+		//the point with the different speed would be the last point, and the point after would be the start of the next simulation
+		GeoCoord start = routeToTraverse.getTrailMarkers().get(1); //first point of the simulation (need to ask why its 1, running point 0 to 1 is always a fail)
+		GeoCoord end; //last point of the simulation
+		TreeMap<Integer, ForecastIO> inflectionPoints = mySession.getMyWeatherController()
+				.findInflectionPoints(routeToTraverse, currentForecastReport.getForecasts());
+		ForecastIO current_forecast = inflectionPoints.get(inflectionPoints.keySet().toArray()[0]);
+		long nextStartTime = startTime;
+		long totalTime = 0;
+		
+		for (int i = 1; i <= laps; i++) {
+			//iterate through all the points except for the last point (perserve last point for one last runSimV2 call since car may be traveling at constant speeds
+			//until the end
+			for (int point_index = 1; point_index < routeToTraverse.getTrailMarkers().size() - 1; point_index++) {
+				//check to see if an inflection point has reached and a new forecast is used
+				if (inflectionPoints.keySet().contains(i)) {
+					current_forecast = inflectionPoints.get(i);
+				}
+				
+				//check to see if there is a speed change
+				//if there is, run a simulation and update list of sim frames, new start speed, new start point, start time and car status using results
+				if (Math.abs(manualSpeedProfile.get(start).get(i) - manualSpeedProfile.get(routeToTraverse.getTrailMarkers().get(point_index)).get(i)) > 0.000001) {
+					end = routeToTraverse.getTrailMarkers().get(point_index);
+					//min charge is set to 0. Since speeds are decided by users and no adjustments will be made, we let the simulation use up all the charge
+					//for each runSimV2 call. We assume that if the cannot make it through without conserving charge for the next runSimV2 call (giving a non-zero
+					//value for min charge), it will not make it through if charge is conserved (may need to change for single lap routes, definitely needs tweaking for
+					//for multiple laps)
+					result = new SimEngine().runSimV2(routeToTraverse, start, end,
+							lastCarReported, manualSpeedProfile.get(start).get(i), manualSpeedProfile.get(end).get(i),
+							nextStartTime, i, 0, current_forecast);
+					//if sim is not successful, remove all the points before the end of the sim (only want to graph to the point the car fails, so speeds after 
+					//that needs to be removed in speed profile)
+					if(!result.wasRunSuccessful()) {
+						for (int removed_point = routeToTraverse.getTrailMarkers().size() - 1; (!end.equals(removed_point) && removed_point >= 0);removed_point--) {
+							manualSpeedProfile.remove(routeToTraverse.getTrailMarkers().get(removed_point));
+						}
+						break;
+					}
+					//if sim is successful, update parameters
+					start = routeToTraverse.getTrailMarkers().get(point_index++);
+					lastCarReported = result.getFinalTelemData();
+					resultFrames.addAll(result.getListOfFrames()); // add sim frames to list
+	                nextStartTime += result.getTravelTime();
+	                totalTime += result.getTravelTime();
+				}
+			}
+			//after simulating almost the whole route, check to see if simulations were successful
+			//if not, print error message 
+			if (!result.wasRunSuccessful()) {
+				System.err.println("Car cannot make it through the route with selected speeds");
+				break;
+			}
+			//if everything has been successful so far, run one last simulation to the end of the route
+			//this cannot be done in the previous for loop since the loop only runs simulations if there is a speed change
+			//most, if not all of the time, the speed would be constant from one point of the route to the end, and this 
+			//will not trigger a runSimV2 call in the for loop
+			else {
+				result = new SimEngine().runSimV2(routeToTraverse, start, routeToTraverse.getTrailMarkers().get(routeToTraverse.getTrailMarkers().size() - 1),
+						lastCarReported, manualSpeedProfile.get(start).get(i), 
+						manualSpeedProfile.get(routeToTraverse.getTrailMarkers().get(routeToTraverse.getTrailMarkers().size()-1)).get(i),
+						nextStartTime, i, 0, current_forecast);
+				
+				lastCarReported = result.getFinalTelemData();
+				resultFrames.addAll(result.getListOfFrames()); // add sim frames to list
+	            totalTime += result.getTravelTime();
+			}
+		}
+		SimulationReport toSend = new SimulationReport(resultFrames, manualSpeedProfile, "some info");
+
+		this.mySession.sendNotification(new NewSimulationReportNotification(toSend)); //send new sim report to be graphed
+	}
 
 	/**
 	 * this is where the class receives any notifications it registered for. the
@@ -199,7 +294,7 @@ public class SimController extends ModuleController {
 			int pointsPerSubChunk = (chunkEnd - chunkStart + 1) / subchunksPerForecast;
 			int remainder = (chunkEnd - chunkStart + 1) % subchunksPerForecast;
 			
-			for (int i = chunkStart; i < chunkEnd; i += pointsPerSubChunk ) {
+			for (int i = chunkStart; i <= chunkEnd; i += pointsPerSubChunk ) {
 				minCharge = getMinCharge(numSubchunksPerLap * totalNumLaps,
                         (currentSubChunk + (lapNum - 1) * numSubchunksPerLap));
 				if (remainder > 0) {
@@ -292,8 +387,6 @@ public class SimController extends ModuleController {
 		double finalSpeed = startingSpeed;
 		double currSpeed = finalSpeed;
 		boolean completed = true;
-		
-		// initialize every geo coord of the chunk with the same speed
 		boolean validprofile = false; // flag to check if the car will run out
 										// of charge
 
