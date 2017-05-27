@@ -152,7 +152,7 @@ public class SimController extends ModuleController {
 		for (int i = 1; i <= laps; i++) {
 			//iterate through all the points except for the last point (perserve last point for one last runSimV2 call since car may be traveling at constant speeds
 			//until the end
-			for (int point_index = 1; point_index < routeToTraverse.getTrailMarkers().size() - 1; point_index++) {
+			for (int point_index = 1; point_index < routeToTraverse.getTrailMarkers().size(); point_index++) {
 				//check to see if an inflection point has reached and a new forecast is used
 				if (inflectionPoints.keySet().contains(i)) {
 					current_forecast = inflectionPoints.get(i);
@@ -160,7 +160,8 @@ public class SimController extends ModuleController {
 				
 				//check to see if there is a speed change
 				//if there is, run a simulation and update list of sim frames, new start speed, new start point, start time and car status using results
-				if (Math.abs(manualSpeedProfile.get(start).get(i) - manualSpeedProfile.get(routeToTraverse.getTrailMarkers().get(point_index)).get(i)) > 0.000001) {
+				if (Math.abs(manualSpeedProfile.get(start).get(i) - manualSpeedProfile.get(routeToTraverse.getTrailMarkers().get(point_index)).get(i)) > 0.000001 ||
+						point_index == routeToTraverse.getTrailMarkers().size()) {
 					end = routeToTraverse.getTrailMarkers().get(point_index);
 					//min charge is set to 0. Since speeds are decided by users and no adjustments will be made, we let the simulation use up all the charge
 					//for each runSimV2 call. We assume that if the cannot make it through without conserving charge for the next runSimV2 call (giving a non-zero
@@ -172,19 +173,26 @@ public class SimController extends ModuleController {
 					//if sim is not successful, remove all the points before the end of the sim (only want to graph to the point the car fails, so speeds after 
 					//that needs to be removed in speed profile)
 					if(!result.wasRunSuccessful()) {
+						System.err.println("Car cannot make it through the route with selected speeds");
 						for (int removed_point = routeToTraverse.getTrailMarkers().size() - 1; (!end.equals(removed_point) && removed_point >= 0);removed_point--) {
 							manualSpeedProfile.remove(routeToTraverse.getTrailMarkers().get(removed_point));
 						}
 						break;
 					}
 					//if sim is successful, update parameters
-					start = routeToTraverse.getTrailMarkers().get(point_index++);
+					if (point_index < routeToTraverse.getTrailMarkers().size() - 1) {
+						start = routeToTraverse.getTrailMarkers().get(++point_index);
+					}
 					lastCarReported = result.getFinalTelemData();
 					resultFrames.addAll(result.getListOfFrames()); // add sim frames to list
 	                nextStartTime += result.getTravelTime();
 	                totalTime += result.getTravelTime();
 				}
+				if (!result.wasRunSuccessful()) {
+					break;
+				}
 			}
+			/*
 			//after simulating almost the whole route, check to see if simulations were successful
 			//if not, print error message 
 			if (!result.wasRunSuccessful()) {
@@ -204,7 +212,7 @@ public class SimController extends ModuleController {
 				lastCarReported = result.getFinalTelemData();
 				resultFrames.addAll(result.getListOfFrames()); // add sim frames to list
 	            totalTime += result.getTravelTime();
-			}
+			}*/
 		}
 		SimulationReport toSend = new SimulationReport(resultFrames, manualSpeedProfile, "some info");
 

@@ -118,14 +118,14 @@ public class SimChangeSpeedsWindow extends JFrame {
 		        
 		        contentPane.add(spinnerSpeeds.get(i), gbc_spinnerSpeeds.get(i));
 		        
-		       // spinnerSpeeds.get(i).addChangeListener(new SliderListener()); for real time change to graph
+		        spinnerSpeeds.get(i).addChangeListener(new SliderListener()); //for real time change to graph
 			} catch (NoLoadedRouteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
     	}
     }
-    /* For real time change to graph
+    /* For real time change to graph*/
     private class SliderListener implements ChangeListener {
 
 		@Override
@@ -133,7 +133,7 @@ public class SimChangeSpeedsWindow extends JFrame {
 			createNewSpeedProfile();
 			
 		}
-    }*/
+    }
     
     private void createNewSpeedProfile() {
     	ArrayList<GeoCoord> allPoints = currentRoute.getTrailMarkers();
