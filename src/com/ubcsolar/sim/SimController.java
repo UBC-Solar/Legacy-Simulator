@@ -188,10 +188,11 @@ public class SimController extends ModuleController {
 	                nextStartTime += result.getTravelTime();
 	                totalTime += result.getTravelTime();
 				}
-				if (!result.wasRunSuccessful()) {
-					break;
-				}
 			}
+			if (!result.wasRunSuccessful()) {
+				break;
+			}
+		}
 			/*
 			//after simulating almost the whole route, check to see if simulations were successful
 			//if not, print error message 
@@ -213,7 +214,7 @@ public class SimController extends ModuleController {
 				resultFrames.addAll(result.getListOfFrames()); // add sim frames to list
 	            totalTime += result.getTravelTime();
 			}*/
-		}
+		
 		SimulationReport toSend = new SimulationReport(resultFrames, manualSpeedProfile, "some info");
 
 		this.mySession.sendNotification(new NewSimulationReportNotification(toSend)); //send new sim report to be graphed
