@@ -66,6 +66,15 @@ public class SimChangeSpeedsWindow extends JFrame {
         gbc_btnAddNewDistance.gridx = 0;
         gbc_btnAddNewDistance.gridy = importantPoints.size() + 2;
         contentPane.add(btnAddNewDistance, gbc_btnAddNewDistance);
+		
+		SimChangeSpeedsWindow thisWindow = this;
+		
+		btnAddNewDistance.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				JFrame frame = new CustomSpeedsWindow(mySession, thisWindow, lastSimReport, currentRoute);
+				frame.setVisible(true);
+			}	
+		});
         
         JButton btnCreateNewSpeedProfile = new JButton("create new speed profile");
         GridBagConstraints gbc_btnCreateNewSpeedProfile = new GridBagConstraints();
