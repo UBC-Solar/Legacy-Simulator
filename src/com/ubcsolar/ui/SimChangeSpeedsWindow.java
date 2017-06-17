@@ -9,9 +9,14 @@ import com.ubcsolar.map.MapController;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -121,12 +126,22 @@ public class SimChangeSpeedsWindow extends JFrame {
 		        spinnerSpeeds.get(i).setValue((int)speedReport.get(currPoint).get(1).doubleValue());//TODO: change second get to use lapNum instead of hardcoded 1
 		        
 		        contentPane.add(spinnerSpeeds.get(i), gbc_spinnerSpeeds.get(i));
-				
+		        
+		        spinnerSpeeds.get(i).addChangeListener(new SliderListener()); //for real time change to graph
 			} catch (NoLoadedRouteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
     	}
+    }
+    /* For real time change to graph*/
+    private class SliderListener implements ChangeListener {
+
+		@Override
+		public void stateChanged(ChangeEvent arg0) {
+			createNewSpeedProfile();
+			
+		}
     }
     
     private void createNewSpeedProfile() {
@@ -159,5 +174,6 @@ public class SimChangeSpeedsWindow extends JFrame {
     	
     	//TODO: do something other than print this speed profile
     	//e.g. => this.parent.runFancyNewSim(newSpeedProfile)
+    	this.myParent.runSimulationwithManualSpeeds(newSpeedProfile);
     }
 }

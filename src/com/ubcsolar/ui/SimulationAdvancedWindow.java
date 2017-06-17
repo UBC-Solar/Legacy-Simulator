@@ -299,7 +299,28 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				this.handleError("No Car Status Reported Yet");
 				return;
 			}
-	}
+		}
+		
+		protected void runSimulationwithManualSpeeds(Map<GeoCoord, Map<Integer, Double>> manualspeeds) {
+			int numLaps = lapSelectComboBox.getSelectedIndex() + 1; //0 based index.
+			long startTimeMillis = getStartTimeInMillis();
+			try {
+				mySession.getMySimController().runSimulationWithManualSpeeds(numLaps, startTimeMillis, manualspeeds);
+			} catch (NoForecastReportException e) {
+				this.handleError("No Forcecasts Loaded");
+				return;
+			} catch (NoLoadedRouteException e) {
+				this.handleError("No Route Loaded");
+				return;
+			} catch (NoLocationReportedException e) {
+				this.handleError("No Location Reported Yet");
+				return;
+			} catch (NoCarStatusException e) {
+				this.handleError("No Car Status Reported Yet");
+				return;
+			}
+		}
+		
 		
 		private long getStartTimeInMillis(){
 			long currTime = System.currentTimeMillis();
