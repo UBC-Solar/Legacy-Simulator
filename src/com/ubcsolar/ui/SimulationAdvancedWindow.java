@@ -10,6 +10,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import com.ubcsolar.common.*;
+import com.ubcsolar.notification.NewMapLoadedNotification;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -23,10 +25,6 @@ import org.jfree.data.xy.XYDataset;
 
 import com.ubcsolar.Main.GlobalController;
 import com.ubcsolar.Main.GlobalValues;
-import com.ubcsolar.common.GeoCoord;
-import com.ubcsolar.common.Listener;
-import com.ubcsolar.common.SimFrame;
-import com.ubcsolar.common.SimulationReport;
 import com.ubcsolar.exception.NoCarStatusException;
 import com.ubcsolar.exception.NoForecastReportException;
 import com.ubcsolar.exception.NoLoadedRouteException;
@@ -68,9 +66,6 @@ import javax.swing.SpinnerNumberModel;
 
 public class SimulationAdvancedWindow extends JFrame implements Listener{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 2684909507474196406L;
 	private JPanel contentPane; //the root content holder
 	private GlobalController mySession; 
@@ -87,16 +82,15 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private ChartPanel SoCChartPanel;
 	private JFreeChart SoCChart;
 	private SimulationReport lastSimReport; //cache the last simReport
+	private Route currentRoute;
 	
-	
-	private final int KM_PER_SLIDER = 1; //could make this dynamic to allow for slider 'zooming'
-	private final double KM_PER_SLIDER_DOUBLE = 0.3;
+
 	private boolean showSpeed = true;
 	private boolean showStateOfCharge = true;
 	private boolean showCloud = true;
 	private boolean showElevation = true;
 	private boolean showTime = true;
-	//private List<SliderSpinnerFrame> displayedSpeedSliderSpinners = new ArrayList<SliderSpinnerFrame>();
+
 
 	
 	private boolean showWelcomeMessageAgain = true;
@@ -110,6 +104,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 	private JLabel lblDesiredSimStart;
 	private JLabel lblHour;
 	private JSpinner hourSpinner;
+	private JButton btnManuallySetSpeeds;
 
 	private void handleError(String message){
 		JOptionPane.showMessageDialog(this, message);
@@ -202,88 +197,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		buttonPanel.add(btnNewSimulation);
 		
-		/*JCheckBox chckbxSpeed = new JCheckBox("Speed");
-		chckbxSpeed.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				showSpeed = chckbxSpeed.isSelected();
-				
-				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
-				JFrame frame = new LoadingWindow(mySession);
-				frame.setVisible(true);
-				refreshChart();
-				frame.setVisible(false);
-				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			}
-		});
-		chckbxSpeed.setSelected(true);
-		buttonPanel.add(chckbxSpeed);
-		
-		JCheckBox chckbxSoc = new JCheckBox("SoC");
-		chckbxSoc.setSelected(true);
-		chckbxSoc.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				showStateOfCharge = chckbxSoc.isSelected();
-				
-				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
-				JFrame frame = new LoadingWindow(mySession);
-				frame.setVisible(true);
-				refreshChart();
-				frame.setVisible(false);
-				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			}
-		});
-		buttonPanel.add(chckbxSoc);
-		
-		
-		
-		JCheckBox chckbxCloud = new JCheckBox("Cloud");
-		chckbxCloud.setSelected(true);
-		chckbxCloud.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				showCloud = chckbxCloud.isSelected();
-				
-				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
-				JFrame frame = new LoadingWindow(mySession);
-				frame.setVisible(true);
-				refreshChart();
-				frame.setVisible(false);
-				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			}
-		});
-		buttonPanel.add(chckbxCloud);
-		
-		JCheckBox chckbxElevation = new JCheckBox("Elevation");
-		chckbxElevation.setSelected(true);
-		chckbxElevation.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				showElevation = chckbxElevation.isSelected();
-
-				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
-				JFrame frame = new LoadingWindow(mySession);
-				frame.setVisible(true);
-				refreshChart();
-				frame.setVisible(false);
-				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			}
-		});
-		buttonPanel.add(chckbxElevation);
-		
-		checkBoxTime = new JCheckBox("Time");
-		checkBoxTime.setSelected(showTime);
-		checkBoxTime.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				showTime = checkBoxTime.isSelected();
-
-				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));// changing the cursor type
-				JFrame frame = new LoadingWindow(mySession);
-				frame.setVisible(true);
-				refreshChart();
-				frame.setVisible(false);
-				contentPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			}
-		});
-		buttonPanel.add(checkBoxTime);*/
-		
 		lapSelectComboBox = new JComboBox<Integer>();
 		lapSelectComboBox.setPreferredSize(new Dimension(39, 18));
 		lapSelectComboBox.setEditable(true);
@@ -299,15 +212,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		
 		lblTotalTimeTaken = new JLabel("Total Time Taken");
 		buttonPanel.add(lblTotalTimeTaken);
-		
-//		JPanel SpeedChartHoldingPanel = new JPanel();
-//		contentPane.add(SpeedChartHoldingPanel, BorderLayout.CENTER);
-//		GridBagLayout gbl_SpeedChartHoldingPanel = new GridBagLayout();
-//		gbl_SpeedChartHoldingPanel.columnWidths = new int[]{0, 0, 0};
-//		gbl_SpeedChartHoldingPanel.rowHeights = new int[] {271, 0, 0};
-//		gbl_SpeedChartHoldingPanel.columnWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
-//		gbl_SpeedChartHoldingPanel.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
-//		SpeedChartHoldingPanel.setLayout(gbl_SpeedChartHoldingPanel);
 		
 		JFreeChart SpeedChart = createChart(createBlankDataset(), "Speed");
 		
@@ -331,8 +235,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		SpeedChartPanel = new ChartPanel(SpeedChart);
 		SpeedChartPanel.setMouseZoomable(true);
 		SpeedChartPanel.setMouseWheelEnabled(true);
-		//SpeedChartPanel.setName("Speed");
-		//buildChart(createBlankDataset(), SpeedChartPanel);
+
 		GridBagConstraints gbc_SpeedChartPanel = new GridBagConstraints();
 		gbc_SpeedChartPanel.weighty = 10.0;
 		gbc_SpeedChartPanel.insets = new Insets(0, 0, 5, 5);
@@ -341,21 +244,11 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		gbc_SpeedChartPanel.gridy = 2;
 		contentPane.add(SpeedChartPanel, gbc_SpeedChartPanel);
 		
-//		JPanel SoCChartHoldingPanel = new JPanel();
-//		contentPane.add(SoCChartHoldingPanel, BorderLayout.SOUTH);
-//		GridBagLayout gbl_SoCChartHoldingPanel = new GridBagLayout();
-//		gbl_SoCChartHoldingPanel.columnWidths = new int[]{0, 0, 0};
-//		gbl_SoCChartHoldingPanel.rowHeights = new int[] {271, 0, 0};
-//		gbl_SoCChartHoldingPanel.columnWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
-//		gbl_SoCChartHoldingPanel.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
-//		SoCChartHoldingPanel.setLayout(gbl_SoCChartHoldingPanel);
-		
 		JFreeChart SoCChart = createChart(createBlankDataset(), "State of Charge");
 		SoCChartPanel = new ChartPanel(SoCChart);
 		SoCChartPanel.setMouseZoomable(true);
 		SoCChartPanel.setMouseWheelEnabled(true);
-		//SoCChartPanel.setName("State of Charge");
-		//buildChart(createBlankDataset(), SoCChartPanel);
+
 		GridBagConstraints gbc_SoCChartPanel = new GridBagConstraints();
 		gbc_SoCChartPanel.weighty = 10.0;
 		gbc_SoCChartPanel.insets = new Insets(0, 0, 5, 5);
@@ -363,6 +256,22 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		gbc_SoCChartPanel.gridx = 0;
 		gbc_SoCChartPanel.gridy = 3;
 		contentPane.add(SoCChartPanel, gbc_SoCChartPanel);
+		
+		btnManuallySetSpeeds = new JButton("Manually set speeds");
+		GridBagConstraints gbc_btnManuallySetSpeeds = new GridBagConstraints();
+		gbc_btnManuallySetSpeeds.insets = new Insets(0, 0, 0, 5);
+		gbc_btnManuallySetSpeeds.gridx = 0;
+		gbc_btnManuallySetSpeeds.gridy = 4;
+		contentPane.add(btnManuallySetSpeeds, gbc_btnManuallySetSpeeds);
+		
+		SimulationAdvancedWindow thisWindow = this;
+		
+		btnManuallySetSpeeds.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFrame frame = new SimChangeSpeedsWindow(mySession, thisWindow, lastSimReport, currentRoute);
+				frame.setVisible(true);
+			}	
+		});
 		
 		setTitleAndLogo();
 		this.register();
@@ -390,7 +299,28 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				this.handleError("No Car Status Reported Yet");
 				return;
 			}
-	}
+		}
+		
+		protected void runSimulationwithManualSpeeds(Map<GeoCoord, Map<Integer, Double>> manualspeeds) {
+			int numLaps = lapSelectComboBox.getSelectedIndex() + 1; //0 based index.
+			long startTimeMillis = getStartTimeInMillis();
+			try {
+				mySession.getMySimController().runSimulationWithManualSpeeds(numLaps, startTimeMillis, manualspeeds);
+			} catch (NoForecastReportException e) {
+				this.handleError("No Forcecasts Loaded");
+				return;
+			} catch (NoLoadedRouteException e) {
+				this.handleError("No Route Loaded");
+				return;
+			} catch (NoLocationReportedException e) {
+				this.handleError("No Location Reported Yet");
+				return;
+			} catch (NoCarStatusException e) {
+				this.handleError("No Car Status Reported Yet");
+				return;
+			}
+		}
+		
 		
 		private long getStartTimeInMillis(){
 			long currTime = System.currentTimeMillis();
@@ -400,30 +330,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		
 		private Map<GeoCoord,Map<Integer, Double>> generateRequestedSpeedMap() {
 			HashMap<GeoCoord,Map<Integer, Double>> toReturn = new HashMap<GeoCoord, Map<Integer,Double>>();
-			/*Random rng = new Random();
-			if(rng.nextBoolean()){
-				for(SimFrame g : this.lastSimReport.getSimFrames()){
-					toReturn.put(g.getGPSReport().getLocation(), 25.0);
-				}
-			}*/ //used this for testing. 
-			
-			/*for(SliderSpinnerFrame f : this.displayedSpeedSliderSpinners){
-				if(f.isManuallySet()){
-					int lapNumber = f.getLapNumber();
-					for(GeoCoord g : f.getRepresentedCoordinates()){
-						if(toReturn.get(g) == null){
-							Map<Integer, Double> lapAndSpeed = new HashMap<Integer,Double>();
-							lapAndSpeed.put(lapNumber, f.getValue()+0.0);
-							toReturn.put(g,lapAndSpeed);
-						}
-						else{
-							toReturn.get(g).put(lapNumber, f.getValue()+0.0); //the '+0.0' is to make it a Double.
-						}
-						 
-					}
-					System.out.println("Manually Requesting speed to: " + f.getValue());
-				}
-			}*/
 			
 			return toReturn;
 		}
@@ -515,7 +421,10 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				updateChart(test.getSimReport(), startDistance);
 				this.validate();
 				this.repaint();
-				
+			}
+			if(n.getClass() == NewMapLoadedNotification.class){
+				NewMapLoadedNotification theMapNotification = (NewMapLoadedNotification) n;
+				this.currentRoute = theMapNotification.getRoute();
 			}
 			
 		}
@@ -540,7 +449,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 			lblTotalTimeTaken.setText("Total Time Taken: " + roundedTime + " minutes");
 			
 			if(simReport.getSimFrames().size() == 0){
-				//this.setDefaultChart(); //last sim was deleted.
+
 				SpeedChart = createChart(createBlankDataset(), "Speed");
 				SoCChart = createChart(createBlankDataset(), "State of Charge");
 				this.SpeedChartPanel.setChart(SpeedChart);
@@ -592,9 +501,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				SpeedPlot.mapDatasetToRangeAxis(0, 0);
 				final StandardXYItemRenderer renderer2 = new StandardXYItemRenderer();
 				renderer2.setSeriesPaint(0, Color.black);
-				//renderer.setBaseLegendTextFont(new Font("Helvetica", Font.BOLD, 11));
+
 				renderer2.setSeriesStroke(0, new BasicStroke(2)); // The parameter in new BasicStroke specifies the thickness
-				//renderer2.setPlotShapes(true);
+
 				SpeedPlot.setRenderer(0, renderer2);
 			}
 		
@@ -609,7 +518,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				final StandardXYItemRenderer renderer3 = new StandardXYItemRenderer();
 				renderer3.setSeriesPaint(0, Color.blue);
 				renderer3.setSeriesStroke(0, new BasicStroke(2));
-				//renderer2.setPlotShapes(true);
+
 				SoCPlot.setRenderer(0, renderer3);
 			}
 			
@@ -624,7 +533,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				final StandardXYItemRenderer renderer4 = new StandardXYItemRenderer();
 				renderer4.setSeriesPaint(0, Color.green);
 				renderer4.setSeriesStroke(0, new BasicStroke(2));
-				//renderer2.setPlotShapes(true);
+
 				plot.setRenderer(3, renderer4);
 			}
 			
@@ -639,7 +548,7 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				final StandardXYItemRenderer renderer5 = new StandardXYItemRenderer();
 				renderer5.setSeriesPaint(0, Color.RED);
 				renderer5.setSeriesStroke(0, new BasicStroke(2));
-				//renderer2.setPlotShapes(true);
+
 				plot.setRenderer(4, renderer5);
 			}
 			
@@ -653,9 +562,9 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 				plot.mapDatasetToRangeAxis(5, 5);
 				final StandardXYItemRenderer renderer5 = new StandardXYItemRenderer();
 				renderer5.setSeriesPaint(0, Color.WHITE);
-				//renderer.setBaseLegendTextFont(new Font("Helvetica", Font.BOLD, 11));
+
 				renderer5.setSeriesStroke(0, new BasicStroke(2));
-				//renderer2.setPlotShapes(true);
+
 				plot.setRenderer(5, renderer5);
 			}
 			
@@ -791,5 +700,6 @@ public class SimulationAdvancedWindow extends JFrame implements Listener{
 		@Override
 		public void register() {
 			mySession.register(this, NewSimulationReportNotification.class);
+			mySession.register(this, NewMapLoadedNotification.class);
 		}
 }
